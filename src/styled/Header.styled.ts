@@ -1,0 +1,116 @@
+import { StyleSheet } from 'react-native';
+import { globalShadows, theme } from './theme.styled';
+
+export const headerStyles = StyleSheet.create({
+  container: {
+    backgroundColor: theme.colors.background,
+    paddingTop: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  profileGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 12,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.primarySoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.mintBdr,
+  },
+  avatarWrapper: {
+    position: 'relative',
+    marginRight: 12,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    borderWidth: 2,
+    borderColor: theme.colors.primarySoft,
+  },
+  avatarText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  onlineBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: theme.colors.onlineBadge,
+    borderWidth: 2,
+    borderColor: theme.colors.surface,
+  },
+  greetingContainer: {
+    justifyContent: 'center',
+    flex: 1,
+  },
+  welcomeText: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    fontWeight: '500',
+    letterSpacing: 0.1,
+    marginBottom: 2,
+  },
+  doctorName: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    letterSpacing: -0.2,
+  },
+  pageTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  specialtyText: {
+    fontSize: 11,
+    color: theme.colors.primary,
+    fontWeight: '600',
+    marginTop: 1,
+  },
+
+  actionsGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surfaceSecondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: theme.spacing.sm,
+    position: 'relative',
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 9,
+    right: 9,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.danger,
+  },
+});
