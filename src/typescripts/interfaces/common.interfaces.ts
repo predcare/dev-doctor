@@ -9,6 +9,7 @@ export interface IRootResponse<T> {
   success: number | boolean;
   message: string;
   data: T;
+  user?: T;
   token?: string;
   status?: number;
   meta: IPaginateMeta;

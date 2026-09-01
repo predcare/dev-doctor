@@ -14,7 +14,10 @@ export enum HttpStatusCode {
   ServiceUnavailable = 503,
 }
 
-export type TStatusCodes = `${Extract<HttpStatusCode, number>}` extends `${infer N extends number}`
+export type TStatusCodes = `${Extract<
+  HttpStatusCode,
+  number
+>}` extends `${infer N extends number}`
   ? N
   : never;
 export interface IBaseApiRoot {
@@ -24,4 +27,5 @@ export interface IBaseApiRoot {
   token: string;
   data: unknown;
   statusCode: number;
+  success?: number | boolean;
 }

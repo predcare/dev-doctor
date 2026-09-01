@@ -11,7 +11,7 @@ import {
 import Path from 'react-native-svg/src/elements/Path';
 import Svg from 'react-native-svg/src/elements/Svg';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { showSuccessToast } from '../../lib/commons/toast.utils';
+import { showSuccessToast } from '../../lib/common/toast.utils';
 import {
   MOCK_APPOINTMENTS,
   MOCK_AVAILABLE_DATES,
@@ -81,7 +81,7 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header */}
       <View style={S.headerWrap}>

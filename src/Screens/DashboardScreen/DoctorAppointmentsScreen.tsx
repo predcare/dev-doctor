@@ -29,8 +29,7 @@ import {
   VideoIcon,
 } from '../../components/ui/icons';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { Header } from '../../Layout/Header';
-import { showInfoToast, showSuccessToast } from '../../lib/commons/toast.utils';
+import { showInfoToast, showSuccessToast } from '../../lib/common/toast.utils';
 import { MOCK_APPOINTMENTS, MockAppointment } from '../../resources/mockData';
 import type { DoctorAppointmentsScreenProps } from '../../route';
 import {
@@ -42,31 +41,26 @@ import { theme } from '../../styled/theme.styled';
 type TabType = 'both' | 'inperson' | 'video';
 type DateRangeFilter = 'today' | 'tomorrow' | 'thisweek' | 'all';
 
-export const DoctorAppointmentsScreen: React.FC<
-  DoctorAppointmentsScreenProps
-> = ({ navigation }) => {
-  const [appointmentsList, setAppointmentsList] =
-    useState<MockAppointment[]>(MOCK_APPOINTMENTS);
+export const DoctorAppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({
+  navigation,
+}) => {
+  const [appointmentsList, setAppointmentsList] = useState<MockAppointment[]>(MOCK_APPOINTMENTS);
   const [activeTab, setActiveTab] = useState<TabType>('both');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter Bottom Sheet State - default to 'all' & [] so all appointments display clearly
   const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const [filterDateRange, setFilterDateRange] =
-    useState<DateRangeFilter>('all');
+  const [filterDateRange, setFilterDateRange] = useState<DateRangeFilter>('all');
   const [filterStatuses, setFilterStatuses] = useState<string[]>([]);
 
   // Pending filter choices inside modal
-  const [pendingDateRange, setPendingDateRange] =
-    useState<DateRangeFilter>('all');
+  const [pendingDateRange, setPendingDateRange] = useState<DateRangeFilter>('all');
   const [pendingStatuses, setPendingStatuses] = useState<string[]>([]);
 
   // Details Modal
-  const [selectedDetailsApt, setSelectedDetailsApt] =
-    useState<MockAppointment | null>(null);
+  const [selectedDetailsApt, setSelectedDetailsApt] = useState<MockAppointment | null>(null);
 
-  const isFilterApplied =
-    filterDateRange !== 'all' || filterStatuses.length > 0;
+  const isFilterApplied = filterDateRange !== 'all' || filterStatuses.length > 0;
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -96,25 +90,15 @@ export const DoctorAppointmentsScreen: React.FC<
 
   const filteredAppointments = appointmentsList.filter(apt => {
     // Custom tab filter
-    if (activeTab === 'video' && apt.consultation_type !== 'video')
-      return false;
-    if (activeTab === 'inperson' && apt.consultation_type === 'video')
-      return false;
+    if (activeTab === 'video' && apt.consultation_type !== 'video') return false;
+    if (activeTab === 'inperson' && apt.consultation_type === 'video') return false;
 
     // Date range filter
-    if (filterDateRange === 'today' && apt.appointment_date !== '2026-08-18')
-      return false;
-    if (filterDateRange === 'tomorrow' && apt.appointment_date !== '2026-08-19')
-      return false;
+    if (filterDateRange === 'today' && apt.appointment_date !== '2026-08-18') return false;
+    if (filterDateRange === 'tomorrow' && apt.appointment_date !== '2026-08-19') return false;
     if (
       filterDateRange === 'thisweek' &&
-      ![
-        '2026-08-18',
-        '2026-08-19',
-        '2026-08-20',
-        '2026-08-21',
-        '2026-08-22',
-      ].includes(apt.appointment_date)
+      !['2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21', '2026-08-22'].includes(apt.appointment_date)
     )
       return false;
 
@@ -137,12 +121,8 @@ export const DoctorAppointmentsScreen: React.FC<
   });
 
   // Top stats
-  const todayCount = appointmentsList.filter(
-    a => a.appointment_date === '2026-08-18',
-  ).length;
-  const upcoming3hCount = appointmentsList.filter(
-    a => a.appointment_status === 'confirmed',
-  ).length;
+  const todayCount = appointmentsList.filter(a => a.appointment_date === '2026-08-18').length;
+  const upcoming3hCount = appointmentsList.filter(a => a.appointment_status === 'confirmed').length;
 
   const handleStartConsultation = (apt: MockAppointment) => {
     if (apt.consultation_type === 'video') {
@@ -167,18 +147,14 @@ export const DoctorAppointmentsScreen: React.FC<
 
   const handleCancelAppointment = (aptId: number) => {
     setAppointmentsList(prev =>
-      prev.map(a =>
-        a.id === aptId ? { ...a, appointment_status: 'cancelled' } : a,
-      ),
+      prev.map(a => (a.id === aptId ? { ...a, appointment_status: 'cancelled' } : a))
     );
     showSuccessToast('Appointment cancelled successfully', 'Cancelled');
   };
 
   const handleCompleteAppointment = (aptId: number) => {
     setAppointmentsList(prev =>
-      prev.map(a =>
-        a.id === aptId ? { ...a, appointment_status: 'completed' } : a,
-      ),
+      prev.map(a => (a.id === aptId ? { ...a, appointment_status: 'completed' } : a))
     );
     showSuccessToast('Appointment marked as completed', 'Completed');
   };
@@ -212,14 +188,19 @@ export const DoctorAppointmentsScreen: React.FC<
   };
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right']}>
-      <Header
-        title="Schedule"
-        subtitle="Manage appointments & consultations"
-        unreadCount={3}
-        onNotificationPress={() => navigation?.navigate('Notifications')}
-        onProfilePress={() => navigation?.navigate('DoctorProfile')}
-      />
+    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+
+      {/* Header */}
+      <View style={S.header}>
+        <TouchableOpacity style={S.backButtonCircle} onPress={() => navigation?.goBack()}>
+          <ChevronLeftIcon size={18} color="#334155" strokeWidth={2.5} />
+        </TouchableOpacity>
+
+        <View style={S.headerContent}>
+          <Text style={S.headerTitle}>Manage Appointments</Text>
+        </View>
+      </View>
 
       {/* Top Stats Cards Row */}
       <View style={S.statsRow}>
@@ -251,10 +232,7 @@ export const DoctorAppointmentsScreen: React.FC<
             returnKeyType="search"
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity
-              onPress={() => setSearchQuery('')}
-              style={{ padding: 4 }}
-            >
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={{ padding: 4 }}>
               <CircleXIcon size={14} color="#94A3B8" />
             </TouchableOpacity>
           )}
@@ -307,8 +285,7 @@ export const DoctorAppointmentsScreen: React.FC<
       {isFilterApplied && (
         <View style={S.filterBanner}>
           <Text style={S.filterBannerTxt}>
-            Filtered · {filteredAppointments.length} appointment
-            {filteredAppointments.length !== 1 ? 's' : ''}
+            Filtered · {filteredAppointments.length} appointment{filteredAppointments.length !== 1 ? 's' : ''}
           </Text>
           <TouchableOpacity onPress={handleResetFilters}>
             <Text style={S.filterBannerClear}>Clear</Text>
@@ -327,15 +304,12 @@ export const DoctorAppointmentsScreen: React.FC<
           <View style={S.emptyContainer}>
             <Text style={{ fontSize: 36 }}>📅</Text>
             <Text style={S.emptyTitle}>No Appointments Found</Text>
-            <Text style={S.emptyText}>
-              No appointments match your search or filter criteria.
-            </Text>
+            <Text style={S.emptyText}>No appointments match your search or filter criteria.</Text>
           </View>
         }
         renderItem={({ item }) => {
           const isVideo = item.consultation_type === 'video';
-          const isCompleted =
-            item.appointment_status.toLowerCase() === 'completed';
+          const isCompleted = item.appointment_status.toLowerCase() === 'completed';
           const statusColor = getStatusColor(item.appointment_status);
           const statusBg = getStatusBackground(item.appointment_status);
 
@@ -391,28 +365,20 @@ export const DoctorAppointmentsScreen: React.FC<
               <View style={S.cardHeader}>
                 <View style={S.patientRow}>
                   <View style={[S.patientAvatar, { backgroundColor: TEAL }]}>
-                    <Text style={S.patientAvatarText}>
-                      {item.patient_name.charAt(0)}
-                    </Text>
+                    <Text style={S.patientAvatarText}>{item.patient_name.charAt(0)}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={S.patientName}>{item.patient_name}</Text>
                     <Text style={S.patientAge}>
                       {item.patient_gender} / {item.patient_age}
                     </Text>
-                    <Text style={S.aptIdText}>
-                      APT ID: {item.appointment_id}
-                    </Text>
+                    <Text style={S.aptIdText}>APT ID: {item.appointment_id}</Text>
                   </View>
                 </View>
 
-                <View
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
-                >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <View style={[S.statusBadge, { backgroundColor: statusBg }]}>
-                    <View
-                      style={[S.statusDot, { backgroundColor: statusColor }]}
-                    />
+                    <View style={[S.statusDot, { backgroundColor: statusColor }]} />
                     <Text style={[S.statusText, { color: statusColor }]}>
                       {item.appointment_status.toUpperCase()}
                     </Text>
@@ -437,33 +403,19 @@ export const DoctorAppointmentsScreen: React.FC<
                   ) : (
                     <ClinicIcon size={12} color="#F97316" />
                   )}
-                  <Text
-                    style={[S.chipText, { color: isVideo ? TEAL : '#F97316' }]}
-                  >
+                  <Text style={[S.chipText, { color: isVideo ? TEAL : '#F97316' }]}>
                     {isVideo ? 'Video Call' : 'In-Clinic'}
                   </Text>
                 </View>
 
                 {/* Date Chip */}
-                <View
-                  style={[
-                    S.chip,
-                    { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' },
-                  ]}
-                >
+                <View style={[S.chip, { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' }]}>
                   <ClockIcon size={12} color="#475569" />
-                  <Text style={[S.chipText, { color: '#475569' }]}>
-                    {item.appointment_date}
-                  </Text>
+                  <Text style={[S.chipText, { color: '#475569' }]}>{item.appointment_date}</Text>
                 </View>
 
                 {/* Time Chip */}
-                <View
-                  style={[
-                    S.chip,
-                    { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' },
-                  ]}
-                >
+                <View style={[S.chip, { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' }]}>
                   <ClockIcon size={12} color="#475569" />
                   <Text style={[S.chipText, { color: '#475569' }]}>
                     {item.start_time} - {item.end_time}
@@ -483,23 +435,13 @@ export const DoctorAppointmentsScreen: React.FC<
 
               {/* Card Footer Actions */}
               <View style={S.cardFooterActions}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 10,
-                  }}
-                >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <TouchableOpacity
                     style={[S.joinButton, { flex: 1 }]}
                     onPress={() => handleStartConsultation(item)}
                     activeOpacity={0.85}
                   >
-                    <PlayCircleIcon
-                      size={20}
-                      color="#FFFFFF"
-                      style={{ marginRight: 8 }}
-                    />
+                    <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
                     <Text style={S.joinButtonText}>
                       {isCompleted
                         ? 'View Details'
@@ -519,11 +461,7 @@ export const DoctorAppointmentsScreen: React.FC<
       />
 
       {/* Details Modal */}
-      <Modal
-        visible={selectedDetailsApt !== null}
-        transparent
-        animationType="slide"
-      >
+      <Modal visible={selectedDetailsApt !== null} transparent animationType="slide">
         <View style={S.modalOverlay}>
           <View style={S.modalContent}>
             <View style={S.modalHeader}>
@@ -535,58 +473,22 @@ export const DoctorAppointmentsScreen: React.FC<
 
             {selectedDetailsApt && (
               <View style={S.modalBody}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '800',
-                    color: theme.colors.dark,
-                  }}
-                >
-                  {selectedDetailsApt.patient_name} (
-                  {selectedDetailsApt.patient_record_id})
+                <Text style={{ fontSize: 16, fontWeight: '800', color: theme.colors.dark }}>
+                  {selectedDetailsApt.patient_name} ({selectedDetailsApt.patient_record_id})
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: theme.colors.textSlate,
-                    marginTop: 4,
-                  }}
-                >
+                <Text style={{ fontSize: 13, color: theme.colors.textSlate, marginTop: 4 }}>
                   📞 Phone: {selectedDetailsApt.patient_phone}
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: theme.colors.textSlate,
-                    marginTop: 2,
-                  }}
-                >
-                  📅 Scheduled: {selectedDetailsApt.appointment_date} (
-                  {selectedDetailsApt.start_time} -{' '}
-                  {selectedDetailsApt.end_time})
+                <Text style={{ fontSize: 13, color: theme.colors.textSlate, marginTop: 2 }}>
+                  📅 Scheduled: {selectedDetailsApt.appointment_date} ({selectedDetailsApt.start_time} - {selectedDetailsApt.end_time})
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: TEAL,
-                    fontWeight: '700',
-                    marginTop: 6,
-                  }}
-                >
-                  Fee: ₹{selectedDetailsApt.appointment_fee} (
-                  {selectedDetailsApt.consultation_type.toUpperCase()})
+                <Text style={{ fontSize: 13, color: TEAL, fontWeight: '700', marginTop: 6 }}>
+                  Fee: ₹{selectedDetailsApt.appointment_fee} ({selectedDetailsApt.consultation_type.toUpperCase()})
                 </Text>
 
                 {!!selectedDetailsApt.reason && (
-                  <View
-                    style={[
-                      S.reasonBox,
-                      { marginTop: 12, marginHorizontal: 0 },
-                    ]}
-                  >
-                    <Text style={S.reasonText}>
-                      Reason: {selectedDetailsApt.reason}
-                    </Text>
+                  <View style={[S.reasonBox, { marginTop: 12, marginHorizontal: 0 }]}>
+                    <Text style={S.reasonText}>Reason: {selectedDetailsApt.reason}</Text>
                   </View>
                 )}
               </View>
@@ -596,8 +498,7 @@ export const DoctorAppointmentsScreen: React.FC<
               <TouchableOpacity
                 style={S.modalDeleteBtn}
                 onPress={() => {
-                  if (selectedDetailsApt)
-                    handleDeleteAppointment(selectedDetailsApt.id);
+                  if (selectedDetailsApt) handleDeleteAppointment(selectedDetailsApt.id);
                 }}
               >
                 <Text style={S.modalDeleteBtnTxt}>Delete Appointment</Text>
@@ -625,18 +526,11 @@ export const DoctorAppointmentsScreen: React.FC<
             <View style={S.sheetHeader}>
               <Text style={S.sheetTitle}>Schedule Filters</Text>
               <TouchableOpacity onPress={() => setShowFilterPanel(false)}>
-                <Text
-                  style={{ fontSize: 18, color: '#64748B', fontWeight: 'bold' }}
-                >
-                  ✕
-                </Text>
+                <Text style={{ fontSize: 18, color: '#64748B', fontWeight: 'bold' }}>✕</Text>
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{ paddingHorizontal: 20 }}
-            >
+            <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: 20 }}>
               <Text style={S.sheetSectionTitle}>DATE RANGE</Text>
 
               {[
@@ -648,27 +542,19 @@ export const DoctorAppointmentsScreen: React.FC<
                 <TouchableOpacity
                   key={opt.key}
                   style={S.filterOptionRow}
-                  onPress={() =>
-                    setPendingDateRange(opt.key as DateRangeFilter)
-                  }
+                  onPress={() => setPendingDateRange(opt.key as DateRangeFilter)}
                 >
                   <Text
                     style={[
                       S.filterOptionTxt,
-                      {
-                        color: pendingDateRange === opt.key ? TEAL : '#1E293B',
-                      },
+                      { color: pendingDateRange === opt.key ? TEAL : '#1E293B' },
                       pendingDateRange === opt.key && { fontWeight: '700' },
                     ]}
                   >
                     {opt.label}
                   </Text>
                   {pendingDateRange === opt.key && (
-                    <Text
-                      style={{ color: TEAL, fontWeight: 'bold', fontSize: 16 }}
-                    >
-                      ✓
-                    </Text>
+                    <Text style={{ color: TEAL, fontWeight: 'bold', fontSize: 16 }}>✓</Text>
                   )}
                 </TouchableOpacity>
               ))}
@@ -687,9 +573,7 @@ export const DoctorAppointmentsScreen: React.FC<
                     style={S.filterOptionRow}
                     onPress={() => {
                       if (selected) {
-                        setPendingStatuses(prev =>
-                          prev.filter(s => s !== st.key),
-                        );
+                        setPendingStatuses(prev => prev.filter(s => s !== st.key));
                       } else {
                         setPendingStatuses(prev => [...prev, st.key]);
                       }
@@ -704,17 +588,7 @@ export const DoctorAppointmentsScreen: React.FC<
                     >
                       {st.label}
                     </Text>
-                    {selected && (
-                      <Text
-                        style={{
-                          color: TEAL,
-                          fontWeight: 'bold',
-                          fontSize: 16,
-                        }}
-                      >
-                        ✓
-                      </Text>
-                    )}
+                    {selected && <Text style={{ color: TEAL, fontWeight: 'bold', fontSize: 16 }}>✓</Text>}
                   </TouchableOpacity>
                 );
               })}

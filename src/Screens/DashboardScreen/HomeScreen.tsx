@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { AppointmentCard } from '../../components/Modules/Dashboard/AppointmentCard';
 import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceBanner';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
@@ -124,8 +118,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
+      {/* Top Header */}
       <Header
-        isHome={true}
+        isHome
         doctorName="Dr. Sarah Jenkins"
         specialty="Cardiologist • MD"
         clinicName="St. Jude Medical Center"
@@ -162,9 +157,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 onPress={() => setShowPeriodMenu(v => !v)}
                 activeOpacity={0.8}
               >
-                <Text style={homeStyles.periodPillText}>
-                  {PERIOD_LABELS[period]}
-                </Text>
+                <Text style={homeStyles.periodPillText}>{PERIOD_LABELS[period]}</Text>
                 {showPeriodMenu ? (
                   <ChevronUpIcon size={12} color={theme.colors.primary} />
                 ) : (
@@ -174,32 +167,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
               {showPeriodMenu && (
                 <View style={homeStyles.periodDropdownMenu}>
-                  {(Object.entries(PERIOD_LABELS) as [PeriodKey, string][]).map(
-                    ([key, label]) => (
-                      <TouchableOpacity
-                        key={key}
-                        onPress={() => {
-                          setPeriod(key);
-                          setShowPeriodMenu(false);
-                        }}
-                        activeOpacity={0.75}
-                        style={homeStyles.periodMenuItem}
+                  {(Object.entries(PERIOD_LABELS) as [PeriodKey, string][]).map(([key, label]) => (
+                    <TouchableOpacity
+                      key={key}
+                      onPress={() => {
+                        setPeriod(key);
+                        setShowPeriodMenu(false);
+                      }}
+                      activeOpacity={0.75}
+                      style={homeStyles.periodMenuItem}
+                    >
+                      <Text
+                        style={[
+                          homeStyles.periodMenuItemText,
+                          period === key && homeStyles.periodMenuItemTextActive,
+                        ]}
                       >
-                        <Text
-                          style={[
-                            homeStyles.periodMenuItemText,
-                            period === key &&
-                              homeStyles.periodMenuItemTextActive,
-                          ]}
-                        >
-                          {label}
-                        </Text>
-                        {period === key && (
-                          <CheckIcon size={14} color={theme.colors.primary} />
-                        )}
-                      </TouchableOpacity>
-                    ),
-                  )}
+                        {label}
+                      </Text>
+                      {period === key && <CheckIcon size={14} color={theme.colors.primary} />}
+                    </TouchableOpacity>
+                  ))}
                 </View>
               )}
             </View>
@@ -227,10 +215,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* Today's Queue / Upcoming Patient Appointments */}
         <View style={homeStyles.sectionHeader}>
           <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
-          <TouchableOpacity
-            onPress={() => navigation?.navigate('Patients')}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity onPress={() => navigation?.navigate('Patients')} activeOpacity={0.7}>
             <Text style={homeStyles.sectionLink}>See All</Text>
           </TouchableOpacity>
         </View>
@@ -264,9 +249,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         ))}
 
         {/* Need Assistance Support Banner */}
-        <AssistanceBanner
-          onContactSupport={() => navigation?.navigate('Notifications')}
-        />
+        <AssistanceBanner onContactSupport={() => navigation?.navigate('Notifications')} />
 
         {/* Quick Access 2x2 Grid */}
         <View style={homeStyles.sectionHeader}>

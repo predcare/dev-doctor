@@ -20,7 +20,14 @@ export interface ListPickerProps {
 }
 
 export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
-  ({ visible, onClose, title, items, selected, onPick }) => (
+  ({
+    visible,
+    onClose,
+    title,
+    items,
+    selected,
+    onPick,
+  }) => (
     <Modal
       visible={visible}
       transparent
@@ -31,10 +38,7 @@ export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
         <View style={s.sheet}>
           <View style={s.sheetHead}>
             <Text style={s.sheetTitle}>{title}</Text>
-            <TouchableOpacity
-              onPress={onClose}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
+            <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <Text style={s.sheetX}>✕</Text>
             </TouchableOpacity>
           </View>
@@ -60,7 +64,9 @@ export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text style={[s.optTxt, sel && s.optTxtSel]}>{it.name}</Text>
+                  <Text style={[s.optTxt, sel && s.optTxtSel]}>
+                    {it.name}
+                  </Text>
                   {sel && <Text style={s.tick}>✓</Text>}
                 </TouchableOpacity>
               );
@@ -69,7 +75,7 @@ export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
         </View>
       </TouchableOpacity>
     </Modal>
-  ),
+  )
 );
 
 const s = StyleSheet.create({
@@ -92,11 +98,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.surfaceBorder,
   },
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-  },
+  sheetTitle: { fontSize: 18, fontWeight: theme.fontWeight.bold, color: theme.colors.dark },
   sheetX: { fontSize: 20, color: theme.colors.textMuted, fontWeight: 'bold' },
   emptyTxt: { fontSize: 14, color: theme.colors.textMuted },
   opt: {

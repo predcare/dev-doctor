@@ -12,6 +12,7 @@ import {
 import Path from 'react-native-svg/src/elements/Path';
 import Svg from 'react-native-svg/src/elements/Svg';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import { showSuccessToast } from '../../lib/common/toast.utils';
 import {
   MOCK_AVAILABLE_DATES,
   MOCK_PATIENTS,
@@ -22,7 +23,6 @@ import {
 } from '../../resources/mockData';
 import type { BookAppointmentScreenProps } from '../../route';
 import { bookAppointmentStyles as S, TEAL } from '../../styled/BookAppointmentScreen.styled';
-import { showSuccessToast } from '../../lib/commons/toast.utils';
 
 const ChevronLeftIcon = () => (
   <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
@@ -98,7 +98,7 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ na
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header */}
       <View style={S.header}>

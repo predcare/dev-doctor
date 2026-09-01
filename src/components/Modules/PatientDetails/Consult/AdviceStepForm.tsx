@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { showSuccessToast } from '../../../../lib/common/toast.utils';
 import { patientDetailsStyles as S } from '../../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../../styled/theme.styled';
 import { ConsultFormValues } from './consultSchema';
-import { showSuccessToast } from '../../../../lib/commons/toast.utils';
 
 export const AdviceStepForm: React.FC = () => {
   const { control, setValue, getValues } = useFormContext<ConsultFormValues>();
@@ -38,9 +38,7 @@ export const AdviceStepForm: React.FC = () => {
             <Text
               style={{
                 fontSize: 14,
-                color: getValues('follow_up_date')
-                  ? theme.colors.textPrimary
-                  : theme.colors.textMuted,
+                color: getValues('follow_up_date') ? theme.colors.textPrimary : theme.colors.textMuted,
                 fontFamily: 'Inter_400Regular',
               }}
             >
@@ -73,24 +71,9 @@ export const AdviceStepForm: React.FC = () => {
 
       {/* Referral Information */}
       <View style={S.consultSectionCard}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 12,
-          }}
-        >
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Text style={S.consultSectionTitle}>Referral Information</Text>
-          <Text
-            style={{
-              fontSize: 10,
-              fontWeight: '700',
-              color: theme.colors.textMuted,
-            }}
-          >
-            OPTIONAL
-          </Text>
+          <Text style={{ fontSize: 10, fontWeight: '700', color: theme.colors.textMuted }}>OPTIONAL</Text>
         </View>
 
         <View style={{ marginBottom: 12 }}>
@@ -179,40 +162,14 @@ export const AdviceStepForm: React.FC = () => {
       </TouchableOpacity>
 
       {/* Follow-up Date Modal Picker */}
-      <Modal
-        visible={showDatePicker}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDatePicker(false)}
-      >
+      <Modal visible={showDatePicker} transparent animationType="fade" onRequestClose={() => setShowDatePicker(false)}>
         <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-          }}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 }}
           activeOpacity={1}
           onPress={() => setShowDatePicker(false)}
         >
-          <View
-            style={{
-              backgroundColor: theme.colors.surface,
-              borderRadius: 16,
-              width: '85%',
-              padding: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: theme.colors.textPrimary,
-                marginBottom: 14,
-                fontFamily: 'Inter_700Bold',
-              }}
-            >
+          <View style={{ backgroundColor: theme.colors.surface, borderRadius: 16, width: '85%', padding: 20 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: theme.colors.textPrimary, marginBottom: 14, fontFamily: 'Inter_700Bold' }}>
               Select Follow-up Date
             </Text>
             {dates.map(d => (
@@ -222,20 +179,9 @@ export const AdviceStepForm: React.FC = () => {
                   setValue('follow_up_date', d);
                   setShowDatePicker(false);
                 }}
-                style={{
-                  paddingVertical: 12,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.colors.surfaceSecondary,
-                }}
+                style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.surfaceSecondary }}
               >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '600',
-                    color: theme.colors.textPrimary,
-                    fontFamily: 'Inter_600SemiBold',
-                  }}
-                >
+                <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.textPrimary, fontFamily: 'Inter_600SemiBold' }}>
                   {d}
                 </Text>
               </TouchableOpacity>

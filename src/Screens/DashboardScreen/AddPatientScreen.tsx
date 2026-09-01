@@ -20,14 +20,8 @@ import MedicalInfoForm from '../../components/Modules/Patients/Forms/MedicalInfo
 import { MockUserItem } from '../../components/Modules/Patients/Modals/UserPickerModal';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import {
-  AddPatientSchema,
-  TAddPatientSchemaType,
-} from '../../lib/schemas/addPatient.schema';
-import type {
-  ProfileScreenNavigationProp,
-  ProfileScreenRouteProp,
-} from '../../route';
+import { AddPatientSchema, TAddPatientSchemaType } from '../../lib/schemas/addPatient.schema';
+import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
 import { theme } from '../../styled/theme.styled';
 
 export interface AddPatientScreenProps {
@@ -35,10 +29,7 @@ export interface AddPatientScreenProps {
   route?: ProfileScreenRouteProp;
 }
 
-export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
-  navigation,
-  route,
-}) => {
+export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, route }) => {
   const user = route?.params ? (route.params as any)?.user : undefined;
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -61,7 +52,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
     type: 'success' | 'error' | 'warning' | 'info',
     title: string,
     message?: string,
-    onPress?: () => void,
+    onPress?: () => void
   ) => {
     setAlertConfig({
       visible: true,
@@ -129,7 +120,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
           `${selectedUser.name} has been added to your clinic.\n\nPatient ID: PAT-1012`,
           () => {
             if (navigation && navigation.canGoBack()) navigation.goBack();
-          },
+          }
         );
       }, 800);
       return;
@@ -169,31 +160,25 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
       showAlert(
         'success',
         'Patient Registered ✅',
-        `Patient ${
-          formData.name || 'Record'
-        } added successfully!\n\nPatient ID: PAT-1011\nPhone: ${
+        `Patient ${formData.name || 'Record'} added successfully!\n\nPatient ID: PAT-1011\nPhone: ${
           formData.phone
         }`,
         () => {
           if (navigation && navigation.canGoBack()) {
             navigation.goBack();
           }
-        },
+        }
       );
     }, 800);
   };
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
       <View style={s.outer}>
         {/* Header Bar */}
         <View style={s.header}>
-          <TouchableOpacity
-            style={s.backBtn}
-            onPress={handleBack}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={s.backBtn} onPress={handleBack} activeOpacity={0.7}>
             <ChevronLeftIcon color={theme.colors.primary} size={18} />
           </TouchableOpacity>
           <View>
@@ -266,9 +251,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
                 {selectedUser.phone_number ? (
                   <View style={s.confirmRow}>
                     <Text style={s.confirmLbl}>Phone</Text>
-                    <Text style={s.confirmVal}>
-                      {selectedUser.phone_number}
-                    </Text>
+                    <Text style={s.confirmVal}>{selectedUser.phone_number}</Text>
                   </View>
                 ) : null}
                 {selectedUser.gender ? (
@@ -279,9 +262,8 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
                 ) : null}
                 <View style={s.confirmInfoBox}>
                   <Text style={s.confirmInfoTxt}>
-                    ✓ All existing data (contact, medical history, address) will
-                    be used as-is from the database. Only clinic registration is
-                    needed.
+                    ✓ All existing data (contact, medical history, address) will be used as-is from
+                    the database. Only clinic registration is needed.
                   </Text>
                 </View>
               </View>
@@ -290,30 +272,20 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({
             {/* Action Buttons Row */}
             <View style={s.btnRow}>
               {selectionMode === 'create_new' && step > 1 && (
-                <TouchableOpacity
-                  style={s.backSecBtn}
-                  onPress={handleBack}
-                  activeOpacity={0.8}
-                >
+                <TouchableOpacity style={s.backSecBtn} onPress={handleBack} activeOpacity={0.8}>
                   <Text style={s.backSecTxt}>← Back</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
                 style={[
                   s.nextBtn,
-                  (selectionMode === 'existing_user' || step === 1) && {
-                    flex: 1,
-                  },
-                  (loading ||
-                    (selectionMode === 'existing_user' && !selectedUser)) && {
+                  (selectionMode === 'existing_user' || step === 1) && { flex: 1 },
+                  (loading || (selectionMode === 'existing_user' && !selectedUser)) && {
                     opacity: 0.55,
                   },
                 ]}
                 onPress={handleNext}
-                disabled={
-                  loading ||
-                  (selectionMode === 'existing_user' && !selectedUser)
-                }
+                disabled={loading || (selectionMode === 'existing_user' && !selectedUser)}
                 activeOpacity={0.85}
               >
                 {loading ? (
@@ -426,11 +398,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backSecTxt: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textSlate,
-  },
+  backSecTxt: { fontSize: 15, fontWeight: theme.fontWeight.bold, color: theme.colors.textSlate },
   nextBtn: {
     flex: 2,
     backgroundColor: theme.colors.primary,
@@ -478,11 +446,7 @@ const s = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.bg,
   },
-  confirmLbl: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.textMuted,
-  },
+  confirmLbl: { fontSize: 13, fontWeight: '600', color: theme.colors.textMuted },
   confirmVal: {
     fontSize: 13,
     fontWeight: '600',

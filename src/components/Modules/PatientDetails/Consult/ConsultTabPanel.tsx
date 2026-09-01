@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { showSuccessToast } from '../../../../lib/common/toast.utils';
 import { consultTabStyles as S } from '../../../../styled/ConsultTabPanel.styled';
 import AdviceStepForm from './AdviceStepForm';
 import { consultFormSchema, ConsultFormValues } from './consultSchema';
@@ -16,14 +17,8 @@ import DiagnosisStepForm from './DiagnosisStepForm';
 import LabsStepForm from './LabsStepForm';
 import MedicationsStepForm from './MedicationsStepForm';
 import VitalsStepForm from './VitalsStepForm';
-import { showSuccessToast } from '../../../../lib/commons/toast.utils';
 
-export type ConsultStep =
-  | 'diagnosis'
-  | 'vitals'
-  | 'medications'
-  | 'labs'
-  | 'advice';
+export type ConsultStep = 'diagnosis' | 'vitals' | 'medications' | 'labs' | 'advice';
 
 export interface ConsultStepItem {
   id: ConsultStep;
@@ -81,8 +76,7 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
         { name: 'Complete Blood Count (CBC)', instructions: 'Fasting sample' },
         { name: 'ECG 12-Lead', instructions: 'Resting state' },
       ],
-      general_advice:
-        'Low salt diet, 30 minutes daily walking, avoid caffeine.',
+      general_advice: 'Low salt diet, 30 minutes daily walking, avoid caffeine.',
       follow_up_date: 'In 2 Weeks (26 Aug 2026)',
       referral_specialist: '',
       referral_doctor_hospital: '',
@@ -108,10 +102,7 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
   };
 
   const handleFinalSubmit = (data: ConsultFormValues) => {
-    showSuccessToast(
-      'Prescription completed and saved!',
-      'Consultation Completed',
-    );
+    showSuccessToast('Prescription completed and saved!', 'Consultation Completed');
     onCompletePrescription?.(data);
   };
 
@@ -149,12 +140,7 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
                 onPress={() => setActiveStep(step.id)}
                 activeOpacity={0.7}
               >
-                <Text
-                  style={[
-                    S.consultStepTabTitle,
-                    active && S.consultStepTabTitleActive,
-                  ]}
-                >
+                <Text style={[S.consultStepTabTitle, active && S.consultStepTabTitleActive]}>
                   {step.title}
                 </Text>
               </TouchableOpacity>
@@ -194,17 +180,13 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
             {isLastStep ? (
               <TouchableOpacity
                 style={S.btnComplete}
-                onPress={() => methods.handleSubmit(handleFinalSubmit)}
+                onPress={methods.handleSubmit(handleFinalSubmit)}
                 activeOpacity={0.85}
               >
                 <Text style={S.btnCompleteText}>✓ Complete</Text>
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                style={S.btnNext}
-                onPress={handleNextStep}
-                activeOpacity={0.85}
-              >
+              <TouchableOpacity style={S.btnNext} onPress={handleNextStep} activeOpacity={0.85}>
                 <Text style={S.btnNextText}>Next ›</Text>
               </TouchableOpacity>
             )}

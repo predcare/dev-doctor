@@ -15,13 +15,7 @@ export const PhoneIcon: React.FC<IconProps> = ({
   const iconHeight = height ?? size;
 
   return (
-    <Svg
-      width={iconWidth}
-      height={iconHeight}
-      viewBox="0 0 24 24"
-      fill="none"
-      style={style}
-    >
+    <Svg width={iconWidth} height={iconHeight} viewBox="0 0 24 24" fill="none" style={style}>
       <Rect
         x="6"
         y="2"

@@ -1,17 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import {
-  RefreshControl,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { RefreshControl, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import ProfileInfoCard from '../../components/Modules/Profile/ProfileInfoCard';
-import PopupAlert, {
-  AlertType,
-} from '../../components/commons/PopupAlert/PopupAlert';
+import PopupAlert, { AlertType } from '../../components/commons/PopupAlert/PopupAlert';
 import CustomTabs from '../../components/ui/CustomTabs/CustomTabs';
 import {
   AssociationIcon,
@@ -29,10 +20,7 @@ import {
   ScheduleIcon,
   SpecializationIcon,
 } from '../../components/ui/icons';
-import type {
-  ProfileScreenNavigationProp,
-  ProfileScreenRouteProp,
-} from '../../route';
+import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
 import { doctorProfileStyles } from '../../styled/DoctorProfileScreen.styled';
 import { theme } from '../../styled/theme.styled';
 
@@ -41,10 +29,7 @@ export interface DoctorProfileScreenProps {
   route?: ProfileScreenRouteProp;
 }
 
-export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
-  navigation,
-  route,
-}) => {
+export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({ navigation, route }) => {
   const user = route?.params ? (route.params as any)?.user : undefined;
 
   const [tab, setTab] = useState<'pro' | 'clinic'>('pro');
@@ -63,11 +48,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
     message: '',
   });
 
-  const showAlert = (
-    title: string,
-    message: string,
-    type: AlertType = 'info',
-  ) => {
+  const showAlert = (title: string, message: string, type: AlertType = 'info') => {
     setPopupAlert({
       visible: true,
       type,
@@ -108,16 +89,13 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
 
   const navigateToAccountTab = () => {
     if (navigation) {
-      (navigation as any).navigate('MainTabs', {
-        screen: 'Account',
-        params: { user },
-      });
+      (navigation as any).navigate('MainTabs', { screen: 'Account', params: { user } });
     }
   };
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
 
       {/* Header Bar */}
       <View style={doctorProfileStyles.header}>
@@ -170,13 +148,9 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
               </View>
             </View>
             <View style={doctorProfileStyles.heroInfo}>
-              <Text style={doctorProfileStyles.drName}>
-                DR. {doctor.name.toUpperCase()}
-              </Text>
+              <Text style={doctorProfileStyles.drName}>DR. {doctor.name.toUpperCase()}</Text>
               <View style={doctorProfileStyles.idRow}>
-                <Text style={doctorProfileStyles.drId}>
-                  ID: {doctor.doctor_id}
-                </Text>
+                <Text style={doctorProfileStyles.drId}>ID: {doctor.doctor_id}</Text>
                 <View style={doctorProfileStyles.dot} />
                 <View
                   style={[
@@ -192,9 +166,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
                     style={[
                       doctorProfileStyles.activeDot,
                       {
-                        backgroundColor: isActive
-                          ? theme.colors.success
-                          : theme.colors.danger,
+                        backgroundColor: isActive ? theme.colors.success : theme.colors.danger,
                       },
                     ]}
                   />
@@ -202,9 +174,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
                     style={[
                       doctorProfileStyles.activeTxt,
                       {
-                        color: isActive
-                          ? theme.colors.success
-                          : theme.colors.danger,
+                        color: isActive ? theme.colors.success : theme.colors.danger,
                       },
                     ]}
                   >
@@ -250,23 +220,17 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
             <ProfileInfoCard
               label="SPECIALIZATION"
               value={doctor.specialization}
-              iconPath={
-                <SpecializationIcon size={18} color={theme.colors.primary} />
-              }
+              iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
             />
             <ProfileInfoCard
               label="QUALIFICATIONS"
               value={doctor.qualifications}
-              iconPath={
-                <QualificationsIcon size={18} color={theme.colors.primary} />
-              }
+              iconPath={<QualificationsIcon size={18} color={theme.colors.primary} />}
             />
             <ProfileInfoCard
               label="EXPERIENCE"
               value={`${doctor.experience_years} Years`}
-              iconPath={
-                <ExperienceIcon size={18} color={theme.colors.primary} />
-              }
+              iconPath={<ExperienceIcon size={18} color={theme.colors.primary} />}
             />
             <ProfileInfoCard
               label="EMAIL"
@@ -299,42 +263,28 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
                 <ProfileInfoCard
                   label="CLINIC NAME"
                   value={doctor.clinic_name}
-                  iconPath={
-                    <ClinicIcon size={18} color={theme.colors.primary} />
-                  }
+                  iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                 />
                 <ProfileInfoCard
                   label="CLINIC ID"
                   value={`CL-${doctor.clinic_id}`}
-                  iconPath={
-                    <ClinicIcon size={18} color={theme.colors.primary} />
-                  }
+                  iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                 />
                 <ProfileInfoCard
                   label="ASSOCIATION STATUS"
                   value={doctor.clinic_association_status.toUpperCase()}
-                  iconPath={
-                    <AssociationIcon size={18} color={theme.colors.primary} />
-                  }
+                  iconPath={<AssociationIcon size={18} color={theme.colors.primary} />}
                 />
                 <ProfileInfoCard
                   label="GOOGLE CALENDAR"
-                  value={
-                    doctor.google_calendar_connected
-                      ? 'Connected'
-                      : 'Not Connected'
-                  }
-                  iconPath={
-                    <ScheduleIcon size={18} color={theme.colors.primary} />
-                  }
+                  value={doctor.google_calendar_connected ? 'Connected' : 'Not Connected'}
+                  iconPath={<ScheduleIcon size={18} color={theme.colors.primary} />}
                 />
               </>
             ) : (
               <View style={doctorProfileStyles.emptyTab}>
                 <ClinicIcon color={theme.colors.textMuted} size={44} />
-                <Text style={doctorProfileStyles.emptyTitle}>
-                  No Clinic Information
-                </Text>
+                <Text style={doctorProfileStyles.emptyTitle}>No Clinic Information</Text>
                 <Text style={doctorProfileStyles.emptySub}>
                   Add your clinic details in Settings
                 </Text>
@@ -343,9 +293,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
                   onPress={navigateToAccountTab}
                   activeOpacity={0.85}
                 >
-                  <Text style={doctorProfileStyles.emptyBtnTxt}>
-                    Go to Settings
-                  </Text>
+                  <Text style={doctorProfileStyles.emptyBtnTxt}>Go to Settings</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -356,15 +304,11 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
         <View style={doctorProfileStyles.actions}>
           <TouchableOpacity
             style={doctorProfileStyles.primaryBtn}
-            onPress={() =>
-              (navigation as any)?.navigate('Availability', { user })
-            }
+            onPress={() => (navigation as any)?.navigate('Availability', { user })}
             activeOpacity={0.87}
           >
             <ScheduleIcon color={theme.colors.surface} size={18} />
-            <Text style={doctorProfileStyles.primaryBtnTxt}>
-              Manage Availability
-            </Text>
+            <Text style={doctorProfileStyles.primaryBtnTxt}>Manage Availability</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -373,9 +317,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = ({
             activeOpacity={0.87}
           >
             <ProfileIcon color={theme.colors.primary} size={18} />
-            <Text style={doctorProfileStyles.secondaryBtnTxt}>
-              Account Settings
-            </Text>
+            <Text style={doctorProfileStyles.secondaryBtnTxt}>Account Settings</Text>
           </TouchableOpacity>
         </View>
 

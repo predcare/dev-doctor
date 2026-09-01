@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { profileStyles } from '../../../styled/ProfileScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 import {
-  CalendarIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   CreditCardIcon,
@@ -20,7 +19,6 @@ export interface AccountSettingsSectionProps {
   onNavigateProfile: () => void;
   onNavigatePrescription: () => void;
   onNavigateInvoice: () => void;
-  onNavigateAvailability?: () => void;
   subExpanded: boolean;
   onToggleSubscription: () => void;
   onManageSubscription?: () => void;
@@ -32,7 +30,6 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
     onNavigateProfile,
     onNavigatePrescription,
     onNavigateInvoice,
-    onNavigateAvailability,
     subExpanded,
     onToggleSubscription,
     onManageSubscription,
@@ -53,13 +50,6 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
           icon={<HospitalIcon size={18} color={theme.colors.primary} />}
           label="Clinic Information"
           onPress={onNavigateProfile}
-        />
-
-        {/* Doctor Availability */}
-        <SettingsRowItem
-          icon={<CalendarIcon size={18} color={theme.colors.primary} />}
-          label="Doctor Availability"
-          onPress={onNavigateAvailability}
         />
 
         {/* Subscription Plan — expandable */}

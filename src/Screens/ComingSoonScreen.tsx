@@ -18,24 +18,15 @@ export const ComingSoonScreen: React.FC<ComingSoonScreenProps> = ({
   icon,
 }) => {
   return (
-    <SafeAreaWrapper
-      backgroundColor={theme.colors.background}
-      barStyle="dark-content"
-    >
-      <Header />
+    <SafeAreaWrapper backgroundColor={theme.colors.background} barStyle="dark-content">
+      <Header title={title} description={description} />
       <View style={comingSoonStyles.container}>
         <View style={comingSoonStyles.content}>
           <View style={comingSoonStyles.card}>
             <View style={comingSoonStyles.iconBadge}>
               {icon || (
                 <Svg width={40} height={40} viewBox="0 0 24 24" fill="none">
-                  <Circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke={theme.colors.primary}
-                    strokeWidth={2}
-                  />
+                  <Circle cx="12" cy="12" r="10" stroke={theme.colors.primary} strokeWidth={2} />
                   <Path
                     d="M12 6V12L16 14"
                     stroke={theme.colors.primary}
@@ -48,15 +39,11 @@ export const ComingSoonScreen: React.FC<ComingSoonScreenProps> = ({
             </View>
 
             <Text style={comingSoonStyles.title}>{title}</Text>
-            <Text style={comingSoonStyles.subtitle}>
-              Under Active Development
-            </Text>
+            <Text style={comingSoonStyles.subtitle}>Under Active Development</Text>
             <Text style={comingSoonStyles.description}>{description}</Text>
 
             <View style={comingSoonStyles.badge}>
-              <Text style={comingSoonStyles.badgeText}>
-                🚀 Coming in Next Release
-              </Text>
+              <Text style={comingSoonStyles.badgeText}>🚀 Coming in Next Release</Text>
             </View>
           </View>
         </View>

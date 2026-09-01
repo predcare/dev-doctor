@@ -1,19 +1,26 @@
+import React from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import BackdropLoader from './src/components/commons/BackdropLoader/BackdropLoader';
-import AppNavigator from './src/navigations/AppNavigator';
+import EventListener from './src/components/commons/EventListener/EventListener';
+import GlobalPopupAlert from './src/components/commons/PopupAlert/GlobalPopupAlert';
+import ReactQueryProvider from './src/components/providers/ReactQueryProvider';
+import AppNavigator from './src/navigation/AppNavigator';
 
-function App() {
+function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <Toast position="top" />
-      <AppNavigator />
-      <BackdropLoader />
-    </SafeAreaProvider>
+    <ReactQueryProvider>
+      <SafeAreaProvider>
+        <AppNavigator />
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <Toast position="top" />
+        <GlobalPopupAlert />
+        <BackdropLoader />
+        <EventListener />
+      </SafeAreaProvider>
+    </ReactQueryProvider>
   );
 }
 

@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import CommonConfirmModal from '../../components/commons/CommonConfirmModal/CommonConfirmModal';
 import NotificationCard from '../../components/Modules/Notifications/NotificationCard';
 import NotificationEmptyCard from '../../components/Modules/Notifications/NotificationEmptyCard';
@@ -37,10 +36,8 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
     event_category: 'appointment',
     event_action: 'New Appointment Booked',
     type: 'appointment',
-    description:
-      'Eleanor Vance scheduled a Video Consultation for Today at 10:30 AM.',
-    message:
-      'Eleanor Vance scheduled a Video Consultation for Today at 10:30 AM.',
+    description: 'Eleanor Vance scheduled a Video Consultation for Today at 10:30 AM.',
+    message: 'Eleanor Vance scheduled a Video Consultation for Today at 10:30 AM.',
     metadata: {
       patient_name: 'Eleanor Vance',
       consultation_type: 'Video Consult',
@@ -56,8 +53,7 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
     event_category: 'prescription',
     event_action: 'Prescription Refill Requested',
     type: 'prescription',
-    description:
-      'Marcus Thorne requested an urgent refill for Amoxicillin 500mg.',
+    description: 'Marcus Thorne requested an urgent refill for Amoxicillin 500mg.',
     message: 'Marcus Thorne requested an urgent refill for Amoxicillin 500mg.',
     metadata: {
       patient_name: 'Marcus Thorne',
@@ -73,10 +69,8 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
     event_category: 'emr_management',
     event_action: 'Lab Results Uploaded',
     type: 'emr_management',
-    description:
-      'New Blood Panel & Thyroid diagnostic report available for Sophia Martinez.',
-    message:
-      'New Blood Panel & Thyroid diagnostic report available for Sophia Martinez.',
+    description: 'New Blood Panel & Thyroid diagnostic report available for Sophia Martinez.',
+    message: 'New Blood Panel & Thyroid diagnostic report available for Sophia Martinez.',
     metadata: {
       patient_name: 'Sophia Martinez',
       document_type: 'Lab Report',
@@ -91,10 +85,8 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
     event_category: 'availability_management',
     event_action: 'Slot Rescheduled',
     type: 'availability_management',
-    description:
-      'Patient Daniel Craig rescheduled his consultation to Tomorrow at 3:00 PM.',
-    message:
-      'Patient Daniel Craig rescheduled his consultation to Tomorrow at 3:00 PM.',
+    description: 'Patient Daniel Craig rescheduled his consultation to Tomorrow at 3:00 PM.',
+    message: 'Patient Daniel Craig rescheduled his consultation to Tomorrow at 3:00 PM.',
     metadata: {
       patient_name: 'Daniel Craig',
       new_date: new Date(Date.now() + 86400000).toISOString(),
@@ -109,10 +101,8 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
     event_category: 'patient_management',
     event_action: 'Patient Profile Updated',
     type: 'patient_management',
-    description:
-      'Olivia Wilde updated clinical allergy notes (Penicillin) in EMR history.',
-    message:
-      'Olivia Wilde updated clinical allergy notes (Penicillin) in EMR history.',
+    description: 'Olivia Wilde updated clinical allergy notes (Penicillin) in EMR history.',
+    message: 'Olivia Wilde updated clinical allergy notes (Penicillin) in EMR history.',
     metadata: {
       patient_name: 'Olivia Wilde',
     },
@@ -126,10 +116,8 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
     event_category: 'emr_management',
     event_action: 'EMR Summary Shared',
     type: 'emr_management',
-    description:
-      'Dr. Robert Chen shared cardiology consultation history for Arthur Pendelton.',
-    message:
-      'Dr. Robert Chen shared cardiology consultation history for Arthur Pendelton.',
+    description: 'Dr. Robert Chen shared cardiology consultation history for Arthur Pendelton.',
+    message: 'Dr. Robert Chen shared cardiology consultation history for Arthur Pendelton.',
     metadata: {
       doctor_name: 'Dr. Robert Chen',
       patient_name: 'Arthur Pendelton',
@@ -139,16 +127,14 @@ const MOCK_INITIAL_NOTIFICATIONS: INotificationDoc[] = [
   },
 ];
 
-export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
-  navigation,
-}) => {
+export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading] = useState(false);
   const [hasError] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
-  const [notificationsData, setNotificationsData] = useState<
-    INotificationDoc[]
-  >(MOCK_INITIAL_NOTIFICATIONS);
+  const [notificationsData, setNotificationsData] = useState<INotificationDoc[]>(
+    MOCK_INITIAL_NOTIFICATIONS
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -163,9 +149,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
 
   const handleConfirmDelete = () => {
     if (!deleteTargetId) return;
-    setNotificationsData(prev =>
-      prev.filter(item => item.id !== deleteTargetId),
-    );
+    setNotificationsData(prev => prev.filter(item => item.id !== deleteTargetId));
     setDeleteTargetId(null);
   };
 
@@ -194,11 +178,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
   const groups = useMemo(() => {
     if (!notificationsData || notificationsData.length === 0) return [];
     const now = new Date();
-    const todayStart = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    ).getTime();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const yesterdayStart = todayStart - 24 * 60 * 60 * 1000;
 
     const groupList: { label: string; data: INotificationDoc[] }[] = [];
@@ -218,8 +198,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
     });
 
     if (today.length) groupList.push({ label: 'TODAY', data: today });
-    if (yesterday.length)
-      groupList.push({ label: 'YESTERDAY', data: yesterday });
+    if (yesterday.length) groupList.push({ label: 'YESTERDAY', data: yesterday });
     if (older.length) groupList.push({ label: 'EARLIER', data: older });
     return groupList;
   }, [notificationsData]);
@@ -233,20 +212,23 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
   }
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation?.goBack()}
-          activeOpacity={0.8}
-        >
-          <View style={styles.backBtnCircle}>
-            <ChevronLeftIcon size={18} color={theme.colors.primary} />
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        <View style={{ width: 44 }} />
-      </View>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation?.goBack()}
+            activeOpacity={0.8}
+          >
+            <View style={styles.backBtnCircle}>
+              <ChevronLeftIcon size={18} color={theme.colors.primary} />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Notifications</Text>
+          <View style={{ width: 44 }} />
+        </View>
+      </SafeAreaView>
 
       {!notificationsData || notificationsData.length === 0 ? (
         <NotificationEmptyCard />
@@ -291,7 +273,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTargetId(null)}
       />
-    </SafeAreaWrapper>
+    </View>
   );
 };
 

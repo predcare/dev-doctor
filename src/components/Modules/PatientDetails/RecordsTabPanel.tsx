@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { showInfoToast, showSuccessToast } from '../../../lib/commons/toast.utils';
+import { showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import DocumentActionsModal from './DocumentActionsModal';
 import EMRUploadModal from './EMRUploadModal';

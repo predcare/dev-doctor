@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Toast from 'react-native-toast-message';
 import InvoiceBillingConfig from '../../components/Modules/Invoice/InvoiceBillingConfig';
 import InvoiceHeaderCard from '../../components/Modules/Invoice/InvoiceHeaderCard';
 import InvoiceLineItemEditor from '../../components/Modules/Invoice/InvoiceLineItemEditor';
@@ -18,7 +17,6 @@ import InvoicePreviewModal from '../../components/Modules/Invoice/InvoicePreview
 import InvoiceSummaryCard from '../../components/Modules/Invoice/InvoiceSummaryCard';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import type { CreateInvoiceScreenProps } from '../../route';
-import { theme } from '../../styled/theme.styled';
 import {
   GstMode,
   Invoice,
@@ -35,17 +33,12 @@ const computeItemTotal = (item: InvoiceLineItem): number => {
   return parseFloat(Math.max(base - discAmt, 0).toFixed(2));
 };
 
-export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({
-  route,
-  navigation,
-}) => {
+export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route, navigation }) => {
   const patientId = route?.params?.patientId || 'PF-001092';
   const patientName = route?.params?.patientName || 'Eleanor Vance';
   const initialFee = route?.params?.fee || 800;
 
-  const [invoiceNumber] = useState(
-    `INV-2026-00${Math.floor(10 + Math.random() * 89)}`,
-  );
+  const [invoiceNumber] = useState(`INV-2026-00${Math.floor(10 + Math.random() * 89)}`);
   const [createdDate] = useState('12 Aug 2026');
 
   // Items
@@ -77,13 +70,12 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({
   const [notes, setNotes] = useState('');
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [generatedInvoiceObj, setGeneratedInvoiceObj] =
-    useState<Invoice | null>(null);
+  const [generatedInvoiceObj, setGeneratedInvoiceObj] = useState<Invoice | null>(null);
 
   // Computed totals
   const subtotal = items.reduce(
     (sum, i) => sum + (parseFloat(i.qty) || 0) * (parseFloat(i.price) || 0),
-    0,
+    0
   );
 
   const totalDiscount = items.reduce((sum, i) => {
@@ -95,27 +87,21 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({
   const taxableAmount = subtotal - totalDiscount;
   const gstRate = gstMode === 'none' ? 0 : 18;
   const totalTax =
-    gstMode === 'none'
-      ? 0
-      : parseFloat(((taxableAmount * gstRate) / 100).toFixed(2));
+    gstMode === 'none' ? 0 : parseFloat(((taxableAmount * gstRate) / 100).toFixed(2));
   const cgst = gstMode === 'intra' ? parseFloat((totalTax / 2).toFixed(2)) : 0;
   const sgst = gstMode === 'intra' ? parseFloat((totalTax / 2).toFixed(2)) : 0;
   const igst = gstMode === 'inter' ? totalTax : 0;
   const grandTotal = parseFloat((taxableAmount + totalTax).toFixed(2));
 
   // Handlers
-  const handleUpdateItem = (
-    id: string,
-    field: keyof InvoiceLineItem,
-    value: any,
-  ) => {
+  const handleUpdateItem = (id: string, field: keyof InvoiceLineItem, value: any) => {
     setItems(prev =>
       prev.map(item => {
         if (item.id !== id) return item;
         const updated = { ...item, [field]: value };
         updated.total = computeItemTotal(updated);
         return updated;
-      }),
+      })
     );
   };
 
@@ -186,8 +172,8 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({
   };
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaWrapper edges={['left', 'right', 'bottom']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -205,10 +191,7 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-        >
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
           {/* Patient Details & Clinic Card with Edit Button */}
           <InvoiceHeaderCard
             patientName={patientName}
@@ -251,11 +234,7 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({
 
       {/* Generate & Send Invoice Button */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.submitBtn}
-          onPress={handleSubmit}
-          activeOpacity={0.85}
-        >
+        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} activeOpacity={0.85}>
           <Text style={styles.submitBtnTxt}>✈️ Generate & Send Invoice</Text>
         </TouchableOpacity>
       </View>

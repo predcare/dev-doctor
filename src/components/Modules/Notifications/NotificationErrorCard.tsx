@@ -20,7 +20,7 @@ export const NotificationErrorCard: React.FC<NotificationErrorCardProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content"  />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.8}>

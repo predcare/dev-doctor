@@ -24,7 +24,8 @@ import {
   PrescriptionIcon,
 } from '../../components/ui/icons';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { showInfoToast, showSuccessToast } from '../../lib/commons/toast.utils';
+import { showInfoToast, showSuccessToast } from '../../lib/common/toast.utils';
+import { useDoctorCall } from '../../navigation/DoctorCallContext';
 import { MOCK_APPOINTMENTS, MockAppointment } from '../../resources/mockData';
 import type { DoctorMeetingScreenProps } from '../../route';
 import { doctorMeetingStyles as S } from '../../styled/DoctorMeetingScreen.styled';
@@ -42,11 +43,10 @@ const MAX_Y = SH - PIP_H - 140;
 
 type ActivePanel = 'none' | 'patient' | 'upload' | 'prescription';
 
-export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const appointmentId = route?.params?.appointmentId;
+export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ navigation, route }) => {
+  const { activeCall, callSeconds, startCall, minimizeCall, endCall } = useDoctorCall();
+
+  const appointmentId = route?.params?.appointmentId ?? activeCall?.appointmentId ?? 101;
   const appointment: MockAppointment =
     MOCK_APPOINTMENTS.find(a => a.id === appointmentId) ?? MOCK_APPOINTMENTS[0];
 
@@ -62,6 +62,34 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
   // Upload Form State
   const [docTitle, setDocTitle] = useState('');
   const [docNotes, setDocNotes] = useState('');
+
+  // Register active call in context and enable native PiP on mount
+  useEffect(() => {
+    startCall({
+      appointmentId: appointment.id,
+      patientName: appointment.patient_name,
+      patientId: appointment.patient_record_id,
+    });
+
+    if (Platform.OS === 'android' && PiPModule?.setCallActive) {
+      PiPModule.setCallActive(true).catch(() => {});
+    }
+
+    return () => {
+      if (Platform.OS === 'android' && PiPModule?.setCallActive) {
+        PiPModule.setCallActive(false).catch(() => {});
+      }
+    };
+  }, [appointment.id]);
+
+  // Listen for native OS PiP mode change
+  useEffect(() => {
+    if (!pipEmitter) return;
+    const sub = pipEmitter.addListener('onPiPModeChanged', (isInPiP: boolean) => {
+      setIsNativePiP(isInPiP);
+    });
+    return () => sub.remove();
+  }, []);
 
   // Draggable Doctor PiP Window State using PanResponder with strict clamping bounds
   const pipPan = useRef(new Animated.ValueXY({ x: MAX_X, y: MIN_Y })).current;
@@ -94,7 +122,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
       onPanResponderRelease: () => {
         pipPan.flattenOffset();
       },
-    }),
+    })
   ).current;
 
   const formatTimer = (seconds: number) => {
@@ -104,24 +132,22 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
   };
 
   const handleEndCall = () => {
-    Alert.alert(
-      'End Consultation',
-      'Are you sure you want to end this video call consultation?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'End Call',
-          style: 'destructive',
-          onPress: () => {
-            showSuccessToast('Consultation session ended', 'Call Ended');
-            navigation?.navigate('DoctorAppointments', { refresh: true });
-          },
+    Alert.alert('End Consultation', 'Are you sure you want to end this video call consultation?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'End Call',
+        style: 'destructive',
+        onPress: () => {
+          endCall();
+          showSuccessToast('Consultation session ended', 'Call Ended');
+          navigation?.navigate('DoctorAppointments', { refresh: true });
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const handleMinimize = () => {
+    minimizeCall();
     showInfoToast('Meeting minimized to floating window', 'Floating PiP');
     navigation?.goBack();
   };
@@ -143,36 +169,18 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
       <View
         style={[
           S.container,
-          {
-            backgroundColor: '#0A1410',
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
+          { backgroundColor: '#0A1410', justifyContent: 'center', alignItems: 'center' },
         ]}
       >
         <View style={S.remotePlaceholder}>
-          <View
-            style={[
-              S.remoteAvatar,
-              { width: 64, height: 64, borderRadius: 32 },
-            ]}
-          >
+          <View style={[S.remoteAvatar, { width: 64, height: 64, borderRadius: 32 }]}>
             <Text style={[S.remoteAvatarTxt, { fontSize: 28 }]}>
               {appointment.patient_name.charAt(0)}
             </Text>
           </View>
-          <Text style={[S.remoteNameTxt, { fontSize: 14 }]}>
-            {appointment.patient_name}
-          </Text>
-          <Text
-            style={{
-              color: '#2DD4BF',
-              fontSize: 11,
-              fontWeight: '700',
-              marginTop: 4,
-            }}
-          >
-            LIVE 00:00
+          <Text style={[S.remoteNameTxt, { fontSize: 14 }]}>{appointment.patient_name}</Text>
+          <Text style={{ color: '#2DD4BF', fontSize: 11, fontWeight: '700', marginTop: 4 }}>
+            LIVE {formatTimer(callSeconds)}
           </Text>
         </View>
       </View>
@@ -181,7 +189,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#0A1410" />
 
       <View style={S.container}>
         {/* Top Header Bar */}
@@ -194,7 +202,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
             {/* Live Pill */}
             <View style={S.timerChipLive}>
               <View style={S.recDot} />
-              <Text style={S.timerText}>LIVE 00:00</Text>
+              <Text style={S.timerText}>LIVE {formatTimer(callSeconds)}</Text>
             </View>
 
             {/* Remaining Pill */}
@@ -210,9 +218,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
           {/* Patient Remote Video View Placeholder */}
           <View style={S.remotePlaceholder}>
             <View style={S.remoteAvatar}>
-              <Text style={S.remoteAvatarTxt}>
-                {appointment.patient_name.charAt(0)}
-              </Text>
+              <Text style={S.remoteAvatarTxt}>{appointment.patient_name.charAt(0)}</Text>
             </View>
             <Text style={S.remoteNameTxt}>{appointment.patient_name}</Text>
             <Text style={S.remoteStatusTxt}>
@@ -242,54 +248,29 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
         {/* Action Bar Tabs (Patient Info | Upload Doc | Prescription) */}
         <View style={S.actionTabsRow}>
           <TouchableOpacity
-            style={[
-              S.actionTabBtn,
-              activePanel === 'patient' && S.actionTabBtnActive,
-            ]}
+            style={[S.actionTabBtn, activePanel === 'patient' && S.actionTabBtnActive]}
             onPress={() => setActivePanel('patient')}
             activeOpacity={0.8}
           >
-            <PatientsIcon
-              size={16}
-              color={activePanel === 'patient' ? '#FFFFFF' : '#94A3B8'}
-            />
-            <Text
-              style={[
-                S.actionTabTxt,
-                activePanel === 'patient' && S.actionTabTxtActive,
-              ]}
-            >
+            <PatientsIcon size={16} color={activePanel === 'patient' ? '#FFFFFF' : '#94A3B8'} />
+            <Text style={[S.actionTabTxt, activePanel === 'patient' && S.actionTabTxtActive]}>
               Patient Info
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              S.actionTabBtn,
-              activePanel === 'upload' && S.actionTabBtnActive,
-            ]}
+            style={[S.actionTabBtn, activePanel === 'upload' && S.actionTabBtnActive]}
             onPress={() => setActivePanel('upload')}
             activeOpacity={0.8}
           >
-            <FileTextIcon
-              size={16}
-              color={activePanel === 'upload' ? '#FFFFFF' : '#94A3B8'}
-            />
-            <Text
-              style={[
-                S.actionTabTxt,
-                activePanel === 'upload' && S.actionTabTxtActive,
-              ]}
-            >
+            <FileTextIcon size={16} color={activePanel === 'upload' ? '#FFFFFF' : '#94A3B8'} />
+            <Text style={[S.actionTabTxt, activePanel === 'upload' && S.actionTabTxtActive]}>
               Upload Doc
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              S.actionTabBtn,
-              activePanel === 'prescription' && S.actionTabBtnActive,
-            ]}
+            style={[S.actionTabBtn, activePanel === 'prescription' && S.actionTabBtnActive]}
             onPress={() => {
               navigation?.navigate('PrescriptionView', {
                 rxId: `RX-${appointment.appointment_id}`,
@@ -300,9 +281,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
             activeOpacity={0.8}
           >
             <PrescriptionIcon size={16} color="#FFFFFF" />
-            <Text style={[S.actionTabTxt, S.actionTabTxtActive]}>
-              Prescription
-            </Text>
+            <Text style={[S.actionTabTxt, S.actionTabTxtActive]}>Prescription</Text>
           </TouchableOpacity>
         </View>
 
@@ -312,10 +291,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
             style={[S.ctrlBtn, micMuted && S.ctrlBtnMuted]}
             onPress={() => {
               setMicMuted(prev => !prev);
-              showInfoToast(
-                micMuted ? 'Microphone unmuted' : 'Microphone muted',
-                'Audio',
-              );
+              showInfoToast(micMuted ? 'Microphone unmuted' : 'Microphone muted', 'Audio');
             }}
             activeOpacity={0.8}
           >
@@ -327,17 +303,12 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
             style={[S.ctrlBtn, cameraOff && S.ctrlBtnMuted]}
             onPress={() => {
               setCameraOff(prev => !prev);
-              showInfoToast(
-                cameraOff ? 'Camera turned on' : 'Camera turned off',
-                'Video',
-              );
+              showInfoToast(cameraOff ? 'Camera turned on' : 'Camera turned off', 'Video');
             }}
             activeOpacity={0.8}
           >
             <Text style={{ fontSize: 20 }}>{cameraOff ? '📷' : '📹'}</Text>
-            <Text style={S.ctrlBtnLabel}>
-              {cameraOff ? 'Start Video' : 'Stop Video'}
-            </Text>
+            <Text style={S.ctrlBtnLabel}>{cameraOff ? 'Start Video' : 'Stop Video'}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -345,10 +316,8 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
             onPress={() => {
               setFrontCamera(prev => !prev);
               showInfoToast(
-                frontCamera
-                  ? 'Switched to back camera'
-                  : 'Switched to front camera',
-                'Camera',
+                frontCamera ? 'Switched to back camera' : 'Switched to front camera',
+                'Camera'
               );
             }}
             activeOpacity={0.8}
@@ -357,11 +326,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
             <Text style={S.ctrlBtnLabel}>Flip</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={S.endCallBtn}
-            onPress={handleEndCall}
-            activeOpacity={0.85}
-          >
+          <TouchableOpacity style={S.endCallBtn} onPress={handleEndCall} activeOpacity={0.85}>
             <Text style={{ fontSize: 20 }}>📞</Text>
             <Text style={S.endCallBtnTxt}>End Call</Text>
           </TouchableOpacity>
@@ -369,47 +334,30 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
       </View>
 
       {/* Patient Info Panel Modal */}
-      <Modal
-        visible={activePanel === 'patient'}
-        transparent
-        animationType="slide"
-      >
+      <Modal visible={activePanel === 'patient'} transparent animationType="slide">
         <View style={S.panelOverlay}>
           <View style={S.panelContent}>
             <View style={S.panelHeader}>
               <Text style={S.panelTitle}>Patient Overview</Text>
-              <TouchableOpacity
-                style={S.panelCloseBtn}
-                onPress={() => setActivePanel('none')}
-              >
+              <TouchableOpacity style={S.panelCloseBtn} onPress={() => setActivePanel('none')}>
                 <CircleXIcon size={20} color="#64748B" />
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              style={S.panelBody}
-              showsVerticalScrollIndicator={false}
-            >
+            <ScrollView style={S.panelBody} showsVerticalScrollIndicator={false}>
               <View style={S.infoCard}>
                 <Text style={S.infoCardTitle}>{appointment.patient_name}</Text>
                 <Text style={S.infoText}>
-                  Gender: {appointment.patient_gender} · Age:{' '}
-                  {appointment.patient_age}
+                  Gender: {appointment.patient_gender} · Age: {appointment.patient_age}
                 </Text>
-                <Text style={S.infoText}>
-                  ID: {appointment.patient_record_id}
-                </Text>
-                <Text style={S.infoText}>
-                  Phone: {appointment.patient_phone}
-                </Text>
+                <Text style={S.infoText}>ID: {appointment.patient_record_id}</Text>
+                <Text style={S.infoText}>Phone: {appointment.patient_phone}</Text>
               </View>
 
               <View style={S.infoCard}>
                 <Text style={S.infoCardTitle}>Chief Complaints & Symptoms</Text>
                 <Text style={S.infoText}>
-                  {appointment.symptoms ||
-                    appointment.reason ||
-                    'None reported'}
+                  {appointment.symptoms || appointment.reason || 'None reported'}
                 </Text>
               </View>
 
@@ -424,27 +372,17 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({
       </Modal>
 
       {/* Upload Document Panel Modal */}
-      <Modal
-        visible={activePanel === 'upload'}
-        transparent
-        animationType="slide"
-      >
+      <Modal visible={activePanel === 'upload'} transparent animationType="slide">
         <View style={S.panelOverlay}>
           <View style={S.panelContent}>
             <View style={S.panelHeader}>
               <Text style={S.panelTitle}>Upload Medical Document</Text>
-              <TouchableOpacity
-                style={S.panelCloseBtn}
-                onPress={() => setActivePanel('none')}
-              >
+              <TouchableOpacity style={S.panelCloseBtn} onPress={() => setActivePanel('none')}>
                 <CircleXIcon size={20} color="#64748B" />
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              style={S.panelBody}
-              showsVerticalScrollIndicator={false}
-            >
+            <ScrollView style={S.panelBody} showsVerticalScrollIndicator={false}>
               <Text style={S.inputLabel}>Document Title *</Text>
               <TextInput
                 style={S.textInput}

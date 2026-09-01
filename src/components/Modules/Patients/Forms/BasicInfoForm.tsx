@@ -1,21 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import {
-  Control,
-  Controller,
-  FieldErrors,
-  UseFormSetValue,
-  UseFormWatch,
-} from 'react-hook-form';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { formatDate } from '../../../../lib/commons/common.utils';
+import { formatDate } from '../../../../lib/common/common.utils';
 import { TAddPatientSchemaType } from '../../../../lib/schemas/addPatient.schema';
 import { theme } from '../../../../styled/theme.styled';
 import DatePickerModal from '../../../commons/DatePickerModal/DatePickerModal';
@@ -34,15 +21,7 @@ export interface BasicInfoFormProps {
 }
 
 export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
-  ({
-    control,
-    setValue,
-    watch,
-    errors,
-    doctorName,
-    selectedUser,
-    setSelectedUser,
-  }) => {
+  ({ control, setValue, watch, errors, doctorName, selectedUser, setSelectedUser }) => {
     const [showBGModal, setShowBGModal] = useState(false);
     const [showUserPicker, setShowUserPicker] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -86,7 +65,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
           setValue('date_of_birth', new Date(u.date_of_birth));
         }
       },
-      [setSelectedUser, setValue],
+      [setSelectedUser, setValue]
     );
 
     const handleSelectionMode = useCallback(
@@ -102,7 +81,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
           setValue('date_of_birth', new Date(2000, 0, 1));
         }
       },
-      [setSelectedUser, setValue],
+      [setSelectedUser, setValue]
     );
 
     return (
@@ -140,9 +119,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
             </Text>
             <Text style={{ fontSize: 14 }}>🔒</Text>
           </View>
-          <Text style={s.lockedHint}>
-            Doctor is automatically assigned to your account
-          </Text>
+          <Text style={s.lockedHint}>Doctor is automatically assigned to your account</Text>
         </View>
 
         {/* Registration Mode Selector */}
@@ -159,9 +136,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                   activeOpacity={0.8}
                 >
                   <Text style={[s.pillTxt, active && s.pillTxtOn]}>
-                    {mode === 'create_new'
-                      ? 'Create New Patient'
-                      : 'Select Existing User'}
+                    {mode === 'create_new' ? 'Create New Patient' : 'Select Existing User'}
                   </Text>
                 </TouchableOpacity>
               );
@@ -180,20 +155,13 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
               onPress={() => setShowUserPicker(true)}
               activeOpacity={0.7}
             >
-              <Text
-                style={selectedUser?.name ? s.inpTxt : s.inpPh}
-                numberOfLines={1}
-              >
+              <Text style={selectedUser?.name ? s.inpTxt : s.inpPh} numberOfLines={1}>
                 {selectedUser?.name || 'Tap to select a user…'}
               </Text>
-              <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>
-                ▼
-              </Text>
+              <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>▼</Text>
             </TouchableOpacity>
             {errors.selected_user_id?.message && (
-              <Text style={s.errTxt}>
-                {String(errors.selected_user_id.message)}
-              </Text>
+              <Text style={s.errTxt}>{String(errors.selected_user_id.message)}</Text>
             )}
           </View>
         )}
@@ -220,9 +188,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                   />
                 )}
               />
-              {errors.name?.message && (
-                <Text style={s.errTxt}>{String(errors.name.message)}</Text>
-              )}
+              {errors.name?.message && <Text style={s.errTxt}>{String(errors.name.message)}</Text>}
             </View>
 
             {/* Date of Birth Picker Field */}
@@ -251,14 +217,10 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                     <TouchableOpacity
                       key={g}
                       style={[s.pill, active && s.pillOn]}
-                      onPress={() =>
-                        setValue('gender', gLower, { shouldValidate: true })
-                      }
+                      onPress={() => setValue('gender', gLower, { shouldValidate: true })}
                       activeOpacity={0.8}
                     >
-                      <Text style={[s.pillTxt, active && s.pillTxtOn]}>
-                        {g}
-                      </Text>
+                      <Text style={[s.pillTxt, active && s.pillTxtOn]}>{g}</Text>
                     </TouchableOpacity>
                   );
                 })}
@@ -279,9 +241,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                 <Text style={bloodGroup ? s.inpTxt : s.inpPh}>
                   {bloodGroup || 'Select Blood Group'}
                 </Text>
-                <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>
-                  ▼
-                </Text>
+                <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>▼</Text>
               </TouchableOpacity>
             </View>
 
@@ -295,9 +255,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                     <TouchableOpacity
                       key={st}
                       style={[s.pill, active && s.pillOn]}
-                      onPress={() =>
-                        setValue('status', st, { shouldValidate: true })
-                      }
+                      onPress={() => setValue('status', st, { shouldValidate: true })}
                       activeOpacity={0.8}
                     >
                       <Text style={[s.pillTxt, active && s.pillTxtOn]}>
@@ -335,7 +293,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
         />
       </>
     );
-  },
+  }
 );
 
 const s = StyleSheet.create({
@@ -393,15 +351,8 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pillOn: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  pillTxt: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.textSlate,
-  },
+  pillOn: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
+  pillTxt: { fontSize: 13, fontWeight: theme.fontWeight.semibold, color: theme.colors.textSlate },
   pillTxtOn: { color: theme.colors.surface },
   imgWrap: { alignItems: 'center', paddingVertical: 10 },
   imgCircle: {
@@ -461,12 +412,7 @@ const s = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
-  lockedHint: {
-    fontSize: 11,
-    color: theme.colors.textMuted,
-    marginTop: 5,
-    fontStyle: 'italic',
-  },
+  lockedHint: { fontSize: 11, color: theme.colors.textMuted, marginTop: 5, fontStyle: 'italic' },
 });
 
 export default BasicInfoForm;

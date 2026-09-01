@@ -1,103 +1,247 @@
-import React, { useState } from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { theme } from '../../../styled/theme.styled';
 
-interface DatePickerModalProps {
+export interface DatePickerProps {
   visible: boolean;
-  value?: Date | string | null;
-  onChange: (date: Date) => void;
+  value: Date;
+  onChange: (d: Date) => void;
   onClose: () => void;
+  title?: string;
 }
 
-export const DatePickerModal: React.FC<DatePickerModalProps> = ({
-  visible,
-  value,
-  onChange,
-  onClose,
-}) => {
-  const initialString = value
-    ? value instanceof Date
-      ? value.toISOString().split('T')[0]
-      : String(value)
-    : '2000-01-01';
+export const DatePickerModal: React.FC<DatePickerProps> = React.memo(
+  ({
+    visible,
+    value,
+    onChange,
+    onClose,
+    title = 'Date of Birth',
+  }) => {
+    const years = Array.from(
+      { length: 100 },
+      (_, i) => new Date().getFullYear() - i
+    );
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  const [selected, setSelected] = useState(initialString);
+    const validDate = value && !isNaN(value.getTime()) ? value : new Date(2000, 0, 1);
 
-  const handleConfirm = () => {
-    onChange(new Date(selected));
-    onClose();
-  };
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={onClose}
+        >
+          <TouchableWithoutFeedback>
+            <View style={styles.sheet}>
+              <View style={styles.sheetHead}>
+                <Text style={styles.sheetTitle}>{title}</Text>
+                <TouchableOpacity
+                  onPress={onClose}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Text style={styles.sheetX}>✕</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{ flexDirection: 'row', height: 260 }}>
+                {/* Days Column */}
+                <FlatList
+                  data={days}
+                  keyExtractor={item => item.toString()}
+                  style={{ flex: 1 }}
+                  showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                  renderItem={({ item }) => {
+                    const sel = validDate.getDate() === item;
+                    return (
+                      <TouchableOpacity
+                        style={[styles.dateOpt, sel && styles.dateOptSel]}
+                        onPress={() => {
+                          const nd = new Date(validDate);
+                          nd.setDate(item);
+                          onChange(nd);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.dateOptTxt,
+                            sel && styles.dateOptSelTxt,
+                          ]}
+                        >
+                          {item}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
 
-  return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-        <View style={styles.content} onStartShouldSetResponder={() => true}>
-          <Text style={styles.title}>Select Date of Birth</Text>
-          <Text style={styles.subtitle}>Current: {selected}</Text>
-          <View style={styles.btnRow}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-              <Text style={styles.confirmText}>Confirm</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
-};
+                {/* Months Column */}
+                <FlatList
+                  data={months}
+                  keyExtractor={item => item}
+                  style={{ flex: 1 }}
+                  showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                  renderItem={({ item, index }) => {
+                    const sel = validDate.getMonth() === index;
+                    return (
+                      <TouchableOpacity
+                        style={[styles.dateOpt, sel && styles.dateOptSel]}
+                        onPress={() => {
+                          const nd = new Date(validDate);
+                          nd.setMonth(index);
+                          onChange(nd);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.dateOptTxt,
+                            sel && styles.dateOptSelTxt,
+                          ]}
+                        >
+                          {item}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
 
-export default DatePickerModal;
+                {/* Years Column */}
+                <FlatList
+                  data={years}
+                  keyExtractor={item => item.toString()}
+                  style={{ flex: 1 }}
+                  showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
+                  renderItem={({ item }) => {
+                    const sel = validDate.getFullYear() === item;
+                    return (
+                      <TouchableOpacity
+                        style={[styles.dateOpt, sel && styles.dateOptSel]}
+                        onPress={() => {
+                          const nd = new Date(validDate);
+                          nd.setFullYear(item);
+                          onChange(nd);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.dateOptTxt,
+                            sel && styles.dateOptSelTxt,
+                          ]}
+                        >
+                          {item}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.doneBtn}
+                onPress={onClose}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.doneTxt}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </Modal>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(15,23,42,0.45)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '75%',
+  },
+  sheetHead: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.surfaceBorder,
   },
-  content: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    width: '90%',
-    maxWidth: 360,
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.dark,
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
+  sheetX: {
+    fontSize: 20,
     color: theme.colors.textMuted,
-    marginBottom: 16,
+    fontWeight: 'bold',
   },
-  btnRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
+  dateOpt: {
+    padding: 12,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.bg,
   },
-  cancelBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+  dateOptSel: {
+    backgroundColor: theme.colors.primarySoft,
   },
-  cancelText: {
-    color: theme.colors.textMuted,
-    fontWeight: '600',
+  dateOptTxt: {
+    fontSize: 15,
+    fontWeight: '400',
+    color: theme.colors.dark,
   },
-  confirmBtn: {
-    backgroundColor: theme.colors.brandBlue,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+  dateOptSelTxt: {
+    color: theme.colors.primary,
+    fontWeight: theme.fontWeight.bold,
   },
-  confirmText: {
+  doneBtn: {
+    backgroundColor: theme.colors.primary,
+    margin: 20,
+    marginTop: 10,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  doneTxt: {
     color: theme.colors.surface,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: theme.fontWeight.bold,
+    letterSpacing: 0.3,
   },
 });
+
+export default DatePickerModal;

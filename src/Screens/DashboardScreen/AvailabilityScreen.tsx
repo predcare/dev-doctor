@@ -16,10 +16,7 @@ import SlotEditorCard from '../../components/Modules/Availability/SlotEditorCard
 import { TimeValue } from '../../components/Modules/Availability/TimeAndFeeConfig';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import type {
-  ProfileScreenNavigationProp,
-  ProfileScreenRouteProp,
-} from '../../route';
+import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
 import { availabilityStyles as S } from '../../styled/DoctorAvailabilityScreen.styled';
 import { theme } from '../../styled/theme.styled';
 
@@ -32,13 +29,7 @@ const mockSlots: AvailabilitySlotItem[] = [
   {
     id: 1,
     date_selection_mode: 'specific',
-    selected_dates: [
-      '2026-08-15',
-      '2026-08-16',
-      '2026-08-20',
-      '2026-08-22',
-      '2026-08-25',
-    ],
+    selected_dates: ['2026-08-15', '2026-08-16', '2026-08-20', '2026-08-22', '2026-08-25'],
     recurring_days: [],
     leave_dates: ['2026-08-18'],
     from_time: '09:00 AM',
@@ -50,43 +41,24 @@ const mockSlots: AvailabilitySlotItem[] = [
   },
 ];
 
-export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
-  navigation,
-}) => {
-  const [existingSlots, setExistingSlots] =
-    useState<AvailabilitySlotItem[]>(mockSlots);
+export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigation }) => {
+  const [existingSlots, setExistingSlots] = useState<AvailabilitySlotItem[]>(mockSlots);
   const [showExistingSlots, setShowExistingSlots] = useState(true);
   const [showNewSlotForm, setShowNewSlotForm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Editor State for Slot Form
-  const [editorTab, setEditorTab] = useState<
-    'specific' | 'recurring' | 'leave'
-  >('specific');
-  const [selectedDates, setSelectedDates] = useState<string[]>([
-    '2026-08-28',
-    '2026-08-29',
-  ]);
-  const [recurringDays, setRecurringDays] = useState<string[]>([
-    'tuesday',
-    'thursday',
-  ]);
+  const [editorTab, setEditorTab] = useState<'specific' | 'recurring' | 'leave'>('specific');
+  const [selectedDates, setSelectedDates] = useState<string[]>(['2026-08-28', '2026-08-29']);
+  const [recurringDays, setRecurringDays] = useState<string[]>(['tuesday', 'thursday']);
   const [startDate, setStartDate] = useState<string | null>('2026-09-01');
   const [endDate, setEndDate] = useState<string | null>('2026-12-31');
   const [leaveDates, setLeaveDates] = useState<string[]>([]);
-  const [fromTime, setFromTime] = useState<TimeValue>({
-    hour: '09',
-    minute: '00',
-    period: 'AM',
-  });
-  const [toTime, setToTime] = useState<TimeValue>({
-    hour: '05',
-    minute: '00',
-    period: 'PM',
-  });
-  const [consultationType, setConsultationType] = useState<
-    'in-person' | 'video' | 'both'
-  >('in-person');
+  const [fromTime, setFromTime] = useState<TimeValue>({ hour: '09', minute: '00', period: 'AM' });
+  const [toTime, setToTime] = useState<TimeValue>({ hour: '05', minute: '00', period: 'PM' });
+  const [consultationType, setConsultationType] = useState<'in-person' | 'video' | 'both'>(
+    'in-person'
+  );
   const [slotDuration, setSlotDuration] = useState<number>(30);
   const [inPersonFee, setInPersonFee] = useState<string>('500');
   const [videoFee, setVideoFee] = useState<string>('400');
@@ -111,7 +83,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
     type: 'success' | 'error' | 'warning' | 'info',
     title: string,
     message?: string,
-    onPress?: () => void,
+    onPress?: () => void
   ) => {
     setAlertConfig({
       visible: true,
@@ -127,25 +99,19 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
 
   const handleToggleDate = (dateStr: string) => {
     setSelectedDates(prev =>
-      prev.includes(dateStr)
-        ? prev.filter(d => d !== dateStr)
-        : [...prev, dateStr],
+      prev.includes(dateStr) ? prev.filter(d => d !== dateStr) : [...prev, dateStr]
     );
   };
 
   const handleToggleLeaveDate = (dateStr: string) => {
     setLeaveDates(prev =>
-      prev.includes(dateStr)
-        ? prev.filter(d => d !== dateStr)
-        : [...prev, dateStr],
+      prev.includes(dateStr) ? prev.filter(d => d !== dateStr) : [...prev, dateStr]
     );
   };
 
   const handleToggleRecurringDay = (dayKey: string) => {
     setRecurringDays(prev =>
-      prev.includes(dayKey)
-        ? prev.filter(d => d !== dayKey)
-        : [...prev, dayKey],
+      prev.includes(dayKey) ? prev.filter(d => d !== dayKey) : [...prev, dayKey]
     );
   };
 
@@ -161,12 +127,9 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
       if (showNewSlotForm) {
         const newSlot: AvailabilitySlotItem = {
           id: Date.now(),
-          date_selection_mode:
-            editorTab === 'recurring' ? 'recurring' : 'specific',
+          date_selection_mode: editorTab === 'recurring' ? 'recurring' : 'specific',
           selected_dates: selectedDates,
-          recurring_days: recurringDays.map(
-            d => d.charAt(0).toUpperCase() + d.slice(1),
-          ),
+          recurring_days: recurringDays.map(d => d.charAt(0).toUpperCase() + d.slice(1)),
           leave_dates: leaveDates,
           from_time: `${fromTime.hour}:${fromTime.minute} ${fromTime.period}`,
           to_time: `${toTime.hour}:${toTime.minute} ${toTime.period}`,
@@ -187,14 +150,14 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
           if (goBack && navigation && navigation.canGoBack()) {
             navigation.goBack();
           }
-        },
+        }
       );
     }, 600);
   };
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaWrapper edges={['top', 'left', 'right']}>
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
       <View style={S.container}>
         {/* Header */}
         <View style={S.header}>
@@ -224,9 +187,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
             <Text style={S.sectionHeaderText}>
               Your Current Availability ({existingSlots.length})
             </Text>
-            <Text style={S.sectionHeaderIcon}>
-              {showExistingSlots ? '▲' : '▼'}
-            </Text>
+            <Text style={S.sectionHeaderIcon}>{showExistingSlots ? '▲' : '▼'}</Text>
           </TouchableOpacity>
 
           {/* List of Existing Availability Slots */}
@@ -294,9 +255,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({
               onChangeFromTime={(field, value) =>
                 setFromTime(prev => ({ ...prev, [field]: value }))
               }
-              onChangeToTime={(field, value) =>
-                setToTime(prev => ({ ...prev, [field]: value }))
-              }
+              onChangeToTime={(field, value) => setToTime(prev => ({ ...prev, [field]: value }))}
               onChangeConsultationType={setConsultationType}
               onChangeDuration={setSlotDuration}
               onChangeInPersonFee={setInPersonFee}

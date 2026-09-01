@@ -35,10 +35,7 @@ export const NotificationSkeleton: React.FC = () => {
       <View style={styles.content}>
         <View style={styles.groupLabelSkeleton} />
         {[1, 2, 3, 4, 5].map(key => (
-          <Animated.View
-            key={key}
-            style={[styles.cardSkeleton, { opacity: pulseAnim }]}
-          >
+          <Animated.View key={key} style={[styles.cardSkeleton, { opacity: pulseAnim }]}>
             <View style={styles.iconBoxSkeleton} />
             <View style={styles.bodySkeleton}>
               <View style={styles.titleRowSkeleton}>

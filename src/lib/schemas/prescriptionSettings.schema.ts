@@ -12,4 +12,6 @@ export const PrescriptionSettingsSchema = yup.object().shape({
   typed_name: yup.string().optional().nullable(),
 });
 
-export type TPrescriptionSettingsSchemaType = yup.InferType<typeof PrescriptionSettingsSchema>;
+export type TPrescriptionSettingsSchemaType = yup.InferType<
+  typeof PrescriptionSettingsSchema
+>;

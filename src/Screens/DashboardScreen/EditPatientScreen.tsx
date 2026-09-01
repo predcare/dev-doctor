@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Modal,
-  Platform,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,7 +13,6 @@ import Toast from 'react-native-toast-message';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import type { EditPatientScreenProps } from '../../route';
 import { editPatientStyles as styles } from '../../styled/EditPatientScreen.styled';
-import { theme } from '../../styled/theme.styled';
 
 const TEAL = '#00897B';
 
@@ -29,10 +25,7 @@ const LockedField = ({ label, value }: { label: string; value: string }) => (
   </View>
 );
 
-export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
-  route,
-  navigation,
-}) => {
+export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, navigation }) => {
   const patientId = route?.params?.patientId || 'PAT-1092';
   const patientName = route?.params?.patientName || 'Eleanor Vance';
 
@@ -66,8 +59,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
     height: '168',
     bmi: '21.97',
     drug_allergies: 'Penicillin, Sulfa drugs',
-    medical_history:
-      'Essential Hypertension (controlled), Mild Seasonal Asthma',
+    medical_history: 'Essential Hypertension (controlled), Mild Seasonal Asthma',
   });
 
   const countries = [
@@ -125,19 +117,10 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
     title: string,
     items: { id: number; name: string }[],
     selectedName: string,
-    onSelect: (item: { id: number; name: string }) => void,
+    onSelect: (item: { id: number; name: string }) => void
   ) => (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
         <View style={styles.modalSheet}>
           <View style={styles.modalHead}>
             <Text style={styles.modalTitle}>{title}</Text>
@@ -158,12 +141,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      styles.modalOptTxt,
-                      selected && styles.modalOptTxtSelected,
-                    ]}
-                  >
+                  <Text style={[styles.modalOptTxt, selected && styles.modalOptTxtSelected]}>
                     {item.name}
                   </Text>
                   {selected && <Text style={styles.checkmark}>✓</Text>}
@@ -177,12 +155,8 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
   );
 
   return (
-    <SafeAreaWrapper
-      edges={['top', 'left', 'right', 'bottom']}
-      backgroundColor={TEAL}
-      barStyle="light-content"
-    >
-      <StatusBar barStyle="light-content" />
+    <SafeAreaWrapper edges={['left', 'right', 'bottom']}>
+      <StatusBar barStyle="light-content" backgroundColor={TEAL} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -458,7 +432,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
         'Select Country',
         countries,
         formData.country,
-        item => handleChange('country', item.name),
+        item => handleChange('country', item.name)
       )}
 
       {/* State Picker Modal */}
@@ -468,7 +442,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
         'Select State',
         states,
         formData.state,
-        item => handleChange('state', item.name),
+        item => handleChange('state', item.name)
       )}
 
       {/* City Picker Modal */}
@@ -478,7 +452,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({
         'Select City',
         cities,
         formData.city,
-        item => handleChange('city', item.name),
+        item => handleChange('city', item.name)
       )}
     </SafeAreaWrapper>
   );

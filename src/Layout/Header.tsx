@@ -1,107 +1,115 @@
 import React from 'react';
-import { StatusBar, Text, TouchableOpacity, View } from 'react-native';
-import { BellIcon, ChevronLeftIcon } from '../components/ui/icons';
+import { Text, TouchableOpacity, View } from 'react-native';
+import {
+  BellIcon,
+  CalendarIcon,
+  ChevronLeftIcon,
+  InfoCircleIcon,
+  InvoiceIcon,
+  PatientsIcon,
+  PrescriptionIcon,
+  SettingsIcon,
+} from '../components/ui/icons';
 import { headerStyles } from '../styled/Header.styled';
 import { theme } from '../styled/theme.styled';
-import { getInitials } from '../lib/commons/common.utils';
 
-export interface HeaderProps {
+const getDefaultHeaderIcon = (title?: string) => {
+  if (!title) return <SettingsIcon size={20} color={theme.colors.primary} />;
+  const lower = title.toLowerCase();
+  if (lower.includes('setting')) return <SettingsIcon size={20} color={theme.colors.primary} />;
+  if (lower.includes('patient')) return <PatientsIcon size={20} color={theme.colors.primary} />;
+  if (lower.includes('appoint') || lower.includes('schedul') || lower.includes('calendar')) {
+    return <CalendarIcon size={20} color={theme.colors.primary} />;
+  }
+  if (lower.includes('invoic') || lower.includes('bill')) {
+    return <InvoiceIcon size={20} color={theme.colors.primary} />;
+  }
+  if (lower.includes('prescrip') || lower.includes('rx')) {
+    return <PrescriptionIcon size={20} color={theme.colors.primary} />;
+  }
+  return <InfoCircleIcon size={20} color={theme.colors.primary} />;
+};
+interface HeaderProps {
   isHome?: boolean;
   title?: string;
+  description?: string;
   subtitle?: string;
+  icon?: React.ReactNode;
+  onBackPress?: () => void;
   doctorName?: string;
   specialty?: string;
   clinicName?: string;
   unreadCount?: number;
-  barStyle?: 'dark-content' | 'light-content';
-  showBack?: boolean;
-  onBackPress?: () => void;
   onNotificationPress?: () => void;
   onProfilePress?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  isHome = false,
+  isHome,
   title,
+  description,
   subtitle,
-  doctorName = 'Dr. Sarah Jenkins',
-  specialty,
-  unreadCount = 0,
-  barStyle = 'dark-content',
-  showBack = false,
+  icon,
   onBackPress,
+  doctorName = 'Dr. Sarah Jenkins',
+  specialty = 'Cardiologist • MD',
+  clinicName = 'St. Jude Medical Center',
+  unreadCount = 3,
   onNotificationPress,
   onProfilePress,
 }) => {
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning 👋';
-    if (hour < 17) return 'Good afternoon 👋';
-    return 'Good evening 👋';
-  };
-
-  const showHomeScreen = isHome || !title;
+  const subText = description || subtitle;
 
   return (
     <View style={headerStyles.container}>
-      <StatusBar barStyle={barStyle} animated />
+      {/* Top Profile & Action Row */}
       <View style={headerStyles.topRow}>
-        <View style={headerStyles.profileGroup}>
-          {showBack ? (
-            <TouchableOpacity
-              style={headerStyles.backBtn}
-              onPress={onBackPress}
-              activeOpacity={0.8}
-            >
-              <ChevronLeftIcon size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={headerStyles.avatarWrapper}
-              onPress={onProfilePress}
-              activeOpacity={0.85}
-            >
-              <View style={headerStyles.avatar}>
-                <Text style={headerStyles.avatarText}>
-                  {getInitials(doctorName)}
-                </Text>
+        {!isHome ? (
+          <View style={headerStyles.titleContainer}>
+            {onBackPress && (
+              <TouchableOpacity
+                style={headerStyles.backButton}
+                onPress={onBackPress}
+                activeOpacity={0.7}
+              >
+                <ChevronLeftIcon size={20} color={theme.colors.dark} />
+              </TouchableOpacity>
+            )}
+            <View style={headerStyles.titleRow}>
+              <View style={headerStyles.titleIconBadge}>{icon || getDefaultHeaderIcon(title)}</View>
+              <View style={headerStyles.titleTextGroup}>
+                <Text style={headerStyles.headerTitle}>{title}</Text>
+                {subText ? <Text style={headerStyles.headerDescription}>{subText}</Text> : null}
+              </View>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={headerStyles.profileGroup}
+            onPress={onProfilePress}
+            activeOpacity={0.8}
+          >
+            <View style={headerStyles.avatarWrapper}>
+              <View style={headerStyles.avatarContainer}>
+                <Text style={headerStyles.avatarText}>SJ</Text>
               </View>
               <View style={headerStyles.onlineBadge} />
-            </TouchableOpacity>
-          )}
+            </View>
 
-          <View style={headerStyles.greetingContainer}>
-            {showHomeScreen ? (
-              <>
-                <Text style={headerStyles.welcomeText}>{getGreeting()}</Text>
-                <Text style={headerStyles.doctorName} numberOfLines={1}>
-                  {doctorName}
-                </Text>
-                {specialty && (
-                  <Text style={headerStyles.specialtyText} numberOfLines={1}>
-                    {specialty}
-                  </Text>
-                )}
-              </>
-            ) : (
-              <>
-                <Text style={headerStyles.pageTitle} numberOfLines={1}>
-                  {title}
-                </Text>
-                {subtitle ? (
-                  <Text style={headerStyles.welcomeText} numberOfLines={1}>
-                    {subtitle}
-                  </Text>
-                ) : null}
-              </>
-            )}
-          </View>
-        </View>
+            <View style={headerStyles.greetingContainer}>
+              <Text style={headerStyles.welcomeText}>Good morning 👋</Text>
+              <Text style={headerStyles.doctorName}>{doctorName}</Text>
+              <Text style={headerStyles.specialtyText}>{specialty}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* Action Buttons */}
         <View style={headerStyles.actionsGroup}>
           <TouchableOpacity
             style={headerStyles.iconButton}
             onPress={onNotificationPress}
-            activeOpacity={0.75}
+            activeOpacity={0.7}
           >
             <BellIcon size={20} color={theme.colors.textPrimary} />
             {unreadCount > 0 && <View style={headerStyles.notificationDot} />}

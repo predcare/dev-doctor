@@ -79,12 +79,12 @@ export const loginStyles = StyleSheet.create({
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 12,
     borderRadius: 10,
-    gap: 6,
+    gap: 8,
   },
   tabButtonActive: {
     backgroundColor: theme.colors.brandBlue,
@@ -207,15 +207,6 @@ export const loginStyles = StyleSheet.create({
     color: theme.colors.brandBlue,
     fontSize: 13,
     fontWeight: '700',
-  },
-
-  timerText: {
-    color: theme.colors.textMuted,
-    fontSize: 13,
-  },
-  timerBold: {
-    fontWeight: '700',
-    color: theme.colors.brandBlue,
   },
 
   // Primary Button

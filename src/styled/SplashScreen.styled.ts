@@ -1,123 +1,120 @@
 import { StyleSheet } from 'react-native';
-import { theme } from './theme.styled';
 
-export const splashStyles = StyleSheet.create({
+export const Splashstyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.primaryDark,
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.xxl,
-  },
-  topDecor: {
-    alignItems: 'center',
-    marginTop: theme.spacing.xl,
-  },
-  logoBadge: {
-    width: 96,
-    height: 96,
-    borderRadius: theme.borderRadius.xl,
-    backgroundColor: theme.colors.overlayWhite15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.overlayWhite25,
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
   },
-  brandTitleContainer: {
+
+  // Background Circles
+  circleContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  circle: {
+    position: 'absolute',
+    borderRadius: 1000,
+    opacity: 0.08,
+  },
+  circle1: {
+    width: 300,
+    height: 300,
+    backgroundColor: '#007AFF',
+    top: -100,
+    right: -100,
+  },
+  circle2: {
+    width: 250,
+    height: 250,
+    backgroundColor: '#007AFF',
+    bottom: -50,
+    left: -80,
+  },
+  circle3: {
+    width: 200,
+    height: 200,
+    backgroundColor: '#007AFF',
+    top: '40%',
+    left: '50%',
+    marginLeft: -100,
+    marginTop: -100,
+    opacity: 0.05,
+  },
+
+  // Content
+  contentContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  brandName: {
-    fontSize: theme.fontSize.hero,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textInverted,
+  logoContainer: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#E6F2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  logo: {
+    width: 110,
+    height: 110,
+  },
+  title: {
+    fontSize: 42,
+    fontWeight: '800',
+    color: '#007AFF',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  tagline: {
+    fontSize: 15,
+    color: '#8E8E93',
     letterSpacing: 0.5,
   },
-  brandTagline: {
-    fontSize: theme.fontSize.md,
-    color: theme.colors.overlayWhite80,
-    marginTop: theme.spacing.xs,
-    fontWeight: theme.fontWeight.medium,
-  },
-  doctorRoleBadge: {
-    backgroundColor: theme.colors.primaryLight,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.borderRadius.full,
-    marginTop: theme.spacing.md,
-  },
-  doctorRoleText: {
-    color: theme.colors.textInverted,
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.bold,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
 
-  centerGraphic: {
-    alignItems: 'center',
-    marginVertical: theme.spacing.xl,
+  // Loader
+  loaderContainer: {
+    position: 'absolute',
+    bottom: 120,
   },
-  illustrationCard: {
-    width: '100%',
-    backgroundColor: theme.colors.overlayWhite10,
-    borderRadius: theme.borderRadius.xl,
-    padding: theme.spacing.xl,
-    borderWidth: 1,
-    borderColor: theme.colors.overlayWhite15,
-  },
-  featureRow: {
+  loadingDots: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    gap: 8,
   },
-  featureIconDot: {
+  dot: {
     width: 10,
     height: 10,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.primaryLight,
-    marginRight: theme.spacing.md,
+    borderRadius: 5,
+    backgroundColor: '#007AFF',
   },
-  featureText: {
-    color: theme.colors.textInverted,
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.medium,
+  dot1: {
+    opacity: 0.4,
+  },
+  dot2: {
+    opacity: 0.7,
+  },
+  dot3: {
+    opacity: 1,
   },
 
-  bottomContainer: {
-    width: '100%',
-    alignItems: 'center',
+  // Footer
+  footer: {
+    position: 'absolute',
+    bottom: 50,
   },
-  primaryButton: {
-    width: '100%',
-    height: 56,
-    backgroundColor: theme.colors.primaryLight,
-    borderRadius: theme.borderRadius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: theme.colors.primaryLight,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  primaryButtonText: {
-    color: theme.colors.textInverted,
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
-  },
-  secondaryLink: {
-    marginTop: theme.spacing.lg,
-    padding: theme.spacing.xs,
-  },
-  secondaryLinkText: {
-    color: theme.colors.overlayWhite75,
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
-  },
-  versionText: {
-    color: theme.colors.overlayWhite75,
-    fontSize: theme.fontSize.xs,
-    marginTop: theme.spacing.md,
+  footerText: {
+    fontSize: 13,
+    color: '#C7C7CC',
+    letterSpacing: 0.5,
   },
 });

@@ -10,22 +10,15 @@ import {
 } from 'react-native';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import PopupAlert from '../../components/commons/PopupAlert/PopupAlert';
-import PatientCard, {
-  PatientItem,
-} from '../../components/Modules/Patients/PatientCard';
-import {
-  ChevronLeftIcon,
-  PlusIcon,
-  SearchIcon,
-} from '../../components/ui/icons';
+import PatientCard, { PatientItem } from '../../components/Modules/Patients/PatientCard';
+import { PlusIcon, SearchIcon } from '../../components/ui/icons';
+import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { Header } from '../../Layout/Header';
-import type {
-  PatientsScreenNavigationProp,
-  PatientsScreenRouteProp,
-} from '../../route';
+import type { PatientsScreenNavigationProp, PatientsScreenRouteProp } from '../../route';
 import { patientsStyles as S } from '../../styled/PatientsScreen.styled';
 import { theme } from '../../styled/theme.styled';
+
+import useScreenFocus from '../../hooks/commons/useScreenFocus';
 
 export interface PatientsScreenProps {
   navigation?: PatientsScreenNavigationProp;
@@ -135,9 +128,7 @@ const mockPatientsList: PatientItem[] = [
   },
 ];
 
-export const PatientsScreen: React.FC<PatientsScreenProps> = ({
-  navigation,
-}) => {
+export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) => {
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -157,7 +148,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({
   const showAlert = (
     type: 'success' | 'error' | 'warning' | 'info',
     title: string,
-    message?: string,
+    message?: string
   ) => {
     setAlertConfig({
       visible: true,
@@ -186,20 +177,24 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({
         p.name.toLowerCase().includes(q) ||
         p.patient_id?.toLowerCase().includes(q) ||
         p.phone_number?.includes(q) ||
-        p.condition?.toLowerCase().includes(q),
+        p.condition?.toLowerCase().includes(q)
     );
   }, [search]);
 
+  useScreenFocus(() => {
+    console.log('called patients');
+  }, []);
+
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <Header
-        title="My Patients"
-        subtitle="View & manage patient records"
-        unreadCount={3}
-        onNotificationPress={() => navigation?.navigate('Notifications')}
-        onProfilePress={() => navigation?.navigate('DoctorProfile')}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
       <View style={S.container}>
+        <Header
+          title="Patients"
+          description="Manage and view your patient records"
+          unreadCount={3}
+          onNotificationPress={() => navigation?.navigate('Notifications')}
+        />
         <View style={S.searchRow}>
           <View style={S.searchPill}>
             <SearchIcon color={theme.colors.textMuted} size={16} />
@@ -212,13 +207,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({
             />
             {search.length > 0 && (
               <TouchableOpacity onPress={clearSearch} activeOpacity={0.7}>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    color: theme.colors.textMuted,
-                    paddingLeft: 6,
-                  }}
-                >
+                <Text style={{ fontSize: 13, color: theme.colors.textMuted, paddingLeft: 6 }}>
                   ✕
                 </Text>
               </TouchableOpacity>

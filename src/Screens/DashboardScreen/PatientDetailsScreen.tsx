@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import {
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Toast from 'react-native-toast-message';
+import { Text, TouchableOpacity, View } from 'react-native';
 import ConsultTabPanel from '../../components/Modules/PatientDetails/Consult/ConsultTabPanel';
-import MedicalDocumentCard, { MedicalDocument } from '../../components/Modules/PatientDetails/MedicalDocumentCard';
-import PatientHeaderCard from '../../components/Modules/PatientDetails/PatientHeaderCard';
-import PatientTabBar, { MainTabKey, TabItem } from '../../components/Modules/PatientDetails/PatientTabBar';
-import PrescriptionCard, { PrescriptionItem } from '../../components/Modules/PatientDetails/PrescriptionCard';
 import PatientInvoiceTabPanel from '../../components/Modules/PatientDetails/Invoice/PatientInvoiceTabPanel';
+import { MedicalDocument } from '../../components/Modules/PatientDetails/MedicalDocumentCard';
+import PatientHeaderCard from '../../components/Modules/PatientDetails/PatientHeaderCard';
+import PatientTabBar, {
+  MainTabKey,
+  TabItem,
+} from '../../components/Modules/PatientDetails/PatientTabBar';
+import { PrescriptionItem } from '../../components/Modules/PatientDetails/PrescriptionCard';
 import PatientProfileTabPanel from '../../components/Modules/PatientDetails/Profile/PatientProfileTabPanel';
 import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
@@ -128,14 +125,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({ navi
   };
 
   return (
-    <SafeAreaWrapper
-      edges={['top', 'left', 'right', 'bottom']}
-      backgroundColor={theme.colors.primary}
-      barStyle="light-content"
-    >
-      <StatusBar barStyle="light-content" />
-
-      {/* Top Header Bar */}
+    <SafeAreaWrapper edges={['left', 'right', 'bottom', 'top']}>
       <View style={patientDetailsStyles.topBar}>
         <TouchableOpacity
           style={patientDetailsStyles.backCircle}
@@ -158,11 +148,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({ navi
       />
 
       {/* Main Tab Navigation Bar */}
-      <PatientTabBar
-        tabs={MAIN_TABS}
-        activeTab={activeMainTab}
-        onTabPress={setActiveMainTab}
-      />
+      <PatientTabBar tabs={MAIN_TABS} activeTab={activeMainTab} onTabPress={setActiveMainTab} />
 
       {/* Active Tab Panel Content */}
       <View style={{ flex: 1 }}>
@@ -222,7 +208,6 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({ navi
           />
         )}
       </View>
- 
     </SafeAreaWrapper>
   );
 };

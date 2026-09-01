@@ -2,51 +2,56 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
+  ActivityIndicator,
   Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   useWindowDimensions,
   View,
 } from 'react-native';
-import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import OtpInput from '../../components/commons/OtpInput';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { MailIcon, PhoneIcon } from '../../components/ui/icons';
-import {
-  LoginFormSchema,
-  TLoginFormSchemaType,
-} from '../../lib/schemas/auth.schema';
+import useFcmToken from '../../hooks/commons/useFcmToken';
+import { useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
+import { ProfileQueryKeys } from '../../hooks/react-query/query.keys';
+import { setItem, STORAGE_KEYS } from '../../lib/common/asyncStorage';
+import { resetToMainTabs } from '../../lib/common/navigation.utils';
+import { showErrorToast } from '../../lib/common/toast.utils';
+import { LoginFormSchema, TLoginFormSchemaType } from '../../lib/schemas/auth.schema';
 import { Assets } from '../../resources/assets';
-import type {
-  LoginScreenNavigationProp,
-  LoginScreenRouteProp,
-} from '../../route';
+import type { LoginScreenNavigationProp, LoginScreenRouteProp } from '../../route';
 import { loginStyles } from '../../styled/LoginScreen.styled';
-import { theme } from '../../styled/theme.styled';
+import theme from '../../styled/theme.styled';
 import { LoginMode } from '../../typescripts/types/common.types';
+import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 export interface LoginScreenProps {
   navigation?: LoginScreenNavigationProp;
   route?: LoginScreenRouteProp;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({
-  navigation: propNavigation,
-}) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNavigation }) => {
   const defaultNavigation = useNavigation<LoginScreenNavigationProp>();
   const navigation = propNavigation || defaultNavigation;
   const { width } = useWindowDimensions();
   const cardWidth = Math.min(width - 32, 480);
-
+  const { deviceInfo, fcmToken } = useFcmToken();
   const [loginMode, setLoginMode] = useState<LoginMode>('mobile');
   const [otpSent, setOtpSent] = useState(false);
 
+  const { setUserData } = useAuthStore(state => state);
+  const { hideLoader, showLoader } = useLoadingStore(state => state);
+  const { mutate: sendOtpMutation, isPending: sendOtpPending } = useSendOtp();
+  const { mutate: verifyOtpMutation, isPending: verifyOtpPending } = useVerifyOTP();
   const {
     control,
     handleSubmit,
@@ -54,14 +59,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     watch,
     clearErrors,
     formState: { errors },
+    getValues,
   } = useForm<TLoginFormSchemaType>({
     resolver: yupResolver(LoginFormSchema),
     defaultValues: {
       mode: 'mobile',
-      identifier: '9876543210',
+      identifier: '',
       otp: '',
     },
-    mode: 'onChange',
+    mode: 'onBlur',
   });
 
   const identifier = watch('identifier') || '';
@@ -72,9 +78,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     if (loginMode === 'email') {
       const [name, domain] = identifier.split('@');
       if (!name || !domain) return identifier;
-      return `${name.slice(0, 2)}${'*'.repeat(
-        Math.max(0, name.length - 2),
-      )}@${domain}`;
+      return `${name.slice(0, 2)}${'*'.repeat(Math.max(0, name.length - 2))}@${domain}`;
     }
     return `+91 ${identifier.slice(0, 2)}****${identifier.slice(-2)}`;
   };
@@ -84,34 +88,70 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     setLoginMode(mode);
     clearErrors();
     setValue('mode', mode, { shouldValidate: false });
-    setValue(
-      'identifier',
-      mode === 'mobile' ? '9876543210' : 'doctor@example.com',
-      {
-        shouldValidate: false,
-      },
-    );
+    setValue('identifier', '', { shouldValidate: false });
     setValue('otp', '', { shouldValidate: false });
     setOtpSent(false);
   };
 
+  const getOtpPayload = (identifier: string, mode: string) => ({
+    identifier: mode === 'mobile' ? identifier.trim() : identifier.trim().toLowerCase(),
+    ...(mode === 'mobile' && { method: 'both' }),
+  });
+
+  const handleSendOtp = (_data: TLoginFormSchemaType, type: 'send' | 'resend' = 'send') => {
+    if (type === 'resend' && sendOtpPending) return;
+    const payload = getOtpPayload(_data.identifier || '', _data.mode);
+    sendOtpMutation(payload, {
+      onSuccess: res => {
+        if (res?.success) {
+          if (type === 'send') setOtpSent(true);
+          setValue('otp', '');
+        }
+      },
+    });
+  };
+
   const onSubmitSendOtp = (_data: TLoginFormSchemaType) => {
-    setValue('otp', '', { shouldValidate: false });
-    setOtpSent(true);
+    handleSendOtp(_data, 'send');
+  };
+
+  const onSubmitResendOtp = (_data: TLoginFormSchemaType) => {
+    handleSendOtp(_data, 'resend');
   };
 
   const onSubmitVerifyOtp = (_data: TLoginFormSchemaType) => {
-    const nav = navigation || defaultNavigation;
-    if (nav) {
-      if (typeof nav.reset === 'function') {
-        nav.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs' }],
-        });
-      } else if (typeof nav.navigate === 'function') {
-        nav.navigate('MainTabs');
-      }
+    if (verifyOtpPending) return;
+    if (!_data.otp || _data.otp.length < 6) {
+      showErrorToast('Please enter a valid 6-digit OTP code.');
+      return;
     }
+    if (!identifier) return;
+
+    const payload = {
+      identifier: identifier,
+      otp: _data.otp,
+      platform: Platform.OS,
+      fcm_token: fcmToken || '',
+      device_name: deviceInfo?.device_name || '',
+    };
+
+    verifyOtpMutation(payload, {
+      onSuccess: async res => {
+        if (res?.success) {
+          const token = res?.token;
+          if (token) {
+            showLoader('Please wait...');
+            await setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+            setUserData(res.user || res.data);
+            await queryClient.invalidateQueries({
+              queryKey: [ProfileQueryKeys.Profile],
+            });
+          }
+          hideLoader();
+          resetToMainTabs(navigation);
+        }
+      },
+    });
   };
 
   const handlePrimaryPress = () => {
@@ -122,14 +162,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     }
   };
 
-  const isVerifyDisabled = otpSent && otpValue.length !== 6;
+  const isVerifyDisabled = otpSent && (otpValue.length !== 6 || verifyOtpPending);
 
   return (
-    <SafeAreaWrapper
-      edges={['top', 'left', 'right', 'bottom']}
-      backgroundColor={theme.colors.brandBlue}
-      barStyle="light-content"
-    >
+    <SafeAreaView style={loginStyles.safeArea}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={loginStyles.keyboardAvoid}
@@ -141,17 +177,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           keyboardShouldPersistTaps="handled"
         >
           <View style={loginStyles.logoContainer}>
-            <Image
-              source={Assets.logo2}
-              style={loginStyles.logo}
-              resizeMode="contain"
-            />
+            <Image source={Assets.logo2} style={loginStyles.logo} resizeMode="contain" />
           </View>
           <View style={[loginStyles.card, { width: cardWidth }]}>
             <View style={loginStyles.titleContainer}>
-              <Text style={loginStyles.title}>
-                {!otpSent ? 'Welcome, Doctor' : 'Verify OTP'}
-              </Text>
+              <Text style={loginStyles.title}>{!otpSent ? 'Welcome, Doctor' : 'Verify OTP'}</Text>
               <Text style={loginStyles.subtitle}>
                 {otpSent
                   ? loginMode === 'mobile'
@@ -160,7 +190,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   : 'Choose your preferred login method'}
               </Text>
             </View>
-
             {!otpSent ? (
               <>
                 <View style={loginStyles.tabContainer}>
@@ -174,11 +203,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   >
                     <PhoneIcon
                       size={18}
-                      color={
-                        loginMode === 'mobile'
-                          ? theme.colors.surface
-                          : theme.colors.textMuted
-                      }
+                      color={loginMode === 'mobile' ? theme.colors.surface : theme.colors.textMuted}
                     />
                     <Text
                       style={[
@@ -200,11 +225,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   >
                     <MailIcon
                       size={18}
-                      color={
-                        loginMode === 'email'
-                          ? theme.colors.surface
-                          : theme.colors.textMuted
-                      }
+                      color={loginMode === 'email' ? theme.colors.surface : theme.colors.textMuted}
                     />
                     <Text
                       style={[
@@ -243,22 +264,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                           placeholder={
                             loginMode === 'mobile'
                               ? 'Enter 10-digit mobile number'
-                              : 'doctor@example.com'
+                              : 'Enter email address'
                           }
                           placeholderTextColor="#999999"
-                          keyboardType={
-                            loginMode === 'mobile'
-                              ? 'phone-pad'
-                              : 'email-address'
-                          }
+                          keyboardType={loginMode === 'mobile' ? 'phone-pad' : 'email-address'}
                           maxLength={loginMode === 'mobile' ? 10 : undefined}
                           autoCapitalize="none"
                           value={value}
                           onChangeText={text => {
                             if (loginMode === 'mobile') {
-                              const cleanNum = text
-                                .replace(/\D/g, '')
-                                .slice(0, 10);
+                              const cleanNum = text.replace(/\D/g, '').slice(0, 10);
                               onChange(cleanNum);
                             } else {
                               onChange(text);
@@ -269,9 +284,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     />
                   </View>
                   {errors.identifier ? (
-                    <Text style={loginStyles.errorText}>
-                      {errors.identifier.message}
-                    </Text>
+                    <Text style={loginStyles.errorText}>{errors.identifier.message}</Text>
                   ) : null}
                 </View>
               </>
@@ -286,9 +299,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                       value={value}
                       onChange={val => {
                         onChange(val);
-                        if (val.length === 6) {
+                        if (val.length === 6 && !verifyOtpPending) {
                           Keyboard.dismiss();
-                          handleSubmit(onSubmitVerifyOtp)();
+                          const currentValues = getValues();
+                          onSubmitVerifyOtp({ ...currentValues, otp: val });
                         }
                       }}
                       numInputs={6}
@@ -296,19 +310,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   )}
                 />
                 {errors.otp ? (
-                  <Text style={loginStyles.errorText}>
-                    {errors.otp.message}
-                  </Text>
+                  <Text style={loginStyles.errorText}>{errors.otp.message}</Text>
                 ) : null}
                 <View style={loginStyles.resendContainer}>
-                  <Text style={loginStyles.resendText}>
-                    Didn't receive OTP?{' '}
-                  </Text>
+                  <Text style={loginStyles.resendText}>Didn't receive OTP? </Text>
                   <Pressable
-                    onPress={() => handleSubmit(onSubmitSendOtp)()}
-                    style={({ pressed }) => [pressed && { opacity: 0.6 }]}
+                    onPress={() => handleSubmit(onSubmitResendOtp)()}
+                    disabled={sendOtpPending}
+                    style={({ pressed }) => [(pressed || sendOtpPending) && { opacity: 0.6 }]}
                   >
-                    <Text style={loginStyles.resendLink}>Resend</Text>
+                    <Text style={loginStyles.resendLink}>
+                      {sendOtpPending ? 'Resending...' : 'Resend'}
+                    </Text>
                   </Pressable>
                 </View>
                 <Pressable
@@ -322,22 +335,27 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   }}
                 >
                   <Text style={loginStyles.changeNumberText}>
-                    ← Change{' '}
-                    {loginMode === 'mobile' ? 'Mobile Number' : 'Email'}
+                    ← Change {loginMode === 'mobile' ? 'Mobile Number' : 'Email'}
                   </Text>
                 </Pressable>
               </View>
             )}
             <Pressable
-              disabled={isVerifyDisabled}
+              disabled={isVerifyDisabled || sendOtpPending || verifyOtpPending}
               style={({ pressed }) => [
                 loginStyles.primaryButton,
-                isVerifyDisabled && loginStyles.buttonDisabled,
-                pressed && !isVerifyDisabled && { opacity: 0.85 },
+                (isVerifyDisabled || sendOtpPending || verifyOtpPending) &&
+                  loginStyles.buttonDisabled,
+                pressed &&
+                  !isVerifyDisabled &&
+                  !sendOtpPending &&
+                  !verifyOtpPending && { opacity: 0.85 },
               ]}
               onPress={handlePrimaryPress}
             >
-              {!otpSent ? (
+              {sendOtpPending || verifyOtpPending ? (
+                <ActivityIndicator color={theme.colors.surface} />
+              ) : !otpSent ? (
                 <Text style={loginStyles.primaryButtonText}>Send OTP</Text>
               ) : (
                 <View style={loginStyles.verifyBtnInner}>
@@ -349,7 +367,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaWrapper>
+    </SafeAreaView>
   );
 };
 

@@ -5,7 +5,7 @@ import Path from 'react-native-svg/src/elements/Path';
 import Rect from 'react-native-svg/src/elements/Rect';
 import Svg from 'react-native-svg/src/elements/Svg';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { showInfoToast, showSuccessToast } from '../../lib/commons/toast.utils';
+import { showInfoToast, showSuccessToast } from '../../lib/common/toast.utils';
 import type { PrescriptionViewScreenProps } from '../../route';
 import {
   prescriptionViewStyles as S,
@@ -247,7 +247,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* Header */}
       <View style={S.header}>

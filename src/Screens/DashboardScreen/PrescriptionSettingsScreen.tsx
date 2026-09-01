@@ -184,7 +184,7 @@ export const PrescriptionSettingsScreen: React.FC<PrescriptionSettingsScreenProp
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
 
       {/* Header Bar */}
       <View style={S.header}>

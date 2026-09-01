@@ -32,13 +32,7 @@ const CameraBadgeIcon = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <Circle
-      cx="12"
-      cy="13"
-      r="4"
-      stroke={theme.colors.primary}
-      strokeWidth="2"
-    />
+    <Circle cx="12" cy="13" r="4" stroke={theme.colors.primary} strokeWidth="2" />
   </Svg>
 );
 

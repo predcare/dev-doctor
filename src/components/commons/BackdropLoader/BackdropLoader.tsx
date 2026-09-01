@@ -15,12 +15,29 @@ export const BackdropLoader: React.FC = () => {
       animationType="fade"
       visible={isLoading}
       statusBarTranslucent
+      hardwareAccelerated
+      supportedOrientations={[
+        'portrait',
+        'portrait-upside-down',
+        'landscape',
+        'landscape-left',
+        'landscape-right',
+      ]}
       onRequestClose={() => {}}
     >
       <View style={styles.overlay}>
-        <View style={styles.card}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.messageText}>{message}</Text>
+        <View style={styles.loaderCard}>
+          <View style={styles.loaderCircle}>
+            <ActivityIndicator size="small" color={theme.colors.primary} />
+          </View>
+
+          <View style={styles.content}>
+            <Text style={styles.title} numberOfLines={2}>
+              {message || 'Please wait...'}
+            </Text>
+
+            <Text style={styles.subtitle}>Processing...</Text>
+          </View>
         </View>
       </View>
     </Modal>
@@ -30,33 +47,73 @@ export const BackdropLoader: React.FC = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    width: '100%',
+    height: '100%',
+
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.xl,
+
+    // Stronger backdrop
+    backgroundColor: 'rgba(2, 6, 23, 0.72)',
   },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.xl,
+
+  loaderCard: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 220,
+
+    width: 'auto',
+    minWidth: 230,
     maxWidth: 320,
-    elevation: 8,
-    shadowColor: theme.colors.textPrimary,
-    shadowOffset: { width: 0, height: 4 },
+
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 18,
+
+    elevation: 15,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
     shadowOpacity: 0.25,
-    shadowRadius: 12,
+    shadowRadius: 18,
   },
-  messageText: {
-    marginTop: theme.spacing.lg,
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.medium,
+
+  loaderCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: 'rgba(59, 130, 246, 0.10)',
+
+    marginRight: 14,
+  },
+
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  title: {
+    fontSize: 14,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
-    textAlign: 'center',
     lineHeight: 20,
+  },
+
+  subtitle: {
+    marginTop: 3,
+
+    fontSize: 12,
+    fontWeight: '400',
+
+    color: '#64748B',
+    lineHeight: 17,
   },
 });
 

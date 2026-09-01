@@ -26,10 +26,7 @@ import {
   InvoiceSettingsSchema,
   TInvoiceSettingsSchemaType,
 } from '../../lib/schemas/invoiceSettings.schema';
-import type {
-  ProfileScreenNavigationProp,
-  ProfileScreenRouteProp,
-} from '../../route';
+import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
 import { invoiceSettingsStyles as S } from '../../styled/InvoiceSettingsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 
@@ -62,11 +59,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
     message: '',
   });
 
-  const showConfirm = (
-    title: string,
-    message: string,
-    onConfirm: () => void,
-  ) => {
+  const showConfirm = (title: string, message: string, onConfirm: () => void) => {
     setConfirmModal({
       visible: true,
       title,
@@ -94,7 +87,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
   const showAlert = (
     type: 'success' | 'error' | 'warning' | 'info',
     title: string,
-    message?: string,
+    message?: string
   ) => {
     setAlertConfig({
       visible: true,
@@ -117,17 +110,15 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
     gst_type: 'none',
     footer_note:
       'Thank you for choosing St. Jude Medical Center. Please keep this invoice for records.',
-    terms_conditions:
-      'Payment due upon receipt. Refunds processed within 7 business days.',
+    terms_conditions: 'Payment due upon receipt. Refunds processed within 7 business days.',
     sig_mode: 'upload',
     typed_name: 'Dr. Sarah Jenkins',
   };
 
-  const { control, handleSubmit, watch, setValue } =
-    useForm<TInvoiceSettingsSchemaType>({
-      resolver: yupResolver(InvoiceSettingsSchema),
-      defaultValues: defaultInvoiceValues,
-    });
+  const { control, handleSubmit, watch, setValue } = useForm<TInvoiceSettingsSchemaType>({
+    resolver: yupResolver(InvoiceSettingsSchema),
+    defaultValues: defaultInvoiceValues,
+  });
 
   // Watched form values for live PDF preview
   const clinicName = watch('clinic_name') || '';
@@ -156,7 +147,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
           showAlert(
             'success',
             'Saved ✅',
-            'Invoice settings updated. All future invoices will use these details automatically.',
+            'Invoice settings updated. All future invoices will use these details automatically.'
           );
         }
       }, 600);
@@ -178,19 +169,14 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
         showAlert(
           'error',
           'Camera Error',
-          response.errorMessage ||
-            `Failed to access camera (${response.errorCode})`,
+          response.errorMessage || `Failed to access camera (${response.errorCode})`
         );
         return;
       }
       const asset = response.assets?.[0];
       if (asset?.uri) {
         setSignatureUrl(asset.uri);
-        showAlert(
-          'success',
-          'Uploaded ✅',
-          'Authorised signature loaded successfully.',
-        );
+        showAlert('success', 'Uploaded ✅', 'Authorised signature loaded successfully.');
       }
     };
 
@@ -205,7 +191,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
 
   return (
     <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
 
       {/* Header Bar */}
       <View style={S.header}>
@@ -246,9 +232,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
 
         {/* Live PDF Header Preview */}
         <View style={S.pdfPreviewCard}>
-          <Text style={S.previewLabel}>
-            Preview — How it will appear on the PDF
-          </Text>
+          <Text style={S.previewLabel}>Preview — How it will appear on the PDF</Text>
           <View style={S.pdfHeaderPreview}>
             <View style={S.previewLogoBox}>
               <Text style={S.previewLogoTxt}>{'PRED\nCARE'}</Text>
@@ -258,15 +242,11 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
                 {clinicName || 'Clinic Name'}
               </Text>
               <Text style={S.previewSubline}>
-                {headerNote
-                  ? headerNote.toUpperCase()
-                  : 'MULTI-SPECIALTY HEALTHCARE CENTER'}
+                {headerNote ? headerNote.toUpperCase() : 'MULTI-SPECIALTY HEALTHCARE CENTER'}
               </Text>
               {clinicAddress || clinicPhone || clinicEmail ? (
                 <Text style={S.previewContact} numberOfLines={1}>
-                  {[clinicAddress, clinicPhone, clinicEmail]
-                    .filter(Boolean)
-                    .join('  |  ')}
+                  {[clinicAddress, clinicPhone, clinicEmail].filter(Boolean).join('  |  ')}
                 </Text>
               ) : null}
             </View>
@@ -281,9 +261,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
               ) : null}
               {clinicGstin ? (
                 <>
-                  <Text style={[S.previewRightLabel, { marginTop: 4 }]}>
-                    GSTIN
-                  </Text>
+                  <Text style={[S.previewRightLabel, { marginTop: 4 }]}>GSTIN</Text>
                   <Text style={S.previewRightVal}>{clinicGstin}</Text>
                 </>
               ) : null}
@@ -293,12 +271,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
           {/* Invoice Prefix Banner Strip */}
           <View style={S.pdfStripPreview}>
             <Text style={S.pdfStripText}>INVOICE</Text>
-            <Text
-              style={[
-                S.pdfStripText,
-                { fontSize: 9, opacity: 0.75, marginLeft: 12 },
-              ]}
-            >
+            <Text style={[S.pdfStripText, { fontSize: 9, opacity: 0.75, marginLeft: 12 }]}>
               {invoicePrefix}-2024-001
             </Text>
           </View>
@@ -406,9 +379,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
         {/* GST Type Dropdown Selector */}
         <View style={S.fieldCard}>
           <Text style={S.fieldLabel}>Default GST Type</Text>
-          <Text style={S.fieldHint}>
-            Set once — auto-applied every time you create an invoice.
-          </Text>
+          <Text style={S.fieldHint}>Set once — auto-applied every time you create an invoice.</Text>
           <TouchableOpacity
             style={S.gstSelector}
             onPress={() => setShowGstPicker(v => !v)}
@@ -421,9 +392,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
                 ? 'Intra-State (CGST + SGST)'
                 : 'Inter-State (IGST)'}
             </Text>
-            <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>
-              ▾
-            </Text>
+            <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>▾</Text>
           </TouchableOpacity>
           {showGstPicker && (
             <View style={S.gstPickerBox}>
@@ -436,10 +405,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
               ).map(opt => (
                 <TouchableOpacity
                   key={opt.key}
-                  style={[
-                    S.gstPickerOpt,
-                    gstType === opt.key && S.gstPickerOptActive,
-                  ]}
+                  style={[S.gstPickerOpt, gstType === opt.key && S.gstPickerOptActive]}
                   onPress={() => {
                     setValue('gst_type', opt.key);
                     setShowGstPicker(false);
@@ -480,7 +446,7 @@ export const InvoiceSettingsScreen: React.FC<InvoiceSettingsScreenProps> = ({
               () => {
                 setSignatureUrl(null);
                 showAlert('info', 'Removed', 'Signature removed successfully.');
-              },
+              }
             )
           }
         />

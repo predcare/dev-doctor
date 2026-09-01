@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import { showInfoToast } from '../../../lib/common/toast.utils';
 import { theme } from '../../../styled/theme.styled';
-import { showInfoToast } from '../../../lib/commons/toast.utils';
 
 export interface EMRUploadModalProps {
   visible: boolean;
