@@ -10,6 +10,7 @@
 - [🛠️ Tech Stack & Dependencies](#%EF%B8%8F-tech-stack--dependencies)
 - [📁 Folder & File Architecture](#-folder--file-architecture)
 - [🗺️ App Navigation & Screen Hierarchy](#%EF%B8%8F-app-navigation--screen-hierarchy)
+- [📱 Page-Wise API Endpoint & Payload Breakdown](#-page-wise-api-endpoint--payload-breakdown)
 - [🌐 API Endpoints & Integration](#-api-endpoints--integration)
 - [⚙️ State Management & Data Flow](#%EF%B8%8F-state-management--data-flow)
 - [🎨 Styling & Theme System](#-styling--theme-system)
@@ -270,6 +271,101 @@ graph TD
 | `Notifications` | `NotificationsScreen` | System notification drawer |
 
 ---
+
+## 📱 Page-Wise API Endpoint & Payload Breakdown
+
+This section details the primary core page APIs, HTTP methods, route paths, request payloads, and expected responses.
+
+---
+
+### 1. 🔑 Login Screen (`LoginScreen.tsx`)
+**APIs Used**: `2` APIs
+
+#### 1.1 Send OTP API
+- **Endpoint**: `POST /doctor/auth/send-otp`
+- **Hook**: `useSendOtp()`
+- **Description**: Sends a 6-digit OTP code to the doctor's registered mobile number or email address.
+- **Request Payload**:
+  ```json
+  {
+    "identifier": "9876543210",
+    "method": "mobile"
+  }
+  ```
+- **Response Structure**:
+  ```json
+  {
+    "status": 200,
+    "success": true,
+    "message": "OTP sent successfully to 9876543210"
+  }
+  ```
+
+#### 1.2 Verify OTP API
+- **Endpoint**: `POST /doctor/auth/verify-otp`
+- **Hook**: `useVerifyOTP()`
+- **Description**: Verifies the OTP, authenticates the doctor, generates a Bearer JWT token, and returns user profile details.
+- **Request Payload**:
+  ```json
+  {
+    "identifier": "9876543210",
+    "platform": "android",
+    "otp": "123456",
+    "fcm_token": "fcm_token_string_sample",
+    "device_name": "Samsung Galaxy S23"
+  }
+  ```
+- **Response Structure**:
+  ```json
+  {
+    "status": 200,
+    "success": true,
+    "message": "Login successful",
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "user": {
+        "id": 12,
+        "name": "Dr. Alex Johnson",
+        "email": "dralex@predcare.in",
+        "mobile_number": "9876543210",
+        "role": "doctor"
+      }
+    }
+  }
+  ```
+
+---
+
+### 2. 🏠 Doctor Profile API (`HomeScreen.tsx` / `DoctorProfileScreen.tsx`)
+**APIs Used**: `1` API
+
+#### 2.1 Fetch Doctor Profile API
+- **Endpoint**: `GET /doctor/own-profile`
+- **Hook**: `useProfile()`
+- **Description**: Retrieves the logged-in doctor's detailed professional and personal profile.
+- **Request Parameters**: None (Header contains `Authorization: Bearer <token>`)
+- **Response Structure**:
+  ```json
+  {
+    "status": 200,
+    "doctor": {
+      "id": 12,
+      "name": "Dr. Alex Johnson",
+      "specialization": "Cardiologist",
+      "registration_number": "REG-884920",
+      "experience_years": 12,
+      "email": "dralex@predcare.in",
+      "mobile": "+919876543210",
+      "clinic_name": "PredCare Health Clinic",
+      "clinic_address": "123 Medical Hub, Bandra West, Mumbai",
+      "profile_image": "storage/doctors/avatars/doc_12.jpg"
+    }
+  }
+  ```
+
+---
+
+
 
 ## 🌐 API Endpoints & Integration
 
