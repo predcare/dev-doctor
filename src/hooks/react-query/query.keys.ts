@@ -57,3 +57,7 @@ export enum AppointmentsQueryKeys {
   BookedSlots = 'AppointmentsBookedSlots',
   Book = 'BookAppointment',
 }
+
+export enum MyAppointmentsQueryKeys {
+  MyAppointments = 'MyAppointments',
+}

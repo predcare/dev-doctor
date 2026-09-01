@@ -1,11 +1,18 @@
-import React from 'react';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 
-/**
- * Higher-Order Component (HOC) wrapper for screen components.
- */
 export function withScreenFocus<P extends object>(Component: React.ComponentType<P>): React.FC<P> {
   const WrappedScreen: React.FC<P> = props => {
-    return <Component {...props} />;
+    const isFocused = useIsFocused();
+    const [focusKey, setFocusKey] = useState(0);
+
+    useEffect(() => {
+      if (isFocused) {
+        setFocusKey(prev => prev + 1);
+      }
+    }, [isFocused]);
+
+    return <Component key={focusKey} {...props} />;
   };
 
   WrappedScreen.displayName = `WithScreenFocus(${

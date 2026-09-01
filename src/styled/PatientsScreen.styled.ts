@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { theme } from './theme.styled';
 
-export const patientsStyles = StyleSheet.create({
+export const MyPatientsStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -100,4 +100,4 @@ export const patientsStyles = StyleSheet.create({
   },
 });
 
-export default patientsStyles;
+export default MyPatientsStyles;

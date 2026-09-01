@@ -10,8 +10,10 @@ import {
   PrescriptionIcon,
   SettingsIcon,
 } from '../components/ui/icons';
+import { getInitials } from '../lib/common/common.utils';
 import { headerStyles } from '../styled/Header.styled';
 import { theme } from '../styled/theme.styled';
+import { useAuthStore } from '../zustand/stores/useAuthStore';
 
 const getDefaultHeaderIcon = (title?: string) => {
   if (!title) return <SettingsIcon size={20} color={theme.colors.primary} />;
@@ -59,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
   onProfilePress,
 }) => {
   const subText = description || subtitle;
-
+  const { userData } = useAuthStore(state => state);
   return (
     <View style={headerStyles.container}>
       {/* Top Profile & Action Row */}
@@ -91,15 +93,17 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <View style={headerStyles.avatarWrapper}>
               <View style={headerStyles.avatarContainer}>
-                <Text style={headerStyles.avatarText}>SJ</Text>
+                <Text style={headerStyles.avatarText}>{getInitials(userData?.name || 'Dr.')}</Text>
               </View>
               <View style={headerStyles.onlineBadge} />
             </View>
 
             <View style={headerStyles.greetingContainer}>
               <Text style={headerStyles.welcomeText}>Good morning 👋</Text>
-              <Text style={headerStyles.doctorName}>{doctorName}</Text>
-              <Text style={headerStyles.specialtyText}>{specialty}</Text>
+              <Text style={headerStyles.doctorName}>{userData?.name || 'Unknown'}</Text>
+              <Text style={headerStyles.specialtyText}>
+                {userData?.specialization || 'Unknown'}
+              </Text>
             </View>
           </TouchableOpacity>
         )}

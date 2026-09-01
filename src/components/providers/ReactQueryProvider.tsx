@@ -4,8 +4,9 @@ import React from 'react';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: true,
-      refetchOnMount: true,
+      staleTime: 1000 * 60 * 1,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
     },
   },
 });

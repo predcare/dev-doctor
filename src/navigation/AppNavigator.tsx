@@ -15,10 +15,12 @@ import { DashboardTabParamList, RootStackParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
 import ComingSoonScreen from '../Screens/ComingSoonScreen';
 import AddPatientScreen from '../Screens/DashboardScreen/AddPatientScreen';
+import DoctorAppointmentsScreen, {
+  AppointmentsScreen,
+} from '../Screens/DashboardScreen/AppointmentsScreen';
 import AvailabilityScreen from '../Screens/DashboardScreen/AvailabilityScreen';
 import BookAppointmentScreen from '../Screens/DashboardScreen/BookAppointmentScreen';
 import CreateInvoiceScreen from '../Screens/DashboardScreen/CreateInvoiceScreen';
-import DoctorAppointmentsScreen from '../Screens/DashboardScreen/DoctorAppointmentsScreen';
 import DoctorMeetingScreen from '../Screens/DashboardScreen/DoctorMeetingScreen';
 import DoctorProfileScreen from '../Screens/DashboardScreen/DoctorProfileScreen';
 import EditPatientScreen from '../Screens/DashboardScreen/EditPatientScreen';
@@ -35,7 +37,6 @@ import SettingScreen from '../Screens/DashboardScreen/SettingScreen';
 import SplashScreen from '../Screens/SplashScreen';
 import { navigationStyles } from '../styled/Navigation.styled';
 import { theme } from '../styled/theme.styled';
-import withScreenFocus from './withScreenFocus';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -48,12 +49,6 @@ const ReportsTabScreen = () => (
     description="View clinical insights, diagnostic trends, and patient health analytics."
   />
 );
-
-const FocusedHomeScreen = withScreenFocus(HomeScreen);
-const FocusedPatientsScreen = withScreenFocus(PatientsScreen);
-const FocusedScheduleScreen = withScreenFocus(DoctorAppointmentsScreen);
-const FocusedReportsScreen = withScreenFocus(ReportsTabScreen);
-const FocusedSettingScreen = withScreenFocus(SettingScreen);
 
 const DashboardTabNavigator: React.FC = () => {
   return (
@@ -68,7 +63,7 @@ const DashboardTabNavigator: React.FC = () => {
     >
       <Tab.Screen
         name="Home"
-        component={FocusedHomeScreen}
+        component={HomeScreen}
         options={{
           headerShown: false,
           title: 'Home',
@@ -99,7 +94,7 @@ const DashboardTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Patients"
-        component={FocusedPatientsScreen}
+        component={PatientsScreen}
         options={{
           headerShown: false,
           title: 'Patients',
@@ -130,7 +125,7 @@ const DashboardTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Schedule"
-        component={FocusedScheduleScreen}
+        component={DoctorAppointmentsScreen}
         options={{
           headerShown: false,
           title: 'Schedule',
@@ -161,7 +156,7 @@ const DashboardTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Reports"
-        component={FocusedReportsScreen}
+        component={ReportsTabScreen}
         options={{
           headerShown: false,
           title: 'Reports',
@@ -192,7 +187,7 @@ const DashboardTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Account"
-        component={FocusedSettingScreen}
+        component={SettingScreen}
         options={{
           headerShown: false,
           title: 'Account',
@@ -249,7 +244,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="EditPatient" component={EditPatientScreen} />
         <Stack.Screen name="Availability" component={AvailabilityScreen} />
         <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} />
-        <Stack.Screen name="DoctorAppointments" component={DoctorAppointmentsScreen} />
+        <Stack.Screen name="DoctorAppointments" component={AppointmentsScreen} />
         <Stack.Screen name="RescheduleAppointment" component={RescheduleAppointmentScreen} />
         <Stack.Screen name="DoctorMeeting" component={DoctorMeetingScreen} />
         <Stack.Screen name="PatientDetails" component={PatientDetailsScreen} />

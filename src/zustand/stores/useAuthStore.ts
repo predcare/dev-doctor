@@ -5,10 +5,10 @@ import { clearStorageExcept, STORAGE_KEYS } from '../../lib/common/asyncStorage'
 import { IMyProfileDoc } from '../../typescripts/interfaces/profile.interfaces';
 
 type TAuthState = {
-  userData: any;
+  userData: IMyProfileDoc | null;
   isLoggedIn: boolean;
   isDoctor?: boolean;
-  setUserData: (user: any) => void;
+  setUserData: (user: IMyProfileDoc | null) => void;
   logout: () => Promise<void>;
 };
 
@@ -18,7 +18,7 @@ export const useAuthStore = create<TAuthState>()(
       userData: null,
       isLoggedIn: false,
       activeWorkspace: null,
-      setUserData: (user: IMyProfileDoc) => {
+      setUserData: (user: IMyProfileDoc | null) => {
         if (!user) {
           set({
             userData: null,

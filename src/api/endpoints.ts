@@ -33,6 +33,9 @@ export const endpoints = {
     newCreate: '/doctor/patients/add',
     sendCred: '/doctor/patients/send-credentials',
   },
+  appointments: {
+    get: '/doctor/appointments/doctor',
+  },
 };
 
 export const successEndpoints = [endpoints.auth.sendOtp, endpoints.auth.verifyOtp];

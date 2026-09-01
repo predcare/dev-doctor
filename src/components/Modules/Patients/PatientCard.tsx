@@ -1,69 +1,39 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ChevronRightIcon from '../../../components/ui/icons/ChevronRightIcon';
+import { capitalizeFirstLetter } from '../../../lib/common/common.utils';
 import { theme } from '../../../styled/theme.styled';
 
-export interface PatientItem {
-  id: string;
-  patient_id?: string;
-  name: string;
-  phone_number?: string;
-  gender?: string;
-  age?: number | string;
-  date_of_birth?: string;
-  condition?: string;
-  last_visit?: string;
-}
-
 export interface PatientCardProps {
-  item: PatientItem;
   onPress?: () => void;
+  name: string;
+  patientId: string;
+  gender: string;
+  age: string;
+  condition?: string;
 }
-
-const getInitials = (name: string): string => {
-  if (!name) return 'PT';
-  const parts = name.trim().split(' ');
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-  }
-  return name.slice(0, 2).toUpperCase();
-};
 
 export const PatientCard: React.FC<PatientCardProps> = React.memo(
-  ({ item, onPress }) => {
-    const patientName = item.name || 'Unknown Patient';
-    const displayId = item.patient_id || `PAT-${item.id}`;
-    const initials = getInitials(patientName);
-    const genderInitial = item.gender ? item.gender.charAt(0).toUpperCase() : '';
-    const ageDisplay = item.age ? `${item.age}y` : '';
-
+  ({ onPress, name, patientId, gender, age, condition }) => {
     return (
-      <TouchableOpacity
-        style={styles.txCard}
-        onPress={onPress}
-        activeOpacity={0.75}
-      >
-        {/* Avatar */}
+      <TouchableOpacity style={styles.txCard} onPress={onPress} activeOpacity={0.75}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarTxt}>{initials}</Text>
+          <Text style={styles.avatarTxt}>PT</Text>
         </View>
-
-        {/* Info */}
         <View style={{ flex: 1 }}>
           <Text style={styles.txName} numberOfLines={1}>
-            {patientName}
+            {name || 'Unknown'}
           </Text>
           <Text style={styles.txSub} numberOfLines={1}>
-            {displayId}
-            {genderInitial || ageDisplay ? '  •  ' : ''}
-            {genderInitial}
-            {genderInitial && ageDisplay ? ' / ' : ''}
-            {ageDisplay}
-            {item.condition ? `  •  ${item.condition}` : ''}
+            {patientId || 'N/A'}
+            {'  •  '}
+            {capitalizeFirstLetter(gender) || 'N/A'}
+            {' / '}
+            {age || 'N/A'}
+            {condition ? `  •  ${condition}` : ''}
           </Text>
         </View>
 
-        {/* Right Arrow */}
         <ChevronRightIcon size={16} color={theme.colors.textMuted} />
       </TouchableOpacity>
     );
