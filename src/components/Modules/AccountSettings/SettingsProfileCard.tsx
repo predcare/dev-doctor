@@ -19,7 +19,7 @@ export const SettingsProfileCard = React.memo<SettingsProfileCardProps>(({ onEdi
   return (
     <View style={profileStyles.profileCard}>
       <View style={profileStyles.avatarContainer}>
-        <Text style={profileStyles.avatarText}>{getInitials(userData?.name)}</Text>
+        <Text style={profileStyles.avatarText}>{getInitials(userData?.name || '')}</Text>
       </View>
       <View style={profileStyles.profileInfo}>
         <Text style={profileStyles.doctorName} numberOfLines={2}>

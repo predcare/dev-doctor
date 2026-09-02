@@ -11,7 +11,8 @@ import {
   SettingsIcon,
 } from '../components/ui/icons';
 import useNotificationListeners from '../hooks/commons/useNotificationListeners';
-import { DashboardTabParamList, RootStackParamList } from '../route';
+import { navigationRef } from './navigationRef';
+import { RootStackParamList, DashboardTabParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
 import ComingSoonScreen from '../Screens/ComingSoonScreen';
 import AddPatientScreen from '../Screens/DashboardScreen/AddPatientScreen';
@@ -221,7 +222,6 @@ const DashboardTabNavigator: React.FC = () => {
 };
 
 export const AppNavigator: React.FC = () => {
-  const navigationRef = useNavigationContainerRef();
   useNotificationListeners(navigationRef);
   return (
     <NavigationContainer ref={navigationRef}>

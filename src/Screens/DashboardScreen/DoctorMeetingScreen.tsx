@@ -1,4 +1,3 @@
-import { MeetingProvider } from '@videosdk.live/react-native-sdk';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
@@ -7,16 +6,20 @@ import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { showErrorToast } from '../../lib/common/toast.utils';
 import type { DoctorMeetingScreenProps } from '../../route';
 import { doctorMeetingStyles as S } from '../../styled/DoctorMeetingScreen.styled';
-import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ navigation, route }) => {
-  const { userData } = useAuthStore(state => state);
   const {
     token: callToken,
     meetingId: callmeetingId,
     resetMeetingStore,
+    setIsInAppPip,
   } = useMeetingStore(state => state);
+
+  // When focused on DoctorMeetingScreen, ensure In-App PiP overlay is hidden
+  useEffect(() => {
+    setIsInAppPip(false);
+  }, [setIsInAppPip]);
 
   const isInvalidSession = !callToken || !callmeetingId;
   useEffect(() => {
@@ -57,32 +60,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
     );
   }
 
-  const doctorParticipantId = userData?.doctor_id ? `doctor_${userData.doctor_id}` : 'doctor_host';
-  const doctorDisplayName = userData?.name ? `Dr. ${userData.name}` : 'Doctor';
-  const sessionKey = `${callmeetingId}_${doctorParticipantId}`;
-
-  return (
-    <MeetingProvider
-      key={sessionKey}
-      config={{
-        meetingId: callmeetingId,
-        participantId: doctorParticipantId,
-        micEnabled: true,
-        webcamEnabled: true,
-        name: doctorDisplayName,
-        maxResolution: 'hd',
-        multiStream: true,
-        codecSwitchEnabled: true,
-        mode: 'SEND_AND_RECV',
-        debugMode: false,
-        defaultCamera: 'front',
-      }}
-      token={callToken}
-      reinitialiseMeetingOnConfigChange={true}
-    >
-      <DoctorMeetingContainer navigation={navigation} route={route} />
-    </MeetingProvider>
-  );
+  return <View style={{ flex: 1, backgroundColor: '#000000' }} />;
 };
 
 export default DoctorMeetingScreen;

@@ -25,6 +25,8 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     startTime,
     endTime,
     callDurationSeconds,
+    isNativePip,
+    setIsInAppPip,
   } = useMeetingStore();
   const { resetMeetingStore } = useMeetingStore(state => state);
 
@@ -47,13 +49,26 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
       }
     });
 
+  const handleEnterPip = React.useCallback(() => {
+    if (callState === 'CONNECTED' || callState === 'CONNECTING') {
+      setIsInAppPip(true);
+      if (navigation?.canGoBack?.()) {
+        navigation.goBack();
+      } else {
+        navigation?.navigate('DoctorAppointments');
+      }
+    } else {
+      endCall();
+    }
+  }, [callState, setIsInAppPip, navigation, endCall]);
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      endCall();
+      handleEnterPip();
       return true;
     });
     return () => backHandler.remove();
-  }, [endCall]);
+  }, [handleEnterPip]);
 
   useEffect(() => {
     if (callState === 'ERROR') {
@@ -92,6 +107,20 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     }
   }, [isTimeUp, endCall]);
 
+  // If in Native Android PiP mode, show full-screen pure video stream
+  if (isNativePip) {
+    return (
+      <View style={S.container}>
+        <MeetingStageContainer
+          callState={callState}
+          remoteParticipantId={remoteParticipantId}
+          errorMessage={errorMessage}
+          onGoBack={handleEnterPip}
+        />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaWrapper>
       <View style={S.container}>
@@ -99,7 +128,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
           callState={callState}
           remoteParticipantId={remoteParticipantId}
           errorMessage={errorMessage}
-          onGoBack={endCall}
+          onGoBack={handleEnterPip}
         />
         <DoctorMeetingHeader
           callState={callState}
@@ -121,9 +150,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
           onToggleVideo={toggleVideo}
           onSwitchCamera={switchCamera}
           onEndCall={endCall}
-          onPipPress={() => {
-            showInfoToast('PIP mode is under development');
-          }}
+          onPipPress={handleEnterPip}
           onRxPress={() => {
             showInfoToast('RX mode is under development');
           }}

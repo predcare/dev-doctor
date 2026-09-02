@@ -23,6 +23,9 @@ interface IMeetingStoreState {
   isCameraOn: boolean;
   facingMode: 'front' | 'back';
   remoteParticipantId: string | null;
+  // PiP States
+  isInAppPip: boolean;
+  isNativePip: boolean;
 
   // Actions
   setMeetingSession: (params: {
@@ -42,6 +45,8 @@ interface IMeetingStoreState {
   setCameraState: (isCameraOn: boolean) => void;
   setFacingMode: (mode: 'front' | 'back') => void;
   setRemoteParticipantId: (id: string | null) => void;
+  setIsInAppPip: (isInAppPip: boolean) => void;
+  setIsNativePip: (isNativePip: boolean) => void;
   resetMeetingStore: () => void;
 }
 
@@ -61,6 +66,8 @@ const initialState = {
   isCameraOn: true,
   facingMode: 'front' as const,
   remoteParticipantId: null,
+  isInAppPip: false,
+  isNativePip: false,
 };
 
 export const useMeetingStore = create<IMeetingStoreState>(set => ({
@@ -89,6 +96,8 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
       callDurationSeconds: callDurationSeconds ?? 0,
       callState: 'CONNECTING',
       errorMessage: null,
+      isInAppPip: false,
+      isNativePip: false,
     }),
 
   setCallState: callState => set({ callState }),
@@ -117,6 +126,10 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
           ? 'CONNECTED'
           : 'CONNECTING',
     })),
+
+  setIsInAppPip: isInAppPip => set({ isInAppPip }),
+
+  setIsNativePip: isNativePip => set({ isNativePip }),
 
   resetMeetingStore: () => set({ ...initialState }),
 }));

@@ -4,3 +4,6 @@ export * from './RemoteParticipantView';
 export * from './MeetingStageContainer';
 export * from './MeetingControlBar';
 export * from './DoctorMeetingContainer';
+export * from './InAppPipOverlay';
+export * from './RemotePipVideoView';
+export * from './GlobalMeetingManager';

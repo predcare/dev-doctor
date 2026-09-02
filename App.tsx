@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import BackdropLoader from './src/components/commons/BackdropLoader/BackdropLoader';
 import EventListener from './src/components/commons/EventListener/EventListener';
 import GlobalPopupAlert from './src/components/commons/PopupAlert/GlobalPopupAlert';
+import GlobalMeetingManager from './src/components/Modules/DoctorMeeting/GlobalMeetingManager';
 import ReactQueryProvider from './src/components/providers/ReactQueryProvider';
 import AppNavigator from './src/navigation/AppNavigator';
 
@@ -14,6 +15,7 @@ function App(): React.JSX.Element {
     <ReactQueryProvider>
       <SafeAreaProvider>
         <AppNavigator />
+        <GlobalMeetingManager />
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         <Toast position="top" />
         <GlobalPopupAlert />

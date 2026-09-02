@@ -118,11 +118,18 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     leaveRef.current = leave;
   }, [leave]);
 
-  // Cleanup on component unmount to ensure VideoSDK leaves session
+  // Cleanup on component unmount to ensure VideoSDK leaves session only when not in PiP
   useEffect(() => {
     isMountedRef.current = true;
+    if (localParticipant) {
+      hasJoinedRef.current = true;
+    }
     return () => {
       isMountedRef.current = false;
+      // If we are minimizing to In-App PiP mode, keep the call running
+      if (useMeetingStore.getState().isInAppPip) {
+        return;
+      }
       if (hasJoinedRef.current || isJoiningRef.current) {
         hasJoinedRef.current = false;
         isJoiningRef.current = false;
@@ -135,7 +142,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
         }
       }
     };
-  }, []);
+  }, [localParticipant]);
 
   useEffect(() => {
     if (participants && participants.size > 0 && isMountedRef.current) {
@@ -150,6 +157,9 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   }, [participants]);
 
   const joinCall = useCallback(() => {
+    if (localParticipant || hasJoinedRef.current) {
+      return;
+    }
     if (join && !hasJoinedRef.current && !isJoiningRef.current) {
       isJoiningRef.current = true;
       setTimeout(() => {
@@ -165,7 +175,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
         }
       }, 300);
     }
-  }, [join]);
+  }, [join, localParticipant]);
 
   const toggleAudio = useCallback(() => {
     if (toggleMic) {
