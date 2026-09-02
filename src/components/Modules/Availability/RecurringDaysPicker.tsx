@@ -6,6 +6,9 @@ export interface RecurringDaysPickerProps {
   recurringDays: string[];
   startDate?: string | null;
   endDate?: string | null;
+  startDateError?: string;
+  endDateError?: string;
+  recurringDaysError?: string;
   onToggleDay: (dayKey: string) => void;
   onChangeStartDate?: (dateStr: string) => void;
   onChangeEndDate?: (dateStr: string) => void;
@@ -51,6 +54,9 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
     recurringDays,
     startDate,
     endDate,
+    startDateError,
+    endDateError,
+    recurringDaysError,
     onToggleDay,
     onChangeStartDate,
     onChangeEndDate,
@@ -87,12 +93,11 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
 
     return (
       <View style={s.container}>
-        {/* Date Range Selectors */}
         <View style={s.rangeRow}>
           <View style={s.rangeCell}>
             <Text style={s.label}>START DATE</Text>
             <TouchableOpacity
-              style={s.dateBtn}
+              style={[s.dateBtn, Boolean(startDateError) && { borderColor: theme.colors.danger }]}
               onPress={() => setModalState({ visible: true, type: 'start' })}
               activeOpacity={0.7}
             >
@@ -101,20 +106,20 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
               </Text>
               <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>📅</Text>
             </TouchableOpacity>
+            {Boolean(startDateError) && <Text style={s.cellErrorTxt}>{startDateError}</Text>}
           </View>
 
           <View style={s.rangeCell}>
             <Text style={s.label}>END DATE</Text>
             <TouchableOpacity
-              style={s.dateBtn}
+              style={[s.dateBtn, Boolean(endDateError) && { borderColor: theme.colors.danger }]}
               onPress={() => setModalState({ visible: true, type: 'end' })}
               activeOpacity={0.7}
             >
-              <Text style={endDate ? s.dateTxt : s.phTxt}>
-                {endDate || 'Select End Date'}
-              </Text>
+              <Text style={endDate ? s.dateTxt : s.phTxt}>{endDate || 'Select End Date'}</Text>
               <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>📅</Text>
             </TouchableOpacity>
+            {Boolean(endDateError) && <Text style={s.cellErrorTxt}>{endDateError}</Text>}
           </View>
         </View>
 
@@ -131,13 +136,12 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
                   onPress={() => onToggleDay(d.key)}
                   activeOpacity={0.8}
                 >
-                  <Text style={[s.dayPillTxt, isSel && s.dayPillTxtSel]}>
-                    {d.label}
-                  </Text>
+                  <Text style={[s.dayPillTxt, isSel && s.dayPillTxtSel]}>{d.label}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
+          {Boolean(recurringDaysError) && <Text style={s.cellErrorTxt}>{recurringDaysError}</Text>}
         </View>
 
         {/* Calendar Picker Modal */}
@@ -177,7 +181,9 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
               {/* Weekday Headers */}
               <View style={s.weekRow}>
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-                  <Text key={d} style={s.weekTxt}>{d}</Text>
+                  <Text key={d} style={s.weekTxt}>
+                    {d}
+                  </Text>
                 ))}
               </View>
 
@@ -207,11 +213,7 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
                     >
                       <View style={[s.dayInner, isSelected && s.daySelected]}>
                         <Text
-                          style={[
-                            s.dayTxt,
-                            isSelected && s.dayTxtSelected,
-                            isPast && s.dayTxtPast,
-                          ]}
+                          style={[s.dayTxt, isSelected && s.dayTxtSelected, isPast && s.dayTxtPast]}
                         >
                           {day.getDate()}
                         </Text>
@@ -404,6 +406,12 @@ const s = StyleSheet.create({
   },
   dayTxtPast: {
     color: theme.colors.textMuted,
+  },
+  cellErrorTxt: {
+    color: theme.colors.danger,
+    fontSize: 11,
+    marginTop: 4,
+    fontWeight: theme.fontWeight.semibold,
   },
 });
 

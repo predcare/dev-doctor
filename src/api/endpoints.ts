@@ -36,6 +36,12 @@ export const endpoints = {
   appointments: {
     get: '/doctor/appointments/doctor',
   },
+  availablity: {
+    get: '/doctor/doctor-availability/doctor/',
+    delete: '/doctor/doctor-availability/',
+    create: '/doctor/doctor-availability/',
+    update: '/doctor/doctor-availability/',
+  },
 };
 
 export const successEndpoints = [endpoints.auth.sendOtp, endpoints.auth.verifyOtp];

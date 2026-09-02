@@ -61,3 +61,10 @@ export enum AppointmentsQueryKeys {
 export enum MyAppointmentsQueryKeys {
   MyAppointments = 'MyAppointments',
 }
+
+export enum AvailbilityQueryKeys {
+  GetAvailablity = 'GetAvailablity',
+  DeleteAvailability = 'DeleteAvailability',
+  CreateAvailability = 'CreateAvailability',
+  UpdateAvailability = 'UpdateAvailability',
+}

@@ -12,6 +12,8 @@ export interface TimeAndFeeConfigProps {
   slotDuration: number;
   inPersonFee: string;
   videoFee: string;
+  inPersonFeeError?: string;
+  videoFeeError?: string;
   hideFee?: boolean;
   requirePayment?: boolean;
   onChangeFromTime: (field: keyof TimeValue, value: string) => void;
@@ -41,6 +43,8 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
     slotDuration,
     inPersonFee,
     videoFee,
+    inPersonFeeError,
+    videoFeeError,
     hideFee = false,
     requirePayment = false,
     onChangeFromTime,
@@ -134,7 +138,7 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                 <Text style={s.consultationCheckText}>✓</Text>
               </View>
             )}
-            <Text style={s.radioOptionIcon}>🏥📹</Text>
+            <Text style={s.radioOptionIcon}>🌐</Text>
             <Text
               style={[
                 s.radioLabel,
@@ -193,13 +197,18 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
           <View style={s.feeInputGroup}>
             <Text style={s.feeLabel}>In-Person Fee (INR) *</Text>
             <TextInput
-              style={s.feeInput}
+              style={[s.feeInput, Boolean(inPersonFeeError) && { borderColor: theme.colors.danger }]}
               value={inPersonFee}
               onChangeText={onChangeInPersonFee}
               keyboardType="numeric"
               placeholder="Enter in-person consultation fee"
               placeholderTextColor={theme.colors.textMuted}
             />
+            {Boolean(inPersonFeeError) && (
+              <Text style={{ color: theme.colors.danger, fontSize: 12, marginTop: 4 }}>
+                {inPersonFeeError}
+              </Text>
+            )}
           </View>
         )}
 
@@ -207,13 +216,18 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
           <View style={s.feeInputGroup}>
             <Text style={s.feeLabel}>Video Fee (INR) *</Text>
             <TextInput
-              style={s.feeInput}
+              style={[s.feeInput, Boolean(videoFeeError) && { borderColor: theme.colors.danger }]}
               value={videoFee}
               onChangeText={onChangeVideoFee}
               keyboardType="numeric"
               placeholder="Enter video consultation fee"
               placeholderTextColor={theme.colors.textMuted}
             />
+            {Boolean(videoFeeError) && (
+              <Text style={{ color: theme.colors.danger, fontSize: 12, marginTop: 4 }}>
+                {videoFeeError}
+              </Text>
+            )}
           </View>
         )}
 
