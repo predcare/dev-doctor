@@ -61,3 +61,8 @@ export interface ILeaveReason {
   code: number;
   message: string;
 }
+
+export interface IChangeAppointmentStatusPayload {
+  appointmentId: number | string;
+  appointment_status: 'completed' | 'in_progress' | 'cancelled' | 'pending' | 'confirmed' | string;
+}

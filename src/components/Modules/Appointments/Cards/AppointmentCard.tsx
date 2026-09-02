@@ -8,6 +8,7 @@ import {
 import theme from '../../../../styled/theme.styled';
 import CustomKebabMenu from '../../../ui/CustomMenu/CustomKebabMenu';
 import {
+  CheckIcon,
   CircleXIcon,
   ClinicIcon,
   ClockIcon,
@@ -45,6 +46,10 @@ const getStatusColor = (status: string) => {
       return '#EF4444';
     case 'pending':
       return '#F59E0B';
+    case 'in-progress':
+    case 'in_progress':
+    case 'inprogress':
+      return '#0EA5E9';
     default:
       return '#3B82F6';
   }
@@ -58,6 +63,10 @@ const getStatusBackground = (status: string) => {
       return '#FEE2E2';
     case 'pending':
       return '#FEF3C7';
+    case 'in-progress':
+    case 'in_progress':
+    case 'inprogress':
+      return '#E0F2FE';
     default:
       return '#DBEAFE';
   }
@@ -101,36 +110,51 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       return rawStatus;
     }, [appointmentStatus, isExpired]);
 
-    const { isVideo, isCompleted, isCancelled, statusColor, statusBg, formattedTime } = useMemo(
-      () => ({
+    const {
+      isVideo,
+      isCompleted,
+      isCancelled,
+      isInProgress,
+      statusColor,
+      statusBg,
+      isConfirmed,
+      formattedTime,
+    } = useMemo(() => {
+      const inProgress =
+        effectiveStatus === 'in-progress' ||
+        effectiveStatus === 'in_progress' ||
+        effectiveStatus === 'inprogress';
+
+      return {
         isVideo: consultation_type?.toLowerCase() === 'video',
         isCompleted: effectiveStatus === 'completed',
         isCancelled: effectiveStatus === 'cancelled',
+        isConfirmed: effectiveStatus === 'confirmed',
+        isInProgress: inProgress,
         statusColor: getStatusColor(effectiveStatus),
         statusBg: getStatusBackground(effectiveStatus),
         formattedTime: formatTimeSlot(startTime, endTime),
-      }),
-      [consultation_type, effectiveStatus, startTime, endTime]
-    );
+      };
+    }, [consultation_type, effectiveStatus, startTime, endTime]);
 
     const menuItems = useMemo(() => {
       if (effectiveStatus === 'completed') {
-        const items = [];
-        items.push({
-          id: 'details',
-          label: 'View Details',
-          icon: <InfoCircleIcon size={18} color="#64748B" />,
-          color: '#64748B',
-          onPress: () => onViewDetails?.(),
-        });
-        items.push({
-          id: 'prescription',
-          label: 'Create Prescription',
-          icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
-          color: theme.colors.primary,
-          onPress: () => onCreatePrescription?.(),
-        });
-        return items;
+        return [
+          {
+            id: 'details',
+            label: 'View Details',
+            icon: <InfoCircleIcon size={18} color="#64748B" />,
+            color: '#64748B',
+            onPress: () => onViewDetails?.(),
+          },
+          {
+            id: 'prescription',
+            label: 'Create Prescription',
+            icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
+            color: theme.colors.primary,
+            onPress: () => onCreatePrescription?.(),
+          },
+        ];
       }
 
       if (effectiveStatus === 'cancelled') {
@@ -145,7 +169,48 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         ];
       }
 
+      if (isInProgress) {
+        return [
+          {
+            id: 'details',
+            label: 'View Details',
+            icon: <InfoCircleIcon size={18} color="#64748B" />,
+            color: '#64748B',
+            onPress: () => onViewDetails?.(),
+          },
+          {
+            id: 'complete',
+            label: 'Mark as Completed',
+            icon: <CheckIcon size={18} color="#10B981" />,
+            color: '#10B981',
+            onPress: () => onComplete?.(),
+          },
+          {
+            id: 'prescription',
+            label: 'Create Prescription',
+            icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
+            color: theme.colors.primary,
+            onPress: () => onCreatePrescription?.(),
+          },
+        ];
+      }
+
+      // Confirmed / Scheduled / Pending / Default
       return [
+        {
+          id: 'details',
+          label: 'View Details',
+          icon: <InfoCircleIcon size={18} color="#64748B" />,
+          color: '#64748B',
+          onPress: () => onViewDetails?.(),
+        },
+        {
+          id: 'complete',
+          label: 'Mark as Completed',
+          icon: <CheckIcon size={18} color="#10B981" />,
+          color: '#10B981',
+          onPress: () => onComplete?.(),
+        },
         {
           id: 'reschedule',
           label: 'Reschedule',
@@ -153,8 +218,23 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           color: '#64748B',
           onPress: () => onReschedule?.(),
         },
+        {
+          id: 'cancel',
+          label: 'Cancel Appointment',
+          icon: <CircleXIcon size={18} color="#EF4444" />,
+          color: '#EF4444',
+          onPress: () => onCancel?.(),
+        },
       ];
-    }, [effectiveStatus, onViewDetails, onCreatePrescription, onReschedule]);
+    }, [
+      effectiveStatus,
+      isInProgress,
+      onViewDetails,
+      onCreatePrescription,
+      onComplete,
+      onReschedule,
+      onCancel,
+    ]);
 
     return (
       <View style={S.card}>
@@ -175,7 +255,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             <View style={[S.statusBadge, { backgroundColor: statusBg }]}>
               <View style={[S.statusDot, { backgroundColor: statusColor }]} />
               <Text style={[S.statusText, { color: statusColor }]}>
-                {effectiveStatus.toUpperCase()}
+                {effectiveStatus.replace(/[-_]/g, ' ').toUpperCase()}
               </Text>
             </View>
             {menuItems.length > 0 && (
@@ -188,7 +268,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         </View>
 
         <View style={S.chipsRow}>
-          {/* Type Chip */}
           <View
             style={[
               S.chip,
@@ -232,15 +311,25 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         )}
 
         {!isCompleted && !isCancelled && (
-          <View style={S.cardFooterActions}>
+          <View style={[S.cardFooterActions, isInProgress && { flexDirection: 'row', gap: 10 }]}>
             <TouchableOpacity
-              style={S.joinButton}
-              onPress={onStartConsultation || onViewDetails}
+              style={[S.joinButton, isInProgress && { flex: 1 }]}
+              onPress={onStartConsultation}
               activeOpacity={0.85}
             >
               <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
               <Text style={S.joinButtonText}>{isVideo ? 'Join Call' : 'Start Consultation'}</Text>
             </TouchableOpacity>
+            {isInProgress && (
+              <TouchableOpacity
+                style={[S.completeButton, { flex: 1 }]}
+                onPress={onComplete}
+                activeOpacity={0.85}
+              >
+                <CheckIcon size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Text style={S.joinButtonText}>Completed</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>

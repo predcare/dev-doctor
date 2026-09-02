@@ -63,3 +63,53 @@ export const capitalizeFirstLetter = (value?: string): string => {
 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
+
+
+export const formatDateToYYYYMMDD = (d: Date): string => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+export const formatTodayBannerDate = (d: Date): string => {
+  const day = d.getDate();
+  const monthNames = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEPT',
+    'OCT',
+    'NOV',
+    'DEC',
+  ];
+  const month = monthNames[d.getMonth()];
+  const year = d.getFullYear();
+  return `${day} ${month} ${year}`;
+};
+
+export const checkIsExpired = (appointmentDate: string, endTime?: string, startTime?: string): boolean => {
+  if (!appointmentDate) return false;
+  const now = new Date();
+  const todayStr = formatDateToYYYYMMDD(now);
+
+  if (appointmentDate < todayStr) {
+    return true;
+  }
+
+  if (appointmentDate === todayStr) {
+    const timeToCheck = endTime || startTime;
+    if (!timeToCheck) return false;
+
+    const parts = timeToCheck.split(':').map(Number);
+    const timeMs = new Date(now).setHours(parts[0] || 0, parts[1] || 0, parts[2] || 0, 0);
+    return now.getTime() > timeMs;
+  }
+
+  return false;
+};

@@ -24,3 +24,13 @@ export const sendHeartBeat = async (body: {
   const res = await axiosInstance.post(`${endpoints.appointments.heartbeat}`, body);
   return res.data;
 };
+
+export const changeAppointmentStatus = async (body: {
+  appointmentId: number | string;
+  appointment_status: string;
+}) => {
+  const res = await axiosInstance.patch(endpoints.appointments.statusChange(body.appointmentId), {
+    appointment_status: body.appointment_status,
+  });
+  return res.data;
+};

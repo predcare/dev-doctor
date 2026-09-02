@@ -387,6 +387,14 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
+  completeButton: {
+    backgroundColor: '#10B981',
+    borderRadius: 12,
+    paddingVertical: 13,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   kebabCircleBtn: {
     width: 38,
     height: 38,

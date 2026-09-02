@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import CommonConfirmModal from '../../components/commons/CommonConfirmModal/CommonConfirmModal';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
 import AppointmentCard from '../../components/Modules/Appointments/Cards/AppointmentCard';
@@ -20,10 +21,18 @@ import { queryClient } from '../../components/providers/ReactQueryProvider';
 import AppointmentSkeleton from '../../components/Skeletons/AppointmentSkeleton';
 import { CircleXIcon, FilterIcon, SearchIcon } from '../../components/ui/icons';
 import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
-import { useMyAppointments } from '../../hooks/react-query/appointments/appointments.hooks';
+import {
+  useChangeAppointmentStatus,
+  useMyAppointments,
+} from '../../hooks/react-query/appointments/appointments.hooks';
 import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import {
+  checkIsExpired,
+  formatDateToYYYYMMDD,
+  formatTodayBannerDate,
+} from '../../lib/common/common.utils';
 import { showErrorToast } from '../../lib/common/toast.utils';
 import { MockAppointment } from '../../resources/mockData';
 import type { DoctorAppointmentsScreenProps } from '../../route';
@@ -31,58 +40,10 @@ import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsSc
 import { theme } from '../../styled/theme.styled';
 import { IAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type TabType = 'both' | 'inperson' | 'video';
-
-const formatDateToYYYYMMDD = (d: Date): string => {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-};
-
-const formatTodayBannerDate = (d: Date): string => {
-  const day = d.getDate();
-  const monthNames = [
-    'JAN',
-    'FEB',
-    'MAR',
-    'APR',
-    'MAY',
-    'JUN',
-    'JUL',
-    'AUG',
-    'SEPT',
-    'OCT',
-    'NOV',
-    'DEC',
-  ];
-  const month = monthNames[d.getMonth()];
-  const year = d.getFullYear();
-  return `${day} ${month} ${year}`;
-};
-
-const checkIsExpired = (appointmentDate: string, endTime?: string, startTime?: string): boolean => {
-  if (!appointmentDate) return false;
-  const now = new Date();
-  const todayStr = formatDateToYYYYMMDD(now);
-
-  if (appointmentDate < todayStr) {
-    return true;
-  }
-
-  if (appointmentDate === todayStr) {
-    const timeToCheck = endTime || startTime;
-    if (!timeToCheck) return false;
-
-    const parts = timeToCheck.split(':').map(Number);
-    const timeMs = new Date(now).setHours(parts[0] || 0, parts[1] || 0, parts[2] || 0, 0);
-    return now.getTime() > timeMs;
-  }
-
-  return false;
-};
 
 export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState<TabType>('both');
@@ -99,6 +60,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
   });
 
   const [selectedDetailsApt, setSelectedDetailsApt] = useState<MockAppointment | null>(null);
+  const [confirmCompleteAptId, setConfirmCompleteAptId] = useState<number | string | null>(null);
 
   const isCustomFilterApplied = useMemo(() => {
     const isDefaultDate = filterStates.dateRange === 'today';
@@ -112,6 +74,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
   }, [filterStates, searchQuery, activeTab]);
 
   const { userData } = useAuthStore(state => state);
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
   const { setMeetingSession } = useMeetingStore(state => state);
 
   const {
@@ -124,7 +87,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
     doctorId: userData?.user_id,
   });
 
-  // Stats calculation and filtered appointments list
+  const { mutate: changeStatus } = useChangeAppointmentStatus();
+
   const { stats, filteredAppointments } = useMemo(() => {
     const appointmentsList: IAppointmentDoc[] = myAppointments || [];
     const now = new Date();
@@ -336,6 +300,29 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
     [navigation, queryClient, setMeetingSession]
   );
 
+  const handleMarkCompleted = useCallback(
+    (appointmentId: number | string) => {
+      showLoader('Loading...');
+      changeStatus(
+        { appointmentId, appointment_status: 'completed' },
+        {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries({
+              queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+            });
+            hideLoader();
+            setConfirmCompleteAptId(null);
+          },
+          onError: () => {
+            hideLoader();
+            setConfirmCompleteAptId(null);
+          },
+        }
+      );
+    },
+    [changeStatus, queryClient, showLoader, hideLoader]
+  );
+
   return (
     <SafeAreaWrapper>
       <Header
@@ -482,6 +469,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
                 isExpired={isExpired}
                 onViewDetails={() => setSelectedDetailsApt(item as any)}
                 onStartConsultation={() => handleJoinVideoCall(item)}
+                onComplete={() => setConfirmCompleteAptId(item.id)}
               />
             );
           }}
@@ -507,6 +495,21 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         onClose={() => {
           handleResetFilters();
         }}
+      />
+
+      <CommonConfirmModal
+        visible={confirmCompleteAptId !== null}
+        title="Complete Appointment"
+        message="Are you sure you want to mark this appointment as completed?"
+        confirmText="Yes, Complete"
+        cancelText="Cancel"
+        type="info"
+        onConfirm={() => {
+          if (confirmCompleteAptId) {
+            handleMarkCompleted(confirmCompleteAptId);
+          }
+        }}
+        onCancel={() => setConfirmCompleteAptId(null)}
       />
     </SafeAreaWrapper>
   );

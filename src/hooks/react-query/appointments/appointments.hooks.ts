@@ -1,6 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { MyAppointmentsQueryKeys } from '../query.keys';
-import { getApptToken, getMyAppointments, sendHeartBeat } from './appointments.func';
+import {
+  changeAppointmentStatus,
+  getApptToken,
+  getMyAppointments,
+  sendHeartBeat,
+} from './appointments.func';
 
 export const useMyAppointments = (params?: { doctorId?: number | string }) =>
   useQuery({
@@ -25,3 +30,11 @@ export const useSendHeartBeat = () =>
   useMutation({
     mutationFn: sendHeartBeat,
   });
+
+export const useChangeAppointmentStatus = () => {
+  return useMutation({
+    mutationKey: [MyAppointmentsQueryKeys.StatusChange],
+    mutationFn: (payload: { appointmentId: number | string; appointment_status: string }) =>
+      changeAppointmentStatus(payload),
+  });
+};

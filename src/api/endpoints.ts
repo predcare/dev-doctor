@@ -38,6 +38,8 @@ export const endpoints = {
     getToken: (appointmentId: number | string) =>
       `/doctor/appointments/${appointmentId}/video-token`,
     heartbeat: '/doctor/appointments/heartbeat',
+    statusChange: (appointmentId: number | string) =>
+      `/doctor/appointments/${appointmentId}/status`,
   },
   availablity: {
     get: '/doctor/doctor-availability/doctor/',
