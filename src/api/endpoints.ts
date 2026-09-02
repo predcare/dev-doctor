@@ -35,6 +35,7 @@ export const endpoints = {
   },
   appointments: {
     get: '/doctor/appointments/doctor',
+    getToken: (appointmentId: number | string) => `/doctor/appointments/${appointmentId}/video-token`,
   },
   availablity: {
     get: '/doctor/doctor-availability/doctor/',

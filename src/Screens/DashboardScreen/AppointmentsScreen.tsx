@@ -16,17 +16,22 @@ import AppointmentFilterModal, {
   FilterStates,
 } from '../../components/Modules/Appointments/Modals/AppointmentFilterModal';
 import AppointmentInfoModal from '../../components/Modules/Appointments/Modals/AppointmentInfoModal';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import AppointmentSkeleton from '../../components/Skeletons/AppointmentSkeleton';
 import { CircleXIcon, FilterIcon, SearchIcon } from '../../components/ui/icons';
+import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
 import { useMyAppointments } from '../../hooks/react-query/appointments/appointments.hooks';
+import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import { showErrorToast } from '../../lib/common/toast.utils';
 import { MockAppointment } from '../../resources/mockData';
 import type { DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { IAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type TabType = 'both' | 'inperson' | 'video';
 
@@ -107,6 +112,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
   }, [filterStates, searchQuery, activeTab]);
 
   const { userData } = useAuthStore(state => state);
+  const { setMeetingSession } = useMeetingStore(state => state);
 
   const {
     data: myAppointments,
@@ -275,6 +281,61 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
     setSelectedDetailsApt(null);
   }, []);
 
+  const handleJoinVideoCall = useCallback(
+    async (appointment: IAppointmentDoc) => {
+      if (!appointment) return;
+      const apptId = appointment.id;
+      let token: string | undefined;
+      let meetingId: string | undefined = appointment.meeting_id;
+      let call_duration_seconds: number | undefined = appointment.call_duration_seconds;
+      if (!apptId) {
+        showErrorToast('No valid appointment ID found to fetch token');
+        return;
+      }
+
+      try {
+        const tokenResponse = await queryClient.fetchQuery({
+          queryKey: [MyAppointmentsQueryKeys.MyAppointments, 'token', apptId],
+          queryFn: () => getApptToken(apptId),
+        });
+        token = tokenResponse?.token;
+        meetingId = tokenResponse?.meeting_id;
+      } catch (error) {
+        console.error('Failed to fetch fresh appointment token:', error);
+      }
+
+      // Fallback to appointment cached credentials if fetch returned empty
+      if (!token && appointment.token) {
+        token = appointment.token;
+        call_duration_seconds = appointment.call_duration_seconds;
+      }
+
+      // Sanitize token & meetingId strings
+      const cleanedToken = token?.trim().replace(/^["']|["']$/g, '');
+      const cleanedMeetingId = meetingId?.trim().replace(/^["']|["']$/g, '');
+
+      if (!cleanedToken || !cleanedMeetingId) {
+        showErrorToast('Meeting credentials missing or invalid');
+        return;
+      }
+
+      setMeetingSession({
+        token: cleanedToken,
+        meetingId: cleanedMeetingId,
+        appointmentId: apptId,
+        patientName: appointment.patient_name,
+        patientAlphanumericId: appointment.patient_alphanumeric_id,
+        appointmentGeneratedId: appointment.appointment_id,
+        startTime: appointment.start_time,
+        endTime: appointment.end_time,
+        callDurationSeconds: call_duration_seconds ?? 0,
+      });
+
+      navigation?.navigate('DoctorMeeting');
+    },
+    [navigation, queryClient, setMeetingSession]
+  );
+
   return (
     <SafeAreaWrapper>
       <Header
@@ -282,7 +343,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         description="View and manage patient schedule"
         unreadCount={3}
         onNotificationPress={() => navigation?.navigate('Notifications')}
-        onBackPress={navigation?.canGoBack?.() ? () => navigation?.goBack() : undefined}
       />
 
       <AppointmentStatsCard todayCount={stats.todayCount} upcoming3hCount={stats.upcoming3hCount} />
@@ -421,6 +481,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
                 endTime={item.end_time}
                 isExpired={isExpired}
                 onViewDetails={() => setSelectedDetailsApt(item as any)}
+                onStartConsultation={() => handleJoinVideoCall(item)}
               />
             );
           }}

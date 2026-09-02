@@ -8,3 +8,8 @@ export const getMyAppointments = async (doctorId: number | string) => {
   );
   return res.data;
 };
+
+export const getApptToken = async (appointmentId: number | string) => {
+  const res = await axiosInstance.get<any>(`${endpoints.appointments.getToken(appointmentId)}`);
+  return res.data;
+};

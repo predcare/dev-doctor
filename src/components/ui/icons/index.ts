@@ -49,3 +49,14 @@ export * from './VideoIcon';
 export * from './CheckIcon';
 export * from './FilterIcon';
 export * from './WalletIcon';
+export * from './MicOffIcon';
+export * from './MicOnIcon';
+export * from './CameraOffIcon';
+export * from './CameraOnIcon';
+export * from './FlipCameraIcon';
+export * from './RxIcon';
+export * from './UploadIcon';
+export * from './PipIcon';
+export * from './EndPhoneIcon';
+export * from './TinyMicOffIcon';
+

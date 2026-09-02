@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { MyAppointmentsQueryKeys } from '../query.keys';
-import { getMyAppointments } from './appointments.func';
+import { getApptToken, getMyAppointments } from './appointments.func';
 
 export const useMyAppointments = (params?: { doctorId?: number | string }) =>
   useQuery({
@@ -12,4 +12,11 @@ export const useMyAppointments = (params?: { doctorId?: number | string }) =>
       if (Array.isArray(v?.appointments)) return v.appointments;
       return [];
     },
+  });
+
+export const useApptToken = (params?: { appointmentId?: number | string }) =>
+  useQuery({
+    queryKey: [MyAppointmentsQueryKeys.Token, params?.appointmentId],
+    queryFn: () => getApptToken(params?.appointmentId!),
+    enabled: !!params?.appointmentId,
   });

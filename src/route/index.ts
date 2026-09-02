@@ -50,7 +50,7 @@ export type RootStackParamList = {
   BookAppointment: { user?: any; patientId?: string } | undefined;
   DoctorAppointments: { user?: any; refresh?: boolean } | undefined;
   RescheduleAppointment: { appointmentId?: number; patientId?: string } | undefined;
-  DoctorMeeting: { appointmentId?: number; patientId?: string } | undefined;
+  DoctorMeeting: { appointmentId?: number | string; patientId?: string; token?: string; meetingId?: string } | undefined;
   PatientDetails: { patientId?: string; patientName?: string } | undefined;
   InvoiceList: { user?: any } | undefined;
   CreateInvoice: {
