@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme, globalShadows } from './theme.styled';
+import { globalShadows, theme } from './theme.styled';
 
 export const comingSoonStyles = StyleSheet.create({
   container: {

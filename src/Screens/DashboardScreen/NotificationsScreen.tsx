@@ -22,6 +22,7 @@ import {
   PillIcon,
   ProfileIcon,
 } from '../../components/ui/icons';
+import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
 import type { NotificationsScreenProps } from '../../route';
 import { notificationsStyles as styles } from '../../styled/NotificationsScreen.styled';
 import { theme } from '../../styled/theme.styled';
@@ -212,68 +213,70 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation?.goBack()}
-            activeOpacity={0.8}
-          >
-            <View style={styles.backBtnCircle}>
-              <ChevronLeftIcon size={18} color={theme.colors.primary} />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Notifications</Text>
-          <View style={{ width: 44 }} />
-        </View>
-      </SafeAreaView>
+    <SafeAreaWrapper>
+      <View style={styles.container}>
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation?.goBack()}
+              activeOpacity={0.8}
+            >
+              <View style={styles.backBtnCircle}>
+                <ChevronLeftIcon size={18} color={theme.colors.primary} />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Notifications</Text>
+            <View style={{ width: 44 }} />
+          </View>
+        </SafeAreaView>
 
-      {!notificationsData || notificationsData.length === 0 ? (
-        <NotificationEmptyCard />
-      ) : (
-        <FlatList
-          data={groups}
-          keyExtractor={g => g.label}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[theme.colors.primary]}
-              tintColor={theme.colors.primary}
-            />
-          }
-          renderItem={({ item: group }) => (
-            <View>
-              <Text style={styles.groupLabel}>{group.label}</Text>
-              {group.data.map(notif => (
-                <View key={notif.id} style={{ marginBottom: 10 }}>
-                  <NotificationCard
-                    item={notif}
-                    onDelete={() => handleDeleteNotification(notif.id)}
-                    icon={getNotificationIcon(notif.event_category)}
-                  />
-                </View>
-              ))}
-            </View>
-          )}
+        {!notificationsData || notificationsData.length === 0 ? (
+          <NotificationEmptyCard />
+        ) : (
+          <FlatList
+            data={groups}
+            keyExtractor={g => g.label}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[theme.colors.primary]}
+                tintColor={theme.colors.primary}
+              />
+            }
+            renderItem={({ item: group }) => (
+              <View>
+                <Text style={styles.groupLabel}>{group.label}</Text>
+                {group.data.map(notif => (
+                  <View key={notif.id} style={{ marginBottom: 10 }}>
+                    <NotificationCard
+                      item={notif}
+                      onDelete={() => handleDeleteNotification(notif.id)}
+                      icon={getNotificationIcon(notif.event_category)}
+                    />
+                  </View>
+                ))}
+              </View>
+            )}
+          />
+        )}
+
+        <CommonConfirmModal
+          visible={!!deleteTargetId}
+          title="Delete Notification"
+          message="Are you sure you want to delete this notification? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          type="danger"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteTargetId(null)}
         />
-      )}
-
-      <CommonConfirmModal
-        visible={!!deleteTargetId}
-        title="Delete Notification"
-        message="Are you sure you want to delete this notification? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        type="danger"
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setDeleteTargetId(null)}
-      />
-    </View>
+      </View>
+    </SafeAreaWrapper>
   );
 };
 

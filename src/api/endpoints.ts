@@ -29,6 +29,7 @@ export const endpoints = {
   patients: {
     get: '/doctor/patients/doctor/',
     delete: '/doctor/patients/',
+    details: '/doctor//patients',
     linkExisting: '/doctor/patients/link-existing',
     newCreate: '/doctor/patients/add',
     sendCred: '/doctor/patients/send-credentials',

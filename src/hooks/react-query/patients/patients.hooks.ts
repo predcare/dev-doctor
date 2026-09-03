@@ -3,6 +3,7 @@ import { PatientsQueryKeys } from '../query.keys';
 import {
   createNewPatient,
   deletePatient,
+  getMyPatientsInfo,
   getMyPatientsList,
   linkExistingPatient,
   sendPatientCredentials,
@@ -51,3 +52,10 @@ export const useSendPatientCredentials = () => {
     mutationFn: (payload: ISendPatientCredentialsPayload) => sendPatientCredentials(payload),
   });
 };
+
+export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.Patients, params],
+    queryFn: () => getMyPatientsInfo(params?.patientId!),
+    enabled: !!params?.patientId,
+  });

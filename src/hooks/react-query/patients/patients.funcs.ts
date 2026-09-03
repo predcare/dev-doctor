@@ -42,3 +42,8 @@ export const sendPatientCredentials = async (payload: ISendPatientCredentialsPay
   const res = await axiosInstance.post<ICommonRoot>(endpoints.patients.sendCred, payload);
   return res.data;
 };
+
+export const getMyPatientsInfo = async (patientId: number | string) => {
+  const res = await axiosInstance.get<ICommonRoot>(`${endpoints.patients.details}${patientId}`);
+  return res.data;
+};
