@@ -44,8 +44,8 @@ export interface PatientInvoiceTabProps {
   navigation: any;
 }
 
-export interface PatientProfileTabPanelProps {
-  patientId: string;
-  patientName?: string;
-  navigation: any;
-}
+// export interface PatientProfileTabPanelProps {
+//   patientId: string;
+//   patientName?: string;
+//   navigation: any;
+// }

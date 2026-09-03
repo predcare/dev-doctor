@@ -23,7 +23,7 @@ export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
 
   const topInset = edges.includes('top')
     ? Platform.OS === 'android'
-      ? (StatusBar.currentHeight ?? insets.top)
+      ? Math.max(insets.top, StatusBar.currentHeight || 0)
       : insets.top
     : 0;
 

@@ -29,7 +29,7 @@ export const endpoints = {
   patients: {
     get: '/doctor/patients/doctor/',
     delete: '/doctor/patients/',
-    details: '/doctor//patients',
+    details: '/doctor/patients/',
     linkExisting: '/doctor/patients/link-existing',
     newCreate: '/doctor/patients/add',
     sendCred: '/doctor/patients/send-credentials',
@@ -47,6 +47,16 @@ export const endpoints = {
     delete: '/doctor/doctor-availability/',
     create: '/doctor/doctor-availability/',
     update: '/doctor/doctor-availability/',
+  },
+  commons: {
+    country: '/patients/locations/countries',
+    states: '/patients/locations/states/',
+    cities: '/patients/locations/cities/',
+  },
+  invoices: {
+    patientInvoices: '/doctor/invoices/doctor/',
+    downloadPdf: (invoiceId: number | string) => `/doctor/invoices/${invoiceId}/pdf`,
+    invoiceSettings: '/doctor/invoices/settings/',
   },
 };
 

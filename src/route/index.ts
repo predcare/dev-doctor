@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 /**
  * Navigation Route Names Constants
  */
-export const ROUTES = {
+export const AppRoute = {
   SPLASH: 'Splash',
   LOGIN: 'Login',
   NOTIFICATIONS: 'Notifications',
@@ -31,7 +31,7 @@ export const ROUTES = {
   ACCOUNT: 'Account',
 } as const;
 
-export type RouteNames = (typeof ROUTES)[keyof typeof ROUTES];
+export type RouteNames = (typeof AppRoute)[keyof typeof AppRoute];
 
 /**
  * Root Stack Navigator Parameter List
@@ -45,20 +45,25 @@ export type RootStackParamList = {
   PrescriptionView: { rxId?: string; patientId?: string; patientName?: string } | undefined;
   InvoiceSettings: { user?: any } | undefined;
   AddPatient: { user?: any } | undefined;
-  EditPatient: { patientId?: string; patientName?: string } | undefined;
+  EditPatient: { patientId?: string | number; patientName?: string } | undefined;
   Availability: { user?: any } | undefined;
   BookAppointment: { user?: any; patientId?: string } | undefined;
   DoctorAppointments: { user?: any; refresh?: boolean } | undefined;
   RescheduleAppointment: { appointmentId?: number; patientId?: string } | undefined;
-  DoctorMeeting: { appointmentId?: number | string; patientId?: string; token?: string; meetingId?: string } | undefined;
-  PatientDetails: { patientId?: string; patientName?: string } | undefined;
+  DoctorMeeting:
+    | { appointmentId?: number | string; patientId?: string; token?: string; meetingId?: string }
+    | undefined;
+  PatientDetails: { patientId?: string | number; patientName?: string } | undefined;
   InvoiceList: { user?: any } | undefined;
-  CreateInvoice: {
-    patientId?: string;
-    patientName?: string;
-    appointmentId?: string;
-    fee?: number;
-  } | undefined;
+  CreateInvoice:
+    | {
+        patientId?: string | number;
+        patientGeneratedId?: string;
+        patientName?: string;
+        appointmentId?: string;
+        fee?: number;
+      }
+    | undefined;
   MainTabs: undefined;
 };
 
@@ -97,28 +102,40 @@ export interface LoginScreenProps {
   route?: LoginScreenRouteProp;
 }
 
-export type NotificationsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Notifications'>;
+export type NotificationsScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Notifications'
+>;
 export type NotificationsScreenRouteProp = RouteProp<RootStackParamList, 'Notifications'>;
 export interface NotificationsScreenProps {
   navigation?: NotificationsScreenNavigationProp;
   route?: NotificationsScreenRouteProp;
 }
 
-export type InvoiceListScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'InvoiceList'>;
+export type InvoiceListScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'InvoiceList'
+>;
 export type InvoiceListScreenRouteProp = RouteProp<RootStackParamList, 'InvoiceList'>;
 export interface InvoiceListScreenProps {
   navigation?: InvoiceListScreenNavigationProp;
   route?: InvoiceListScreenRouteProp;
 }
 
-export type CreateInvoiceScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CreateInvoice'>;
+export type CreateInvoiceScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'CreateInvoice'
+>;
 export type CreateInvoiceScreenRouteProp = RouteProp<RootStackParamList, 'CreateInvoice'>;
 export interface CreateInvoiceScreenProps {
   navigation?: CreateInvoiceScreenNavigationProp;
   route?: CreateInvoiceScreenRouteProp;
 }
 
-export type EditPatientScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditPatient'>;
+export type EditPatientScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'EditPatient'
+>;
 export type EditPatientScreenRouteProp = RouteProp<RootStackParamList, 'EditPatient'>;
 export interface EditPatientScreenProps {
   navigation?: EditPatientScreenNavigationProp;
@@ -178,49 +195,73 @@ export interface ProfileScreenProps {
   route?: ProfileScreenRouteProp;
 }
 
-export type DoctorProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'DoctorProfile'>;
+export type DoctorProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'DoctorProfile'
+>;
 export type DoctorProfileScreenRouteProp = RouteProp<RootStackParamList, 'DoctorProfile'>;
 export interface DoctorProfileScreenProps {
   navigation?: DoctorProfileScreenNavigationProp;
   route?: DoctorProfileScreenRouteProp;
 }
 
-export type PatientDetailsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PatientDetails'>;
+export type PatientDetailsScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'PatientDetails'
+>;
 export type PatientDetailsScreenRouteProp = RouteProp<RootStackParamList, 'PatientDetails'>;
 export interface PatientDetailsScreenProps {
   navigation?: PatientDetailsScreenNavigationProp;
   route?: PatientDetailsScreenRouteProp;
 }
 
-export type PrescriptionViewScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'PrescriptionView'>;
+export type PrescriptionViewScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'PrescriptionView'
+>;
 export type PrescriptionViewScreenRouteProp = RouteProp<RootStackParamList, 'PrescriptionView'>;
 export interface PrescriptionViewScreenProps {
   navigation?: PrescriptionViewScreenNavigationProp;
   route?: PrescriptionViewScreenRouteProp;
 }
 
-export type BookAppointmentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'BookAppointment'>;
+export type BookAppointmentScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'BookAppointment'
+>;
 export type BookAppointmentScreenRouteProp = RouteProp<RootStackParamList, 'BookAppointment'>;
 export interface BookAppointmentScreenProps {
   navigation?: BookAppointmentScreenNavigationProp;
   route?: BookAppointmentScreenRouteProp;
 }
 
-export type DoctorAppointmentsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'DoctorAppointments'>;
+export type DoctorAppointmentsScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'DoctorAppointments'
+>;
 export type DoctorAppointmentsScreenRouteProp = RouteProp<RootStackParamList, 'DoctorAppointments'>;
 export interface DoctorAppointmentsScreenProps {
   navigation?: DoctorAppointmentsScreenNavigationProp;
   route?: DoctorAppointmentsScreenRouteProp;
 }
 
-export type RescheduleAppointmentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'RescheduleAppointment'>;
-export type RescheduleAppointmentScreenRouteProp = RouteProp<RootStackParamList, 'RescheduleAppointment'>;
+export type RescheduleAppointmentScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'RescheduleAppointment'
+>;
+export type RescheduleAppointmentScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'RescheduleAppointment'
+>;
 export interface RescheduleAppointmentScreenProps {
   navigation?: RescheduleAppointmentScreenNavigationProp;
   route?: RescheduleAppointmentScreenRouteProp;
 }
 
-export type DoctorMeetingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'DoctorMeeting'>;
+export type DoctorMeetingScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'DoctorMeeting'
+>;
 export type DoctorMeetingScreenRouteProp = RouteProp<RootStackParamList, 'DoctorMeeting'>;
 export interface DoctorMeetingScreenProps {
   navigation?: DoctorMeetingScreenNavigationProp;

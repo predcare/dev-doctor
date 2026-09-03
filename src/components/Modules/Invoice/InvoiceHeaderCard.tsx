@@ -1,10 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { theme } from '../../../styled/theme.styled';
 
 interface InvoiceHeaderCardProps {
   patientName: string;
-  patientId: string;
+  patientGenId: string;
   patientAge?: string;
   patientGender?: string;
   clinicName?: string;
@@ -16,18 +15,15 @@ interface InvoiceHeaderCardProps {
 
 export const InvoiceHeaderCard: React.FC<InvoiceHeaderCardProps> = ({
   patientName,
-  patientId,
+  patientGenId,
   patientAge = '34y',
   patientGender = 'Female',
   clinicName = 'Pred Care Multispecialty Clinic',
   clinicAddress = '7th Block, Koramangala, Bengaluru, KA',
-  invoiceNumber,
-  invoiceDate,
   onEditClinicPress,
 }) => {
   return (
     <View style={styles.container}>
-      {/* ── Patient Details Card ── */}
       <View style={styles.patientCard}>
         <View style={styles.patientAvatar}>
           <Text style={styles.patientAvatarTxt}>
@@ -38,7 +34,7 @@ export const InvoiceHeaderCard: React.FC<InvoiceHeaderCardProps> = ({
           <Text style={styles.patientLabel}>PATIENT DETAILS</Text>
           <Text style={styles.patientName}>{patientName}</Text>
           <Text style={styles.patientMeta}>
-            {[patientAge, patientGender, `ID: #${patientId}`].join('  •  ')}
+            {[patientAge, patientGender, `ID: #${patientGenId}`].join('  •  ')}
           </Text>
         </View>
       </View>

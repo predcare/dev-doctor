@@ -14,7 +14,8 @@ export enum NotificationQueryKeys {
 }
 
 export enum PatientsQueryKeys {
-  Patients = 'Patients',
+  PatientsList = 'PatientsList',
+  PatientInfo = 'PatientInfo',
   LinkExisting = 'LinkExisting',
   NewCreate = 'NewCreate',
   SendCred = 'SendCred',
@@ -69,4 +70,9 @@ export enum AvailbilityQueryKeys {
   DeleteAvailability = 'DeleteAvailability',
   CreateAvailability = 'CreateAvailability',
   UpdateAvailability = 'UpdateAvailability',
+}
+
+export enum MyInvoices {
+  PatientInvoices = 'PatientInvoices',
+  InvoiceSettings = 'InvoiceSettings',
 }

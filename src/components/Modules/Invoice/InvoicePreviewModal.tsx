@@ -1,104 +1,112 @@
 import React from 'react';
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Toast from 'react-native-toast-message';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useDownloadInvoicePdf } from '../../../hooks/react-query/invoices/invoices.hooks';
+import { handleInvoicePdfAction } from '../../../lib/common/file.utils';
+import { showErrorToast } from '../../../lib/common/toast.utils';
 import { theme } from '../../../styled/theme.styled';
-import { Invoice } from '../../../typescripts/types/invoice.types';
+import { IInvoiceDoc } from '../../../typescripts/interfaces/invoices.interfaces';
 
 interface InvoicePreviewModalProps {
   visible: boolean;
-  invoice: Invoice | null;
+  invoice: IInvoiceDoc | null;
   onClose: () => void;
+  patientGeneratedId?: string | number;
 }
 
 export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
   visible,
   invoice,
   onClose,
+  patientGeneratedId,
 }) => {
+  const { mutate: downloadPdf, isPending: isDownloading } = useDownloadInvoicePdf();
+
   if (!invoice) return null;
 
-  const handlePrint = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Sending to Printer...',
-      text2: `Invoice ${invoice.invoiceNumber} queued for printing.`,
-      position: 'bottom',
+  const invoiceNumber = invoice.invoice_number || '';
+  const patientName = invoice.patient_name || 'Patient';
+  const patientId = patientGeneratedId || '';
+  const paymentStatus = invoice.payment_status || 'pending';
+  const paymentMode = invoice.payment_mode || 'Cash';
+
+  const subtotalNum = parseFloat(String(invoice.subtotal || 0));
+  const totalDiscountNum = parseFloat(String(invoice.total_discount || 0));
+  const cgstNum = parseFloat(String(invoice.cgst || 0));
+  const sgstNum = parseFloat(String(invoice.sgst || 0));
+  const igstNum = parseFloat(String(invoice.igst || 0));
+  const grandTotalNum = parseFloat(String(invoice.grand_total || 0));
+
+  const rawStatus = String(paymentStatus).toLowerCase().trim();
+  const isPaid = rawStatus === 'paid';
+  const isOverdue = rawStatus === 'overdue';
+  const statusBg = isPaid ? theme.colors.successSoft : isOverdue ? '#FEE2E2' : '#FEF3C7';
+  const statusColor = isPaid ? theme.colors.success : isOverdue ? '#DC2626' : '#B45309';
+
+  const handleOpenPDF = () => {
+    if (!invoice?.id) return;
+    downloadPdf(invoice.id, {
+      onSuccess: bytes => {
+        handleInvoicePdfAction(invoice, 'open', bytes);
+      },
     });
   };
 
   const handleSavePDF = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'PDF Exported!',
-      text2: `${invoice.invoiceNumber}.pdf saved to Downloads directory.`,
-      position: 'bottom',
+    if (!invoice?.id) {
+      showErrorToast('Invoice ID is missing', 'Cannot Download PDF');
+      return;
+    }
+    downloadPdf(invoice.id, {
+      onSuccess: bytes => {
+        console.log('bytes', bytes)
+        handleInvoicePdfAction(invoice, 'save', bytes);
+      },
     });
-    onClose();
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          {/* Header Bar */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Tax Invoice / Receipt Preview</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Text style={styles.closeTxt}>✕</Text>
             </TouchableOpacity>
           </View>
-
-          {/* PDF Receipt Layout Paper */}
           <ScrollView style={styles.paperScroll} contentContainerStyle={styles.paperContent}>
-            {/* Header / Clinic Logo */}
-            <View style={styles.paperHeader}>
+            {/* <View style={styles.paperHeader}>
               <View style={styles.clinicDetails}>
-                <Text style={styles.paperClinicName}>
-                  {invoice.clinicName || 'Pred Care Multispecialty Clinic'}
-                </Text>
-                <Text style={styles.paperClinicSub}>
-                  {invoice.clinicAddress || '7th Block, Koramangala, Bengaluru, KA'}
-                </Text>
+                <Text style={styles.paperClinicName}>{clinicName}</Text>
+                <Text style={styles.paperClinicSub}>{clinicAddress}</Text>
                 <Text style={styles.paperClinicSub}>Phone: +91 98765 43210 • Reg: MED-KA-9921</Text>
               </View>
               <View style={styles.invoiceBadgeBox}>
                 <Text style={styles.paperInvTitle}>TAX INVOICE</Text>
-                <Text style={styles.paperInvNum}>{invoice.invoiceNumber}</Text>
-                <Text style={styles.paperInvDate}>Date: {invoice.createdDate}</Text>
+                <Text style={styles.paperInvNum}>{invoiceNumber}</Text>
+                <Text style={styles.paperInvDate}>Date: {dateOnly(createdAt)}</Text>
               </View>
             </View>
 
-            <View style={styles.paperDivider} />
+            <View style={styles.paperDivider} /> */}
 
-            {/* Billed To Section */}
             <View style={styles.billedToRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.labelTitle}>BILLED TO:</Text>
-                <Text style={styles.patientName}>{invoice.patientName}</Text>
-                <Text style={styles.patientMeta}>ID: {invoice.patientId}</Text>
+                <Text style={styles.paperInvNum}>{invoiceNumber}</Text>
+                <Text style={styles.patientName}>{patientName}</Text>
+                <Text style={styles.patientMeta}>ID: {patientId}</Text>
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <Text style={styles.labelTitle}>PAYMENT STATUS:</Text>
-                <View style={styles.statusPill}>
-                  <Text style={styles.statusTxt}>{invoice.status.toUpperCase()}</Text>
+                <View style={[styles.statusPill, { backgroundColor: statusBg }]}>
+                  <Text style={[styles.statusTxt, { color: statusColor }]}>
+                    {String(paymentStatus).toUpperCase()}
+                  </Text>
                 </View>
-                <Text style={styles.modeTxt}>Mode: {invoice.paymentMode}</Text>
+                <Text style={styles.modeTxt}>Mode: {paymentMode}</Text>
               </View>
             </View>
-
-            {/* Line Items Table */}
             <View style={styles.tableContainer}>
               <View style={styles.tableHeader}>
                 <Text style={[styles.thCell, { flex: 2 }]}>Particulars</Text>
@@ -107,15 +115,17 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
                 <Text style={[styles.thCell, { flex: 1, textAlign: 'right' }]}>Total (₹)</Text>
               </View>
 
-              {invoice.items.map((item, idx) => (
+              {(invoice.items || []).map((item, idx) => (
                 <View key={item.id || idx} style={styles.tableRow}>
                   <Text style={[styles.tdCell, { flex: 2, fontWeight: '600' }]}>{item.name}</Text>
-                  <Text style={[styles.tdCell, { flex: 0.6, textAlign: 'center' }]}>{item.qty}</Text>
+                  <Text style={[styles.tdCell, { flex: 0.6, textAlign: 'center' }]}>
+                    {item.qty}
+                  </Text>
                   <Text style={[styles.tdCell, { flex: 1, textAlign: 'right' }]}>
-                    {parseFloat(item.price).toFixed(2)}
+                    {parseFloat(String(item.price || 0)).toFixed(2)}
                   </Text>
                   <Text style={[styles.tdCell, { flex: 1, textAlign: 'right', fontWeight: '700' }]}>
-                    {item.total.toFixed(2)}
+                    {Number(item.total || 0).toFixed(2)}
                   </Text>
                 </View>
               ))}
@@ -125,50 +135,61 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
             <View style={styles.totalsBox}>
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Subtotal:</Text>
-                <Text style={styles.totalVal}>₹{invoice.subtotal.toFixed(2)}</Text>
+                <Text style={styles.totalVal}>₹{subtotalNum.toFixed(2)}</Text>
               </View>
 
-              {invoice.totalDiscount > 0 && (
+              {totalDiscountNum > 0 && (
                 <View style={styles.totalRow}>
                   <Text style={styles.totalLabel}>Discounts:</Text>
                   <Text style={[styles.totalVal, { color: theme.colors.success }]}>
-                    - ₹{invoice.totalDiscount.toFixed(2)}
+                    - ₹{totalDiscountNum.toFixed(2)}
                   </Text>
                 </View>
               )}
 
-              {invoice.cgst > 0 && (
+              {(cgstNum > 0 || sgstNum > 0) && (
                 <View style={styles.totalRow}>
                   <Text style={styles.totalLabel}>CGST (9%) + SGST (9%):</Text>
-                  <Text style={styles.totalVal}>₹{(invoice.cgst + invoice.sgst).toFixed(2)}</Text>
+                  <Text style={styles.totalVal}>₹{(cgstNum + sgstNum).toFixed(2)}</Text>
+                </View>
+              )}
+
+              {igstNum > 0 && (
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>IGST (18%):</Text>
+                  <Text style={styles.totalVal}>₹{igstNum.toFixed(2)}</Text>
                 </View>
               )}
 
               <View style={styles.grandRow}>
                 <Text style={styles.grandLabel}>Amount Paid / Total:</Text>
-                <Text style={styles.grandVal}>₹{invoice.grandTotal.toFixed(2)}</Text>
+                <Text style={styles.grandVal}>₹{grandTotalNum.toFixed(2)}</Text>
               </View>
             </View>
-
-            {/* Signature & Stamp */}
             <View style={styles.footerSignatureRow}>
               <Text style={styles.footerNoteText}>
                 {invoice.notes || 'Thank you for choosing our clinic. Wish you a healthy recovery!'}
               </Text>
-              <View style={styles.sigBox}>
+              {/* <View style={styles.sigBox}>
                 <View style={styles.sigLine} />
                 <Text style={styles.sigTxt}>Doctor Signature & Stamp</Text>
-              </View>
+              </View> */}
             </View>
           </ScrollView>
-
-          {/* Bottom Actions */}
           <View style={styles.modalActions}>
-            <TouchableOpacity style={styles.btnSecondary} onPress={handlePrint}>
-              <Text style={styles.btnSecondaryTxt}>🖨️ Print Receipt</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnPrimary} onPress={handleSavePDF}>
-              <Text style={styles.btnPrimaryTxt}>📥 Download PDF</Text>
+            {!!invoice.id && (
+              <TouchableOpacity style={styles.btnSecondary} onPress={handleOpenPDF}>
+                <Text style={styles.btnSecondaryTxt}>👁️ Open PDF</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={[styles.btnPrimary, isDownloading && { opacity: 0.6 }]}
+              onPress={handleSavePDF}
+              disabled={isDownloading}
+            >
+              <Text style={styles.btnPrimaryTxt}>
+                {isDownloading ? '⏳ Downloading...' : '📥 Download PDF'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

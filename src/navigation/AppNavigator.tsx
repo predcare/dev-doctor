@@ -1,8 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   HomeIcon,
   PatientsIcon,
@@ -11,8 +12,7 @@ import {
   SettingsIcon,
 } from '../components/ui/icons';
 import useNotificationListeners from '../hooks/commons/useNotificationListeners';
-import { navigationRef } from './navigationRef';
-import { RootStackParamList, DashboardTabParamList } from '../route';
+import { DashboardTabParamList, RootStackParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
 import ComingSoonScreen from '../Screens/ComingSoonScreen';
 import AddPatientScreen from '../Screens/DashboardScreen/AddPatientScreen';
@@ -38,6 +38,7 @@ import SettingScreen from '../Screens/DashboardScreen/SettingScreen';
 import SplashScreen from '../Screens/SplashScreen';
 import { navigationStyles } from '../styled/Navigation.styled';
 import { theme } from '../styled/theme.styled';
+import { navigationRef } from './navigationRef';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -52,10 +53,20 @@ const ReportsTabScreen = () => (
 );
 
 const DashboardTabNavigator: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = 62 + insets.bottom;
+  const tabBarPaddingBottom = Math.max(insets.bottom, 6);
+
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarStyle: navigationStyles.tabBar,
+        tabBarStyle: [
+          navigationStyles.tabBar,
+          {
+            height: tabBarHeight,
+            paddingBottom: tabBarPaddingBottom,
+          },
+        ],
         tabBarItemStyle: navigationStyles.tabItem,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.textSlate,

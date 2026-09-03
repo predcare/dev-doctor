@@ -4,6 +4,11 @@ export interface IMyPatientListRoot {
   patients: IMyPatientDoc[];
 }
 
+export interface IPatientInfoRoot {
+  success: boolean;
+  patient: IMyPatientDoc;
+}
+
 export interface ILinkExistingPatientResponse {
   success: boolean;
   message?: string;
@@ -39,12 +44,24 @@ export interface IMyPatientDoc {
   blood_pressure: any;
   pulse: any;
   temperature: any;
+  blood_type: any;
   spo2: any;
   weight: any;
   height: any;
   bmi: any;
   total_appointments: number;
   last_appointment_date?: string;
+  created_from: string;
+  created_by: number;
+  drug_allergies: any;
+  verified_at: any;
+  verified_by: any;
+  updated_at: string;
+  deleted_at: any;
+  age_display: string;
+  age_years: number;
+  gender_display: string;
+  appointments: any[];
 }
 
 export interface IPatientBasicInfo {

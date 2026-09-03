@@ -5,6 +5,7 @@ import {
   ICreatePatientResponse,
   ILinkExistingPatientResponse,
   IMyPatientListRoot,
+  IPatientInfoRoot,
 } from '../../../typescripts/interfaces/patients.interfaces';
 import {
   ICreatePatientPayload,
@@ -44,6 +45,8 @@ export const sendPatientCredentials = async (payload: ISendPatientCredentialsPay
 };
 
 export const getMyPatientsInfo = async (patientId: number | string) => {
-  const res = await axiosInstance.get<ICommonRoot>(`${endpoints.patients.details}${patientId}`);
+  const res = await axiosInstance.get<IPatientInfoRoot>(
+    `${endpoints.patients.details}${patientId}`
+  );
   return res.data;
 };

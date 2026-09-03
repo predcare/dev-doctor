@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Modal,
   ScrollView,
-  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
@@ -155,10 +154,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
   );
 
   return (
-    <SafeAreaWrapper edges={['left', 'right', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor={TEAL} />
-
-      {/* Header */}
+    <SafeAreaWrapper>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backCircle}
@@ -180,7 +176,6 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Section 1: Personal Information (Locked) */}
         <View style={styles.sectionRow}>
           <View style={[styles.sectionBar, { backgroundColor: '#6366F1' }]} />
           <Text style={styles.sectionTitle}>Personal Information</Text>
@@ -196,8 +191,6 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
           <LockedField label="Gender" value={roGender} />
           <LockedField label="Date of Birth" value={roDob} />
         </View>
-
-        {/* Section 2: Address Information */}
         <View style={styles.sectionRow}>
           <View style={[styles.sectionBar, { backgroundColor: TEAL }]} />
           <Text style={styles.sectionTitle}>Address Information</Text>

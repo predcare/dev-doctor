@@ -9,7 +9,7 @@ export const patientDetailsStyles = StyleSheet.create({
 
   // Top Header Bar
   topBar: {
-    height: 56,
+    height: 65,
     backgroundColor: theme.colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
@@ -29,12 +29,21 @@ export const patientDetailsStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.bold,
     marginTop: -2,
   },
+  topBarTitleContainer: {
+    flex: 1,
+    marginLeft: theme.spacing.md,
+  },
   topBarTitle: {
-    fontSize: theme.fontSize.lg,
+    fontSize: 16,
     color: theme.colors.textInverted,
     fontWeight: theme.fontWeight.bold,
-    marginLeft: theme.spacing.md,
     fontFamily: 'Inter_700Bold',
+  },
+  topBarSubTitle: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.78)',
+    fontFamily: 'Inter_500Medium',
+    marginTop: 1,
   },
 
   // Patient Header Profile Card
@@ -59,6 +68,7 @@ export const patientDetailsStyles = StyleSheet.create({
     borderRadius: 31,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   profileAvatarText: {
     fontSize: 22,

@@ -18,8 +18,11 @@ import { useMyPatientList } from '../../hooks/react-query/patients/patients.hook
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { getAge } from '../../lib/common/common.utils';
-import { showInfoToast } from '../../lib/common/toast.utils';
-import type { PatientsScreenNavigationProp, PatientsScreenRouteProp } from '../../route';
+import {
+  AppRoute,
+  type PatientsScreenNavigationProp,
+  type PatientsScreenRouteProp,
+} from '../../route';
 import { MyPatientsStyles as S } from '../../styled/PatientsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
@@ -55,8 +58,18 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) =>
   }, []);
 
   const handleAddPatient = useCallback(() => {
-    appNavigation.navigate('AddPatient');
+    appNavigation.navigate(AppRoute.ADD_PATIENT);
   }, [appNavigation]);
+
+  const handlePatientDetails = useCallback(
+    (params: { patientId: string | number; name: string }) => {
+      appNavigation.navigate(AppRoute.PATIENT_DETAILS, {
+        patientId: params?.patientId,
+        patientName: params?.name,
+      });
+    },
+    [appNavigation]
+  );
 
   const displayPatients = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -145,7 +158,12 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) =>
                 name={item?.name}
                 patientId={item?.patient_id}
                 condition={item?.condition}
-                onPress={() => showInfoToast('Coming Soon...')}
+                onPress={() =>
+                  handlePatientDetails({
+                    name: item?.name,
+                    patientId: item?.user_id,
+                  })
+                }
               />
             )}
             contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}

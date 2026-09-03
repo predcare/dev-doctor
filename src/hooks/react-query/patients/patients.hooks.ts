@@ -16,7 +16,7 @@ import {
 
 export const useMyPatientList = (params?: { doctorId?: number | string }) =>
   useQuery({
-    queryKey: [PatientsQueryKeys.Patients, params],
+    queryKey: [PatientsQueryKeys.PatientsList, params],
     queryFn: () => getMyPatientsList(params?.doctorId!),
     enabled: !!params?.doctorId,
     select: v => {
@@ -55,7 +55,8 @@ export const useSendPatientCredentials = () => {
 
 export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
   useQuery({
-    queryKey: [PatientsQueryKeys.Patients, params],
+    queryKey: [PatientsQueryKeys.PatientInfo, params],
     queryFn: () => getMyPatientsInfo(params?.patientId!),
     enabled: !!params?.patientId,
+    select: v => (!v?.patient ? null : v.patient),
   });

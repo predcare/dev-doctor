@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import InvoiceFilterModal from '../../components/Modules/Invoice/InvoiceFilterModal';
-import InvoicePreviewModal from '../../components/Modules/Invoice/InvoicePreviewModal';
 import SelectPatientModal, {
   SelectablePatient,
 } from '../../components/Modules/Invoice/SelectPatientModal';
@@ -335,13 +334,13 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
       />
 
       {/* PDF View Modal */}
-      {selectedInvoiceForPreview && (
+      {/* {selectedInvoiceForPreview && (
         <InvoicePreviewModal
           visible={!!selectedInvoiceForPreview}
-          invoice={selectedInvoiceForPreview}
+          invoice={selectedInvoiceForPreview as any}
           onClose={() => setSelectedInvoiceForPreview(null)}
         />
-      )}
+      )} */}
 
       {/* Filter Popup Modal */}
       <InvoiceFilterModal

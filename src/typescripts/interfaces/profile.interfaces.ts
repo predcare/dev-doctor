@@ -21,4 +21,5 @@ export interface IMyProfileDoc {
   clinic_id: number;
   clinic_name: string;
   clinic_association_status: string;
+  clinic_address:string
 }

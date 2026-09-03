@@ -5,8 +5,8 @@ export const headerStyles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.surface,
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm + 2,
     ...globalShadows.card,
   },
   topRow: {
