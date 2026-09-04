@@ -7,6 +7,8 @@ import {
   IMyPatientListRoot,
   IPatientInfoRoot,
 } from '../../../typescripts/interfaces/patients.interfaces';
+import { IPatientPrescriptionListRoot } from '../../../typescripts/interfaces/prescriptions.interfaces';
+import { IPatientEMRRoot } from '../../../typescripts/interfaces/profile.interfaces';
 import {
   ICreatePatientPayload,
   ILinkExistingPatientPayload,
@@ -48,5 +50,43 @@ export const getMyPatientsInfo = async (patientId: number | string) => {
   const res = await axiosInstance.get<IPatientInfoRoot>(
     `${endpoints.patients.details}${patientId}`
   );
+  return res.data;
+};
+
+export const getMyPatientsEmrs = async (patientId: number | string) => {
+  const res = await axiosInstance.get<IPatientEMRRoot>(
+    `${endpoints.patients.emrRecords}${patientId}`
+  );
+  return res.data;
+};
+
+export const getMyPatientsPrescriptions = async (patientId: number | string) => {
+  const res = await axiosInstance.get<IPatientPrescriptionListRoot>(
+    `${endpoints.patients.prescriptions(patientId)}`
+  );
+  return res.data;
+};
+
+export const shareEmrDocument = async (
+  docId: string | number,
+  body: { visible_to_patient: number }
+) => {
+  const res = await axiosInstance.patch<ICommonRoot>(endpoints.patients.emrShare(docId), body);
+  return res.data;
+};
+
+export const sharePrescription = async (
+  presId: string | number,
+  body: { visible_to_patient: number }
+) => {
+  const res = await axiosInstance.patch<ICommonRoot>(
+    endpoints.patients.prescriptionsShare(presId),
+    body
+  );
+  return res.data;
+};
+
+export const uploadEmr = async (body: FormData) => {
+  const res = await axiosInstance.post<ICommonRoot>(endpoints.patients.emrUpload, body);
   return res.data;
 };

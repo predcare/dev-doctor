@@ -128,7 +128,7 @@ export const patientDetailsStyles = StyleSheet.create({
     position: 'relative',
   },
   mainTabLabel: {
-    fontSize: theme.fontSize.sm,
+    fontSize: 12,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textSlate,
     fontFamily: 'Inter_600SemiBold',
@@ -141,8 +141,8 @@ export const patientDetailsStyles = StyleSheet.create({
   mainTabIndicator: {
     position: 'absolute',
     bottom: 0,
-    left: 14,
-    right: 14,
+    left: 6,
+    right: 6,
     height: 3,
     borderRadius: 2,
     backgroundColor: theme.colors.primary,
@@ -257,19 +257,16 @@ export const patientDetailsStyles = StyleSheet.create({
     fontSize: 15,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
   },
   recordSub: {
     fontSize: theme.fontSize.xs,
     color: theme.colors.textSlate,
     marginTop: 2,
-    fontFamily: 'Inter_400Regular',
   },
   recordMeta: {
     fontSize: theme.fontSize.xs,
     color: theme.colors.textMuted,
     marginTop: 4,
-    fontFamily: 'Inter_400Regular',
   },
   pill: {
     paddingHorizontal: 8,
@@ -280,7 +277,6 @@ export const patientDetailsStyles = StyleSheet.create({
   pillText: {
     fontSize: 11,
     fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
   },
   shareRow: {
     flexDirection: 'row',
@@ -294,12 +290,10 @@ export const patientDetailsStyles = StyleSheet.create({
   shareLabel: {
     fontSize: 12,
     fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
   },
   shareSub: {
     fontSize: 11,
     color: theme.colors.textMuted,
-    fontFamily: 'Inter_400Regular',
   },
   chevronText: {
     fontSize: 20,
@@ -326,20 +320,17 @@ export const patientDetailsStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
   },
   emptyTitle: {
     fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textSecondary,
     marginBottom: 4,
-    fontFamily: 'Inter_700Bold',
   },
   emptyText: {
     fontSize: theme.fontSize.xs,
     color: theme.colors.textMuted,
     textAlign: 'center',
-    fontFamily: 'Inter_400Regular',
   },
 
   // ── Consult Form Section Styles ──
@@ -399,7 +390,6 @@ export const patientDetailsStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
     minHeight: 80,
-    fontFamily: 'Inter_400Regular',
   },
   consultInput: {
     backgroundColor: theme.colors.background,
@@ -410,14 +400,12 @@ export const patientDetailsStyles = StyleSheet.create({
     color: theme.colors.textPrimary,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
-    fontFamily: 'Inter_400Regular',
   },
   vitalLabel: {
     fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.textSecondary,
     marginBottom: 4,
-    fontFamily: 'Inter_600SemiBold',
   },
   vitalsRow: {
     flexDirection: 'row',
@@ -438,7 +426,6 @@ export const patientDetailsStyles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: theme.fontSize.sm,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_400Regular',
   },
   vitalUnitTag: {
     backgroundColor: theme.colors.surfaceSecondary,
@@ -539,7 +526,6 @@ export const patientDetailsStyles = StyleSheet.create({
   pickerSelectText: {
     fontSize: theme.fontSize.sm,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_400Regular',
   },
 
   // Buttons

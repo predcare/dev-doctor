@@ -23,6 +23,8 @@ export const AppRoute = {
   PATIENT_DETAILS: 'PatientDetails',
   INVOICE_LIST: 'InvoiceList',
   CREATE_INVOICE: 'CreateInvoice',
+  CREATE_PRESCRIPTION: 'CreatePrescription',
+  PRESCRIPTION_LIST: 'PrescriptionList',
   MAIN_TABS: 'MainTabs',
   HOME: 'Home',
   PATIENTS: 'Patients',
@@ -42,7 +44,10 @@ export type RootStackParamList = {
   Notifications: { user?: any } | undefined;
   DoctorProfile: { user?: any } | undefined;
   PrescriptionSettings: { user?: any } | undefined;
-  PrescriptionView: { rxId?: string; patientId?: string; patientName?: string } | undefined;
+  PrescriptionView:
+    | { rxId?: string | number; patientId?: string; patientName?: string }
+    | undefined;
+  PrescriptionList: { user?: any } | undefined;
   InvoiceSettings: { user?: any } | undefined;
   AddPatient: { user?: any } | undefined;
   EditPatient: { patientId?: string | number; patientName?: string } | undefined;
@@ -62,6 +67,14 @@ export type RootStackParamList = {
         patientName?: string;
         appointmentId?: string;
         fee?: number;
+      }
+    | undefined;
+  CreatePrescription:
+    | {
+        patientId?: string | number;
+        appointmentId?: string | number;
+        patientName?: string;
+        prescriptionId?: string | number;
       }
     | undefined;
   MainTabs: undefined;
@@ -266,4 +279,14 @@ export type DoctorMeetingScreenRouteProp = RouteProp<RootStackParamList, 'Doctor
 export interface DoctorMeetingScreenProps {
   navigation?: DoctorMeetingScreenNavigationProp;
   route?: DoctorMeetingScreenRouteProp;
+}
+
+export type CreatePrescriptionScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'CreatePrescription'
+>;
+export type CreatePrescriptionScreenRouteProp = RouteProp<RootStackParamList, 'CreatePrescription'>;
+export interface CreatePrescriptionScreenProps {
+  navigation?: CreatePrescriptionScreenNavigationProp;
+  route?: CreatePrescriptionScreenRouteProp;
 }

@@ -19,6 +19,8 @@ export enum PatientsQueryKeys {
   LinkExisting = 'LinkExisting',
   NewCreate = 'NewCreate',
   SendCred = 'SendCred',
+  EmrRecords = 'EmrRecords',
+  Prescriptions = 'Prescriptions',
 }
 
 export enum CommonQueryKeys {
@@ -41,6 +43,8 @@ export enum PrescriptionQueryKeys {
   SendEmail = 'SendPrescriptionEmail',
   Pdf = 'PrescriptionPdf',
   Share = 'SharePrescription',
+  GetPresciptionInfo = 'GetPresciptionInfo',
+  GetAllPrescriptions = 'GetAllPrescriptions',
 }
 
 export enum InvoiceQueryKeys {
@@ -74,5 +78,6 @@ export enum AvailbilityQueryKeys {
 
 export enum MyInvoices {
   PatientInvoices = 'PatientInvoices',
+  AllInvoices = 'AllInvoices',
   InvoiceSettings = 'InvoiceSettings',
 }

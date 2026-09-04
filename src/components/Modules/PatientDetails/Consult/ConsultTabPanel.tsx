@@ -38,10 +38,7 @@ export interface ConsultTabPanelProps {
   onCancelConsult?: () => void;
 }
 
-export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
-  onCompletePrescription,
-  onCancelConsult,
-}) => {
+export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({ onCompletePrescription }) => {
   const [activeStep, setActiveStep] = useState<ConsultStep>('diagnosis');
 
   const methods = useForm<ConsultFormValues>({
@@ -129,7 +126,6 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* Step Navigation Bar - Fits 5 Tabs Cleanly in One Screen */}
         <View style={S.consultStepBarWrapper}>
           {CONSULT_STEPS.map(step => {
             const active = step.id === activeStep;
@@ -147,8 +143,6 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
             );
           })}
         </View>
-
-        {/* Step Form Body Content */}
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
@@ -157,8 +151,6 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
         >
           {renderStepForm()}
         </ScrollView>
-
-        {/* Sticky Bottom Action Navigation Bar */}
         <View style={S.consultStickyBottomBar}>
           <View style={S.autoSaveRow}>
             <View style={S.autoSaveDot} />
@@ -175,8 +167,6 @@ export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({
             >
               <Text style={S.btnPrevText}>‹ Previous</Text>
             </TouchableOpacity>
-
-            {/* Next or Complete Button */}
             {isLastStep ? (
               <TouchableOpacity
                 style={S.btnComplete}

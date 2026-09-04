@@ -8,8 +8,6 @@ interface InvoiceHeaderCardProps {
   patientGender?: string;
   clinicName?: string;
   clinicAddress?: string;
-  invoiceNumber: string;
-  invoiceDate: string;
   onEditClinicPress?: () => void;
 }
 
@@ -34,7 +32,9 @@ export const InvoiceHeaderCard: React.FC<InvoiceHeaderCardProps> = ({
           <Text style={styles.patientLabel}>PATIENT DETAILS</Text>
           <Text style={styles.patientName}>{patientName}</Text>
           <Text style={styles.patientMeta}>
-            {[patientAge, patientGender, `ID: #${patientGenId}`].join('  •  ')}
+            {[patientAge, patientGender, patientGenId ? `ID: #${patientGenId}` : null]
+              .filter(Boolean)
+              .join('  •  ')}
           </Text>
         </View>
       </View>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { AppointmentCard } from '../../components/Modules/Dashboard/AppointmentCard';
 import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceBanner';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
@@ -14,7 +14,6 @@ import {
   PatientsIcon,
   PrescriptionIcon,
   ScheduleIcon,
-  SearchIcon,
   WalletIcon,
 } from '../../components/ui/icons';
 import { Header } from '../../Layout/Header';
@@ -99,7 +98,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     {
       id: 'q2',
       label: 'WRITE RX',
-      screen: 'PrescriptionSettings' as const,
+      screen: 'PrescriptionList' as const,
       icon: <PrescriptionIcon size={30} color={theme.colors.primary} />,
     },
     {
@@ -117,7 +116,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   ];
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaWrapper>
       {/* Top Header */}
       <Header
         isHome
@@ -134,23 +133,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         contentContainerStyle={homeStyles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Search Input Bar */}
-        <View style={homeStyles.searchBar}>
-          <SearchIcon size={20} color={theme.colors.textMuted} />
-          <TextInput
-            style={homeStyles.searchInput}
-            placeholder="Search patient name, ID, or condition..."
-            placeholderTextColor={theme.colors.textMuted}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-
-        {/* Highlights & Insights Section */}
         <View style={homeStyles.insightsSection}>
           <View style={homeStyles.insightsHeader}>
             <Text style={homeStyles.insightsTitle}>Highlights & Insights</Text>
-            {/* Period Dropdown */}
             <View style={{ position: 'relative' }}>
               <TouchableOpacity
                 style={homeStyles.periodPill}
@@ -192,8 +177,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               )}
             </View>
           </View>
-
-          {/* Horizontal Stats Carousel */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -211,8 +194,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             ))}
           </ScrollView>
         </View>
-
-        {/* Today's Queue / Upcoming Patient Appointments */}
         <View style={homeStyles.sectionHeader}>
           <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
           <TouchableOpacity onPress={() => navigation?.navigate('Patients')} activeOpacity={0.7}>
@@ -248,10 +229,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           />
         ))}
 
-        {/* Need Assistance Support Banner */}
         <AssistanceBanner onContactSupport={() => navigation?.navigate('Notifications')} />
 
-        {/* Quick Access 2x2 Grid */}
         <View style={homeStyles.sectionHeader}>
           <Text style={homeStyles.sectionTitle}>Quick Access</Text>
         </View>

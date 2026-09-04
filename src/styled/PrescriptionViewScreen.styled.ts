@@ -296,6 +296,83 @@ export const prescriptionViewStyles = StyleSheet.create({
     justifyContent: 'center',
   },
 
+  // Medical background (Allergies & Chronic) - Full width
+  medicalBadgesColumn: {
+    gap: 8,
+  },
+  medicalBadgeFull: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E1E3E3',
+  },
+  medicalBadgeTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+    letterSpacing: 0.4,
+  },
+  medicalBadgeVal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E293B',
+    lineHeight: 20,
+  },
+
+  // Custom Vitals
+  customVitalBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#E1E3E3',
+    marginBottom: 6,
+  },
+  customVitalLbl: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#475569',
+  },
+  customVitalVal: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: TEAL,
+  },
+
+  // Referral card
+  referralCard: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+    gap: 6,
+  },
+  referralTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1D4ED8',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  referralRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  referralTxt: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E3A8A',
+  },
+
   // Tab bar
   tabBar: {
     backgroundColor: '#FFFFFF',
@@ -316,3 +393,4 @@ export const prescriptionViewStyles = StyleSheet.create({
 });
 
 export default prescriptionViewStyles;
+

@@ -104,7 +104,8 @@ export const DocumentActionsModal: React.FC<DocumentActionsModalProps> = ({
 
   if (!visible || !document) return null;
 
-  const ext = (document.document_path || '').split('.').pop()?.toLowerCase() || '';
+  const cleanPath = (document.document_url || '').split('?')[0] || '';
+  const ext = (cleanPath.split('.').pop() || '').toLowerCase();
   const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
   const openTitle = isImage ? 'Open Image' : 'Open File';
   const openSubtitle = isImage

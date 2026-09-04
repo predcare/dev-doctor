@@ -58,7 +58,7 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
     }
     downloadPdf(invoice.id, {
       onSuccess: bytes => {
-        console.log('bytes', bytes)
+        console.log('bytes', bytes);
         handleInvoicePdfAction(invoice, 'save', bytes);
       },
     });
@@ -95,7 +95,7 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
                 <Text style={styles.labelTitle}>BILLED TO:</Text>
                 <Text style={styles.paperInvNum}>{invoiceNumber}</Text>
                 <Text style={styles.patientName}>{patientName}</Text>
-                <Text style={styles.patientMeta}>ID: {patientId}</Text>
+                {patientId && <Text style={styles.patientMeta}>ID: {patientId}</Text>}
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <Text style={styles.labelTitle}>PAYMENT STATUS:</Text>

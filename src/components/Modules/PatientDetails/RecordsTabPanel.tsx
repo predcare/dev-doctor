@@ -1,112 +1,93 @@
-import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, Linking, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
+import { useMyPatientEmrs } from '../../../hooks/react-query/patients/patients.hooks';
 import { showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
+import { theme } from '../../../styled/theme.styled';
+import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import CommonEmptyCard from '../../commons/CommonEmptyCard/CommonEmptyCard';
+import CommonErrorCard from '../../commons/CommonErrorCard/CommonErrorCard';
+import MedicalRecordsSkeleton from '../../Skeletons/MedicalRecordsSkeleton';
 import DocumentActionsModal from './DocumentActionsModal';
 import EMRUploadModal from './EMRUploadModal';
 import MedicalDocumentCard, { MedicalDocument } from './MedicalDocumentCard';
-import PrescriptionCard, { PrescriptionItem } from './PrescriptionCard';
-
-export type RecordSubTab = 'all' | 'documents' | 'prescriptions';
 
 export interface RecordsTabPanelProps {
-  documents: MedicalDocument[];
-  prescriptions: PrescriptionItem[];
-  onToggleDocShare?: (docId: string, newShareState: boolean) => void;
-  onToggleRxShare?: (rxId: string, newShareState: boolean) => void;
-  onAddDocumentSuccess?: (newDoc: { title: string; type: string }) => void;
-  onDocumentPress?: (doc: MedicalDocument) => void;
-  onPrescriptionPress?: (rx: PrescriptionItem) => void;
+  patientId: number | string;
 }
 
-export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({
-  documents,
-  prescriptions,
-  onToggleDocShare,
-  onToggleRxShare,
-  onAddDocumentSuccess,
-  onDocumentPress,
-  onPrescriptionPress,
-}) => {
-  const [activeSubTab, setActiveSubTab] = useState<RecordSubTab>('all');
+export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) => {
+  const { userData } = useAuthStore(state => state);
+  const {
+    data: emrData,
+    isPending: isEMRPending,
+    isError: isEMRCardError,
+    error: emrCardError,
+    refetch: refetchEmr,
+  } = useMyPatientEmrs({
+    patientId: patientId,
+  });
+
+  const [refreshing, setRefreshing] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedDocForAction, setSelectedDocForAction] = useState<MedicalDocument | null>(null);
   const [showActionsModal, setShowActionsModal] = useState(false);
+  const [localShareOverrides, setLocalShareOverrides] = useState<Record<string | number, boolean>>(
+    {}
+  );
 
-  const RECORD_TABS = [
-    { key: 'all' as RecordSubTab, label: 'All', count: documents.length + prescriptions.length },
-    { key: 'documents' as RecordSubTab, label: 'Docs', count: documents.length },
-    { key: 'prescriptions' as RecordSubTab, label: 'Rx', count: prescriptions.length },
-  ];
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetchEmr();
+    setRefreshing(false);
+  }, [refetchEmr]);
 
   const handleDocumentClick = (doc: MedicalDocument) => {
-    if (onDocumentPress) {
-      onDocumentPress(doc);
-      return;
-    }
     setSelectedDocForAction(doc);
     setShowActionsModal(true);
   };
 
+  const handleToggleShare = (docId: string | number, newShareState: boolean) => {
+    setLocalShareOverrides(prev => ({ ...prev, [docId]: newShareState }));
+  };
+
   const handleOpenDocument = (doc: MedicalDocument) => {
-    showInfoToast(`Opening "${doc.title}"...`, 'Opening Document');
+    const fullUrl = doc.document_url;
+    showInfoToast(`Opening "${doc.title || 'Document'}"...`, 'Opening Document');
+    if (fullUrl) {
+      Linking.openURL(fullUrl).catch(() => {
+        showInfoToast(`Could not open document`, 'Open Document');
+      });
+    }
   };
 
   const handleSaveToDevice = (doc: MedicalDocument) => {
-    showSuccessToast(
-      `"${doc.title}" downloaded to your device downloads folder`,
-      'Saved to Device'
-    );
+    const fullUrl = doc.document_url;
+    if (fullUrl) {
+      Linking.openURL(fullUrl).catch(() => {
+        showInfoToast(`Could not download document`, 'Download Document');
+      });
+    } else {
+      showSuccessToast(
+        `"${doc.title || 'Document'}" downloaded to your device downloads folder`,
+        'Saved to Device'
+      );
+    }
   };
 
-  const showDocs = activeSubTab === 'all' || activeSubTab === 'documents';
-  const showPres = activeSubTab === 'all' || activeSubTab === 'prescriptions';
-  const totalCount = (showDocs ? documents.length : 0) + (showPres ? prescriptions.length : 0);
-
   return (
-    <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-      {/* Sub-tabs Row with + Upload button pinned right */}
-      <View style={patientDetailsStyles.subTabRow}>
-        {RECORD_TABS.map(rt => {
-          const active = activeSubTab === rt.key;
-          return (
-            <TouchableOpacity
-              key={rt.key}
-              style={[
-                patientDetailsStyles.subTab,
-                active && patientDetailsStyles.subTabActive,
-              ]}
-              onPress={() => setActiveSubTab(rt.key)}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  patientDetailsStyles.subTabText,
-                  active && patientDetailsStyles.subTabTextActive,
-                ]}
-              >
-                {rt.label}
-              </Text>
-              <View
-                style={[
-                  patientDetailsStyles.subTabBadge,
-                  active && patientDetailsStyles.subTabBadgeActive,
-                ]}
-              >
-                <Text
-                  style={[
-                    patientDetailsStyles.subTabBadgeText,
-                    active && patientDetailsStyles.subTabBadgeTextActive,
-                  ]}
-                >
-                  {rt.count}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-
-        {/* + Upload Document Button */}
+    <View style={{ flex: 1 }}>
+      <View
+        style={[
+          patientDetailsStyles.subTabRow,
+          { justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+        ]}
+      >
+        <Text
+          style={[patientDetailsStyles.cardSectionTitle, { marginBottom: 0, paddingHorizontal: 0 }]}
+        >
+          Medical Documents
+        </Text>
         <TouchableOpacity
           style={patientDetailsStyles.addDocBtn}
           onPress={() => setShowUploadModal(true)}
@@ -115,53 +96,62 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({
           <Text style={patientDetailsStyles.addDocBtnText}>+</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Documents Section */}
-      {showDocs && documents.length > 0 && (
-        <View style={{ marginBottom: 12 }}>
-          <Text style={patientDetailsStyles.cardSectionTitle}>Medical Documents</Text>
-          {documents.map(doc => (
+      {isEMRPending && !refreshing ? (
+        <View style={{ flex: 1 }}>
+          <MedicalRecordsSkeleton />
+        </View>
+      ) : isEMRCardError ? (
+        <View style={{ flex: 1 }}>
+          <CommonErrorCard
+            title="Failed to Load Medical Documents"
+            message={
+              (emrCardError as any)?.message ||
+              'Something went wrong while fetching patient records.'
+            }
+            onRetry={refetchEmr}
+          />
+        </View>
+      ) : (
+        <FlatList
+          data={emrData || []}
+          keyExtractor={item => String(item.id)}
+          renderItem={({ item }) => (
             <MedicalDocumentCard
-              key={doc.id}
-              document={doc}
-              onPress={() => handleDocumentClick(doc)}
-              onToggleShare={newVal => onToggleDocShare?.(doc.id, newVal)}
+              document_type={item.document_type}
+              id={item.id}
+              title={item.title}
+              visible_to_patient={item?.visible_to_patient}
+              appointment_date={item?.appointment_date}
+              created_at={item?.created_at}
+              doctor_name={item?.doctor_name}
+              doctor_id={item?.doctor_id}
+              isDoctorUploaded={item?.doctor_id === userData?.user_id}
+              document_url={item?.document_url}
+              onPress={() => handleDocumentClick(item)}
+              onToggleShare={newVal => handleToggleShare(item.id, newVal)}
             />
-          ))}
-        </View>
-      )}
-
-      {/* Prescriptions Section */}
-      {showPres && prescriptions.length > 0 && (
-        <View style={{ marginBottom: 12 }}>
-          <Text style={patientDetailsStyles.cardSectionTitle}>Prescriptions</Text>
-          {prescriptions.map(rx => (
-            <PrescriptionCard
-              key={rx.id}
-              prescription={rx}
-              onPress={() => onPrescriptionPress?.(rx)}
-              onToggleShare={newVal => onToggleRxShare?.(rx.id, newVal)}
+          )}
+          ListEmptyComponent={
+            <CommonEmptyCard
+              title="No Medical Documents"
+              message="No medical documents uploaded yet for this patient."
+              actionText="+ Add Document"
+              onAction={() => setShowUploadModal(true)}
             />
-          ))}
-        </View>
+          }
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+        />
       )}
 
-      {/* Empty State */}
-      {totalCount === 0 && (
-        <View style={patientDetailsStyles.emptyState}>
-          <View style={patientDetailsStyles.emptyIconBox}>
-            <Text style={patientDetailsStyles.emptyIconText}>Rx</Text>
-          </View>
-          <Text style={patientDetailsStyles.emptyTitle}>No Medical Records</Text>
-          <Text style={patientDetailsStyles.emptyText}>
-            No documents or prescriptions uploaded yet for this category.
-          </Text>
-        </View>
-      )}
-
-      <View style={{ height: 40 }} />
-
-      {/* Custom Document Action Sheet Modal */}
       <DocumentActionsModal
         visible={showActionsModal}
         document={selectedDocForAction}
@@ -173,13 +163,16 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({
         }}
       />
 
-      {/* EMR Upload Modal */}
       <EMRUploadModal
         visible={showUploadModal}
+        patientId={patientId}
+        doctorId={userData?.user_id}
         onClose={() => setShowUploadModal(false)}
-        onUploadSuccess={onAddDocumentSuccess}
+        onUploadSuccess={() => {
+          refetchEmr();
+        }}
       />
-    </ScrollView>
+    </View>
   );
 };
 

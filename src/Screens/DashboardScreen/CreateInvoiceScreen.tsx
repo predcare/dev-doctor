@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -12,12 +13,14 @@ import {
   View,
 } from 'react-native';
 import InvoiceHeaderCard from '../../components/Modules/Invoice/InvoiceHeaderCard';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import SendIcon from '../../components/ui/icons/SendIcon';
 import TrashIcon from '../../components/ui/icons/TrashIcon';
-import { useInvoiceSettings } from '../../hooks/react-query/invoices/invoices.hooks';
+import { useCreateInvoices } from '../../hooks/react-query/invoices/invoices.hooks';
 import { useMyPatientInfo } from '../../hooks/react-query/patients/patients.hooks';
+import { MyInvoices } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { showErrorToast } from '../../lib/common/toast.utils';
+import { showErrorToast, showSuccessToast } from '../../lib/common/toast.utils';
 import {
   createInvoiceSchema,
   TCreateInvoiceSchemaType,
@@ -25,10 +28,12 @@ import {
 import type { CreateInvoiceScreenProps } from '../../route';
 import { createInvoiceStyles as S } from '../../styled/CreateInvoiceScreen.styled';
 import { TPaymentMode } from '../../typescripts/types/common.types';
-import { Invoice, InvoiceLineItem, PaymentMode } from '../../typescripts/types/invoice.types';
+import { InvoiceLineItem } from '../../typescripts/types/invoice.types';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 const fmt = (n: number) => `₹ ${n.toFixed(2)}`;
+const paymentModes: TPaymentMode[] = ['Cash', 'Card', 'UPI', 'Online', 'Bank Transfer'];
 
 const computeItemTotal = (item: any): number => {
   const qty = parseFloat(item?.qty) || 0;
@@ -42,23 +47,16 @@ const computeItemTotal = (item: any): number => {
 export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route, navigation }) => {
   const patientId = String(route?.params?.patientId || '');
   const patientGeneratedId = String(route?.params?.patientGeneratedId || '');
-
-  const [invoiceNumber] = useState(`INV-2026-00${Math.floor(10 + Math.random() * 89)}`);
-  const [createdDate] = useState('12 Aug 2026');
+  const appointmentId = String(route?.params?.appointmentId || '');
   const [showPaymentPicker, setShowPaymentPicker] = useState(false);
 
   const { userData } = useAuthStore(state => state);
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
   const { data: patientInfo } = useMyPatientInfo({
     patientId: patientId,
   });
 
   const patientName = patientInfo?.name || 'Patient';
-
-  const { data: invoiceSettingsData } = useInvoiceSettings({
-    doctorId: userData?.user_id,
-  });
-
-  const paymentModes: TPaymentMode[] = ['Cash', 'Card', 'UPI', 'Online', 'Bank Transfer'];
 
   const {
     control,
@@ -67,7 +65,7 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
     setValue,
     formState: { errors },
   } = useForm<TCreateInvoiceSchemaType>({
-    resolver: yupResolver(createInvoiceSchema) as any,
+    resolver: yupResolver(createInvoiceSchema),
     defaultValues: {
       items: [
         {
@@ -95,6 +93,8 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
   const watchedGstMode = watch('gstMode') || 'none';
   const watchedPaymentMode = watch('paymentMode') || 'Cash';
   const watchedPaymentStatus = watch('paymentStatus') || 'Unpaid';
+
+  const { mutate: createInvoices, isPending: loadingCreateInvoices } = useCreateInvoices();
 
   // Computed totals memoized
   const { subtotal, totalDiscount, taxableAmount, cgst, sgst, igst, grandTotal } = useMemo(() => {
@@ -158,7 +158,7 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
   };
 
   const onSubmit = (data: TCreateInvoiceSchemaType) => {
-    if (!invoiceSettingsData?.clinic_name.trim()) {
+    if (!userData?.clinic_name.trim()) {
       showErrorToast(
         'Please configure your clinic information in Invoice Settings before generating invoices'
       );
@@ -177,26 +177,40 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
       total: computeItemTotal(item),
     }));
 
-    const newInvoice: Invoice = {
-      id: `inv_${Date.now()}`,
-      invoiceNumber,
-      patientId: String(patientId),
-      patientName,
-      createdDate,
-      appointmentDate: createdDate,
+    const payload = {
+      appointment_id: appointmentId || '',
+      doctor_id: userData?.user_id,
+      patient_id: patientId,
       items: itemsWithTotals,
+      gst_type: 'none',
+      payment_mode: data?.paymentMode,
+      payment_status: data?.paymentStatus,
+      notes: data?.notes,
       subtotal,
-      totalDiscount,
+      total_discount: totalDiscount,
       cgst,
       sgst,
       igst,
-      grandTotal,
-      paymentMode: data.paymentMode as PaymentMode,
-      status: (data.paymentStatus || 'Unpaid') as any,
-      notes: data.notes || '',
-      clinicName: userData?.clinic_name,
-      clinicAddress: invoiceSettingsData?.clinic_address,
+      grand_total: grandTotal,
+      clinic_name: userData?.clinic_name,
+      clinic_address: userData?.clinic_address,
+      clinic_phone: userData?.clinic_phone,
+      clinic_email: userData?.clinic_email,
+      clinic_gstin: userData?.clinic_gstin,
     };
+    showLoader('Creating invoice...');
+    createInvoices(payload, {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: [MyInvoices.AllInvoices] });
+        hideLoader();
+        showSuccessToast('Invoice created successfully');
+        navigation?.goBack();
+      },
+      onError: (err: any) => {
+        hideLoader();
+        showErrorToast(err?.message || 'Failed to create invoice', 'Error');
+      },
+    });
   };
 
   return (
@@ -225,10 +239,8 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
           <InvoiceHeaderCard
             patientName={patientName}
             patientGenId={patientGeneratedId}
-            invoiceNumber={invoiceNumber}
-            invoiceDate={createdDate}
-            clinicName={invoiceSettingsData?.clinic_name || ''}
-            clinicAddress={invoiceSettingsData?.clinic_address || ''}
+            clinicName={userData?.clinic_name || ''}
+            clinicAddress={userData?.clinic_address || ''}
             onEditClinicPress={handleNavigateInvoiceSettings}
           />
 
@@ -441,7 +453,6 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
                 </View>
               )}
 
-              {/* Payment Status Selection */}
               <Text style={[S.fieldLbl, { marginTop: 14 }]}>PAYMENT STATUS</Text>
               <View style={S.statusChipRow}>
                 <TouchableOpacity
@@ -551,20 +562,25 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
             <Text style={S.grandVal}>{fmt(grandTotal)}</Text>
           </View>
         </ScrollView>
-
-        {/* Footer */}
         <View style={S.footer}>
           <View style={S.footerSummary}>
             <Text style={S.footerLabel}>GRAND TOTAL</Text>
             <Text style={S.footerAmount}>₹{grandTotal.toLocaleString('en-IN')}</Text>
           </View>
           <TouchableOpacity
-            style={S.submitBtn}
+            style={[S.submitBtn, loadingCreateInvoices && { opacity: 0.7 }]}
             onPress={handleSubmit(onSubmit)}
+            disabled={loadingCreateInvoices}
             activeOpacity={0.85}
           >
-            <SendIcon color="#FFFFFF" size={18} />
-            <Text style={S.submitBtnTxt}>Generate & Send</Text>
+            {loadingCreateInvoices ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <>
+                <SendIcon color="#FFFFFF" size={18} />
+                <Text style={S.submitBtnTxt}>Generate & Send</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

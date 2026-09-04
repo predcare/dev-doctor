@@ -18,6 +18,7 @@ const useAuthProfile = () => {
 
   useEffect(() => {
     if (profileDetails.isSuccess && profileDetails?.data?.success) {
+      console.log('profileDetails?.data?.doctor', profileDetails?.data?.doctor)
       setUserData(profileDetails?.data?.doctor);
     }
   }, [
@@ -41,7 +42,7 @@ const useAuthProfile = () => {
       }
     };
     fetchToken();
-  }, []);
+  }, [isLoggedIn]);
 
   return {
     ...profileDetails.data,

@@ -59,4 +59,16 @@ export * from './UploadIcon';
 export * from './PipIcon';
 export * from './EndPhoneIcon';
 export * from './TinyMicOffIcon';
+export * from './FileDocumentIcon';
+export * from './ImageIcon';
+export * from './VitalsPulseIcon';
+export * from './SymptomsWarningIcon';
+export * from './DiagnosisDocumentIcon';
+export * from './LightbulbInstructionsIcon';
+export * from './LabTestBoardIcon';
+export * from './ReferralIcon';
+export * from './PromoStarIcon';
+export * from './PatientAvatarIcon';
+export * from './PatientAgeCalendarIcon';
+export * from './PatientGenderIcon';
 

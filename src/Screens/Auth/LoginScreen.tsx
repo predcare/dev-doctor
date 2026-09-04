@@ -21,6 +21,7 @@ import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { MailIcon, PhoneIcon } from '../../components/ui/icons';
 import useFcmToken from '../../hooks/commons/useFcmToken';
 import { useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
+import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
 import { ProfileQueryKeys } from '../../hooks/react-query/query.keys';
 import { setItem, STORAGE_KEYS } from '../../lib/common/asyncStorage';
 import { resetToMainTabs } from '../../lib/common/navigation.utils';
@@ -142,7 +143,17 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
           if (token) {
             showLoader('Please wait...');
             await setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-            setUserData(res.user || res.data);
+            try {
+              const profileRes = await getProfile();
+              if (profileRes?.doctor) {
+                setUserData(profileRes.doctor);
+              } else {
+                setUserData(res.user || res.data);
+              }
+            } catch (err) {
+              console.error('Failed to fetch doctor profile after login:', err);
+              setUserData(res.user || res.data);
+            }
             await queryClient.invalidateQueries({
               queryKey: [ProfileQueryKeys.Profile],
             });

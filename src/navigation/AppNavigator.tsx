@@ -22,6 +22,7 @@ import DoctorAppointmentsScreen, {
 import AvailabilityScreen from '../Screens/DashboardScreen/AvailabilityScreen';
 import BookAppointmentScreen from '../Screens/DashboardScreen/BookAppointmentScreen';
 import CreateInvoiceScreen from '../Screens/DashboardScreen/CreateInvoiceScreen';
+import CreatePrescriptionScreen from '../Screens/DashboardScreen/CreatePrescriptionScreen';
 import DoctorMeetingScreen from '../Screens/DashboardScreen/DoctorMeetingScreen';
 import DoctorProfileScreen from '../Screens/DashboardScreen/DoctorProfileScreen';
 import EditPatientScreen from '../Screens/DashboardScreen/EditPatientScreen';
@@ -31,6 +32,7 @@ import InvoiceSettingsScreen from '../Screens/DashboardScreen/InvoiceSettingsScr
 import NotificationsScreen from '../Screens/DashboardScreen/NotificationsScreen';
 import PatientDetailsScreen from '../Screens/DashboardScreen/PatientDetailsScreen';
 import PatientsScreen from '../Screens/DashboardScreen/PatientsScreen';
+import PrescriptionListScreen from '../Screens/DashboardScreen/PrescriptionListScreen';
 import PrescriptionSettingsScreen from '../Screens/DashboardScreen/PrescriptionSettingsScreen';
 import PrescriptionViewScreen from '../Screens/DashboardScreen/PrescriptionViewScreen';
 import RescheduleAppointmentScreen from '../Screens/DashboardScreen/RescheduleAppointmentScreen';
@@ -261,6 +263,8 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="PatientDetails" component={PatientDetailsScreen} />
         <Stack.Screen name="InvoiceList" component={InvoiceListScreen} />
         <Stack.Screen name="CreateInvoice" component={CreateInvoiceScreen} />
+        <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />
+        <Stack.Screen name="PrescriptionList" component={PrescriptionListScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

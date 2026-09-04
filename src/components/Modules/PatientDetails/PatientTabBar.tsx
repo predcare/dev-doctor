@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 
-export type MainTabKey = 'records' | 'consultation' | 'invoice' | 'profile';
+export type MainTabKey = 'records' | 'prescriptions' | 'consultation' | 'invoice' | 'profile';
 
 export interface TabItem {
   key: MainTabKey;
@@ -36,6 +36,7 @@ export const PatientTabBar: React.FC<PatientTabBarProps> = ({
                 patientDetailsStyles.mainTabLabel,
                 active && patientDetailsStyles.mainTabLabelActive,
               ]}
+              numberOfLines={1}
             >
               {tab.label}
             </Text>

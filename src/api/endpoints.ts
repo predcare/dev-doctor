@@ -33,6 +33,11 @@ export const endpoints = {
     linkExisting: '/doctor/patients/link-existing',
     newCreate: '/doctor/patients/add',
     sendCred: '/doctor/patients/send-credentials',
+    emrRecords: '/doctor/emr/patient/',
+    prescriptions: (uid: string | number) => `/doctor/prescriptions/patient/${uid}?role=doctor`,
+    emrShare: (docId: string | number) => `/doctor/emr/document/${docId}/share`,
+    prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
+    emrUpload: '/doctor/emr/upload',
   },
   appointments: {
     get: '/doctor/appointments/doctor',
@@ -54,9 +59,21 @@ export const endpoints = {
     cities: '/patients/locations/cities/',
   },
   invoices: {
+    getAll: (uid: string | number) => `/doctor/invoices/doctor/${uid}`,
     patientInvoices: '/doctor/invoices/doctor/',
     downloadPdf: (invoiceId: number | string) => `/doctor/invoices/${invoiceId}/pdf`,
     invoiceSettings: '/doctor/invoices/settings/',
+    create: '/doctor/invoices',
+  },
+  prescritions: {
+    create: '/doctor/prescriptions',
+    getAll: (doctorId: string | number) => `/doctor/prescriptions/doctor/${doctorId}`,
+    update: (id: string | number) => `/doctor/prescriptions/${id}`,
+    upsertDraft: (id?: string | number) =>
+      id ? `/doctor/prescriptions/upsert-draft/${id}` : '/doctor/prescriptions/upsert-draft',
+    get: (id: string | number) => `/doctor/prescriptions/${id}`,
+    sendAgain: (id: string | number) => `/doctor/prescriptions/${id}/send-email`,
+    downloadPrescription: (id: string | number) => `/doctor/prescriptions/${id}/pdf`,
   },
 };
 
