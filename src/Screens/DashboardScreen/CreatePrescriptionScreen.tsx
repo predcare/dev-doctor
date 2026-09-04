@@ -493,10 +493,10 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                 </TouchableOpacity>
               )}
               <View style={S.stickyBottomBar}>
-                <View style={S.autoSaveRow}>
+                {/* <View style={S.autoSaveRow}>
                   <View style={S.autoSaveDot} />
                   <Text style={S.autoSaveText}>Auto-save active</Text>
-                </View>
+                </View> */}
                 <View style={S.bottomBtnRow}>
                   <TouchableOpacity
                     style={[S.btnPrev, isFirstStep && { opacity: 0.4 }]}
