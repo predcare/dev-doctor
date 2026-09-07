@@ -8,6 +8,7 @@ import {
   FlipCameraIcon,
   MicOffIcon,
   MicOnIcon,
+  PatientsIcon,
   PipIcon,
   RxIcon,
   UploadIcon,
@@ -63,21 +64,22 @@ export const MeetingControlBar: React.FC<MeetingControlBarProps> = ({
         </TouchableOpacity>
       </View>
       <View style={S.controlRow}>
+        <TouchableOpacity style={S.controlBtn} activeOpacity={0.8}>
+          <PatientsIcon size={22} color="#94A3B8" />
+          <Text style={S.controlBtnTxt}>Patient</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onRxPress}>
           <RxIcon size={22} color="#94A3B8" />
           <Text style={S.controlBtnTxt}>RX</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onUploadPress}>
           <UploadIcon size={22} color="#94A3B8" />
           <Text style={S.controlBtnTxt}>UPLOAD</Text>
         </TouchableOpacity>
-
         <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onPipPress}>
           <PipIcon size={22} color="#94A3B8" />
           <Text style={S.controlBtnTxt}>PIP</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={[S.controlBtn, S.controlBtnEnd]}
           activeOpacity={0.8}
