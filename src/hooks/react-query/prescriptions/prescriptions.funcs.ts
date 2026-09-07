@@ -7,11 +7,7 @@ import {
   IPatientPrescriptionInfoRoot,
   IPatientPrescriptionListRoot,
 } from '../../../typescripts/interfaces/prescriptions.interfaces';
-import {
-  ICreatePrescriptionPayload,
-  IUpdatePrescriptionPayload,
-  IUpsertDraftPrescriptionPayload,
-} from './payload.interfaces';
+import { ICreatePrescriptionPayload, IUpdatePrescriptionPayload } from './payload.interfaces';
 
 export const createPrescription = async (payload: ICreatePrescriptionPayload) => {
   const res = await axiosInstance.post<ICommonRoot>(endpoints.prescritions.create, payload);
@@ -23,7 +19,7 @@ export const upsertDraftPrescription = async ({
   payload,
 }: {
   id?: number | string;
-  payload: IUpsertDraftPrescriptionPayload;
+  payload: IUpdatePrescriptionPayload;
 }) => {
   const res = await axiosInstance.post<ICommonRoot>(
     endpoints.prescritions.upsertDraft(id),

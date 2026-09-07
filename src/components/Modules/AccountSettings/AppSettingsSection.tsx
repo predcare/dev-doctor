@@ -18,7 +18,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
     <>
       <SettingsSectionLabel title="APP SETTINGS" />
       <View style={profileStyles.menuGroup}>
-        {/* Google Calendar toggle */}
         <SettingsRowItem
           icon={<CalendarIcon size={18} color={theme.colors.primary} />}
           label="Google Calendar"
@@ -32,7 +31,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
           }
         />
 
-        {/* Notifications toggle */}
         <SettingsRowItem
           icon={<BellIcon size={18} color={theme.colors.primary} />}
           label="Notifications"
@@ -46,7 +44,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
           }
         />
 
-        {/* Security & FaceID toggle */}
         <SettingsRowItem
           icon={<ShieldIcon size={18} color={theme.colors.primary} />}
           label="Security & FaceID"
@@ -59,8 +56,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
             />
           }
         />
-
-        {/* Theme */}
         <SettingsRowItem
           icon={<ThemeIcon size={18} color={theme.colors.primary} />}
           label="Theme"

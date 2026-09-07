@@ -15,7 +15,6 @@ const useAuthProfile = () => {
     queryFn: () => getProfile(),
     enabled: !isTokenLoading && !!token && isLoggedIn,
   });
-console.log('profileDetails', profileDetails?.error)
   useEffect(() => {
     if (profileDetails.isSuccess && profileDetails?.data?.success) {
       setUserData(profileDetails?.data?.doctor);

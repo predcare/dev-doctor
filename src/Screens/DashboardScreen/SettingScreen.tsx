@@ -6,7 +6,6 @@ import AccountSettingsSection from '../../components/Modules/AccountSettings/Acc
 import AppSettingsSection from '../../components/Modules/AccountSettings/AppSettingsSection';
 import SettingsProfileCard from '../../components/Modules/AccountSettings/SettingsProfileCard';
 import SupportSection from '../../components/Modules/AccountSettings/SupportSection';
-import WalletSection from '../../components/Modules/AccountSettings/WalletSection';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { resetToLogin } from '../../lib/common/navigation.utils';
 import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
@@ -20,8 +19,7 @@ export interface ProfileScreenProps {
   route?: ProfileScreenRouteProp;
 }
 
-export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
-  const user = route?.params ? (route.params as any)?.user : undefined;
+export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [subExpanded, setSubExpanded] = useState(false);
 
   const showComingSoon = useAlertStore(state => state.showComingSoon);
@@ -45,7 +43,7 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation, route 
   };
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaWrapper>
       <Header
         title="Settings"
         description="Manage your App Settings"
@@ -58,15 +56,11 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation, route 
         contentContainerStyle={profileStyles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsProfileCard
-          onEditProfile={() => navigation?.navigate('DoctorProfile', { user })}
-        />
+        <SettingsProfileCard onEditProfile={() => navigation?.navigate('DoctorProfile')} />
         <AccountSettingsSection
-          onNavigateProfile={() => navigation?.navigate('DoctorProfile', { user })}
-          onNavigatePrescription={() =>
-            (navigation as any)?.navigate('PrescriptionSettings', { user })
-          }
-          onNavigateInvoice={() => (navigation as any)?.navigate('InvoiceSettings', { user })}
+          onNavigateProfile={() => navigation?.navigate('DoctorProfile')}
+          onNavigatePrescription={() => (navigation as any)?.navigate('PrescriptionSettings')}
+          onNavigateInvoice={() => (navigation as any)?.navigate('InvoiceSettings')}
           subExpanded={subExpanded}
           onToggleSubscription={() => setSubExpanded(v => !v)}
           onManageSubscription={() =>
@@ -74,9 +68,9 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation, route 
           }
           onAddonPress={addonName => showComingSoon(`${addonName} add-on purchase is coming soon.`)}
         />
-        <WalletSection
+        {/* <WalletSection
           onTopUp={() => showComingSoon('Messaging credits top-up feature is coming soon.')}
-        />
+        /> */}
         <AppSettingsSection
           onGCToggle={() => showComingSoon('Google Calendar sync is coming soon.')}
           onNotifToggle={() => showComingSoon('Notification settings is coming soon.')}

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
   KeyboardAvoidingView,
@@ -29,7 +29,6 @@ import {
   useCreatePrescription,
   useGetPrescriptionDetails,
   useUpdatePrescription,
-  useUpsertDraftPrescription,
 } from '../../hooks/react-query/prescriptions/prescriptions.hooks';
 import { PatientsQueryKeys, PrescriptionQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
@@ -76,6 +75,16 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
   const prescriptionId = route?.params?.prescriptionId;
   const [activeStep, setActiveStep] = useState<PrescriptionStep>('clinical');
   const { userData } = useAuthStore(state => state);
+  const currentPrescriptionId = useRef<number | null>(
+    prescriptionId ? Number(prescriptionId) : null
+  );
+  const [autoSaveStatus, setAutoSaveStatus] = useState<
+    'idle' | 'typing' | 'saving' | 'saved' | 'error'
+  >('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialLoadRef = useRef<boolean>(true);
+
   const { showLoader, hideLoader } = useLoadingStore(state => state);
   const {
     data: patientInfo,
@@ -101,9 +110,6 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     useCreatePrescription();
   const { mutate: updatePrescription, isPending: updatePrescriptionPending } =
     useUpdatePrescription();
-
-  const { mutate: upsertDraftPrescription, isPending: upsertDraftPrescriptionPending } =
-    useUpsertDraftPrescription();
 
   const methods = useForm<TCreatePrescriptionFormValues>({
     resolver: yupResolver(createPrescriptionSchema),
@@ -160,14 +166,14 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     }
   };
 
-  const handleFinalSubmit = (_data: TCreatePrescriptionFormValues) => {
+  const hasAnyContent = (_data: TCreatePrescriptionFormValues) => {
     const validMedications = _data?.medications?.filter(m => m?.name && m.name.trim() !== '');
     const validCustomVitals = _data?.custom_vitals?.filter(
       v => (v?.name && v.name.trim() !== '') || (v?.value && v.value.trim() !== '')
     );
     const validLabTests = _data?.lab_tests_structured?.filter(l => l?.name && l.name.trim() !== '');
 
-    const hasAnyContent = Boolean(
+    return Boolean(
       _data?.chief_complaints?.trim() ||
         _data?.examination_notes?.trim() ||
         _data?.diagnosis?.trim() ||
@@ -191,16 +197,18 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
         (validCustomVitals && validCustomVitals.length > 0) ||
         (validLabTests && validLabTests.length > 0)
     );
+  };
 
-    if (!hasAnyContent) {
-      showErrorToast(
-        'Please enter at least one detail (e.g. Diagnosis, Symptoms, Vitals, or Medications) to complete the prescription.',
-        'Prescription Empty'
-      );
-      return;
-    }
-
+  const buildPrescriptionPayload = (
+    _data: TCreatePrescriptionFormValues,
+    status: 'draft' | 'completed' = 'draft'
+  ): ICreatePrescriptionPayload => {
     const rx = prescriptionInfo?.prescription;
+    const validMedications = _data?.medications?.filter(m => m?.name && m.name.trim() !== '');
+    const validCustomVitals = _data?.custom_vitals?.filter(
+      v => (v?.name && v.name.trim() !== '') || (v?.value && v.value.trim() !== '')
+    );
+    const validLabTests = _data?.lab_tests_structured?.filter(l => l?.name && l.name.trim() !== '');
 
     const rawPayload: Record<string, any> = {
       doctor_id: userData?.user_id || '',
@@ -235,28 +243,98 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       referral_doctor_hospital: _data?.referral_doctor_hospital,
       referral_reason: _data?.referral_reason,
       notes: _data?.notes,
-      status: 'completed',
+      status: status,
       clinic_name: userData?.clinic_name,
       clinic_address: userData?.clinic_address,
     };
 
-    const payload = Object.fromEntries(
+    return Object.fromEntries(
       Object.entries(rawPayload).filter(([_, val]) => {
         if (val === null || val === undefined || val === '') return false;
         if (Array.isArray(val) && val.length === 0) return false;
         return true;
       })
     ) as unknown as ICreatePrescriptionPayload;
+  };
 
-    if (prescriptionId) {
+  const triggerAutoSave = (formValues: TCreatePrescriptionFormValues) => {
+    if (!hasAnyContent(formValues)) return;
+
+    setAutoSaveStatus('saving');
+    const payload = buildPrescriptionPayload(formValues, 'draft');
+    const activeId =
+      currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+    const getFormattedTime = () => {
+      const date = new Date();
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    if (activeId) {
       updatePrescription(
         {
-          id: Number(prescriptionId),
+          id: activeId,
+          payload: payload as unknown as IUpdatePrescriptionPayload,
+        },
+        {
+          onSuccess: () => {
+            setAutoSaveStatus('saved');
+            setLastSavedAt(getFormattedTime());
+          },
+          onError: () => {
+            setAutoSaveStatus('error');
+          },
+        }
+      );
+    } else {
+      createPrescription(payload, {
+        onSuccess: response => {
+          const createId = response?.id;
+          if (createId) {
+            currentPrescriptionId.current = Number(createId);
+          }
+          queryClient.invalidateQueries({
+            queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+          });
+          queryClient.invalidateQueries({
+            queryKey: [PatientsQueryKeys.Prescriptions],
+          });
+          setAutoSaveStatus('saved');
+          setLastSavedAt(getFormattedTime());
+        },
+        onError: () => {
+          setAutoSaveStatus('error');
+        },
+      });
+    }
+  };
+
+  const handleFinalSubmit = (_data: TCreatePrescriptionFormValues) => {
+    if (!hasAnyContent(_data)) {
+      showErrorToast(
+        'Please enter at least one detail (e.g. Diagnosis, Symptoms, Vitals, or Medications) to complete the prescription.',
+        'Prescription Empty'
+      );
+      return;
+    }
+
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    const payload = buildPrescriptionPayload(_data, 'completed');
+    const activeId =
+      currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+    if (activeId) {
+      showLoader('Updating prescription...');
+      updatePrescription(
+        {
+          id: activeId,
           payload: payload as unknown as IUpdatePrescriptionPayload,
         },
         {
           onSuccess: async () => {
-            showLoader('Updating prescription...');
             await queryClient.invalidateQueries({
               queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
             });
@@ -264,6 +342,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
               queryKey: [PatientsQueryKeys.Prescriptions],
             });
             showSuccessToast('Prescription updated successfully');
+            hideLoader();
             navigation?.goBack();
           },
           onError: () => {
@@ -272,9 +351,13 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
         }
       );
     } else {
+      showLoader('Creating new prescription...');
       createPrescription(payload, {
-        onSuccess: async () => {
-          showLoader('Creating new prescription...');
+        onSuccess: async response => {
+          const createId = response?.id;
+          if (createId) {
+            currentPrescriptionId.current = Number(createId);
+          }
           await queryClient.invalidateQueries({
             queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
           });
@@ -282,6 +365,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             queryKey: [PatientsQueryKeys.Prescriptions],
           });
           showSuccessToast('Prescription created successfully');
+          hideLoader();
           navigation?.goBack();
         },
         onError: () => {
@@ -338,9 +422,40 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     ? 'Edit Existing Prescription'
     : 'Create New Prescription';
 
+  const currentAutoSave = useMemo(() => {
+    switch (autoSaveStatus) {
+      case 'typing':
+        return {
+          color: '#F59E0B',
+          text: 'Auto-save active',
+        };
+      case 'saving':
+        return {
+          color: '#3B82F6',
+          text: 'Saving draft...',
+        };
+      case 'saved':
+        return {
+          color: theme.colors.success,
+          text: lastSavedAt ? `Saved at ${lastSavedAt}` : 'Draft saved',
+        };
+      case 'error':
+        return {
+          color: theme.colors.danger || '#EF4444',
+          text: 'Auto-save failed',
+        };
+      default:
+        return {
+          color: theme.colors.success,
+          text: 'Auto-save active',
+        };
+    }
+  }, [autoSaveStatus, lastSavedAt]);
+
   useEffect(() => {
     if (prescriptionId && prescriptionInfo?.prescription) {
       const rx = prescriptionInfo.prescription;
+      currentPrescriptionId.current = Number(prescriptionId);
       methods.reset({
         chief_complaints: rx.chief_complaints || rx.symptoms || '',
         examination_notes: rx.examination_notes || '',
@@ -395,6 +510,41 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       });
     }
   }, [prescriptionId, prescriptionInfo?.prescription, methods]);
+
+  useEffect(() => {
+    if (isLoadingData) {
+      isInitialLoadRef.current = true;
+      return;
+    }
+    const timer = setTimeout(() => {
+      isInitialLoadRef.current = false;
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [isLoadingData]);
+
+  useEffect(() => {
+    const subscription = methods.watch(value => {
+      if (isInitialLoadRef.current || isLoadingData) return;
+      if (!hasAnyContent(value as TCreatePrescriptionFormValues)) return;
+
+      setAutoSaveStatus('typing');
+
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      autoSaveTimerRef.current = setTimeout(() => {
+        triggerAutoSave(methods.getValues());
+      }, 2000);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [methods, isLoadingData]);
 
   return (
     <SafeAreaWrapper>
@@ -494,8 +644,8 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
               )}
               <View style={S.stickyBottomBar}>
                 <View style={S.autoSaveRow}>
-                  <View style={S.autoSaveDot} />
-                  <Text style={S.autoSaveText}>Auto-save active</Text>
+                  <View style={[S.autoSaveDot, { backgroundColor: currentAutoSave.color }]} />
+                  <Text style={S.autoSaveText}>{currentAutoSave.text}</Text>
                 </View>
                 <View style={S.bottomBtnRow}>
                   <TouchableOpacity

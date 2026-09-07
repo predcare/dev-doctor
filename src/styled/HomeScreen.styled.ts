@@ -257,6 +257,11 @@ export const homeStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textInverted,
   },
+  grayDisabled: {
+    fontSize: 12,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.textMuted,
+  },
   joinBtn: {
     backgroundColor: theme.colors.primary,
     paddingHorizontal: 16,

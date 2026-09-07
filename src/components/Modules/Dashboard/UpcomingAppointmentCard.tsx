@@ -11,6 +11,7 @@ export interface AppointmentCardProps {
   ageGender: string;
   time: string;
   timeDistance: string;
+  isExpired: boolean;
   consultType: 'ONLINE' | 'IN-PERSON' | string;
   chiefComplaint: string;
   onActionPress?: () => void;
@@ -25,6 +26,7 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
   consultType,
   chiefComplaint,
   onActionPress,
+  isExpired,
 }) => {
   return (
     <View style={homeStyles.appointmentCard}>
@@ -60,11 +62,26 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
         </View>
 
         <TouchableOpacity
-          style={homeStyles.detailsBtn}
+          style={[
+            homeStyles.detailsBtn,
+            isExpired && {
+              backgroundColor: theme.colors.grayDisabled,
+            },
+          ]}
           onPress={onActionPress}
           activeOpacity={0.85}
+          disabled={isExpired}
         >
-          <Text style={homeStyles.detailsBtnText}>Details</Text>
+          <Text
+            style={[
+              homeStyles.detailsBtnText,
+              isExpired && {
+                color: theme.colors.grayText,
+              },
+            ]}
+          >
+            Details
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

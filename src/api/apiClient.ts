@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(async config => {
   const token = await getItem(STORAGE_KEYS.AUTH_TOKEN);
-  console.log('dev token ==================>', token);
+  // console.log('dev token ==================>', token);
   if (token && !!config.headers) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
@@ -25,7 +25,7 @@ axiosInstance.interceptors.request.use(async config => {
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse<IBaseApiRoot>) => {
     const requestUrl = res.config?.url || '';
-    console.log('requestUrl', requestUrl);
+    // console.log('requestUrl', requestUrl);
     const method = res.config?.method?.toLowerCase() || '';
     const successMethods = ['post', 'put', 'patch', 'delete'];
     const isSuccessEndpoint = successEndpoints.some(endpoint => requestUrl.includes(endpoint));

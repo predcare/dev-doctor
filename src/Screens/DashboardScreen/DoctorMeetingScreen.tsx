@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
-import { DoctorMeetingContainer } from '../../components/Modules/DoctorMeeting';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { showErrorToast } from '../../lib/common/toast.utils';
 import type { DoctorMeetingScreenProps } from '../../route';

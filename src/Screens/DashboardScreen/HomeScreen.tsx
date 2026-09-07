@@ -21,10 +21,11 @@ import {
 import { useHomeStats, useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
 import { Header } from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { getTimeUntilStart } from '../../lib/common/common.utils';
+import { _compactNumber, checkIsExpired, getTimeUntilStart } from '../../lib/common/common.utils';
 import { AppRoute, type HomeScreenProps } from '../../route';
 import { homeStyles } from '../../styled/HomeScreen.styled';
 import { theme } from '../../styled/theme.styled';
+import { formatTime12h } from '../../utils/availabilityUtils';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
 type PeriodKey = 'today' | 'week' | 'month';
@@ -111,7 +112,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {
         id: '3',
         label: 'Earnings',
-        value: `₹${boardStats?.todayRevenue ?? 0}`,
+        value: `₹${_compactNumber(Number(boardStats?.todayRevenue ?? 0))}`,
         icon: <WalletIcon size={20} color="#10B981" />,
         iconBg: '#D1FAE5',
       },
@@ -229,16 +230,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <AppointmentSkeleton />
         ) : upcomingAppts && upcomingAppts?.length > 0 ? (
           upcomingAppts?.slice(0, 3)?.map(apt => {
+            const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
             return (
               <UpcomingAppointmentCard
                 key={apt.appointment_id}
                 id={String(apt.id)}
                 patientName={apt.patient_name || 'Patient'}
                 ageGender={apt.patient_gender}
-                time={apt.start_time}
+                time={formatTime12h(apt.start_time)}
                 timeDistance={getTimeUntilStart(apt?.start_time)}
                 consultType={apt.consultation_type || 'ONLINE'}
                 chiefComplaint={apt.symptoms || apt.reason || ''}
+                isExpired={isExpired}
                 onActionPress={() => {
                   navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
                 }}

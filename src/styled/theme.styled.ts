@@ -69,6 +69,8 @@ export const theme = {
     errorRed: '#FF3B30',
     errorBg: '#FFF5F5',
     navBorder: 'rgba(15, 118, 110, 0.12)',
+    grayDisabled: '#E2E8F0',
+    grayText: '#94A3B8',
     transparent: 'transparent',
     overlayWhite10: 'rgba(255, 255, 255, 0.1)',
     overlayWhite15: 'rgba(255, 255, 255, 0.15)',

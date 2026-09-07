@@ -3,6 +3,7 @@ export interface ICommonRoot {
   message: string;
   data?: unknown;
   status: number;
+  id?: number;
 }
 
 export interface IRootResponse<T> {
