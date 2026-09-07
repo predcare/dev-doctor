@@ -1,40 +1,59 @@
-import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-  FlatList,
-  Modal,
+  ActivityIndicator,
+  RefreshControl,
   ScrollView,
-  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Path from 'react-native-svg/src/elements/Path';
-import Svg from 'react-native-svg/src/elements/Svg';
-import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { showSuccessToast } from '../../lib/common/toast.utils';
 import {
-  MOCK_AVAILABLE_DATES,
-  MOCK_PATIENTS,
-  MOCK_SLOTS_BY_PERIOD,
-  MockAvailableDate,
-  MockPatient,
-  MockTimeSlot,
-} from '../../resources/mockData';
-import type { BookAppointmentScreenProps } from '../../route';
-import { bookAppointmentStyles as S, TEAL } from '../../styled/BookAppointmentScreen.styled';
+  AvailableDateItem,
+  BookingDateSelectModal,
+} from '../../components/Modules/Appointments/Modals/BookingDateSelectModal';
+import { BookingPatientSelectModal } from '../../components/Modules/Appointments/Modals/BookingPatientSelectModal';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
+import { ChevronLeftIcon } from '../../components/ui/icons';
+import { useBookAppointments } from '../../hooks/react-query/appointments/appointments.hooks';
+import { ICreateAppointmentPayload } from '../../hooks/react-query/auth/payload.interfaces';
+import { useMyAvailablities } from '../../hooks/react-query/availability/availablity.hooks';
+import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
+import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import { capitalize } from '../../lib/common/common.utils';
+import { showErrorToast } from '../../lib/common/toast.utils';
+import { AppRoute, type BookAppointmentScreenProps } from '../../route';
+import { bookAppointmentStyles as S } from '../../styled/BookAppointmentScreen.styled';
+import theme from '../../styled/theme.styled';
+import {
+  formatTime12h,
+  groupSlotsByPeriod,
+  ISlotItem,
+  normalizeApiTime,
+  parseDoctorAvailableDates,
+  SlotPeriod,
+} from '../../utils/availabilityUtils';
+import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
-const ChevronLeftIcon = () => (
-  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-    <Path
-      d="M15 18L9 12L15 6"
-      stroke={TEAL}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
+export interface ISelectedPatients {
+  name: string;
+  patientGenId: string;
+  id: number;
+  Phone: number;
+  gender?: string;
+  age?: string;
+}
+
+export interface IFormStates {
+  selectedDate: string;
+  formattedDate?: string;
+  appointmentFee: number;
+  consultationType: 'clinic' | 'video' | 'in-person' | string;
+  reason: string;
+  selectedSlots: ISlotItem[] | null;
+}
 
 const PeriodIcon = ({ period }: { period: string }) => {
   switch (period) {
@@ -51,56 +70,201 @@ const PeriodIcon = ({ period }: { period: string }) => {
   }
 };
 
-const PERIOD_ORDER = ['MORNING', 'AFTERNOON', 'EVENING', 'NIGHT'];
+const PeriodSeries: SlotPeriod[] = ['MORNING', 'AFTERNOON', 'EVENING', 'NIGHT'];
 
-export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ navigation }) => {
-  const [selectedPatient, setSelectedPatient] = useState<MockPatient | null>(MOCK_PATIENTS[0]);
-  const [consultationType, setConsultationType] = useState<'clinic' | 'video'>('clinic');
-  const [selectedDateObj, setSelectedDateObj] = useState<MockAvailableDate | null>(
-    MOCK_AVAILABLE_DATES[0]
-  );
-  const [selectedDate, setSelectedDate] = useState<string>(MOCK_AVAILABLE_DATES[0].date);
-  const [selectedSlots, setSelectedSlots] = useState<MockTimeSlot[]>([]);
-  const [reason, setReason] = useState('');
-
-  // Modals visibility
+export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () => {
+  const navigation = useNavigation();
+  const { userData } = useAuthStore(state => state);
+  const [selectedPatient, setSelectedPatient] = useState<ISelectedPatients | null>(null);
   const [showPatientPicker, setShowPatientPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [patientSearch, setPatientSearch] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const { showLoader, hideLoader } = useLoadingStore();
+  const [formStates, setFormState] = useState<IFormStates>({
+    selectedDate: '',
+    formattedDate: '',
+    appointmentFee: 0,
+    consultationType: 'clinic',
+    reason: '',
+    selectedSlots: null,
+  });
 
-  const appointmentFee =
-    consultationType === 'video'
-      ? selectedDateObj?.video_fee || 300
-      : selectedDateObj?.in_person_fee || 500;
+  const {
+    data: myAvailblities,
+    isFetching: myAvailPending,
+    refetch: refetchAvailablities,
+  } = useMyAvailablities({
+    doctorId: selectedPatient?.patientGenId ? userData?.user_id : undefined,
+  });
 
-  const filteredPatients = MOCK_PATIENTS.filter(
-    p =>
-      p.name.toLowerCase().includes(patientSearch.toLowerCase()) ||
-      p.patientId.toLowerCase().includes(patientSearch.toLowerCase()) ||
-      p.phone.includes(patientSearch)
-  );
+  const { mutate: bookAppt, isPending: bookApptPending } = useBookAppointments();
 
-  const formatTime = (timeString: string) => {
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+  const activeAvailabilityDoc = useMemo(() => {
+    if (myAvailblities?.[0]) {
+      return myAvailblities[0];
+    }
+    return [];
+  }, [myAvailblities]);
+
+  const availableDates = useMemo<AvailableDateItem[]>(() => {
+    return parseDoctorAvailableDates(activeAvailabilityDoc);
+  }, [activeAvailabilityDoc]);
+
+  const periodWiseSlots = useMemo(() => {
+    if (!formStates.selectedDate || !activeAvailabilityDoc) {
+      return null;
+    }
+    return groupSlotsByPeriod(
+      activeAvailabilityDoc.time_slots || [],
+      activeAvailabilityDoc.booked_slots || {},
+      formStates.selectedDate
+    );
+  }, [formStates.selectedDate, activeAvailabilityDoc]);
+
+  const { totalAmount } = useMemo(() => {
+    if (!formStates.appointmentFee || !formStates?.selectedSlots?.length) {
+      return {
+        consultationFee: 0,
+        totalAmount: 0,
+      };
+    }
+
+    const fee = Number(formStates.appointmentFee) * formStates?.selectedSlots.length;
+
+    return {
+      consultationFee: fee,
+      totalAmount: fee,
+    };
+  }, [formStates.appointmentFee, formStates?.selectedSlots]);
+
+  const updateFormState = (patch: Partial<IFormStates>) => {
+    setFormState(prev => ({ ...prev, ...patch }));
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetchAvailablities();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchAvailablities]);
+
+  const areSlotsConsecutive = (slots: ISlotItem[]): boolean => {
+    if (slots.length <= 1) return true;
+    const sorted = [...slots].sort((a, b) => a.start.localeCompare(b.start));
+    for (let i = 0; i < sorted.length - 1; i++) {
+      if (sorted[i].end !== sorted[i + 1].start) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleSlotPress = (slot: ISlotItem, currentSelected: ISlotItem[]) => {
+    if (slot.booked) return;
+
+    const isSelected = currentSelected.some(selectedSlot => selectedSlot.start === slot.start);
+
+    if (isSelected) {
+      const updated = currentSelected.filter(selectedSlot => selectedSlot.start !== slot.start);
+
+      if (updated.length > 0 && !areSlotsConsecutive(updated)) {
+        showErrorToast('Please select consecutive slots only.');
+        return;
+      }
+
+      updateFormState({
+        selectedSlots: updated.length > 0 ? updated : null,
+      });
+
+      return;
+    }
+    if (currentSelected.length === 0) {
+      updateFormState({
+        selectedSlots: [slot],
+      });
+
+      return;
+    }
+    const sorted = [...currentSelected].sort((a, b) => a.start.localeCompare(b.start));
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+
+    const isBeforeFirst = slot.end === first.start;
+    const isAfterLast = slot.start === last.end;
+
+    if (isAfterLast || isBeforeFirst) {
+      updateFormState({
+        selectedSlots: [...currentSelected, slot],
+      });
+    } else {
+      showErrorToast('Please select consecutive slots only.');
+    }
   };
 
   const handleBookAppointment = () => {
-    showSuccessToast(
-      `Appointment booked for ${selectedPatient?.name} on ${selectedDateObj?.formattedDate}`,
-      'Booking Confirmed'
+    if (!selectedPatient?.patientGenId) return showErrorToast('Select Patient First');
+    if (!formStates.selectedDate) return showErrorToast('Select Appointment Date');
+    if (!formStates.selectedSlots || formStates.selectedSlots.length === 0) {
+      return showErrorToast('Select at least one Time Slot');
+    }
+    if (!areSlotsConsecutive(formStates.selectedSlots)) {
+      return showErrorToast('Please select consecutive slots only.');
+    }
+    if (!userData?.user_id || !userData?.clinic_id) return showErrorToast('Doctor ID is missing');
+
+    if (formStates?.selectedSlots.some(s => s.booked)) {
+      showErrorToast('One or more selected slots are already booked. Please choose another.');
+      return;
+    }
+    const sorted = [...formStates?.selectedSlots].sort((a, b) => a.start.localeCompare(b.start));
+
+    const firstSlot = sorted[0];
+    const lastSlot = sorted[sorted.length - 1];
+
+    const slotTimeJson = JSON.stringify(
+      sorted.map(s => ({ start: s.start, end: s.end, booked: false }))
     );
-    navigation?.goBack();
+    showLoader('Please Wait....');
+    const payload: ICreateAppointmentPayload = {
+      doctor_id: userData.user_id,
+      patient_id: selectedPatient.id,
+      appointment_date: formStates.selectedDate,
+      start_time: normalizeApiTime(firstSlot.start),
+      end_time: normalizeApiTime(lastSlot.end),
+      consultation_type: 'in-person',
+      appointment_fee: formStates.appointmentFee || 0,
+      appointment_type: 'first_visit',
+      appointment_status: 'confirmed',
+      payment_status: 'pending',
+      reason: formStates.reason.trim() || null,
+      symptoms: null,
+      appointment_slot_time: slotTimeJson,
+      clinic_id: userData?.clinic_id ?? 1,
+    };
+    bookAppt(payload, {
+      onSuccess: async () => {
+        updateFormState({
+          appointmentFee: 0,
+          consultationType: 'clinic',
+          formattedDate: '',
+          reason: '',
+          selectedDate: '',
+          selectedSlots: null,
+        });
+        await queryClient.invalidateQueries({ queryKey: [MyAppointmentsQueryKeys.MyAppointments] });
+        hideLoader();
+        navigation.navigate(AppRoute.MAIN_TABS, { screen: AppRoute.SCHEDULE });
+      },
+      onError: () => {
+        hideLoader();
+      },
+    });
   };
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-
-      {/* Header */}
+    <SafeAreaWrapper>
       <View style={S.header}>
         <TouchableOpacity style={S.backButton} onPress={() => navigation?.goBack()}>
           <ChevronLeftIcon />
@@ -108,9 +272,19 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ na
         <Text style={S.headerTitle}>Book Appointment</Text>
       </View>
 
-      <ScrollView style={S.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={S.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => selectedPatient?.patientGenId && onRefresh()}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
+        }
+      >
         <View style={S.content}>
-          {/* STEP 1: Select Patient */}
           <View style={S.section}>
             <Text style={S.sectionTitle}>1. Select Patient</Text>
             <TouchableOpacity
@@ -121,7 +295,7 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ na
               <View style={S.selectButtonContent}>
                 {selectedPatient ? (
                   <Text style={S.selectedText}>
-                    {selectedPatient.name} ({selectedPatient.patientId})
+                    {selectedPatient.name} ({selectedPatient.patientGenId})
                   </Text>
                 ) : (
                   <Text style={S.placeholderText}>Select a patient</Text>
@@ -130,330 +304,238 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = ({ na
               </View>
             </TouchableOpacity>
 
-            {selectedPatient && (
+            {selectedPatient?.patientGenId && (
               <View style={S.patientInfo}>
                 <Text style={S.patientInfoText}>
-                  👤 {selectedPatient.gender}, {selectedPatient.age}
+                  👤 {selectedPatient.name}, {capitalize(selectedPatient?.gender || '')}
                 </Text>
-                <Text style={S.patientInfoText}>📞 {selectedPatient.phone}</Text>
+                <Text style={S.patientInfoText}>📞 {selectedPatient.Phone}</Text>
               </View>
             )}
           </View>
-
-          {/* STEP 2: Consultation Type */}
           <View style={S.section}>
             <Text style={S.sectionTitle}>2. Consultation Type</Text>
             <View style={S.typeRow}>
               <TouchableOpacity
-                style={[S.typeButton, consultationType === 'clinic' && S.typeButtonActive]}
+                style={[S.typeButton, S.typeButtonActive]}
                 onPress={() => {
-                  setConsultationType('clinic');
-                  setSelectedSlots([]);
+                  updateFormState({
+                    consultationType: 'clinic',
+                    selectedSlots: null,
+                  });
                 }}
                 activeOpacity={0.8}
               >
                 <Text style={S.typeButtonIcon}>🏥</Text>
-                <Text
-                  style={[
-                    S.typeButtonText,
-                    consultationType === 'clinic' && S.typeButtonTextActive,
-                  ]}
-                >
-                  In-Clinic
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[S.typeButton, consultationType === 'video' && S.typeButtonActive]}
-                onPress={() => {
-                  setConsultationType('video');
-                  setSelectedSlots([]);
-                }}
-                activeOpacity={0.8}
-              >
-                <Text style={S.typeButtonIcon}>📹</Text>
-                <Text
-                  style={[S.typeButtonText, consultationType === 'video' && S.typeButtonTextActive]}
-                >
-                  Video Call
-                </Text>
+                <Text style={[S.typeButtonText, S.typeButtonTextActive]}>In-Clinic</Text>
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* STEP 3: Select Date */}
           <View style={S.section}>
             <Text style={S.sectionTitle}>3. Select Date</Text>
             <TouchableOpacity
-              style={S.selectButton}
-              onPress={() => setShowDatePicker(true)}
+              style={[S.selectButton, myAvailPending && { opacity: 0.7 }]}
+              onPress={() => {
+                if (myAvailPending) return;
+                if (!selectedPatient?.patientGenId) return showErrorToast('Select Patient First');
+                !myAvailPending && setShowDatePicker(true);
+              }}
+              disabled={myAvailPending}
               activeOpacity={0.8}
             >
               <View style={S.selectButtonContent}>
-                {selectedDateObj ? (
-                  <Text style={S.selectedText}>📅 {selectedDateObj.formattedDate}</Text>
+                {myAvailPending ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <ActivityIndicator size="small" color={theme.colors.primary} />
+                    <Text style={S.placeholderText}>Loading available dates...</Text>
+                  </View>
+                ) : formStates.selectedDate ? (
+                  <Text style={S.selectedText}>
+                    📅 {formStates.formattedDate || formStates.selectedDate}
+                  </Text>
                 ) : (
                   <Text style={S.placeholderText}>Select appointment date</Text>
                 )}
-                <Text style={S.selectButtonIcon}>▼</Text>
+                {!myAvailPending && <Text style={S.selectButtonIcon}>▼</Text>}
               </View>
             </TouchableOpacity>
           </View>
 
-          {/* STEP 4: Select Time Slot(s) */}
           <View style={S.section}>
             <Text style={S.sectionTitle}>4. Select Time Slot</Text>
 
-            {/* Legend */}
-            <View style={S.legendRow}>
-              <View style={S.legendItem}>
-                <View
-                  style={[S.legendDot, { backgroundColor: '#EBEBEB', borderColor: '#C8D8D8' }]}
-                />
-                <Text style={S.legendText}>Available</Text>
+            {!formStates.selectedDate ? (
+              <View style={S.emptyState}>
+                <Text style={S.emptyStateText}>No Date Selected</Text>
+                <Text style={S.emptyStateSubtext}>
+                  Please select an available date above to view available time slots.
+                </Text>
               </View>
-              <View style={S.legendItem}>
-                <View style={[S.legendDot, { backgroundColor: '#FFFFFF', borderColor: TEAL }]} />
-                <Text style={S.legendText}>Selected</Text>
-              </View>
-              <View style={S.legendItem}>
-                <View
-                  style={[
-                    S.legendDot,
-                    { backgroundColor: '#EBEBEB', opacity: 0.4, borderColor: '#8E9A97' },
-                  ]}
-                />
-                <Text style={S.legendText}>Booked</Text>
-              </View>
-            </View>
-
-            {/* Selected slots summary box */}
-            {selectedSlots.length > 0 &&
-              (() => {
-                const sorted = [...selectedSlots].sort((a, b) => a.start.localeCompare(b.start));
-                return (
-                  <View style={S.slotSummaryBox}>
-                    <Text style={S.slotSummaryText}>
-                      <Text style={{ fontWeight: '700' }}>
-                        {selectedSlots.length} Slot{selectedSlots.length > 1 ? 's' : ''} Selected
-                      </Text>{' '}
-                      ({formatTime(sorted[0].start)} → {formatTime(sorted[sorted.length - 1].end)})
-                    </Text>
-                    <TouchableOpacity onPress={() => setSelectedSlots([])}>
-                      <Text style={S.slotClearText}>Clear</Text>
-                    </TouchableOpacity>
+            ) : (
+              <>
+                <View style={S.legendRow}>
+                  <View style={S.legendItem}>
+                    <View
+                      style={[S.legendDot, { backgroundColor: '#EBEBEB', borderColor: '#C8D8D8' }]}
+                    />
+                    <Text style={S.legendText}>Available</Text>
                   </View>
-                );
-              })()}
-
-            {/* Period-Grouped Slots */}
-            {PERIOD_ORDER.map(period => {
-              const periodSlots = MOCK_SLOTS_BY_PERIOD[period];
-              if (!periodSlots || periodSlots.length === 0) return null;
-
-              return (
-                <View key={period} style={S.periodSection}>
-                  <View style={S.periodHeader}>
-                    <PeriodIcon period={period} />
-                    <Text style={S.periodTitle}>
-                      {period.charAt(0) + period.slice(1).toLowerCase()}
-                    </Text>
+                  <View style={S.legendItem}>
+                    <View
+                      style={[
+                        S.legendDot,
+                        { backgroundColor: '#FFFFFF', borderColor: theme.colors.primary },
+                      ]}
+                    />
+                    <Text style={S.legendText}>Selected</Text>
                   </View>
-
-                  <View style={S.slotsGrid}>
-                    {periodSlots.map((slot, index) => {
-                      const isSelected = selectedSlots.some(s => s.start === slot.start);
-                      const isBooked = slot.booked === true;
-
-                      const handleSlotPress = () => {
-                        if (isBooked) return;
-                        if (isSelected) {
-                          setSelectedSlots(prev => prev.filter(s => s.start !== slot.start));
-                          return;
-                        }
-                        if (selectedSlots.length === 0) {
-                          setSelectedSlots([slot]);
-                          return;
-                        }
-                        const sorted = [...selectedSlots].sort((a, b) =>
-                          a.start.localeCompare(b.start)
-                        );
-                        const first = sorted[0];
-                        const last = sorted[sorted.length - 1];
-                        const isBeforeFirst = slot.end === first.start;
-                        const isAfterLast = slot.start === last.end;
-
-                        if (isAfterLast || isBeforeFirst) {
-                          setSelectedSlots(prev => [...prev, slot]);
-                        } else {
-                          setSelectedSlots([slot]);
-                        }
-                      };
-
-                      return (
-                        <TouchableOpacity
-                          key={index}
-                          style={[
-                            S.slotButton,
-                            isBooked && S.slotButtonBooked,
-                            isSelected && S.slotButtonSelected,
-                          ]}
-                          onPress={handleSlotPress}
-                          disabled={isBooked}
-                          activeOpacity={0.7}
-                        >
-                          <Text
-                            style={[
-                              S.slotButtonText,
-                              isBooked && S.slotButtonTextBooked,
-                              isSelected && S.slotButtonTextSelected,
-                            ]}
-                          >
-                            {formatTime(slot.start)} - {formatTime(slot.end)}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
+                  <View style={S.legendItem}>
+                    <View
+                      style={[
+                        S.legendDot,
+                        { backgroundColor: '#EBEBEB', opacity: 0.4, borderColor: '#8E9A97' },
+                      ]}
+                    />
+                    <Text style={S.legendText}>Booked</Text>
                   </View>
                 </View>
-              );
-            })}
+
+                {formStates.selectedSlots &&
+                  formStates.selectedSlots.length > 0 &&
+                  (() => {
+                    const sorted = [...formStates.selectedSlots!].sort((a, b) =>
+                      a.start.localeCompare(b.start)
+                    );
+                    return (
+                      <View style={S.slotSummaryBox}>
+                        <Text style={S.slotSummaryText}>
+                          <Text style={{ fontWeight: '700' }}>
+                            {formStates.selectedSlots!.length} Slot
+                            {formStates.selectedSlots!.length > 1 ? 's' : ''} Selected
+                          </Text>{' '}
+                          ({formatTime12h(sorted[0].start)} →{' '}
+                          {formatTime12h(sorted[sorted.length - 1].end)})
+                        </Text>
+                        <TouchableOpacity onPress={() => updateFormState({ selectedSlots: null })}>
+                          <Text style={S.slotClearText}>Clear</Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })()}
+
+                {periodWiseSlots &&
+                  PeriodSeries.map(period => {
+                    const periodSlots = periodWiseSlots[period] || [];
+                    if (periodSlots.length === 0) return null;
+                    return (
+                      <View key={period} style={S.periodSection}>
+                        <View style={S.periodHeader}>
+                          <PeriodIcon period={period} />
+                          <Text style={S.periodTitle}>
+                            {period.charAt(0) + period.slice(1).toLowerCase()}
+                          </Text>
+                        </View>
+
+                        <View style={S.slotsGrid}>
+                          {periodSlots.map((slot, index) => {
+                            const currentSelected = formStates.selectedSlots || [];
+                            const isSelected = currentSelected.some(
+                              selectedSlot => selectedSlot.start === slot.start
+                            );
+                            const isBooked = slot.booked;
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={[
+                                  S.slotButton,
+                                  isBooked && S.slotButtonBooked,
+                                  isSelected && S.slotButtonSelected,
+                                ]}
+                                onPress={() => handleSlotPress(slot, currentSelected)}
+                                disabled={isBooked}
+                                activeOpacity={0.7}
+                              >
+                                <Text
+                                  style={[
+                                    S.slotButtonText,
+                                    isBooked && S.slotButtonTextBooked,
+                                    isSelected && S.slotButtonTextSelected,
+                                  ]}
+                                >
+                                  {slot.displayTime}
+                                </Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      </View>
+                    );
+                  })}
+              </>
+            )}
           </View>
 
-          {/* STEP 5: Fee */}
           <View style={S.section}>
             <Text style={S.sectionTitle}>5. Appointment Fee</Text>
             <View style={S.feeDisplay}>
               <Text style={S.feeLabel}>Consultation Fee</Text>
-              <Text style={S.feeAmount}>₹{appointmentFee}</Text>
+              <Text style={S.feeAmount}>₹{totalAmount || 0}</Text>
             </View>
-            <Text style={S.feeNote}>
-              {consultationType === 'video' ? 'Video consultation' : 'In-clinic consultation'} fee
-            </Text>
+            <Text style={S.feeNote}>In-clinic consultation fee</Text>
           </View>
 
-          {/* Reason for Visit */}
           <View style={S.section}>
             <Text style={S.sectionTitle}>Reason for Visit (Optional)</Text>
             <TextInput
               style={S.input}
               placeholder="e.g., Follow-up, Routine Check-up"
               placeholderTextColor="#94A3B8"
-              value={reason}
-              onChangeText={setReason}
+              value={formStates.reason}
+              onChangeText={text => updateFormState({ reason: text })}
             />
           </View>
 
-          {/* Book Button */}
           <TouchableOpacity
             style={[
               S.bookButton,
-              (!selectedPatient || !selectedDate || selectedSlots.length === 0) &&
-                S.bookButtonDisabled,
+              (!selectedPatient?.patientGenId || bookApptPending) && S.bookButtonDisabled,
             ]}
             onPress={handleBookAppointment}
-            disabled={!selectedPatient || !selectedDate || selectedSlots.length === 0}
             activeOpacity={0.85}
+            disabled={!selectedPatient?.patientGenId || bookApptPending}
           >
-            <Text style={S.bookButtonText}>Book Appointment</Text>
+            {bookApptPending ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={S.bookButtonText}>Book Appointment</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Patient Picker Modal */}
-      <Modal visible={showPatientPicker} transparent animationType="slide">
-        <View style={S.modalOverlay}>
-          <View style={S.modalContent}>
-            <View style={S.modalHeader}>
-              <Text style={S.modalTitle}>Select Patient</Text>
-              <TouchableOpacity onPress={() => setShowPatientPicker(false)}>
-                <Text style={S.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
+      <BookingPatientSelectModal
+        visible={showPatientPicker}
+        onClose={() => setShowPatientPicker(false)}
+        selectedPatient={selectedPatient || null}
+        onSelectPatient={patient => setSelectedPatient(patient)}
+        doctorId={String(userData?.user_id)}
+      />
 
-            <TextInput
-              style={S.searchInput}
-              placeholder="Search patient by name or ID..."
-              placeholderTextColor="#94A3B8"
-              value={patientSearch}
-              onChangeText={setPatientSearch}
-            />
-
-            <FlatList
-              data={filteredPatients}
-              keyExtractor={item => item.id}
-              style={S.patientList}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={S.patientItem}
-                  onPress={() => {
-                    setSelectedPatient(item);
-                    setShowPatientPicker(false);
-                  }}
-                >
-                  <View style={[S.patientAvatar, { backgroundColor: item.avatarBgColor || TEAL }]}>
-                    <Text style={S.patientAvatarText}>{item.name.charAt(0)}</Text>
-                  </View>
-                  <View style={S.patientDetails}>
-                    <Text style={S.patientName}>{item.name}</Text>
-                    <Text style={S.patientId}>
-                      ID: {item.patientId} · {item.gender}, {item.age}
-                    </Text>
-                    <Text style={S.patientPhone}>{item.phone}</Text>
-                  </View>
-                  {selectedPatient?.id === item.id && <Text style={S.dateItemCheck}>✓</Text>}
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
-
-      {/* Date Picker Modal */}
-      <Modal visible={showDatePicker} transparent animationType="slide">
-        <View style={S.modalOverlay}>
-          <View style={S.dateModalContent}>
-            <View style={S.modalHeader}>
-              <Text style={S.modalTitle}>Select Available Date</Text>
-              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                <Text style={S.modalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={MOCK_AVAILABLE_DATES}
-              keyExtractor={item => item.date}
-              style={S.dateList}
-              renderItem={({ item }) => {
-                const isSelected = selectedDate === item.date;
-                return (
-                  <TouchableOpacity
-                    style={[S.dateItem, isSelected && S.dateItemSelected]}
-                    onPress={() => {
-                      setSelectedDate(item.date);
-                      setSelectedDateObj(item);
-                      setShowDatePicker(false);
-                    }}
-                  >
-                    <View style={S.dateItemContent}>
-                      <Text style={S.dateItemIcon}>📅</Text>
-                      <View style={S.dateItemText}>
-                        <Text style={[S.dateItemDate, isSelected && S.dateItemDateSelected]}>
-                          {item.formattedDate}
-                        </Text>
-                        <Text style={[S.dateItemType, isSelected && S.dateItemTypeSelected]}>
-                          Fee: ₹{consultationType === 'video' ? item.video_fee : item.in_person_fee}
-                        </Text>
-                      </View>
-                    </View>
-                    {isSelected && <Text style={S.dateItemCheck}>✓</Text>}
-                  </TouchableOpacity>
-                );
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
+      <BookingDateSelectModal
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        selectedDate={formStates.selectedDate}
+        availableDates={availableDates}
+        onSelectDate={dateObj => {
+          const apptFee = dateObj.in_person_fee || 0;
+          updateFormState({
+            selectedDate: dateObj.date,
+            formattedDate: dateObj.formattedDate,
+            appointmentFee: apptFee,
+            selectedSlots: null,
+          });
+        }}
+      />
     </SafeAreaWrapper>
   );
 };

@@ -30,18 +30,24 @@ export const OtpInput: React.FC<OtpInputProps> = ({
   }, [autoFocus, disabled]);
 
   const handleChangeText = (text: string, index: number) => {
-    const cleanText = text.replace(/\D/g, '');
+    let cleanText = text.replace(/\D/g, '');
+
+    if (
+      cleanText.length > numInputs &&
+      digits[index] &&
+      cleanText.startsWith(digits[index])
+    ) {
+      cleanText = cleanText.slice(digits[index].length);
+    }
 
     if (cleanText.length > 1) {
-      let pasted = cleanText;
-      if (digits[index] && pasted.startsWith(digits[index]) && pasted.length > numInputs) {
-        pasted = pasted.slice(digits[index].length);
-      }
-      pasted = pasted.slice(0, numInputs);
+      const pasted = cleanText.slice(0, numInputs);
 
       if (pasted.length === numInputs) {
         onChange(pasted);
-        inputsRef.current[numInputs - 1]?.focus();
+        setTimeout(() => {
+          inputsRef.current[numInputs - 1]?.focus();
+        }, 50);
       } else {
         const newDigits = [...digits];
         for (let i = 0; i < pasted.length && index + i < numInputs; i++) {
@@ -49,8 +55,10 @@ export const OtpInput: React.FC<OtpInputProps> = ({
         }
         const updatedOtp = newDigits.join('');
         onChange(updatedOtp);
-        const focusIdx = Math.min(index + pasted.length - 1, numInputs - 1);
-        inputsRef.current[focusIdx]?.focus();
+        const focusIdx = Math.min(index + pasted.length, numInputs - 1);
+        setTimeout(() => {
+          inputsRef.current[focusIdx]?.focus();
+        }, 50);
       }
       return;
     }
@@ -61,7 +69,9 @@ export const OtpInput: React.FC<OtpInputProps> = ({
     onChange(newOtpStr);
 
     if (cleanText && index < numInputs - 1) {
-      inputsRef.current[index + 1]?.focus();
+      setTimeout(() => {
+        inputsRef.current[index + 1]?.focus();
+      }, 10);
     }
   };
 
@@ -70,7 +80,9 @@ export const OtpInput: React.FC<OtpInputProps> = ({
       const newDigits = [...digits];
       newDigits[index - 1] = '';
       onChange(newDigits.join(''));
-      inputsRef.current[index - 1]?.focus();
+      setTimeout(() => {
+        inputsRef.current[index - 1]?.focus();
+      }, 10);
     }
   };
 
@@ -89,6 +101,7 @@ export const OtpInput: React.FC<OtpInputProps> = ({
           onKeyPress={e => handleKeyPress(e, index)}
           editable={!disabled}
           selectTextOnFocus
+          maxLength={numInputs}
           autoFocus={autoFocus && index === 0}
           textContentType="oneTimeCode"
           autoComplete="one-time-code"

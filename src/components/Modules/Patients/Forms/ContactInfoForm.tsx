@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, Control, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  useCitiesBySId,
+  useCountries,
+  useStatesByCId,
+} from '../../../../hooks/react-query/common/common.hooks';
 import { TAddPatientSchemaType } from '../../../../lib/schemas/addPatient.schema';
 import { theme } from '../../../../styled/theme.styled';
 
@@ -13,30 +18,6 @@ export interface ContactInfoFormProps {
 
 import ListPickerModal from '../Modals/ListPickerModal';
 
-const mockCountries = [
-  { id: 1, name: 'India' },
-  { id: 2, name: 'United States' },
-  { id: 3, name: 'United Kingdom' },
-  { id: 4, name: 'Canada' },
-  { id: 5, name: 'Australia' },
-];
-
-const mockStates = [
-  { id: 10, name: 'Karnataka' },
-  { id: 11, name: 'Maharashtra' },
-  { id: 12, name: 'Delhi' },
-  { id: 13, name: 'Tamil Nadu' },
-  { id: 14, name: 'California' },
-];
-
-const mockCities = [
-  { id: 100, name: 'Bengaluru' },
-  { id: 101, name: 'Mumbai' },
-  { id: 102, name: 'New Delhi' },
-  { id: 103, name: 'Chennai' },
-  { id: 104, name: 'Los Angeles' },
-];
-
 export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
   ({ control, setValue, watch, errors }) => {
     const phone = watch('phone') || '';
@@ -44,9 +25,62 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
     const stateName = watch('state') || '';
     const cityName = watch('city') || '';
 
-    const [showCountryModal, setShowCountryModal] = React.useState(false);
-    const [showStateModal, setShowStateModal] = React.useState(false);
-    const [showCityModal, setShowCityModal] = React.useState(false);
+    const [showCountryModal, setShowCountryModal] = useState(false);
+    const [showStateModal, setShowStateModal] = useState(false);
+    const [showCityModal, setShowCityModal] = useState(false);
+
+    const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>();
+    const [selectedStateId, setSelectedStateId] = useState<number | undefined>();
+
+    const { data: rawCountries, isLoading: loadingCountries } = useCountries();
+    const { data: rawStates, isLoading: loadingStates } = useStatesByCId(
+      selectedCountryId ? { cId: selectedCountryId } : undefined
+    );
+    const { data: rawCities, isLoading: loadingCities } = useCitiesBySId(
+      selectedStateId ? { sId: selectedStateId } : undefined
+    );
+
+    const countries = useMemo(() => {
+      if (!Array.isArray(rawCountries)) return [];
+      return rawCountries.map((c: any) => ({
+        id: Number(c.id) || c.id,
+        name: c.name,
+      }));
+    }, [rawCountries]);
+
+    const states = useMemo(() => {
+      if (!Array.isArray(rawStates)) return [];
+      return rawStates.map((s: any) => ({
+        id: Number(s.id) || s.id,
+        name: s.name,
+      }));
+    }, [rawStates]);
+
+    const cities = useMemo(() => {
+      if (!Array.isArray(rawCities)) return [];
+      return rawCities.map((c: any) => ({
+        id: Number(c.id) || c.id,
+        name: c.name,
+      }));
+    }, [rawCities]);
+
+    useEffect(() => {
+      if (!selectedCountryId && country && countries.length > 0) {
+        const found = countries.find((c: any) => c.name.toLowerCase() === country.toLowerCase());
+        if (found) {
+          setSelectedCountryId(Number(found.id));
+        }
+      }
+    }, [country, countries, selectedCountryId]);
+
+    useEffect(() => {
+      if (!selectedStateId && stateName && states.length > 0) {
+        const found = states.find((s: any) => s.name.toLowerCase() === stateName.toLowerCase());
+        if (found) {
+          setSelectedStateId(Number(found.id));
+        }
+      }
+    }, [stateName, states, selectedStateId]);
 
     return (
       <>
@@ -259,24 +293,37 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
           visible={showCountryModal}
           onClose={() => setShowCountryModal(false)}
           title="Select Country"
-          items={mockCountries}
+          items={countries}
           selected={country}
-          onPick={it => setValue('country', it.name, { shouldValidate: true })}
+          isLoading={loadingCountries}
+          onPick={it => {
+            setValue('country', it.name, { shouldValidate: true });
+            setSelectedCountryId(Number(it.id));
+            setValue('state', '', { shouldValidate: true });
+            setValue('city', '', { shouldValidate: true });
+            setSelectedStateId(undefined);
+          }}
         />
         <ListPickerModal
           visible={showStateModal}
           onClose={() => setShowStateModal(false)}
           title="Select State"
-          items={mockStates}
+          items={states}
           selected={stateName}
-          onPick={it => setValue('state', it.name, { shouldValidate: true })}
+          isLoading={loadingStates}
+          onPick={it => {
+            setValue('state', it.name, { shouldValidate: true });
+            setSelectedStateId(Number(it.id));
+            setValue('city', '', { shouldValidate: true });
+          }}
         />
         <ListPickerModal
           visible={showCityModal}
           onClose={() => setShowCityModal(false)}
           title="Select City"
-          items={mockCities}
+          items={cities}
           selected={cityName}
+          isLoading={loadingCities}
           onPick={it => setValue('city', it.name, { shouldValidate: true })}
         />
       </>

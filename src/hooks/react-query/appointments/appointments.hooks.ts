@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { MyAppointmentsQueryKeys } from '../query.keys';
 import {
+  bookAppointments,
   changeAppointmentStatus,
   getApptToken,
   getMyAppointments,
@@ -38,3 +39,8 @@ export const useChangeAppointmentStatus = () => {
       changeAppointmentStatus(payload),
   });
 };
+
+export const useBookAppointments = () =>
+  useMutation({
+    mutationFn: bookAppointments,
+  });

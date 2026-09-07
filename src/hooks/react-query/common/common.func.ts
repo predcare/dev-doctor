@@ -13,6 +13,6 @@ export const getStates = async (countryId: number) => {
 };
 
 export const getCities = async (stateId: number) => {
-  const res = await axiosInstance.get<ICommonRoot>(`${endpoints.commons.states}${stateId}`);
+  const res = await axiosInstance.get<ICommonRoot>(`${endpoints.commons.cities}${stateId}`);
   return res.data;
 };

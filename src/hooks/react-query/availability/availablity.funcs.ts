@@ -27,3 +27,10 @@ export const updateAvailability = async (id: number | string, body: any) => {
   const res = await axiosInstance.put(`${endpoints.availablity.update}${id}`, body);
   return res.data;
 };
+
+export const getMyAvailablities = async (doctorId: number | string) => {
+  const res = await axiosInstance.get<IMyAvailabilityRoot>(
+    `${endpoints.availablity.docAvailabilities}${doctorId}`
+  );
+  return res.data;
+};

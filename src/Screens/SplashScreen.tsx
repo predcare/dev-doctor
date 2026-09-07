@@ -99,16 +99,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
   }, [fadeAnim, scaleAnim, pulseAnim, navigation, onFinish, setUserData, logout]);
 
   return (
-    <SafeAreaWrapper backgroundColor={theme.colors.primaryDark} barStyle="light-content">
+    <SafeAreaWrapper backgroundColor={theme.colors.primaryDark}>
       <View style={Splashstyles.container}>
-        {/* Background Gradient Circles */}
         <View style={Splashstyles.circleContainer}>
           <View style={[Splashstyles.circle, Splashstyles.circle1]} />
           <View style={[Splashstyles.circle, Splashstyles.circle2]} />
           <View style={[Splashstyles.circle, Splashstyles.circle3]} />
         </View>
-
-        {/* Logo and Title Container */}
         <Animated.View
           style={[
             Splashstyles.contentContainer,
@@ -118,7 +115,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
             },
           ]}
         >
-          {/* Logo/Icon */}
           <View style={Splashstyles.logoContainer}>
             <Image
               source={require('../assets/logo2.png')}
@@ -127,11 +123,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
             />
           </View>
 
-          {/* App Title */}
           <Text style={Splashstyles.tagline}>Your Health, Secured & Protected</Text>
         </Animated.View>
 
-        {/* Animated Loading Indicator */}
         <Animated.View
           style={[
             Splashstyles.loaderContainer,
@@ -147,9 +141,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
           </View>
         </Animated.View>
 
-        {/* Footer */}
         <View style={Splashstyles.footer}>
-          <Text style={Splashstyles.footerText}>Powered by PredCare</Text>
+          <Text style={Splashstyles.footerText}>Powered by PRED Care</Text>
         </View>
       </View>
     </SafeAreaWrapper>

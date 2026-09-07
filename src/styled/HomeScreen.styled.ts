@@ -32,7 +32,6 @@ export const homeStyles = StyleSheet.create({
     marginLeft: theme.spacing.sm,
     fontSize: theme.fontSize.sm,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_400Regular',
   },
 
   // Highlights & Insights Section
@@ -49,7 +48,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
   },
   periodPill: {
     backgroundColor: theme.colors.primarySoft,
@@ -66,7 +64,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
-    fontFamily: 'Inter_600SemiBold',
   },
   periodDropdownMenu: {
     position: 'absolute',
@@ -93,62 +90,48 @@ export const homeStyles = StyleSheet.create({
   periodMenuItemText: {
     fontSize: theme.fontSize.xs,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_500Medium',
   },
   periodMenuItemTextActive: {
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
   },
 
   // Stat Tile
   statTile: {
-    width: 148,
+    width: 152,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
+    borderRadius: 20,
+    padding: 16,
     marginRight: theme.spacing.md,
     borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
     ...globalShadows.card,
   },
   statTileTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: theme.spacing.sm,
+    marginBottom: 14,
   },
   statIconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: theme.colors.surfaceSecondary,
+    width: 42,
+    height: 42,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  statTrendBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statTrendText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
-  },
   statTileValue: {
-    fontSize: 26,
+    fontSize: 25,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textPrimary,
-    marginBottom: 2,
-    fontFamily: 'Inter_700Bold',
+    marginBottom: 3,
   },
   statTileLabel: {
-    fontSize: theme.fontSize.xs,
-    color: theme.colors.textMuted,
-    fontFamily: 'Inter_500Medium',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.textSlate,
   },
 
-  // Common Section Header
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -159,16 +142,13 @@ export const homeStyles = StyleSheet.create({
     fontSize: theme.fontSize.lg,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
   },
   sectionLink: {
     fontSize: theme.fontSize.sm,
     color: theme.colors.primary,
     fontWeight: theme.fontWeight.semibold,
-    fontFamily: 'Inter_600SemiBold',
   },
 
-  // Appointment Queue Card
   appointmentCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.lg,
@@ -192,13 +172,11 @@ export const homeStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
   },
   apptDistance: {
     fontSize: theme.fontSize.xs,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textMuted,
-    fontFamily: 'Inter_600SemiBold',
   },
   apptPatientRow: {
     flexDirection: 'row',
@@ -217,7 +195,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: 15,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_700Bold',
   },
   patientInfoGroup: {
     flex: 1,
@@ -232,7 +209,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: 15,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
   },
   statusDot: {
     width: 8,
@@ -244,7 +220,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: theme.fontSize.xs,
     color: theme.colors.textMuted,
     marginBottom: 4,
-    fontFamily: 'Inter_400Regular',
   },
   consultChip: {
     paddingHorizontal: 10,
@@ -257,18 +232,15 @@ export const homeStyles = StyleSheet.create({
     fontSize: 10,
     fontWeight: theme.fontWeight.bold,
     letterSpacing: 0.2,
-    fontFamily: 'Inter_700Bold',
   },
   symptomsText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
     lineHeight: 16,
-    fontFamily: 'Inter_400Regular',
   },
   symptomsLabel: {
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
   },
 
   // Action Buttons
@@ -284,7 +256,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_700Bold',
   },
   joinBtn: {
     backgroundColor: theme.colors.primary,
@@ -300,7 +271,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_700Bold',
   },
 
   // Need Assistance Banner
@@ -336,14 +306,12 @@ export const homeStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.textInverted,
     marginBottom: 6,
-    fontFamily: 'Inter_700Bold',
   },
   supportSub: {
     fontSize: 13,
     color: 'rgba(255, 255, 255, 0.85)',
     lineHeight: 18,
     marginBottom: theme.spacing.lg,
-    fontFamily: 'Inter_400Regular',
   },
   supportBtn: {
     backgroundColor: theme.colors.surface,
@@ -356,7 +324,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.accent,
-    fontFamily: 'Inter_700Bold',
   },
 
   // Quick Access 2x2 Grid
@@ -386,6 +353,5 @@ export const homeStyles = StyleSheet.create({
     letterSpacing: 0.4,
     marginTop: 8,
     textAlign: 'center',
-    fontFamily: 'Inter_600SemiBold',
   },
 });

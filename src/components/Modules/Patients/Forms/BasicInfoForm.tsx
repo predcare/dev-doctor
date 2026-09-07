@@ -5,6 +5,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { formatDate } from '../../../../lib/common/common.utils';
 import { TAddPatientSchemaType } from '../../../../lib/schemas/addPatient.schema';
 import { theme } from '../../../../styled/theme.styled';
+import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
 import DatePickerModal from '../../../commons/DatePickerModal/DatePickerModal';
 import CalendarIcon from '../../../ui/icons/CalendarIcon';
 import BloodGroupModal from '../Modals/BloodGroupModal';
@@ -25,7 +26,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
     const [showBGModal, setShowBGModal] = useState(false);
     const [showUserPicker, setShowUserPicker] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
-
+    const { userData } = useAuthStore(state => state);
     const selectionMode = watch('selectionMode');
     const profileImage = watch('profile_image');
     const dateOfBirth = watch('date_of_birth') || new Date(2000, 0, 1);
@@ -86,7 +87,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
 
     return (
       <>
-        {/* Profile Image */}
         <View style={s.group}>
           <Text style={s.lbl}>PROFILE IMAGE</Text>
           <View style={s.imgWrap}>
@@ -115,7 +115,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
           <Text style={s.lbl}>ASSIGNED DOCTOR</Text>
           <View style={s.lockedRow}>
             <Text style={s.lockedTxt} numberOfLines={1}>
-              {doctorName || 'Dr. Sarah Jenkins'}
+              Dr. {userData?.name}
             </Text>
             <Text style={{ fontSize: 14 }}>🔒</Text>
           </View>

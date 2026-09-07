@@ -229,10 +229,15 @@ export const bookAppointmentStyles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 0,
   },
-  slotButtonBooked: { backgroundColor: theme.colors.surfaceSecondary, opacity: 0.4 },
+  slotButtonBooked: {
+    backgroundColor: theme.colors.surfaceSecondary,
+    opacity: 0.8,
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  },
   slotButtonSelected: {
     backgroundColor: theme.colors.surface,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: theme.colors.primary,
   },
   slotButtonText: {
@@ -322,8 +327,21 @@ export const bookAppointmentStyles = StyleSheet.create({
     marginBottom: 2,
   },
   dateItemDateSelected: { color: theme.colors.primary },
-  dateItemType: { fontSize: 12, color: theme.colors.textSlate },
-  dateItemTypeSelected: { color: theme.colors.primary },
+  dateItemSublabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textSlate,
+  },
+  dateItemSublabelSelected: {
+    color: theme.colors.primary,
+  },
+  dateItemRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  dateItemType: { fontSize: 12, color: theme.colors.textSlate, fontWeight: '500' },
+  dateItemTypeSelected: { color: theme.colors.primary, fontWeight: '600' },
   dateItemCheck: { fontSize: 18, color: theme.colors.primary, fontWeight: 'bold' },
   searchInput: {
     margin: 20,
@@ -341,12 +359,17 @@ export const bookAppointmentStyles = StyleSheet.create({
     flexDirection: 'row',
     padding: 14,
     marginHorizontal: 20,
-    marginBottom: 8,
+    marginBottom: 10,
     backgroundColor: theme.colors.background,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
+  },
+  patientItemSelected: {
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.primary,
+    borderWidth: 1.5,
   },
   patientAvatar: {
     width: 46,
@@ -363,18 +386,123 @@ export const bookAppointmentStyles = StyleSheet.create({
     color: theme.colors.surface,
   },
   patientDetails: { flex: 1 },
+  patientHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+    gap: 8,
+  },
   patientName: {
     fontSize: 15,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.dark,
+    flex: 1,
+  },
+  patientBadge: {
+    backgroundColor: theme.colors.mintBg,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  patientBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.primary,
+  },
+  patientMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginBottom: 3,
+    flexWrap: 'wrap',
   },
   patientId: {
     fontSize: 12,
     color: theme.colors.textSlate,
-    marginBottom: 2,
   },
-  patientPhone: { fontSize: 12, color: theme.colors.textSlate },
+  bloodBadge: {
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 6,
+  },
+  bloodBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#EF4444',
+  },
+  patientPhone: {
+    fontSize: 12,
+    color: theme.colors.textSlate,
+  },
+  checkBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  checkBadgeText: {
+    color: theme.colors.surface,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+
+  // Skeleton Loading
+  skeletonItem: {
+    backgroundColor: theme.colors.surfaceSecondary,
+    borderColor: theme.colors.surfaceBorder,
+  },
+  skeletonAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#E2E8F0',
+    marginRight: 12,
+  },
+  skeletonLine: {
+    backgroundColor: '#CBD5E1',
+    borderRadius: 4,
+  },
+
+  // Error State
+  errorStateContainer: {
+    alignItems: 'center',
+    padding: 32,
+  },
+  errorIcon: {
+    fontSize: 32,
+    marginBottom: 10,
+  },
+  errorTitle: {
+    fontSize: 15,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.dark,
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  errorSubtitle: {
+    fontSize: 12,
+    color: theme.colors.textSlate,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: theme.colors.surface,
+    fontWeight: '600',
+    fontSize: 13,
+  },
+
+  // Empty State
   emptyState: { alignItems: 'center', padding: 40 },
   emptyStateText: {
     fontSize: 16,

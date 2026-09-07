@@ -13,9 +13,10 @@ export interface MockPatient {
 export interface MockAvailableDate {
   date: string;
   formattedDate: string;
-  consultation_type: 'video' | 'in-person' | 'both';
-  clinic_id: string;
-  availability_id: string;
+  relativeLabel?: string;
+  consultation_type: 'video' | 'in-person' | 'both' | string;
+  clinic_id: string | number;
+  availability_id?: string | number;
   in_person_fee: number;
   video_fee: number;
 }
@@ -246,3 +247,58 @@ export const MOCK_APPOINTMENTS: MockAppointment[] = [
     symptoms: 'Shortness of breath on exertion',
   },
 ];
+
+export const MOCK_DOCTOR_AVAILABILITY_DOC = {
+  id: 9,
+  created_from: 'doctor app',
+  created_by: 10,
+  google_event_id: null,
+  clinic_id: 3,
+  doctor_id: 10,
+  date_selection_mode: 'recurring',
+  selected_dates: [],
+  recurring_days: ['monday', 'tuesday', 'wednesday', 'thursday'],
+  recurring_start_date: '2026-09-02',
+  recurring_end_date: '2026-09-29',
+  recurring_dates: [
+    '2026-09-02',
+    '2026-09-03',
+    '2026-09-07',
+    '2026-09-08',
+    '2026-09-09',
+    '2026-09-10',
+    '2026-09-14',
+    '2026-09-15',
+    '2026-09-16',
+    '2026-09-17',
+    '2026-09-21',
+    '2026-09-22',
+    '2026-09-23',
+    '2026-09-24',
+    '2026-09-28',
+    '2026-09-29',
+  ],
+  leave_dates: [],
+  slot_duration: 30,
+  from_time: '09:00:00',
+  to_time: '17:00:00',
+  time_slots: [
+    { start: '09:00:00', end: '09:30:00' },
+    { start: '09:30:00', end: '10:00:00' },
+  ],
+  booked_slots: {
+    '2026-09-02': ['16:30:00'],
+    '2026-09-03': ['12:30:00', '09:00:00'],
+    '2026-09-07': ['15:00:00'],
+  },
+  consultation_type: 'both',
+  in_person_fee: '1000.00',
+  video_fee: '1000.00',
+  hide_fee: 1,
+  require_payment: 1,
+  status: 1,
+  created_at: '2026-09-02T05:06:05.000Z',
+  updated_at: '2026-09-07T05:16:21.000Z',
+  deleted_at: null,
+};
+

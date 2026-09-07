@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,11 +17,20 @@ import BasicInfoForm from '../../components/Modules/Patients/Forms/BasicInfoForm
 import ContactInfoForm from '../../components/Modules/Patients/Forms/ContactInfoForm';
 import MedicalInfoForm from '../../components/Modules/Patients/Forms/MedicalInfoForm';
 import { MockUserItem } from '../../components/Modules/Patients/Modals/UserPickerModal';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
+import {
+  useCreateNewPatient,
+  useLinkExistingPatient,
+  useSendPatientCredentials,
+} from '../../hooks/react-query/patients/patients.hooks';
+import { PatientsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import { formatDateToYYYYMMDD } from '../../lib/common/common.utils';
 import { AddPatientSchema, TAddPatientSchemaType } from '../../lib/schemas/addPatient.schema';
 import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
 import { theme } from '../../styled/theme.styled';
+import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
 export interface AddPatientScreenProps {
   navigation?: ProfileScreenNavigationProp;
@@ -33,7 +41,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
   const user = route?.params ? (route.params as any)?.user : undefined;
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-
+  const { userData } = useAuthStore(state => state);
   // Popup Alert State
   const [alertConfig, setAlertConfig] = useState<{
     visible: boolean;
@@ -65,6 +73,11 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
       },
     });
   };
+
+  const { mutate: createNewPatientMutation, isPending: createNewPatientPending } =
+    useCreateNewPatient();
+  const { mutate: sendCred, isPending: sendPending } = useSendPatientCredentials();
+  const { mutate: linkExistingPatientMutation, isPending: linkPending } = useLinkExistingPatient();
 
   const {
     control,
@@ -112,17 +125,34 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
         return;
       }
       setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        showAlert(
-          'success',
-          'Patient Linked ✅',
-          `${selectedUser.name} has been added to your clinic.\n\nPatient ID: PAT-1012`,
-          () => {
-            if (navigation && navigation.canGoBack()) navigation.goBack();
-          }
-        );
-      }, 800);
+      linkExistingPatientMutation(
+        {
+          user_id: selectedUser.id,
+          doctor_id: userData?.user_id || '',
+        },
+        {
+          onSuccess: async (res: any) => {
+            setLoading(false);
+            await queryClient.invalidateQueries({
+              queryKey: [PatientsQueryKeys.PatientsList],
+            });
+            showAlert(
+              'success',
+              'Patient Linked ✅',
+              `${selectedUser.name} has been added to your clinic.`,
+              () => {
+                if (navigation && navigation.canGoBack()) navigation.goBack();
+              }
+            );
+          },
+          onError: (err: any) => {
+            setLoading(false);
+            const msg =
+              err?.response?.data?.message || err?.message || 'Failed to link existing patient';
+            showAlert('error', 'Linking Failed', msg);
+          },
+        }
+      );
       return;
     }
 
@@ -146,7 +176,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
       handleSubmit(onSubmitNew)();
       return;
     }
-  }, [step, selectionMode, selectedUser, trigger, handleSubmit]);
+  }, [step, selectionMode, selectedUser, trigger, handleSubmit, linkExistingPatientMutation, userData?.user_id, navigation]);
 
   const handleBack = useCallback(() => {
     if (step > 1 && selectionMode === 'create_new') setStep(p => p - 1);
@@ -155,28 +185,104 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
 
   const onSubmitNew = (formData: TAddPatientSchemaType) => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      showAlert(
-        'success',
-        'Patient Registered ✅',
-        `Patient ${formData.name || 'Record'} added successfully!\n\nPatient ID: PAT-1011\nPhone: ${
-          formData.phone
-        }`,
-        () => {
-          if (navigation && navigation.canGoBack()) {
-            navigation.goBack();
+
+    const payload = {
+      name: formData.name?.trim() || '',
+      email: formData.email?.trim() || null,
+      phone: formData.phone?.trim() || '',
+      alternate_number: formData.alternate_number?.trim() || null,
+      whatsapp_number: formData.whatsapp_number?.trim() || null,
+      gender: formData.gender || '',
+      date_of_birth: formData.date_of_birth ? formatDateToYYYYMMDD(formData.date_of_birth) : '',
+      address: formData.address?.trim() || '',
+      city: formData.city?.trim() || null,
+      state: formData.state?.trim() || null,
+      postal_code: formData.postal_code?.trim() || null,
+      country: formData.country?.trim() || null,
+      status: formData.status || 'active',
+      medical_history: formData.medical_history?.trim() || null,
+      doctor_id: userData?.user_id || '',
+      profile_image: undefined,
+    };
+
+    createNewPatientMutation(payload, {
+      onSuccess(res) {
+        if (res.success) {
+          const patId = res?.patient?.patient_id;
+          const patEmail = res?.patient?.email || formData.email?.trim();
+          const patName = res?.patient?.name || formData.name?.trim();
+          const patPhone = res?.patient?.phone_number || formData.phone?.trim();
+
+          if (patEmail && patId) {
+            sendCred(
+              {
+                patient_id: patId,
+                email: patEmail,
+                name: patName,
+                phone: patPhone,
+              },
+              {
+                onSuccess: async () => {
+                  await queryClient.invalidateQueries({
+                    queryKey: [PatientsQueryKeys.PatientsList],
+                  });
+                  setLoading(false);
+                  showAlert(
+                    'success',
+                    'Patient Registered ✅',
+                    `${formData.name} registered and login credentials sent.`,
+                    () => {
+                      if (navigation && navigation.canGoBack()) navigation.goBack();
+                    }
+                  );
+                },
+                onError: async () => {
+                  await queryClient.invalidateQueries({
+                    queryKey: [PatientsQueryKeys.PatientsList],
+                  });
+                  setLoading(false);
+                  showAlert(
+                    'success',
+                    'Patient Registered ✅',
+                    `${formData.name} registered successfully.`,
+                    () => {
+                      if (navigation && navigation.canGoBack()) navigation.goBack();
+                    }
+                  );
+                },
+              }
+            );
+          } else {
+            queryClient.invalidateQueries({
+              queryKey: [PatientsQueryKeys.PatientsList],
+            });
+            setLoading(false);
+            showAlert(
+              'success',
+              'Patient Registered ✅',
+              `${formData.name} registered successfully.`,
+              () => {
+                if (navigation && navigation.canGoBack()) navigation.goBack();
+              }
+            );
           }
+        } else {
+          setLoading(false);
+          showAlert('error', 'Registration Failed', res.message || 'Failed to create patient');
         }
-      );
-    }, 800);
+      },
+      onError: (error: any) => {
+        setLoading(false);
+        const msg =
+          error?.response?.data?.message || error?.message || 'Error creating patient registration';
+        showAlert('error', 'Error', msg);
+      },
+    });
   };
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
+    <SafeAreaWrapper>
       <View style={s.outer}>
-        {/* Header Bar */}
         <View style={s.header}>
           <TouchableOpacity style={s.backBtn} onPress={handleBack} activeOpacity={0.7}>
             <ChevronLeftIcon color={theme.colors.primary} size={18} />
@@ -186,8 +292,6 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
             <Text style={s.hSub}>PRED CARE • REGISTRATION</Text>
           </View>
         </View>
-
-        {/* Step Indicator Bar */}
         {selectionMode === 'create_new' && (
           <View style={s.stepWrap}>
             <StepIndicator step={step} />

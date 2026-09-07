@@ -35,7 +35,7 @@ import {
 } from '../../lib/common/common.utils';
 import { showErrorToast } from '../../lib/common/toast.utils';
 import { MockAppointment } from '../../resources/mockData';
-import type { DoctorAppointmentsScreenProps } from '../../route';
+import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { IAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
@@ -134,7 +134,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
 
     // 2. Filter Appointments
     const query = searchQuery.trim().toLowerCase();
-
     const filtered = appointmentsList.filter(apt => {
       // Consultation Type Tab Filter
       if (activeTab === 'inperson' && apt.consultation_type?.toLowerCase() !== 'in-person') {
@@ -178,23 +177,25 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         const statusMatch = filterStates.statuses.some(st => {
           const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
           const rawAptStatus = apt.appointment_status?.toLowerCase();
+          const isInProgress =
+            rawAptStatus === 'in_progress' ||
+            rawAptStatus === 'in-progress' ||
+            rawAptStatus === 'inprogress';
           const effectiveAptStatus =
-            isExpired && rawAptStatus !== 'cancelled' ? 'completed' : rawAptStatus;
+            isExpired && rawAptStatus !== 'cancelled' && !isInProgress ? 'completed' : rawAptStatus;
           const payStatus = apt.payment_status?.toLowerCase();
 
           if (st === 'upcoming')
             return (
-              !isExpired &&
-              (effectiveAptStatus === 'confirmed' || effectiveAptStatus === 'upcoming')
+              (!isExpired || isInProgress) &&
+              (effectiveAptStatus === 'confirmed' ||
+                effectiveAptStatus === 'upcoming' ||
+                isInProgress)
             );
           if (st === 'completed') return effectiveAptStatus === 'completed';
           if (st === 'cancelled') return rawAptStatus === 'cancelled';
           if (st === 'pending')
-            return (
-              payStatus === 'pending' ||
-              effectiveAptStatus === 'in_progress' ||
-              effectiveAptStatus === 'pending'
-            );
+            return payStatus === 'pending' || isInProgress || effectiveAptStatus === 'pending';
           if (st === 'noshow')
             return effectiveAptStatus === 'noshow' || effectiveAptStatus === 'no_show';
           return false;
@@ -268,13 +269,11 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         console.error('Failed to fetch fresh appointment token:', error);
       }
 
-      // Fallback to appointment cached credentials if fetch returned empty
       if (!token && appointment.token) {
         token = appointment.token;
         call_duration_seconds = appointment.call_duration_seconds;
       }
 
-      // Sanitize token & meetingId strings
       const cleanedToken = token?.trim().replace(/^["']|["']$/g, '');
       const cleanedMeetingId = meetingId?.trim().replace(/^["']|["']$/g, '');
 
@@ -295,9 +294,43 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         callDurationSeconds: call_duration_seconds ?? 0,
       });
 
-      navigation?.navigate('DoctorMeeting');
+      navigation?.navigate(AppRoute.DOCTOR_MEETING);
     },
     [navigation, queryClient, setMeetingSession]
+  );
+
+  const handleStartConsulation = useCallback(
+    (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
+      if (status?.toLowerCase() === 'confirmed') {
+        showLoader('Loading...');
+        changeStatus(
+          { appointmentId, appointment_status: status },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries({
+                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+              });
+              hideLoader();
+              setConfirmCompleteAptId(null);
+              navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                patientId: patientId,
+                patientName: patientName,
+              });
+            },
+            onError: () => {
+              hideLoader();
+              setConfirmCompleteAptId(null);
+            },
+          }
+        );
+      } else {
+        navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+          patientId: patientId,
+          patientName: patientName,
+        });
+      }
+    },
+    [changeStatus, queryClient, showLoader, hideLoader]
   );
 
   const handleMarkCompleted = useCallback(
@@ -468,8 +501,16 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
                 endTime={item.end_time}
                 isExpired={isExpired}
                 onViewDetails={() => setSelectedDetailsApt(item as any)}
-                onStartConsultation={() => handleJoinVideoCall(item)}
+                onVideoCall={() => handleJoinVideoCall(item)}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
+                onStartConsultation={() => {
+                  handleStartConsulation(
+                    item?.id,
+                    item?.patient_id,
+                    item?.patient_name,
+                    'in_progress'
+                  );
+                }}
               />
             );
           }}

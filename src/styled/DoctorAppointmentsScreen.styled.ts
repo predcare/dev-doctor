@@ -296,7 +296,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 14,
     paddingBottom: 10,
-    gap: 8,
+    gap: 3,
   },
   chip: {
     flexDirection: 'row',
@@ -308,31 +308,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderWidth: 1,
   },
   chipText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-
-  // Symptoms Box
-  symptomsBox: {
-    marginHorizontal: 14,
-    marginBottom: 10,
-    backgroundColor: theme.colors.background,
-    borderRadius: 10,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-  },
-  symptomsLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: theme.colors.textMuted,
-    letterSpacing: 0.6,
-    marginBottom: 3,
-  },
-  symptomsText: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    lineHeight: 18,
+    fontSize: 11,
+    fontWeight: '600',
   },
 
   // Action Buttons
@@ -388,7 +365,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     fontWeight: '700',
   },
   completeButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: theme.colors.primary,
     borderRadius: 12,
     paddingVertical: 13,
     flexDirection: 'row',

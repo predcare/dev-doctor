@@ -38,6 +38,7 @@ export const endpoints = {
     emrShare: (docId: string | number) => `/doctor/emr/document/${docId}/share`,
     prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
     emrUpload: '/doctor/emr/upload',
+    consults: (uid: string | number) => `/doctor/patient-consults/${uid}`,
   },
   appointments: {
     get: '/doctor/appointments/doctor',
@@ -46,12 +47,14 @@ export const endpoints = {
     heartbeat: '/doctor/appointments/heartbeat',
     statusChange: (appointmentId: number | string) =>
       `/doctor/appointments/${appointmentId}/status`,
+    bookByDoc: '/doctor/appointments/book',
   },
   availablity: {
     get: '/doctor/doctor-availability/doctor/',
     delete: '/doctor/doctor-availability/',
     create: '/doctor/doctor-availability/',
     update: '/doctor/doctor-availability/',
+    docAvailabilities: '/doctor/doctor-availability/doctor/',
   },
   commons: {
     country: '/patients/locations/countries',
@@ -74,6 +77,14 @@ export const endpoints = {
     get: (id: string | number) => `/doctor/prescriptions/${id}`,
     sendAgain: (id: string | number) => `/doctor/prescriptions/${id}/send-email`,
     downloadPrescription: (id: string | number) => `/doctor/prescriptions/${id}/pdf`,
+  },
+  notifications: {
+    getAll: '/doctor/notifications/',
+    delete: '/doctor/notifications/',
+  },
+  homes: {
+    stats: (doctorId: string | number) => `/doctor/appointments/doctor/${doctorId}/stats`,
+    upcomingAppts: (doctorId: string | number) => `/doctor/appointments/doctor/${doctorId}/today`,
   },
 };
 

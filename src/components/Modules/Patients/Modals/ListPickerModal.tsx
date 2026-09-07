@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Modal,
   StyleSheet,
@@ -27,6 +28,7 @@ export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
     items,
     selected,
     onPick,
+    isLoading = false,
   }) => (
     <Modal
       visible={visible}
@@ -42,36 +44,42 @@ export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
               <Text style={s.sheetX}>✕</Text>
             </TouchableOpacity>
           </View>
-          <FlatList
-            data={items}
-            keyExtractor={it => it.id.toString()}
-            style={{ maxHeight: 420 }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-              <View style={{ padding: 32, alignItems: 'center' }}>
-                <Text style={s.emptyTxt}>No options available</Text>
-              </View>
-            }
-            renderItem={({ item: it }) => {
-              const sel = it.name === selected;
-              return (
-                <TouchableOpacity
-                  style={[s.opt, sel && s.optSel]}
-                  onPress={() => {
-                    onPick(it);
-                    onClose();
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[s.optTxt, sel && s.optTxtSel]}>
-                    {it.name}
-                  </Text>
-                  {sel && <Text style={s.tick}>✓</Text>}
-                </TouchableOpacity>
-              );
-            }}
-          />
+          {isLoading ? (
+            <View style={{ padding: 32, alignItems: 'center' }}>
+              <ActivityIndicator color={theme.colors.primary} size="large" />
+            </View>
+          ) : (
+            <FlatList
+              data={items}
+              keyExtractor={it => it.id.toString()}
+              style={{ maxHeight: 420 }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <View style={{ padding: 32, alignItems: 'center' }}>
+                  <Text style={s.emptyTxt}>No options available</Text>
+                </View>
+              }
+              renderItem={({ item: it }) => {
+                const sel = it.name === selected;
+                return (
+                  <TouchableOpacity
+                    style={[s.opt, sel && s.optSel]}
+                    onPress={() => {
+                      onPick(it);
+                      onClose();
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[s.optTxt, sel && s.optTxtSel]}>
+                      {it.name}
+                    </Text>
+                    {sel && <Text style={s.tick}>✓</Text>}
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          )}
         </View>
       </TouchableOpacity>
     </Modal>

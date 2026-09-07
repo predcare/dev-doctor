@@ -16,7 +16,7 @@ export const InvoiceHeaderCard: React.FC<InvoiceHeaderCardProps> = ({
   patientGenId,
   patientAge = '34y',
   patientGender = 'Female',
-  clinicName = 'Pred Care Multispecialty Clinic',
+  clinicName = 'PRED Care Multispecialty Clinic',
   clinicAddress = '7th Block, Koramangala, Bengaluru, KA',
   onEditClinicPress,
 }) => {

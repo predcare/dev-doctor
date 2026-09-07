@@ -1,6 +1,7 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import { IMyAppointmentsRoot } from '../../../typescripts/interfaces/appointments.interfaces';
+import { ICreateAppointmentPayload } from '../auth/payload.interfaces';
 
 export const getMyAppointments = async (doctorId: number | string) => {
   const res = await axiosInstance.get<IMyAppointmentsRoot>(
@@ -32,5 +33,10 @@ export const changeAppointmentStatus = async (body: {
   const res = await axiosInstance.patch(endpoints.appointments.statusChange(body.appointmentId), {
     appointment_status: body.appointment_status,
   });
+  return res.data;
+};
+
+export const bookAppointments = async (body: ICreateAppointmentPayload) => {
+  const res = await axiosInstance.post(endpoints.appointments.bookByDoc, body);
   return res.data;
 };

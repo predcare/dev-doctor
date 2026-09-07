@@ -36,22 +36,23 @@ interface AppointmentCardProps {
   onCreatePrescription?: () => void;
   onViewDetails?: () => void;
   onDelete?: () => void;
+  onVideoCall?: () => void;
 }
 
 const getStatusColor = (status: string) => {
   switch (status?.toLowerCase()) {
     case 'completed':
-      return '#10B981';
+      return '#16A34A';
     case 'cancelled':
-      return '#EF4444';
+      return '#DC2626';
     case 'pending':
-      return '#F59E0B';
+      return '#D97706';
     case 'in-progress':
     case 'in_progress':
     case 'inprogress':
-      return '#0EA5E9';
+      return '#0284C7';
     default:
-      return '#3B82F6';
+      return '#64748B';
   }
 };
 
@@ -74,14 +75,22 @@ const getStatusBackground = (status: string) => {
 
 const formatTimeSlot = (startTime?: string, endTime?: string) => {
   if (!startTime) return 'Flexible';
-  const formatTime = (t: string) => {
-    const parts = t.split(':');
-    if (parts.length >= 2) return `${parts[0]}:${parts[1]}`;
-    return t;
+
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+
+    if (isNaN(hours) || isNaN(minutes)) return time;
+
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 || 12;
+
+    return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
   };
-  const s = formatTime(startTime);
-  const e = endTime ? formatTime(endTime) : '';
-  return e ? `${s} - ${e}` : s;
+
+  const start = formatTime(startTime);
+  const end = endTime ? formatTime(endTime) : '';
+
+  return end ? `${start} - ${end}` : start;
 };
 
 export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
@@ -100,11 +109,13 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     onComplete,
     onCreatePrescription,
     onViewDetails,
-    onDelete,
+    onVideoCall,
   }) => {
     const effectiveStatus = useMemo(() => {
       const rawStatus = appointmentStatus?.toLowerCase() || '';
-      if (isExpired && rawStatus !== 'cancelled') {
+      const isInProgress =
+        rawStatus === 'in-progress' || rawStatus === 'in_progress' || rawStatus === 'inprogress';
+      if (isExpired && rawStatus !== 'cancelled' && !isInProgress) {
         return 'completed';
       }
       return rawStatus;
@@ -117,7 +128,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       isInProgress,
       statusColor,
       statusBg,
-      isConfirmed,
       formattedTime,
     } = useMemo(() => {
       const inProgress =
@@ -195,7 +205,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         ];
       }
 
-      // Confirmed / Scheduled / Pending / Default
       return [
         {
           id: 'details',
@@ -238,7 +247,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
 
     return (
       <View style={S.card}>
-        {/* Card Header */}
         <View style={S.cardHeader}>
           <View style={S.patientRow}>
             <View style={[S.patientAvatar, { backgroundColor: theme.colors.primary }]}>
@@ -291,7 +299,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             <Text style={[S.chipText, { color: '#475569' }]}>{appointment_date}</Text>
           </View>
 
-          {/* Time Chip */}
           <View style={[S.chip, { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' }]}>
             <ClockIcon size={12} color="#475569" />
             <Text style={[S.chipText, { color: '#475569' }]}>{formattedTime}</Text>
@@ -314,7 +321,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           <View style={[S.cardFooterActions, isInProgress && { flexDirection: 'row', gap: 10 }]}>
             <TouchableOpacity
               style={[S.joinButton, isInProgress && { flex: 1 }]}
-              onPress={onStartConsultation}
+              onPress={() => (isVideo ? onVideoCall?.() : onStartConsultation?.())}
               activeOpacity={0.85}
             >
               <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />

@@ -25,9 +25,8 @@ export const AppointmentSkeleton: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {[1, 2, 3, 4].map(key => (
+      {[1].map(key => (
         <Animated.View key={key} style={[styles.card, { opacity: pulseAnim }]}>
-          {/* Card Header */}
           <View style={styles.cardHeader}>
             <View style={styles.patientRow}>
               <View style={styles.avatarSkeleton} />
@@ -42,15 +41,11 @@ export const AppointmentSkeleton: React.FC = () => {
               <View style={styles.kebabSkeleton} />
             </View>
           </View>
-
-          {/* Chips Row */}
           <View style={styles.chipsRow}>
             <View style={[styles.chipSkeleton, { width: 84 }]} />
             <View style={[styles.chipSkeleton, { width: 96 }]} />
             <View style={[styles.chipSkeleton, { width: 88 }]} />
           </View>
-
-          {/* Footer Action Button */}
           {key % 2 !== 0 && <View style={styles.footerActionSkeleton} />}
         </Animated.View>
       ))}

@@ -64,7 +64,6 @@ export const capitalizeFirstLetter = (value?: string): string => {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
 
-
 export const formatDateToYYYYMMDD = (d: Date): string => {
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -93,7 +92,11 @@ export const formatTodayBannerDate = (d: Date): string => {
   return `${day} ${month} ${year}`;
 };
 
-export const checkIsExpired = (appointmentDate: string, endTime?: string, startTime?: string): boolean => {
+export const checkIsExpired = (
+  appointmentDate: string,
+  endTime?: string,
+  startTime?: string
+): boolean => {
   if (!appointmentDate) return false;
   const now = new Date();
   const todayStr = formatDateToYYYYMMDD(now);
@@ -112,4 +115,41 @@ export const checkIsExpired = (appointmentDate: string, endTime?: string, startT
   }
 
   return false;
+};
+
+export const getTimeUntilStart = (startTime: string): string => {
+  const now = new Date();
+
+  const [hours, minutes, seconds] = startTime.split(':').map(Number);
+
+  const start = new Date();
+  start.setHours(hours, minutes, seconds || 0, 0);
+
+  const diffMs = start.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return 'Started';
+  }
+
+  const totalMinutes = Math.ceil(diffMs / (1000 * 60));
+
+  const hoursLeft = Math.floor(totalMinutes / 60);
+  const minutesLeft = totalMinutes % 60;
+
+  if (hoursLeft > 0 && minutesLeft > 0) {
+    return `${hoursLeft} hour${hoursLeft > 1 ? 's' : ''} ${minutesLeft} minute${
+      minutesLeft > 1 ? 's' : ''
+    }`;
+  }
+
+  if (hoursLeft > 0) {
+    return `${hoursLeft} hour${hoursLeft > 1 ? 's' : ''}`;
+  }
+
+  return `${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}`;
+};
+
+export const capitalize = (value: string): string => {
+  if (!value) return '';
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 };

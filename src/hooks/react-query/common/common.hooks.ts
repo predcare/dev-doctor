@@ -6,16 +6,33 @@ export const useCountries = () =>
   useQuery({
     queryKey: [CommonQueryKeys.Countries],
     queryFn: () => getCountries(),
+    select: (v: any) => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
   });
 
-export const useStatesByCId = (params: { cId: number }) =>
+export const useStatesByCId = (params?: { cId?: number }) =>
   useQuery({
     queryKey: [CommonQueryKeys.States, params],
-    queryFn: () => getStates(params?.cId),
+    queryFn: () => getStates(params?.cId!),
+    enabled: !!params?.cId,
+    select: (v: any) => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
   });
 
-export const useCitiesBySId = (params: { sId: number }) =>
+export const useCitiesBySId = (params?: { sId?: number }) =>
   useQuery({
     queryKey: [CommonQueryKeys.Cities, params],
-    queryFn: () => getCities(params?.sId),
+    queryFn: () => getCities(params?.sId!),
+    enabled: !!params?.sId,
+    select: (v: any) => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
   });

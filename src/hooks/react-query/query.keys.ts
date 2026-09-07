@@ -74,10 +74,15 @@ export enum AvailbilityQueryKeys {
   DeleteAvailability = 'DeleteAvailability',
   CreateAvailability = 'CreateAvailability',
   UpdateAvailability = 'UpdateAvailability',
+  GetMyAvailablity = 'GetMyAvailablity',
 }
 
 export enum MyInvoices {
   PatientInvoices = 'PatientInvoices',
   AllInvoices = 'AllInvoices',
   InvoiceSettings = 'InvoiceSettings',
+}
+
+export enum HomeApiQuery {
+  STATS = 'STATS',
 }

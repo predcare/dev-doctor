@@ -1,5 +1,5 @@
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
+import type { CompositeNavigationProp, NavigatorScreenParams, RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 /**
@@ -77,7 +77,7 @@ export type RootStackParamList = {
         prescriptionId?: string | number;
       }
     | undefined;
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<DashboardTabParamList> | undefined;
 };
 
 /**

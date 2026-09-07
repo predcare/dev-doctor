@@ -21,7 +21,6 @@ export interface ICreatePatientPayload {
   doctor_id: number | string;
   profile_image?: string | null;
 }
-
 export interface ISendPatientCredentialsPayload {
   patient_id: string | number;
   email: string;

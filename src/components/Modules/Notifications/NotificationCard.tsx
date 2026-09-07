@@ -1,15 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Animated, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CalendarIcon, TrashIcon } from '../../ui/icons';
 import { theme } from '../../../styled/theme.styled';
 import {
   IMetadata,
   INotificationDoc,
 } from '../../../typescripts/interfaces/notification.interfaces';
+import { CalendarIcon, TrashIcon } from '../../ui/icons';
 
 export interface NotificationCardProps {
   item: INotificationDoc;
   onDelete?: () => void;
+  onPress?: () => void;
   icon?: React.ReactNode;
   iconColor?: string;
   isUnread?: boolean;
@@ -34,9 +35,21 @@ export const formatTimeAgo = (dateStr: string): string => {
   return date.toLocaleDateString();
 };
 
+export const formatEventAction = (action?: string, type?: string): string => {
+  const raw = action || type || 'Notification';
+  if (raw.includes('_')) {
+    return raw
+      .split('_')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+  }
+  return raw;
+};
+
 export const NotificationCard: React.FC<NotificationCardProps> = ({
   item,
   onDelete,
+  onPress,
   icon,
   iconColor = theme.colors.primary,
 }) => {
@@ -76,11 +89,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     })
   ).current;
 
-  const eventAction = item.event_action || item.type || 'Notification';
+  const eventAction = formatEventAction(item.event_action, item.type);
   const description = item.description || item.message || 'You have a new notification';
 
-  const metadata: IMetadata =
-    typeof item.metadata === 'string'
+  const metadata: IMetadata = useMemo(() => {
+    return typeof item.metadata === 'string'
       ? (() => {
           try {
             return JSON.parse(item.metadata);
@@ -89,10 +102,10 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           }
         })()
       : item.metadata || {};
+  }, [item.metadata]);
 
   return (
     <View style={styles.container}>
-      {/* Background Delete Action Button */}
       {onDelete && (
         <TouchableOpacity
           style={styles.deleteButton}
@@ -116,54 +129,84 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
         style={[styles.card, { transform: [{ translateX: pan }] }]}
         {...panResponder.panHandlers}
       >
-        <View style={[styles.cardIconBox, { backgroundColor: `${iconColor}14` }]}>
-          {typeof icon === 'string' ? (
-            <Text style={{ fontSize: 20 }}>{icon}</Text>
-          ) : icon ? (
-            icon
-          ) : (
-            <CalendarIcon color={iconColor} size={22} />
-          )}
-        </View>
-
-        <View style={styles.cardBody}>
-          <View style={styles.cardTopRow}>
-            <Text style={styles.cardTitle} numberOfLines={1}>
-              {eventAction}
-            </Text>
-            <Text style={styles.cardTime}>{formatTimeAgo(item.created_at)}</Text>
+        <TouchableOpacity
+          activeOpacity={onPress ? 0.7 : 1}
+          onPress={onPress}
+          style={styles.cardTouchable}
+        >
+          <View style={[styles.cardIconBox, { backgroundColor: `${iconColor}14` }]}>
+            {typeof icon === 'string' ? (
+              <Text style={{ fontSize: 20 }}>{icon}</Text>
+            ) : icon ? (
+              icon
+            ) : (
+              <CalendarIcon color={iconColor} size={22} />
+            )}
           </View>
-          <Text style={styles.cardDesc} numberOfLines={3}>
-            {description}
-          </Text>
 
-          {metadata && Object.keys(metadata).length > 0 && (
-            <View style={styles.metadataContainer}>
-              {!!metadata.patient_name && (
-                <View style={styles.metadataChip}>
-                  <Text style={styles.metadataChipText}>👤 {metadata.patient_name}</Text>
-                </View>
-              )}
-              {!!metadata.document_type && (
-                <View style={styles.metadataChip}>
-                  <Text style={styles.metadataChipText}>📄 {metadata.document_type}</Text>
-                </View>
-              )}
-              {!!metadata.new_date && (
-                <View style={styles.metadataChip}>
-                  <Text style={styles.metadataChipText}>
-                    📅 {new Date(metadata.new_date).toLocaleDateString()}
-                  </Text>
-                </View>
-              )}
-              {!!metadata.medications_count && (
-                <View style={styles.metadataChip}>
-                  <Text style={styles.metadataChipText}>💊 {metadata.medications_count} meds</Text>
-                </View>
-              )}
+          <View style={styles.cardBody}>
+            <View style={styles.cardTopRow}>
+              <Text style={styles.cardTitle} numberOfLines={1}>
+                {eventAction}
+              </Text>
+              <Text style={styles.cardTime}>{formatTimeAgo(item.created_at)}</Text>
             </View>
-          )}
-        </View>
+            <Text style={styles.cardDesc} numberOfLines={3}>
+              {description}
+            </Text>
+
+            {metadata && Object.keys(metadata).length > 0 && (
+              <View style={styles.metadataContainer}>
+                {!!metadata.patient_name && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>👤 {metadata.patient_name}</Text>
+                  </View>
+                )}
+                {!!metadata.doctor_name && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>
+                      🩺 Dr. {metadata.doctor_name.replace(/^Dr\.\s*/i, '')}
+                    </Text>
+                  </View>
+                )}
+                {!!metadata.appointment_id && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>🔖 {metadata.appointment_id}</Text>
+                  </View>
+                )}
+                {!!metadata.appointment_date && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>📅 {metadata.appointment_date}</Text>
+                  </View>
+                )}
+                {!!metadata.appointment_slot_time && metadata.appointment_slot_time !== 'N/A' && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>⏰ {metadata.appointment_slot_time}</Text>
+                  </View>
+                )}
+                {!!metadata.title && !metadata.document_type && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>📄 {metadata.title}</Text>
+                  </View>
+                )}
+                {!!metadata.new_date && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>
+                      📅 {new Date(metadata.new_date).toLocaleDateString()}
+                    </Text>
+                  </View>
+                )}
+                {!!metadata.medications_count && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>
+                      💊 {metadata.medications_count} meds
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
@@ -195,14 +238,16 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     shadowColor: '#1E293B',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 5,
     elevation: 2,
+  },
+  cardTouchable: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 14,
   },
   cardIconBox: {
     width: 46,
@@ -223,7 +268,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
     color: '#0F172A',
     flex: 1,
@@ -236,7 +281,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cardDesc: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#64748B',
     lineHeight: 19,
   },

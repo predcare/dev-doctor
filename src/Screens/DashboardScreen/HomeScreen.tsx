@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { AppointmentCard } from '../../components/Modules/Dashboard/AppointmentCard';
+import React, { useCallback, useMemo, useState } from 'react';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceBanner';
+import HomeStatsCard from '../../components/Modules/Dashboard/HomeStatsCard';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
-import { StatTile } from '../../components/Modules/Dashboard/StatTile';
+import UpcomingAppointmentCard from '../../components/Modules/Dashboard/UpcomingAppointmentCard';
+import { AppointmentSkeleton } from '../../components/Skeletons/AppointmentSkeleton';
+import { HomeStatSkeleton } from '../../components/Skeletons/HomeStatSkeleton';
 import {
   CalendarIcon,
   CheckIcon,
@@ -16,11 +18,14 @@ import {
   ScheduleIcon,
   WalletIcon,
 } from '../../components/ui/icons';
+import { useHomeStats, useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
 import { Header } from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import type { HomeScreenProps } from '../../route';
+import { getTimeUntilStart } from '../../lib/common/common.utils';
+import { AppRoute, type HomeScreenProps } from '../../route';
 import { homeStyles } from '../../styled/HomeScreen.styled';
 import { theme } from '../../styled/theme.styled';
+import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
 type PeriodKey = 'today' | 'week' | 'month';
 
@@ -30,94 +35,98 @@ const PERIOD_LABELS: Record<PeriodKey, string> = {
   month: 'This Month',
 };
 
+const quickAccessItems = [
+  {
+    id: 'q1',
+    label: 'BOOK APPT',
+    screen: 'BookAppointment' as const,
+    icon: <CalendarIcon size={30} color={theme.colors.primary} />,
+  },
+  {
+    id: 'q2',
+    label: 'WRITE RX',
+    screen: 'PrescriptionList' as const,
+    icon: <PrescriptionIcon size={30} color={theme.colors.primary} />,
+  },
+  {
+    id: 'q3',
+    label: 'AVAILABILITY',
+    screen: 'Availability' as const,
+    icon: <ScheduleIcon size={30} color={theme.colors.primary} />,
+  },
+  {
+    id: 'q4',
+    label: 'BILLING',
+    screen: 'InvoiceList' as const,
+    icon: <InvoiceIcon size={30} color={theme.colors.primary} />,
+  },
+];
+
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [period, setPeriod] = useState<PeriodKey>('week');
   const [showPeriodMenu, setShowPeriodMenu] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const { userData } = useAuthStore(state => state);
 
-  // Static Mock Stats Data
-  const stats = [
-    {
-      id: '1',
-      label: 'Upcoming Appts',
-      value: '5',
-      trend: '+12%',
-      isUp: true,
-      icon: <ClockIcon size={20} color="#8B5CF6" />,
-    },
-    {
-      id: '2',
-      label: 'Total Appts',
-      value: '14',
-      trend: '+8%',
-      isUp: true,
-      icon: <CalendarIcon size={20} color={theme.colors.primary} />,
-    },
-    {
-      id: '3',
-      label: 'Earnings',
-      value: '₹18.5k',
-      trend: '+15%',
-      isUp: true,
-      icon: <WalletIcon size={20} color={theme.colors.primary} />,
-    },
-    {
-      id: '4',
-      label: 'Total Patients',
-      value: '128',
-      trend: '+5%',
-      isUp: true,
-      icon: <PatientsIcon size={20} color={theme.colors.warning} />,
-    },
-  ];
+  const {
+    data: boardStats,
+    isPending: statsPending,
+    refetch: refetchHomeStats,
+  } = useHomeStats({
+    doctorId: userData?.user_id || '',
+    period: period,
+  });
 
-  // Static Mock Upcoming Patient Appointments Data
-  const upcomingPatients = [
-    {
-      id: 'p1',
-      name: 'Eleanor Vance',
-      ageGender: '34 yrs • Female',
-      time: '10:30 AM',
-      timeDistance: 'IN 15 MINS',
-      type: 'ONLINE',
-      chiefComplaint: 'Chest tightness & fatigue',
-      avatar: 'EV',
-      avatarBg: theme.colors.primary,
-      isOngoing: true,
-    },
-  ];
+  const {
+    data: upcomingAppts,
+    isPending: upcomiongApptsPending,
+    refetch: refetchAppointments,
+  } = useHomeUpcomingAppts({
+    doctorId: userData?.user_id || '',
+  });
 
-  // Quick Access Items Data using UI Icons
-  const quickAccessItems = [
-    {
-      id: 'q1',
-      label: 'BOOK APPT',
-      screen: 'BookAppointment' as const,
-      icon: <CalendarIcon size={30} color={theme.colors.primary} />,
-    },
-    {
-      id: 'q2',
-      label: 'WRITE RX',
-      screen: 'PrescriptionList' as const,
-      icon: <PrescriptionIcon size={30} color={theme.colors.primary} />,
-    },
-    {
-      id: 'q3',
-      label: 'AVAILABILITY',
-      screen: 'Availability' as const,
-      icon: <ScheduleIcon size={30} color={theme.colors.primary} />,
-    },
-    {
-      id: 'q4',
-      label: 'BILLING',
-      screen: 'InvoiceList' as const,
-      icon: <InvoiceIcon size={30} color={theme.colors.primary} />,
-    },
-  ];
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([refetchHomeStats(), refetchAppointments()]);
+    setRefreshing(false);
+  }, [refetchHomeStats, refetchAppointments]);
+
+  const homeStats = useMemo(() => {
+    return [
+      {
+        id: '1',
+        label: 'Upcoming Appts',
+        value: String(boardStats?.upcomingAppointments ?? 0),
+        icon: <ClockIcon size={20} color="#8B5CF6" />,
+        iconBg: '#F3E8FF',
+      },
+      {
+        id: '2',
+        label:
+          period === 'today' ? 'Today Appts' : period === 'week' ? 'Week Appts' : 'Month Appts',
+        value: String(boardStats?.todayAppointments ?? 0),
+        icon: <CalendarIcon size={20} color="#0EA5E9" />,
+        iconBg: '#E0F2FE',
+      },
+      {
+        id: '3',
+        label: 'Earnings',
+        value: `₹${boardStats?.todayRevenue ?? 0}`,
+        icon: <WalletIcon size={20} color="#10B981" />,
+        iconBg: '#D1FAE5',
+      },
+      {
+        id: '4',
+        label: 'Total Patients',
+        value: String(boardStats?.totalPatients ?? 0),
+        icon: <PatientsIcon size={20} color="#F59E0B" />,
+        iconBg: '#FEF3C7',
+      },
+    ];
+  }, [boardStats, period]);
 
   return (
     <SafeAreaWrapper>
-      {/* Top Header */}
       <Header
         isHome
         doctorName="Dr. Sarah Jenkins"
@@ -127,11 +136,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         onNotificationPress={() => navigation?.navigate('Notifications')}
         onProfilePress={() => navigation?.navigate('DoctorProfile')}
       />
-
       <ScrollView
         style={homeStyles.container}
         contentContainerStyle={homeStyles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
+        }
       >
         <View style={homeStyles.insightsSection}>
           <View style={homeStyles.insightsHeader}>
@@ -177,59 +193,67 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               )}
             </View>
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: theme.spacing.lg }}
-          >
-            {stats.map(stat => (
-              <StatTile
-                key={stat.id}
-                label={stat.label}
-                value={stat.value}
-                trend={stat.trend}
-                isUp={stat.isUp}
-                icon={stat.icon}
-              />
-            ))}
-          </ScrollView>
+
+          {statsPending ? (
+            <HomeStatSkeleton />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: theme.spacing.lg }}
+            >
+              {homeStats.map(stat => (
+                <HomeStatsCard
+                  key={stat.id}
+                  label={stat.label}
+                  value={stat.value}
+                  icon={stat.icon}
+                  iconBg={stat.iconBg}
+                />
+              ))}
+            </ScrollView>
+          )}
         </View>
+
         <View style={homeStyles.sectionHeader}>
           <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
-          <TouchableOpacity onPress={() => navigation?.navigate('Patients')} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={() => navigation?.navigate(AppRoute.PATIENTS)}
+            activeOpacity={0.7}
+          >
             <Text style={homeStyles.sectionLink}>See All</Text>
           </TouchableOpacity>
         </View>
 
-        {upcomingPatients.map(patient => (
-          <AppointmentCard
-            key={patient.id}
-            id={patient.id}
-            patientName={patient.name}
-            ageGender={patient.ageGender}
-            time={patient.time}
-            timeDistance={patient.timeDistance}
-            consultType={patient.type}
-            chiefComplaint={patient.chiefComplaint}
-            avatarInitials={patient.avatar}
-            avatarBgColor={patient.avatarBg}
-            isOngoing={patient.isOngoing}
-            onActionPress={() =>
-              (navigation as any)?.navigate('PatientDetails', {
-                patientId: patient.id,
-                patientName: patient.name,
-              })
-            }
-            onSecondaryPress={() =>
-              (navigation as any)?.navigate('PatientDetails', {
-                patientId: patient.id,
-                patientName: patient.name,
-              })
-            }
-          />
-        ))}
+        {upcomiongApptsPending ? (
+          <AppointmentSkeleton />
+        ) : upcomingAppts && upcomingAppts?.length > 0 ? (
+          upcomingAppts?.slice(0, 3)?.map(apt => {
+            return (
+              <UpcomingAppointmentCard
+                key={apt.appointment_id}
+                id={String(apt.id)}
+                patientName={apt.patient_name || 'Patient'}
+                ageGender={apt.patient_gender}
+                time={apt.start_time}
+                timeDistance={getTimeUntilStart(apt?.start_time)}
+                consultType={apt.consultation_type || 'ONLINE'}
+                chiefComplaint={apt.symptoms || apt.reason || ''}
+                onActionPress={() => {
+                  navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
+                }}
+              />
+            );
+          })
+        ) : (
+          <View style={{ paddingVertical: theme.spacing.lg, alignItems: 'center' }}>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: theme.fontSize.sm }}>
+              No upcoming appointments found.
+            </Text>
+          </View>
+        )}
 
-        <AssistanceBanner onContactSupport={() => navigation?.navigate('Notifications')} />
+        <AssistanceBanner onContactSupport={() => navigation?.navigate(AppRoute.ACCOUNT)} />
 
         <View style={homeStyles.sectionHeader}>
           <Text style={homeStyles.sectionTitle}>Quick Access</Text>

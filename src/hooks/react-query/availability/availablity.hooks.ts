@@ -4,6 +4,7 @@ import {
   createAvailability,
   deleteAvailability,
   getAvailablity,
+  getMyAvailablities,
   updateAvailability,
 } from './availablity.funcs';
 
@@ -36,4 +37,16 @@ export const useCreateAvailability = () =>
 export const useUpdateAvailability = () =>
   useMutation({
     mutationFn: ({ id, body }: { id: number | string; body: any }) => updateAvailability(id, body),
+  });
+
+export const useMyAvailablities = (params?: { doctorId?: number | string }) =>
+  useQuery({
+    queryKey: [AvailbilityQueryKeys.GetMyAvailablity, params],
+    queryFn: () => getMyAvailablities(params?.doctorId!),
+    enabled: !!params?.doctorId,
+    select: v => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
   });
