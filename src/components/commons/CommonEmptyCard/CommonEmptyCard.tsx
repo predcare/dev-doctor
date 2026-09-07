@@ -1,6 +1,15 @@
-import React from 'react';
-import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import React, { useEffect, useRef } from 'react';
+import {
+  Animated,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import theme from '../../../styled/theme.styled';
+import { DefaultEmptyIcon } from '../../ui/icons';
 
 export interface CommonEmptyCardProps {
   title?: string;
@@ -11,23 +20,6 @@ export interface CommonEmptyCardProps {
   containerStyle?: StyleProp<ViewStyle>;
 }
 
-const DefaultEmptyIcon = () => (
-  <Svg width={40} height={40} viewBox="0 0 24 24" fill="none">
-    <Rect
-      x="3"
-      y="4"
-      width="18"
-      height="16"
-      rx="3"
-      stroke="#0F766E"
-      strokeWidth="1.8"
-      strokeDasharray="3 3"
-    />
-    <Path d="M8 12H16M10 16H14" stroke="#0F766E" strokeWidth="1.8" strokeLinecap="round" />
-    <Circle cx="12" cy="8" r="1.5" fill="#0F766E" />
-  </Svg>
-);
-
 export default function CommonEmptyCard({
   title = 'No Data Found',
   message = 'There are no items to display right now.',
@@ -36,80 +28,177 @@ export default function CommonEmptyCard({
   onAction,
   containerStyle,
 }: CommonEmptyCardProps) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.92)).current;
+  const floatAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 7,
+        tension: 90,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    const floatLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: -6,
+          duration: 1600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 1600,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.05,
+          duration: 1600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1600,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    floatLoop.start();
+    pulseLoop.start();
+
+    return () => {
+      floatLoop.stop();
+      pulseLoop.stop();
+    };
+  }, [fadeAnim, scaleAnim, floatAnim, pulseAnim]);
+
   return (
-    <View style={[styles.container, containerStyle]}>
-      <View style={styles.iconCircle}>{icon ? icon : <DefaultEmptyIcon />}</View>
+    <Animated.View
+      style={[
+        styles.container,
+        containerStyle,
+        {
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
+    >
+      <Animated.View
+        style={[
+          styles.iconRingOuter,
+          {
+            transform: [{ translateY: floatAnim }, { scale: pulseAnim }],
+          },
+        ]}
+      >
+        <View style={styles.iconCircle}>{icon ? icon : <DefaultEmptyIcon />}</View>
+      </Animated.View>
 
       <Text style={styles.titleText}>{title}</Text>
 
       {message ? <Text style={styles.messageText}>{message}</Text> : null}
 
       {onAction && actionText ? (
-        <TouchableOpacity style={styles.actionButton} onPress={onAction} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.actionButton} onPress={onAction} activeOpacity={0.82}>
           <Text style={styles.actionText}>{actionText}</Text>
         </TouchableOpacity>
       ) : null}
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 24,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 24,
     margin: 16,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#0F172A',
+    borderColor: theme.colors.surfaceBorder,
+    shadowColor: theme.colors.textPrimary,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  iconRingOuter: {
+    padding: 6,
+    borderRadius: 44,
+    backgroundColor: theme.colors.navBorder,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.mintBdr,
   },
   iconCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: '#F0FDFA',
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: theme.colors.primarySoft,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#CCFBF1',
+    borderWidth: 1.5,
+    borderColor: theme.colors.mintBg,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
   },
   titleText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#0F172A',
+    color: theme.colors.textPrimary,
     marginBottom: 6,
     textAlign: 'center',
+    letterSpacing: -0.2,
   },
   messageText: {
-    fontSize: 13,
-    color: '#64748B',
+    fontSize: 13.5,
+    color: theme.colors.textSlate,
     textAlign: 'center',
-    lineHeight: 19,
+    lineHeight: 20,
     marginBottom: 4,
-    maxWidth: 280,
+    maxWidth: 290,
   },
   actionButton: {
-    marginTop: 16,
-    backgroundColor: '#0F766E',
-    paddingVertical: 10,
-    paddingHorizontal: 22,
-    borderRadius: 8,
+    marginTop: 18,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 11,
+    paddingHorizontal: 24,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 3,
   },
   actionText: {
-    color: '#FFFFFF',
+    color: theme.colors.surface,
     fontSize: 14,
     fontWeight: '600',
+    letterSpacing: 0.2,
   },
 });

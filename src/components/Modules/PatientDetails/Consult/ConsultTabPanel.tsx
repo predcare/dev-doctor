@@ -1,189 +1,172 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { showSuccessToast } from '../../../../lib/common/toast.utils';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, RefreshControl, View } from 'react-native';
+import { useChangeAppointmentStatus } from '../../../../hooks/react-query/appointments/appointments.hooks';
+import { useMyPatientConsults } from '../../../../hooks/react-query/patients/patients.hooks';
+import { MyAppointmentsQueryKeys } from '../../../../hooks/react-query/query.keys';
+import { AppRoute } from '../../../../route';
 import { consultTabStyles as S } from '../../../../styled/ConsultTabPanel.styled';
-import AdviceStepForm from './AdviceStepForm';
-import { consultFormSchema, ConsultFormValues } from './consultSchema';
-import DiagnosisStepForm from './DiagnosisStepForm';
-import LabsStepForm from './LabsStepForm';
-import MedicationsStepForm from './MedicationsStepForm';
-import VitalsStepForm from './VitalsStepForm';
+import { theme } from '../../../../styled/theme.styled';
+import { ConsultStatus } from '../../../../typescripts/enums';
+import { useLoadingStore } from '../../../../zustand/stores/useLoadingStore';
+import CommonEmptyCard from '../../../commons/CommonEmptyCard/CommonEmptyCard';
+import CommonErrorCard from '../../../commons/CommonErrorCard/CommonErrorCard';
+import { queryClient } from '../../../providers/ReactQueryProvider';
+import ConsultSkeleton from '../../../Skeletons/ConsultSkeleton';
+import { ClockIcon } from '../../../ui/icons';
+import ConsultCard from './ConsultCard';
 
-export type ConsultStep = 'diagnosis' | 'vitals' | 'medications' | 'labs' | 'advice';
-
-export interface ConsultStepItem {
-  id: ConsultStep;
-  title: string;
+interface ConsultPageProps {
+  patientId: number | string;
 }
 
-const CONSULT_STEPS: ConsultStepItem[] = [
-  { id: 'diagnosis', title: 'Diagnosis' },
-  { id: 'vitals', title: 'Vitals' },
-  { id: 'medications', title: 'Medications' },
-  { id: 'labs', title: 'Lab Tests' },
-  { id: 'advice', title: 'Advice' },
-];
+export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
+  const navigation = useNavigation();
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
+  const [refreshing, setRefreshing] = useState(false);
 
-export interface ConsultTabPanelProps {
-  onCompletePrescription?: (values: ConsultFormValues) => void;
-  onCancelConsult?: () => void;
-}
-
-export const ConsultTabPanel: React.FC<ConsultTabPanelProps> = ({ onCompletePrescription }) => {
-  const [activeStep, setActiveStep] = useState<ConsultStep>('diagnosis');
-
-  const methods = useForm<ConsultFormValues>({
-    resolver: yupResolver(consultFormSchema),
-    defaultValues: {
-      chief_complaints: 'Chest tightness & fatigue since 3 days',
-      examination_notes: 'Normal S1/S2 heart sounds, mild tachycardia',
-      diagnosis: 'Atypical Chest Pain & Essential Hypertension',
-      treatment_plan: 'Oral antihypertensives & lifestyle modification',
-      blood_pressure: '135/85',
-      pulse: '84',
-      temperature: '36.8',
-      spo2: '98',
-      weight: '68',
-      height: '165',
-      bmi: '25.0',
-      custom_vitals: [],
-      medications: [
-        {
-          id: 1,
-          name: 'Amlodipine',
-          strength: '5',
-          strengthUnit: 'mg',
-          dosage: '1-0-0',
-          timing: 'Before food',
-          durationNum: '30',
-          durationUnit: 'days',
-          instructions: 'Take in morning with water',
-        },
-      ],
-      lab_tests_structured: [
-        { name: 'Complete Blood Count (CBC)', instructions: 'Fasting sample' },
-        { name: 'ECG 12-Lead', instructions: 'Resting state' },
-      ],
-      general_advice: 'Low salt diet, 30 minutes daily walking, avoid caffeine.',
-      follow_up_date: 'In 2 Weeks (26 Aug 2026)',
-      referral_specialist: '',
-      referral_doctor_hospital: '',
-      referral_reason: '',
-      notes: '',
-    },
+  const {
+    data: consults,
+    isPending: consultPending,
+    isError: consultError,
+    error,
+    refetch: consultRefetch,
+  } = useMyPatientConsults({
+    patientId: patientId,
   });
+  const { mutate: changeStatus, isPending: changeStatusLoading } = useChangeAppointmentStatus();
 
-  const stepIndex = CONSULT_STEPS.findIndex(s => s.id === activeStep);
-  const isFirstStep = stepIndex === 0;
-  const isLastStep = stepIndex === CONSULT_STEPS.length - 1;
+  const handleStartConsulation = useCallback(
+    (
+      appointmentId: number | string,
+      patientId: number,
+      patientName: string,
+      status: string,
+      id: string | number
+    ) => {
+      if (status?.toLowerCase() === ConsultStatus.CONFIRMED) {
+        showLoader('Loading...');
+        changeStatus(
+          { appointmentId, appointment_status: ConsultStatus.IN_PROGRESS },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries({
+                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+              });
+              hideLoader();
+              navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                patientId: patientId,
+                patientName: patientName,
+              });
+            },
+            onError: () => {
+              hideLoader();
+            },
+          }
+        );
+      } else {
+        navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+          patientId: patientId,
+          patientName: patientName,
+        });
+      }
+    },
+    [changeStatus, queryClient, showLoader, hideLoader, navigation]
+  );
 
-  const handleNextStep = () => {
-    if (!isLastStep) {
-      setActiveStep(CONSULT_STEPS[stepIndex + 1].id);
-    }
-  };
+  const handleMarkCompleted = useCallback(
+    (appointmentId: number | string, id: string | number) => {
+      showLoader('Loading...');
+      changeStatus(
+        { appointmentId, appointment_status: ConsultStatus.COMPLETED },
+        {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries({
+              queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+            });
+            hideLoader();
+          },
+          onError: () => {
+            hideLoader();
+          },
+        }
+      );
+    },
+    [changeStatus, queryClient, showLoader, hideLoader]
+  );
 
-  const handlePrevStep = () => {
-    if (!isFirstStep) {
-      setActiveStep(CONSULT_STEPS[stepIndex - 1].id);
-    }
-  };
-
-  const handleFinalSubmit = (data: ConsultFormValues) => {
-    showSuccessToast('Prescription completed and saved!', 'Consultation Completed');
-    onCompletePrescription?.(data);
-  };
-
-  const renderStepForm = () => {
-    switch (activeStep) {
-      case 'diagnosis':
-        return <DiagnosisStepForm />;
-      case 'vitals':
-        return <VitalsStepForm />;
-      case 'medications':
-        return <MedicationsStepForm />;
-      case 'labs':
-        return <LabsStepForm />;
-      case 'advice':
-        return <AdviceStepForm />;
-      default:
-        return <DiagnosisStepForm />;
-    }
-  };
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await consultRefetch();
+    setRefreshing(false);
+  }, [consultRefetch]);
 
   return (
-    <FormProvider {...methods}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={S.consultStepBarWrapper}>
-          {CONSULT_STEPS.map(step => {
-            const active = step.id === activeStep;
+    <View style={S.container}>
+      {consultPending && !refreshing ? (
+        <ConsultSkeleton />
+      ) : consultError ? (
+        <CommonErrorCard
+          title="Failed to Load Consults"
+          message={error?.message || 'Something went wrong while fetching patient consults.'}
+          onRetry={consultRefetch}
+        />
+      ) : (
+        <FlatList
+          data={consults || []}
+          keyExtractor={item => String(item.id)}
+          renderItem={({ item }) => {
             return (
-              <TouchableOpacity
-                key={step.id}
-                style={[S.consultStepTab, active && S.consultStepTabActive]}
-                onPress={() => setActiveStep(step.id)}
-                activeOpacity={0.7}
-              >
-                <Text style={[S.consultStepTabTitle, active && S.consultStepTabTitleActive]}>
-                  {step.title}
-                </Text>
-              </TouchableOpacity>
+              <ConsultCard
+                appointmentDate={item.appointment_date}
+                appointmentGeneratedId={item.appointment_id}
+                appointmentStatus={item.appointment_status}
+                appointmentType={item.consultation_type}
+                patientName={item.patient_name}
+                patientId={item.patient_alphanumeric_id}
+                startTime={item.start_time}
+                endTime={item.end_time}
+                onCompleted={() => {
+                  handleMarkCompleted(item.id, item.id);
+                }}
+                onVideoCall={() => {}}
+                onStartConsultation={() => {
+                  handleStartConsulation(
+                    item.appointment_id,
+                    item.patient_id,
+                    item.patient_name,
+                    item.appointment_status,
+                    item.id
+                  );
+                }}
+                loading={changeStatusLoading}
+              />
             );
-          })}
-        </View>
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+          }}
+          ListEmptyComponent={
+            <CommonEmptyCard
+              actionText="Reload Consults"
+              message="No Consultation History Found"
+              title="No Consultations"
+              onAction={() => {
+                consultRefetch();
+              }}
+              icon={<ClockIcon size={40} color={theme.colors.textSlate} />}
+            />
+          }
+          contentContainerStyle={S.listContent}
           showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {renderStepForm()}
-        </ScrollView>
-        <View style={S.consultStickyBottomBar}>
-          <View style={S.autoSaveRow}>
-            <View style={S.autoSaveDot} />
-            <Text style={S.autoSaveText}>Auto-save active</Text>
-          </View>
-
-          <View style={S.bottomBtnRow}>
-            {/* Previous Button */}
-            <TouchableOpacity
-              style={[S.btnPrev, isFirstStep && { opacity: 0.4 }]}
-              onPress={handlePrevStep}
-              disabled={isFirstStep}
-              activeOpacity={0.7}
-            >
-              <Text style={S.btnPrevText}>‹ Previous</Text>
-            </TouchableOpacity>
-            {isLastStep ? (
-              <TouchableOpacity
-                style={S.btnComplete}
-                onPress={methods.handleSubmit(handleFinalSubmit)}
-                activeOpacity={0.85}
-              >
-                <Text style={S.btnCompleteText}>✓ Complete</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity style={S.btnNext} onPress={handleNextStep} activeOpacity={0.85}>
-                <Text style={S.btnNextText}>Next ›</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </FormProvider>
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+        />
+      )}
+    </View>
   );
 };
 

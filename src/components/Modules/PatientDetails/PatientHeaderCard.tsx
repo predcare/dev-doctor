@@ -27,6 +27,7 @@ export const PatientHeaderCard: React.FC<PatientHeaderCardProps> = ({
   const imgPath = useMemo(() => {
     return mediaPaths(profileImg);
   }, [profileImg]);
+
   return (
     <View style={patientDetailsStyles.profileCard}>
       <View style={patientDetailsStyles.profileCardInner}>

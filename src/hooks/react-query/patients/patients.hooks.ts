@@ -3,6 +3,7 @@ import { PatientsQueryKeys } from '../query.keys';
 import {
   createNewPatient,
   deletePatient,
+  getMyPatientsConsults,
   getMyPatientsEmrs,
   getMyPatientsInfo,
   getMyPatientsList,
@@ -119,3 +120,15 @@ export const useUploadEmr = () => {
     mutationFn: (body: FormData) => uploadEmr(body),
   });
 };
+
+export const useMyPatientConsults = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.MyConsults, params],
+    queryFn: () => getMyPatientsConsults(params?.patientId!),
+    enabled: !!params?.patientId,
+    select: v => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.appointments)) return v.appointments;
+      return [];
+    },
+  });

@@ -21,6 +21,7 @@ export enum PatientsQueryKeys {
   SendCred = 'SendCred',
   EmrRecords = 'EmrRecords',
   Prescriptions = 'Prescriptions',
+  MyConsults = 'MyConsults',
 }
 
 export enum CommonQueryKeys {

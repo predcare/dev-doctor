@@ -62,17 +62,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
   const [selectedDetailsApt, setSelectedDetailsApt] = useState<MockAppointment | null>(null);
   const [confirmCompleteAptId, setConfirmCompleteAptId] = useState<number | string | null>(null);
 
-  const isCustomFilterApplied = useMemo(() => {
-    const isDefaultDate = filterStates.dateRange === 'today';
-    const isDefaultStatus =
-      filterStates.statuses.length === 1 && filterStates.statuses[0] === 'upcoming';
-    const noCustomDates = filterStates.fromDate === null && filterStates.toDate === null;
-    const noSearch = searchQuery.trim().length === 0;
-    const noTab = activeTab === 'both';
-
-    return !(isDefaultDate && isDefaultStatus && noCustomDates && noSearch && noTab);
-  }, [filterStates, searchQuery, activeTab]);
-
   const { userData } = useAuthStore(state => state);
   const { showLoader, hideLoader } = useLoadingStore(state => state);
   const { setMeetingSession } = useMeetingStore(state => state);
@@ -88,6 +77,17 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
   });
 
   const { mutate: changeStatus } = useChangeAppointmentStatus();
+
+  const isCustomFilterApplied = useMemo(() => {
+    const isDefaultDate = filterStates.dateRange === 'today';
+    const isDefaultStatus =
+      filterStates.statuses.length === 1 && filterStates.statuses[0] === 'upcoming';
+    const noCustomDates = filterStates.fromDate === null && filterStates.toDate === null;
+    const noSearch = searchQuery.trim().length === 0;
+    const noTab = activeTab === 'both';
+
+    return !(isDefaultDate && isDefaultStatus && noCustomDates && noSearch && noTab);
+  }, [filterStates, searchQuery, activeTab]);
 
   const { stats, filteredAppointments } = useMemo(() => {
     const appointmentsList: IAppointmentDoc[] = myAppointments || [];

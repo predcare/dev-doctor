@@ -127,18 +127,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
             )}
 
             {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
-            {activeMainTab === 'consultation' && (
-              <ConsultTabPanel
-                onCompletePrescription={completedRx => {
-                  const newRxId = `RX-${Date.now().toString().slice(-4)}`;
-                  navigation?.navigate('PrescriptionView', {
-                    rxId: newRxId,
-                    patientName: patient.name,
-                    patientId: patient.patientId,
-                  });
-                }}
-              />
-            )}
+            {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />}
           </View>
         </>
       )}

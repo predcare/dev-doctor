@@ -38,7 +38,7 @@ export const endpoints = {
     emrShare: (docId: string | number) => `/doctor/emr/document/${docId}/share`,
     prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
     emrUpload: '/doctor/emr/upload',
-    consults: (uid: string | number) => `/doctor/patient-consults/${uid}`,
+    consults: (uid: string | number) => `/doctor/appointments/doctor/patient-consult/${uid}`,
   },
   appointments: {
     get: '/doctor/appointments/doctor',

@@ -28,16 +28,12 @@ export const BackdropLoader: React.FC = () => {
       <View style={styles.overlay}>
         <View style={styles.loaderCard}>
           <View style={styles.loaderCircle}>
-            <ActivityIndicator size="small" color={theme.colors.primary} />
+            <ActivityIndicator size="large" color={theme.colors.white} />
           </View>
 
-          <View style={styles.content}>
-            <Text style={styles.title} numberOfLines={2}>
-              {message || 'Please wait...'}
-            </Text>
-
-            <Text style={styles.subtitle}>Processing...</Text>
-          </View>
+          <Text style={styles.title} numberOfLines={2}>
+            {message || 'Please wait...'}
+          </Text>
         </View>
       </View>
     </Modal>
@@ -47,73 +43,41 @@ export const BackdropLoader: React.FC = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-
     justifyContent: 'center',
     alignItems: 'center',
-
-    // Stronger backdrop
-    backgroundColor: 'rgba(2, 6, 23, 0.72)',
+    backgroundColor: 'rgba(15, 23, 42, 0.80)',
   },
 
   loaderCard: {
-    flexDirection: 'row',
     alignItems: 'center',
-
-    width: 'auto',
-    minWidth: 230,
-    maxWidth: 320,
-
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 18,
-
-    elevation: 15,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 18,
+    justifyContent: 'center',
+    minWidth: 130,
+    maxWidth: 260,
+    paddingVertical: 18,
+    paddingHorizontal: 22,
   },
 
   loaderCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-
+    width: 78,
+    height: 78,
     alignItems: 'center',
     justifyContent: 'center',
-
-    backgroundColor: 'rgba(59, 130, 246, 0.10)',
-
-    marginRight: 14,
-  },
-
-  content: {
-    flex: 1,
-    justifyContent: 'center',
+    marginBottom: 12,
+    borderRadius: 29,
+    backgroundColor: 'rgba(255, 255, 255, 0.30)',
   },
 
   title: {
     fontSize: 14,
     fontWeight: '600',
-    color: theme.colors.textPrimary,
+
+    color: '#FFFFFF',
+
+    textAlign: 'center',
+
     lineHeight: 20,
-  },
 
-  subtitle: {
-    marginTop: 3,
-
-    fontSize: 12,
-    fontWeight: '400',
-
-    color: '#64748B',
-    lineHeight: 17,
+    letterSpacing: 0.1,
   },
 });
 
