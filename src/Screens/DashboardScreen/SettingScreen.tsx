@@ -8,7 +8,11 @@ import SettingsProfileCard from '../../components/Modules/AccountSettings/Settin
 import SupportSection from '../../components/Modules/AccountSettings/SupportSection';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { resetToLogin } from '../../lib/common/navigation.utils';
-import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
+import {
+  AppRoute,
+  type ProfileScreenNavigationProp,
+  type ProfileScreenRouteProp,
+} from '../../route';
 import { profileStyles } from '../../styled/ProfileScreen.styled';
 import { useAlertStore } from '../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
@@ -47,8 +51,7 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <Header
         title="Settings"
         description="Manage your App Settings"
-        unreadCount={3}
-        onNotificationPress={() => navigation?.navigate('Notifications')}
+        onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
       />
 
       <ScrollView

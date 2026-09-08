@@ -1,4 +1,54 @@
 import dayjs from 'dayjs';
+import { Linking, Platform } from 'react-native';
+import { showErrorToast } from './toast.utils';
+
+export interface OpenMapParams {
+  address?: string;
+  lat?: number | string | null;
+  long?: number | string | null;
+}
+
+export const openLocationOnMap = (params: OpenMapParams): void => {
+  const { address, lat, long } = params || {};
+
+  const latitude = lat ?? null;
+  const longitude = long ?? null;
+  const clinicAddress = address?.trim() || '';
+
+  // Validate location data
+  const hasCoordinates =
+    latitude !== null &&
+    latitude !== undefined &&
+    latitude !== '' &&
+    longitude !== null &&
+    longitude !== undefined &&
+    longitude !== '';
+
+  const hasAddress = Boolean(clinicAddress);
+
+  // No location information available
+  if (!hasCoordinates && !hasAddress) {
+    showErrorToast('Clinic location is not available');
+    return;
+  }
+
+  let url = '';
+
+  // Prefer coordinates when available
+  if (hasCoordinates) {
+    url =
+      Platform.OS === 'ios'
+        ? `maps:0,0?q=${latitude},${longitude}`
+        : `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  } else if (hasAddress) {
+    url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinicAddress)}`;
+  }
+
+  Linking.openURL(url).catch(err => {
+    console.error('Failed to open map URL:', err);
+    showErrorToast('Unable to open map');
+  });
+};
 
 export const formatDate = (
   date: Date | string | null | undefined,
@@ -190,4 +240,10 @@ export const formatTimeSlot = (startTime?: string, endTime?: string) => {
   const end = endTime ? formatTime(endTime) : '';
 
   return end ? `${start} - ${end}` : start;
+};
+
+export const maskValue = (value: string) => {
+  if (!value) return '';
+  if (value.length <= 2) return value;
+  return value.slice(0, 2) + '*'.repeat(value.length - 2);
 };

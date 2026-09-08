@@ -7,6 +7,7 @@ export enum AuthQueryKey {
 export enum ProfileQueryKeys {
   Profile = 'Profile',
   UpdateProfile = 'UpdateProfile',
+  DoctorProfile = 'DoctorProfile',
 }
 
 export enum NotificationQueryKeys {
@@ -28,6 +29,7 @@ export enum CommonQueryKeys {
   Countries = 'Countries',
   States = 'States',
   Cities = 'Cities',
+  GET_ALL_USERS = 'GET_ALL_USERS',
 }
 
 export enum PrescriptionQueryKeys {

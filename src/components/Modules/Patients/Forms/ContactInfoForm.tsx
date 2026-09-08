@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Controller, Control, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import {
   useCitiesBySId,
   useCountries,
@@ -16,6 +16,7 @@ export interface ContactInfoFormProps {
   errors: FieldErrors<TAddPatientSchemaType>;
 }
 
+import { ContactInfoStyles } from '../../../../styled/AddPatientStyles.styled';
 import ListPickerModal from '../Modals/ListPickerModal';
 
 export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
@@ -32,11 +33,11 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
     const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>();
     const [selectedStateId, setSelectedStateId] = useState<number | undefined>();
 
-    const { data: rawCountries, isLoading: loadingCountries } = useCountries();
-    const { data: rawStates, isLoading: loadingStates } = useStatesByCId(
+    const { data: rawCountries, isPending: loadingCountries } = useCountries();
+    const { data: rawStates, isPending: loadingStates } = useStatesByCId(
       selectedCountryId ? { cId: selectedCountryId } : undefined
     );
-    const { data: rawCities, isLoading: loadingCities } = useCitiesBySId(
+    const { data: rawCities, isPending: loadingCities } = useCitiesBySId(
       selectedStateId ? { sId: selectedStateId } : undefined
     );
 
@@ -50,9 +51,9 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
 
     const states = useMemo(() => {
       if (!Array.isArray(rawStates)) return [];
-      return rawStates.map((s: any) => ({
-        id: Number(s.id) || s.id,
-        name: s.name,
+      return rawStates.map((ContactInfoStyles: any) => ({
+        id: Number(ContactInfoStyles.id) || ContactInfoStyles.id,
+        name: ContactInfoStyles.name,
       }));
     }, [rawStates]);
 
@@ -75,7 +76,10 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
 
     useEffect(() => {
       if (!selectedStateId && stateName && states.length > 0) {
-        const found = states.find((s: any) => s.name.toLowerCase() === stateName.toLowerCase());
+        const found = states.find(
+          (ContactInfoStyles: any) =>
+            ContactInfoStyles.name.toLowerCase() === stateName.toLowerCase()
+        );
         if (found) {
           setSelectedStateId(Number(found.id));
         }
@@ -84,10 +88,9 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
 
     return (
       <>
-        {/* Mobile Number */}
-        <View style={s.group}>
-          <Text style={s.lbl}>
-            MOBILE NUMBER <Text style={s.req}>*</Text>
+        <View style={ContactInfoStyles.group}>
+          <Text style={ContactInfoStyles.lbl}>
+            MOBILE NUMBER <Text style={ContactInfoStyles.req}>*</Text>
           </Text>
           <Controller
             control={control}
@@ -95,8 +98,8 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             render={({ field: { onChange, value, onBlur } }) => (
               <TextInput
                 style={[
-                  s.inp,
-                  !!errors.phone && s.inpErr,
+                  ContactInfoStyles.inp,
+                  !!errors.phone && ContactInfoStyles.inpErr,
                   (value || '').length === 10 && { borderColor: theme.colors.success },
                 ]}
                 placeholder="e.g. 9845012345"
@@ -110,7 +113,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             )}
           />
           {errors.phone?.message ? (
-            <Text style={s.errTxt}>{String(errors.phone.message)}</Text>
+            <Text style={ContactInfoStyles.errTxt}>{String(errors.phone.message)}</Text>
           ) : phone.length > 0 ? (
             <Text
               style={{
@@ -125,14 +128,14 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
         </View>
 
         {/* Email Address */}
-        <View style={s.group}>
-          <Text style={s.lbl}>EMAIL ADDRESS</Text>
+        <View style={ContactInfoStyles.group}>
+          <Text style={ContactInfoStyles.lbl}>EMAIL ADDRESS</Text>
           <Controller
             control={control}
             name="email"
             render={({ field: { onChange, value, onBlur } }) => (
               <TextInput
-                style={[s.inp, !!errors.email && s.inpErr]}
+                style={[ContactInfoStyles.inp, !!errors.email && ContactInfoStyles.inpErr]}
                 placeholder="e.g. eleanor.vance@example.com"
                 placeholderTextColor={theme.colors.textMuted}
                 value={value || ''}
@@ -144,20 +147,23 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             )}
           />
           {errors.email?.message && (
-            <Text style={s.errTxt}>{String(errors.email.message)}</Text>
+            <Text style={ContactInfoStyles.errTxt}>{String(errors.email.message)}</Text>
           )}
         </View>
 
         {/* Alt & WhatsApp */}
         <View style={{ flexDirection: 'row', gap: 12 }}>
-          <View style={[s.group, { flex: 1 }]}>
-            <Text style={s.lbl}>ALT. NUMBER</Text>
+          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
+            <Text style={ContactInfoStyles.lbl}>ALT. NUMBER</Text>
             <Controller
               control={control}
               name="alternate_number"
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInput
-                  style={[s.inp, !!errors.alternate_number && s.inpErr]}
+                  style={[
+                    ContactInfoStyles.inp,
+                    !!errors.alternate_number && ContactInfoStyles.inpErr,
+                  ]}
                   placeholder="9876543210"
                   placeholderTextColor={theme.colors.textMuted}
                   value={value || ''}
@@ -170,14 +176,17 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             />
           </View>
 
-          <View style={[s.group, { flex: 1 }]}>
-            <Text style={s.lbl}>WHATSAPP</Text>
+          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
+            <Text style={ContactInfoStyles.lbl}>WHATSAPP</Text>
             <Controller
               control={control}
               name="whatsapp_number"
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInput
-                  style={[s.inp, !!errors.whatsapp_number && s.inpErr]}
+                  style={[
+                    ContactInfoStyles.inp,
+                    !!errors.whatsapp_number && ContactInfoStyles.inpErr,
+                  ]}
                   placeholder="9876543210"
                   placeholderTextColor={theme.colors.textMuted}
                   value={value || ''}
@@ -192,9 +201,9 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
         </View>
 
         {/* Street Address */}
-        <View style={s.group}>
-          <Text style={s.lbl}>
-            STREET ADDRESS <Text style={s.req}>*</Text>
+        <View style={ContactInfoStyles.group}>
+          <Text style={ContactInfoStyles.lbl}>
+            STREET ADDRESS <Text style={ContactInfoStyles.req}>*</Text>
           </Text>
           <Controller
             control={control}
@@ -202,9 +211,9 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             render={({ field: { onChange, value, onBlur } }) => (
               <TextInput
                 style={[
-                  s.inp,
+                  ContactInfoStyles.inp,
                   { minHeight: 70, textAlignVertical: 'top', paddingTop: 12 },
-                  !!errors.address && s.inpErr,
+                  !!errors.address && ContactInfoStyles.inpErr,
                 ]}
                 placeholder="Enter full street address"
                 placeholderTextColor={theme.colors.textMuted}
@@ -216,33 +225,37 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             )}
           />
           {errors.address?.message && (
-            <Text style={s.errTxt}>{String(errors.address.message)}</Text>
+            <Text style={ContactInfoStyles.errTxt}>{String(errors.address.message)}</Text>
           )}
         </View>
 
         {/* Country & State Pickers */}
         <View style={{ flexDirection: 'row', gap: 12 }}>
-          <View style={[s.group, { flex: 1 }]}>
-            <Text style={s.lbl}>
-              COUNTRY <Text style={s.req}>*</Text>
+          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
+            <Text style={ContactInfoStyles.lbl}>
+              COUNTRY <Text style={ContactInfoStyles.req}>*</Text>
             </Text>
             <TouchableOpacity
-              style={[s.inpRow, !!errors.country && s.inpErr]}
+              style={[ContactInfoStyles.inpRow, !!errors.country && ContactInfoStyles.inpErr]}
               onPress={() => setShowCountryModal(true)}
               activeOpacity={0.7}
             >
-              <Text style={country ? s.inpTxt : s.inpPh}>{country || 'Select Country'}</Text>
+              <Text style={country ? ContactInfoStyles.inpTxt : ContactInfoStyles.inpPh}>
+                {country || 'Select Country'}
+              </Text>
               <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>▼</Text>
             </TouchableOpacity>
           </View>
-          <View style={[s.group, { flex: 1 }]}>
-            <Text style={s.lbl}>STATE</Text>
+          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
+            <Text style={ContactInfoStyles.lbl}>STATE</Text>
             <TouchableOpacity
-              style={s.inpRow}
+              style={ContactInfoStyles.inpRow}
               onPress={() => setShowStateModal(true)}
               activeOpacity={0.7}
             >
-              <Text style={stateName ? s.inpTxt : s.inpPh}>{stateName || 'Select State'}</Text>
+              <Text style={stateName ? ContactInfoStyles.inpTxt : ContactInfoStyles.inpPh}>
+                {stateName || 'Select State'}
+              </Text>
               <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>▼</Text>
             </TouchableOpacity>
           </View>
@@ -250,25 +263,27 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
 
         {/* City & Postal Code */}
         <View style={{ flexDirection: 'row', gap: 12 }}>
-          <View style={[s.group, { flex: 1 }]}>
-            <Text style={s.lbl}>CITY</Text>
+          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
+            <Text style={ContactInfoStyles.lbl}>CITY</Text>
             <TouchableOpacity
-              style={s.inpRow}
+              style={ContactInfoStyles.inpRow}
               onPress={() => setShowCityModal(true)}
               activeOpacity={0.7}
             >
-              <Text style={cityName ? s.inpTxt : s.inpPh}>{cityName || 'Select City'}</Text>
+              <Text style={cityName ? ContactInfoStyles.inpTxt : ContactInfoStyles.inpPh}>
+                {cityName || 'Select City'}
+              </Text>
               <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>▼</Text>
             </TouchableOpacity>
           </View>
-          <View style={[s.group, { flex: 1 }]}>
-            <Text style={s.lbl}>POSTAL CODE</Text>
+          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
+            <Text style={ContactInfoStyles.lbl}>POSTAL CODE</Text>
             <Controller
               control={control}
               name="postal_code"
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInput
-                  style={s.inp}
+                  style={ContactInfoStyles.inp}
                   placeholder="560001"
                   placeholderTextColor={theme.colors.textMuted}
                   value={value || ''}
@@ -281,10 +296,11 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
           </View>
         </View>
 
-        <View style={s.infoBox}>
+        <View style={ContactInfoStyles.infoBox}>
           <Text style={{ fontSize: 15 }}>ℹ️</Text>
-          <Text style={s.infoTxt}>
-            <Text style={{ fontWeight: '800' }}>Note:</Text> Patient will receive login credentials via SMS/Email after registration.
+          <Text style={ContactInfoStyles.infoTxt}>
+            <Text style={{ fontWeight: '800' }}>Note:</Text> Patient will receive login credentials
+            via SMS/Email after registration.
           </Text>
         </View>
 
@@ -330,68 +346,5 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
     );
   }
 );
-
-const s = StyleSheet.create({
-  group: { marginBottom: 18 },
-  lbl: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textMuted,
-    letterSpacing: 1.1,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  req: { color: theme.colors.danger },
-  inp: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 15,
-    fontWeight: '400',
-    color: theme.colors.dark,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-  },
-  inpErr: {
-    borderColor: theme.colors.danger,
-  },
-  inpRow: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-  },
-  inpTxt: { fontSize: 15, fontWeight: '400', color: theme.colors.dark },
-  inpPh: { fontSize: 15, fontWeight: '400', color: theme.colors.textMuted },
-  errTxt: {
-    fontSize: 12,
-    color: theme.colors.danger,
-    marginTop: 5,
-    fontWeight: '500',
-  },
-  infoBox: {
-    backgroundColor: theme.colors.primarySoft,
-    borderRadius: 12,
-    padding: 14,
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.primary,
-  },
-  infoTxt: {
-    flex: 1,
-    fontSize: 13,
-    fontWeight: '500',
-    color: theme.colors.primary,
-    lineHeight: 20,
-  },
-});
 
 export default ContactInfoForm;

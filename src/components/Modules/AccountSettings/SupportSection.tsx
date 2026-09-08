@@ -36,6 +36,7 @@ export const SupportSection = React.memo<SupportSectionProps>(
         />
       </View>
       <Text style={profileStyles.versionText}>VERSION 2.4.0 (BUILD 882)</Text>
+      <View style={{ height: 20 }} />
     </>
   )
 );

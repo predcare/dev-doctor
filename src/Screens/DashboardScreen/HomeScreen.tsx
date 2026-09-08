@@ -126,16 +126,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     ];
   }, [boardStats, period]);
 
+  const filtersUpcomingAppts = useMemo(() => {
+    return upcomingAppts || [];
+  }, [upcomingAppts]);
+
   return (
     <SafeAreaWrapper>
       <Header
         isHome
-        doctorName="Dr. Sarah Jenkins"
-        specialty="Cardiologist • MD"
-        clinicName="St. Jude Medical Center"
-        unreadCount={3}
-        onNotificationPress={() => navigation?.navigate('Notifications')}
-        onProfilePress={() => navigation?.navigate('DoctorProfile')}
+        onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
+        onProfilePress={() => navigation?.navigate(AppRoute.DOCTOR_PROFILE)}
       />
       <ScrollView
         style={homeStyles.container}
@@ -228,8 +228,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         {upcomiongApptsPending ? (
           <AppointmentSkeleton />
-        ) : upcomingAppts && upcomingAppts?.length > 0 ? (
-          upcomingAppts?.slice(0, 3)?.map(apt => {
+        ) : filtersUpcomingAppts && filtersUpcomingAppts?.length > 0 ? (
+          filtersUpcomingAppts?.slice(0, 3)?.map(apt => {
             const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
             return (
               <UpcomingAppointmentCard

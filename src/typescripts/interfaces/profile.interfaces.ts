@@ -15,6 +15,8 @@ export interface IMyProfileDoc {
   id: number;
   name: string;
   phone_number: string;
+  alternate_number: string;
+  whatsapp_number: string;
   role: string;
   status: string;
   user_id: number;
@@ -31,6 +33,19 @@ export interface IMyProfileDoc {
   clinic_phone: string;
   clinic_email: string;
   clinic_gstin: string;
+  sub_specializations: any;
+  address: any;
+  city: any;
+  state: any;
+  country: any;
+  postal_code: any;
+  profile_image: any;
+  languages_spoken: string[];
+  license_valid_until: any;
+  gender: string;
+  clinic_reg_number: string;
+  clinic_location: IClinicLocation;
+  location: ILocation;
 }
 
 export interface IPatientEMRDoc {
@@ -54,4 +69,14 @@ export interface IPatientEMRDoc {
   patient_user_id: number;
   notes: string;
   shared_doctor_ids: number[];
+}
+
+export interface ILocation {
+  lat: number;
+  lng: number;
+}
+
+export interface IClinicLocation {
+  lat: number;
+  lng: number;
 }

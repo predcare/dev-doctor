@@ -53,9 +53,6 @@ export const Header: React.FC<HeaderProps> = ({
   subtitle,
   icon,
   onBackPress,
-  doctorName = 'Dr. Sarah Jenkins',
-  specialty = 'Cardiologist • MD',
-  clinicName = 'St. Jude Medical Center',
   unreadCount = 3,
   onNotificationPress,
   onProfilePress,
@@ -64,7 +61,6 @@ export const Header: React.FC<HeaderProps> = ({
   const { userData } = useAuthStore(state => state);
   return (
     <View style={headerStyles.container}>
-      {/* Top Profile & Action Row */}
       <View style={headerStyles.topRow}>
         {!isHome ? (
           <View style={headerStyles.titleContainer}>
@@ -108,7 +104,6 @@ export const Header: React.FC<HeaderProps> = ({
           </TouchableOpacity>
         )}
 
-        {/* Action Buttons */}
         <View style={headerStyles.actionsGroup}>
           <TouchableOpacity
             style={headerStyles.iconButton}

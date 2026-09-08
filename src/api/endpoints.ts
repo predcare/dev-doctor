@@ -57,9 +57,10 @@ export const endpoints = {
     docAvailabilities: '/doctor/doctor-availability/doctor/',
   },
   commons: {
-    country: '/patients/locations/countries',
-    states: '/patients/locations/states/',
-    cities: '/patients/locations/cities/',
+    country: '/doctor/patients/locations/countries',
+    states: '/doctor/patients/locations/states/',
+    cities: '/doctor/patients/locations/cities/',
+    users: '/doctor/auth/users',
   },
   invoices: {
     getAll: (uid: string | number) => `/doctor/invoices/doctor/${uid}`,

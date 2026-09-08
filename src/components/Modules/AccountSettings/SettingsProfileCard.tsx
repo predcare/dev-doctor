@@ -34,7 +34,7 @@ export const SettingsProfileCard = React.memo<SettingsProfileCardProps>(({ onEdi
         onPress={onEditProfile}
         activeOpacity={0.75}
       >
-        <Text style={profileStyles.editProfileBtnTxt}>Edit Profile</Text>
+        <Text style={profileStyles.editProfileBtnTxt}>View Profile</Text>
       </TouchableOpacity>
     </View>
   );

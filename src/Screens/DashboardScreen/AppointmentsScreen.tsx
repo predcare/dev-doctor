@@ -361,7 +361,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
       <Header
         title="Manage Appointments"
         description="View and manage patient schedule"
-        unreadCount={3}
         onNotificationPress={() => navigation?.navigate('Notifications')}
       />
 

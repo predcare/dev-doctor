@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -26,9 +25,10 @@ import {
 } from '../../hooks/react-query/patients/patients.hooks';
 import { PatientsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { formatDateToYYYYMMDD } from '../../lib/common/common.utils';
+import { formatDateToYYYYMMDD, maskValue } from '../../lib/common/common.utils';
 import { AddPatientSchema, TAddPatientSchemaType } from '../../lib/schemas/addPatient.schema';
 import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
+import { AddPatientStyles } from '../../styled/AddPatientStyles.styled';
 import { theme } from '../../styled/theme.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
@@ -116,7 +116,6 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
 
   const selectionMode = watch('selectionMode');
 
-  // Step Navigation & Validation
   const handleNext = useCallback(async () => {
     if (selectionMode === 'existing_user') {
       const isStep1Valid = await trigger(['selectionMode', 'selected_user_id']);
@@ -176,7 +175,16 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
       handleSubmit(onSubmitNew)();
       return;
     }
-  }, [step, selectionMode, selectedUser, trigger, handleSubmit, linkExistingPatientMutation, userData?.user_id, navigation]);
+  }, [
+    step,
+    selectionMode,
+    selectedUser,
+    trigger,
+    handleSubmit,
+    linkExistingPatientMutation,
+    userData?.user_id,
+    navigation,
+  ]);
 
   const handleBack = useCallback(() => {
     if (step > 1 && selectionMode === 'create_new') setStep(p => p - 1);
@@ -204,7 +212,6 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
       doctor_id: userData?.user_id || '',
       profile_image: undefined,
     };
-
     createNewPatientMutation(payload, {
       onSuccess(res) {
         if (res.success) {
@@ -282,18 +289,22 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
 
   return (
     <SafeAreaWrapper>
-      <View style={s.outer}>
-        <View style={s.header}>
-          <TouchableOpacity style={s.backBtn} onPress={handleBack} activeOpacity={0.7}>
+      <View style={AddPatientStyles.outer}>
+        <View style={AddPatientStyles.header}>
+          <TouchableOpacity
+            style={AddPatientStyles.backBtn}
+            onPress={handleBack}
+            activeOpacity={0.7}
+          >
             <ChevronLeftIcon color={theme.colors.primary} size={18} />
           </TouchableOpacity>
           <View>
-            <Text style={s.hTitle}>Add New Patient</Text>
-            <Text style={s.hSub}>PRED CARE • REGISTRATION</Text>
+            <Text style={AddPatientStyles.hTitle}>Add New Patient</Text>
+            <Text style={AddPatientStyles.hSub}>PRED CARE • REGISTRATION</Text>
           </View>
         </View>
         {selectionMode === 'create_new' && (
-          <View style={s.stepWrap}>
+          <View style={AddPatientStyles.stepWrap}>
             <StepIndicator step={step} />
           </View>
         )}
@@ -303,13 +314,12 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <ScrollView
-            style={s.scroll}
-            contentContainerStyle={s.formContent}
+            style={AddPatientStyles.scroll}
+            contentContainerStyle={AddPatientStyles.formContent}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
-            {/* Form Card Container */}
-            <View style={s.cardContainer}>
+            <View style={AddPatientStyles.cardContainer}>
               {(step === 1 || selectionMode === 'existing_user') && (
                 <BasicInfoForm
                   control={control}
@@ -322,12 +332,10 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
                 />
               )}
 
-              {/* Step 2: Medical Info */}
               {selectionMode === 'create_new' && step === 2 && (
                 <MedicalInfoForm control={control} />
               )}
 
-              {/* Step 3: Contact Info */}
               {selectionMode === 'create_new' && step === 3 && (
                 <ContactInfoForm
                   control={control}
@@ -338,34 +346,37 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
               )}
             </View>
 
-            {/* Patient Summary Card for Existing User */}
             {selectionMode === 'existing_user' && selectedUser && (
-              <View style={s.confirmCard}>
-                <Text style={s.confirmTitle}>Patient Summary</Text>
-                <View style={s.confirmRow}>
-                  <Text style={s.confirmLbl}>Name</Text>
-                  <Text style={s.confirmVal}>{selectedUser.name}</Text>
+              <View style={AddPatientStyles.confirmCard}>
+                <Text style={AddPatientStyles.confirmTitle}>Patient Summary</Text>
+                <View style={AddPatientStyles.confirmRow}>
+                  <Text style={AddPatientStyles.confirmLbl}>Name</Text>
+                  <Text style={AddPatientStyles.confirmVal}>{selectedUser?.name}</Text>
                 </View>
-                {selectedUser.email ? (
-                  <View style={s.confirmRow}>
-                    <Text style={s.confirmLbl}>Email</Text>
-                    <Text style={s.confirmVal}>{selectedUser.email}</Text>
+                {selectedUser?.email ? (
+                  <View style={AddPatientStyles.confirmRow}>
+                    <Text style={AddPatientStyles.confirmLbl}>Email</Text>
+                    <Text style={AddPatientStyles.confirmVal}>
+                      {maskValue(selectedUser?.email)}
+                    </Text>
                   </View>
                 ) : null}
-                {selectedUser.phone_number ? (
-                  <View style={s.confirmRow}>
-                    <Text style={s.confirmLbl}>Phone</Text>
-                    <Text style={s.confirmVal}>{selectedUser.phone_number}</Text>
+                {selectedUser?.phone_number ? (
+                  <View style={AddPatientStyles.confirmRow}>
+                    <Text style={AddPatientStyles.confirmLbl}>Phone</Text>
+                    <Text style={AddPatientStyles.confirmVal}>
+                      {maskValue(selectedUser?.phone_number)}
+                    </Text>
                   </View>
                 ) : null}
-                {selectedUser.gender ? (
-                  <View style={s.confirmRow}>
-                    <Text style={s.confirmLbl}>Gender</Text>
-                    <Text style={s.confirmVal}>{selectedUser.gender}</Text>
+                {selectedUser?.gender ? (
+                  <View style={AddPatientStyles.confirmRow}>
+                    <Text style={AddPatientStyles.confirmLbl}>Gender</Text>
+                    <Text style={AddPatientStyles.confirmVal}>{selectedUser?.gender}</Text>
                   </View>
                 ) : null}
-                <View style={s.confirmInfoBox}>
-                  <Text style={s.confirmInfoTxt}>
+                <View style={AddPatientStyles.confirmInfoBox}>
+                  <Text style={AddPatientStyles.confirmInfoTxt}>
                     ✓ All existing data (contact, medical history, address) will be used as-is from
                     the database. Only clinic registration is needed.
                   </Text>
@@ -373,16 +384,19 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
               </View>
             )}
 
-            {/* Action Buttons Row */}
-            <View style={s.btnRow}>
+            <View style={AddPatientStyles.btnRow}>
               {selectionMode === 'create_new' && step > 1 && (
-                <TouchableOpacity style={s.backSecBtn} onPress={handleBack} activeOpacity={0.8}>
-                  <Text style={s.backSecTxt}>← Back</Text>
+                <TouchableOpacity
+                  style={AddPatientStyles.backSecBtn}
+                  onPress={handleBack}
+                  activeOpacity={0.8}
+                >
+                  <Text style={AddPatientStyles.backSecTxt}>← Back</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
                 style={[
-                  s.nextBtn,
+                  AddPatientStyles.nextBtn,
                   (selectionMode === 'existing_user' || step === 1) && { flex: 1 },
                   (loading || (selectionMode === 'existing_user' && !selectedUser)) && {
                     opacity: 0.55,
@@ -395,7 +409,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
                 {loading ? (
                   <ActivityIndicator color={theme.colors.surface} />
                 ) : (
-                  <Text style={s.nextTxt}>
+                  <Text style={AddPatientStyles.nextTxt}>
                     {selectionMode === 'existing_user'
                       ? 'Add to My Clinic ✓'
                       : step === 3
@@ -423,155 +437,5 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
     </SafeAreaWrapper>
   );
 };
-
-const s = StyleSheet.create({
-  outer: { flex: 1, backgroundColor: theme.colors.bg },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 14,
-    backgroundColor: theme.colors.surface,
-    gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
-    elevation: 2,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: theme.colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-  },
-  hTitle: {
-    fontSize: 19,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-    letterSpacing: 0.1,
-  },
-  hSub: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textMuted,
-    letterSpacing: 1.2,
-    marginTop: 2,
-  },
-  stepWrap: {
-    backgroundColor: theme.colors.surface,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-  },
-  scroll: { flex: 1 },
-  formContent: { paddingHorizontal: 16, paddingTop: 16 },
-  cardContainer: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
-    marginBottom: 16,
-  },
-  btnRow: { flexDirection: 'row', gap: 12, marginTop: 4 },
-  backSecBtn: {
-    paddingVertical: 15,
-    paddingHorizontal: 22,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: theme.colors.surfaceBorder,
-    backgroundColor: theme.colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backSecTxt: { fontSize: 15, fontWeight: theme.fontWeight.bold, color: theme.colors.textSlate },
-  nextBtn: {
-    flex: 2,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 3,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  nextTxt: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.surface,
-    letterSpacing: 0.4,
-  },
-  confirmCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  confirmTitle: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-    letterSpacing: 0.5,
-    marginBottom: 12,
-    textTransform: 'uppercase',
-  },
-  confirmRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.bg,
-  },
-  confirmLbl: { fontSize: 13, fontWeight: '600', color: theme.colors.textMuted },
-  confirmVal: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.dark,
-    flex: 1,
-    textAlign: 'right',
-  },
-  confirmInfoBox: {
-    backgroundColor: theme.colors.primarySoft,
-    borderRadius: 10,
-    padding: 12,
-    marginTop: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.primary,
-  },
-  confirmInfoTxt: {
-    fontSize: 12,
-    color: theme.colors.primary,
-    fontWeight: '500',
-    lineHeight: 18,
-  },
-});
 
 export default AddPatientScreen;

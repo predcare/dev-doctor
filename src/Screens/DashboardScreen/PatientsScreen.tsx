@@ -89,8 +89,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) =>
         <Header
           title="Patients"
           description="Manage and view your patient records"
-          unreadCount={3}
-          onNotificationPress={() => navigation?.navigate('Notifications')}
+          onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
         />
         <View style={S.searchRow}>
           <View style={[S.searchPill, myPatientPending && { opacity: 0.7 }]}>

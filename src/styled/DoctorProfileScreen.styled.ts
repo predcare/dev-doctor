@@ -264,6 +264,16 @@ export const doctorProfileStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary,
   },
+  mapBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.mintBdr,
+  },
 });
 
 export default doctorProfileStyles;

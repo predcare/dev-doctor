@@ -9,10 +9,11 @@ export interface ProfileInfoCardProps {
   multiTag?: boolean;
   tags?: string[];
   containerStyle?: ViewStyle;
+  rightAction?: React.ReactNode;
 }
 
 export const ProfileInfoCard: React.FC<ProfileInfoCardProps> = React.memo(
-  ({ iconPath, label, value, multiTag = false, tags = [], containerStyle }) => (
+  ({ iconPath, label, value, multiTag = false, tags = [], containerStyle, rightAction }) => (
     <View style={[styles.card, containerStyle]}>
       <View style={styles.tealCircle}>{iconPath}</View>
       <View style={styles.body}>
@@ -29,6 +30,7 @@ export const ProfileInfoCard: React.FC<ProfileInfoCardProps> = React.memo(
           <Text style={styles.val}>{value || 'N/A'}</Text>
         )}
       </View>
+      {rightAction && <View style={styles.rightActionContainer}>{rightAction}</View>}
     </View>
   )
 );
@@ -97,6 +99,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
+  },
+  rightActionContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginLeft: 8,
   },
 });
 
