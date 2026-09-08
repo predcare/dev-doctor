@@ -21,6 +21,12 @@ export interface ICreatePatientResponse {
   patient?: IPatientBasicInfo;
 }
 
+export interface IPatientFamilyMemberRoot {
+  success: boolean;
+  members: IPatientFamilyMember[];
+  count: number;
+}
+
 export interface IMyPatientDoc {
   id: number;
   user_id: number;
@@ -70,4 +76,23 @@ export interface IPatientBasicInfo {
   user_id: string | number;
   email?: string;
   phone_number?: string;
+}
+
+export interface IPatientFamilyMember {
+  user_id: number;
+  name: string;
+  relation: string;
+  gender: string;
+  date_of_birth: string;
+  phone: string;
+  email: string;
+  patient_record_id: number;
+  patient_id: string;
+  profile_image: any;
+  address: any;
+  city: any;
+  state: any;
+  postal_code: any;
+  country: any;
+  profile_picture: any;
 }

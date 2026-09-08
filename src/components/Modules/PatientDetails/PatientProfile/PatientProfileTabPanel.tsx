@@ -1,18 +1,63 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useMyPatientFamilyMembers } from '../../../../hooks/react-query/patients/patients.hooks';
+import { capitalize } from '../../../../lib/common/common.utils';
 import { showErrorToast } from '../../../../lib/common/toast.utils';
 import { AppRoute } from '../../../../route';
-import { patientProfileTabStyles as s } from '../../../../styled/PatientProfileTabPanel.styled';
+import { patientProfileTabStyles } from '../../../../styled/PatientProfileTabPanel.styled';
 import { theme } from '../../../../styled/theme.styled';
-import { IMyPatientDoc } from '../../../../typescripts/interfaces/patients.interfaces';
+import {
+  IMyPatientDoc,
+  IPatientFamilyMember,
+} from '../../../../typescripts/interfaces/patients.interfaces';
+import FamilyMemberCard from './FamilyMemberCard';
 
 interface ProfileTabProps {
   patientInfo?: IMyPatientDoc | null;
 }
 
+// Static mock family members as per response format
+const STATIC_FAMILY_MEMBERS: IPatientFamilyMember[] = [
+  {
+    user_id: 5,
+    name: 'Samir',
+    relation: 'parent',
+    gender: 'male',
+    date_of_birth: '1994-12-31',
+    phone: '8918030206',
+    email: 'iamsahilmallick@gmail.com',
+    patient_record_id: 3,
+    patient_id: 'PT0003',
+    profile_image: null,
+    address: null,
+    city: null,
+    state: null,
+    postal_code: null,
+    country: null,
+    profile_picture: null,
+  },
+];
+
 export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo }) => {
   const navigation = useNavigation();
+
+  const {
+    data: familyMemberList,
+    isPending: familyMemberListPending,
+    isError: isFamilyMemberListError,
+    error: familyMemberListError,
+  } = useMyPatientFamilyMembers({
+    patientId: patientInfo?.user_id,
+  });
+
   const patient = useMemo(
     () => ({
       patientId: patientInfo?.patient_id || '-',
@@ -24,7 +69,7 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
       address: patientInfo?.address,
       date_of_birth: patientInfo?.date_of_birth,
       age: patientInfo?.age_display || '',
-      gender: patientInfo?.gender?.toUpperCase(),
+      gender: capitalize(patientInfo?.gender || ''),
       blood_group: patientInfo?.blood_type || '',
       blood_pressure: patientInfo?.blood_pressure || '',
       pulse: patientInfo?.pulse || '',
@@ -70,7 +115,6 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
     ],
     [patient]
   );
-
   const handleEditProfile = () => {
     if (!patientInfo?.user_id) return showErrorToast('Invalid patient details');
     if (navigation?.navigate) {
@@ -84,60 +128,78 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
   return (
     <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
       <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 4 }}>
-        <TouchableOpacity style={s.editProfileBtn} activeOpacity={0.85} onPress={handleEditProfile}>
-          <Text style={s.editProfileBtnText}>Edit Profile</Text>
+        <TouchableOpacity
+          style={patientProfileTabStyles.editProfileBtn}
+          activeOpacity={0.85}
+          onPress={handleEditProfile}
+        >
+          <Text style={patientProfileTabStyles.editProfileBtnText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
-      <View style={s.card}>
-        <Text style={s.cardSectionTitle}>Contact Information</Text>
+      <View style={patientProfileTabStyles.card}>
+        <Text style={patientProfileTabStyles.cardSectionTitle}>Contact Information</Text>
         {contactInfoRows.map((row, i) => (
           <View key={i}>
-            {i > 0 && <View style={s.divider} />}
-            <View style={s.infoRow}>
-              <Text style={s.infoLabel}>{row.label}</Text>
-              <Text style={s.infoValue}>{row.value}</Text>
+            {i > 0 && <View style={patientProfileTabStyles.divider} />}
+            <View style={patientProfileTabStyles.infoRow}>
+              <Text style={patientProfileTabStyles.infoLabel}>{row.label}</Text>
+              <Text style={patientProfileTabStyles.infoValue}>{row.value}</Text>
             </View>
           </View>
         ))}
       </View>
-      <View style={s.card}>
-        <Text style={s.cardSectionTitle}>Personal Details</Text>
+      <View style={patientProfileTabStyles.card}>
+        <Text style={patientProfileTabStyles.cardSectionTitle}>Personal Details</Text>
         {personalDetailRows.map((row, i) => (
           <View key={i}>
-            {i > 0 && <View style={s.divider} />}
-            <View style={s.infoRow}>
-              <Text style={s.infoLabel}>{row.label}</Text>
-              <Text style={s.infoValue}>{row.value}</Text>
+            {i > 0 && <View style={patientProfileTabStyles.divider} />}
+            <View style={patientProfileTabStyles.infoRow}>
+              <Text style={patientProfileTabStyles.infoLabel}>{row.label}</Text>
+              <Text style={patientProfileTabStyles.infoValue}>{row.value}</Text>
             </View>
           </View>
         ))}
       </View>
-      <View style={s.card}>
-        <Text style={s.cardSectionTitle}>Health Vitals</Text>
-        <View style={s.vitalsGrid}>
+      <View style={patientProfileTabStyles.card}>
+        <Text style={patientProfileTabStyles.cardSectionTitle}>Health Vitals</Text>
+        <View style={patientProfileTabStyles.vitalsGrid}>
           {vitalsList.map((v, i) => (
-            <View key={i} style={s.vitalBox}>
-              <Text style={[s.vitalValue, v.value === '—' && { color: '#CBD5E1' }]}>{v.value}</Text>
-              <Text style={s.vitalLabel}>{v.label}</Text>
+            <View key={i} style={patientProfileTabStyles.vitalBox}>
+              <Text
+                style={[
+                  patientProfileTabStyles.vitalValue,
+                  v.value === '—' && { color: '#CBD5E1' },
+                ]}
+              >
+                {v.value}
+              </Text>
+              <Text style={patientProfileTabStyles.vitalLabel}>{v.label}</Text>
             </View>
           ))}
         </View>
       </View>
       {(patient.drug_allergies || patient.medical_history) && (
-        <View style={s.card}>
-          <Text style={s.cardSectionTitle}>Medical Alerts</Text>
+        <View style={patientProfileTabStyles.card}>
+          <Text style={patientProfileTabStyles.cardSectionTitle}>Medical Alerts</Text>
           {patient.drug_allergies && patient.drug_allergies !== 'None' && (
-            <View style={[s.alertBox, { backgroundColor: '#FFF1F2', borderColor: '#FECDD3' }]}>
+            <View
+              style={[
+                patientProfileTabStyles.alertBox,
+                { backgroundColor: '#FFF1F2', borderColor: '#FECDD3' },
+              ]}
+            >
               <View style={{ flex: 1 }}>
-                <Text style={[s.alertLabel, { color: '#BE123C' }]}>Drug Allergies</Text>
-                <Text style={s.alertText}>{patient.drug_allergies}</Text>
+                <Text style={[patientProfileTabStyles.alertLabel, { color: '#BE123C' }]}>
+                  Drug Allergies
+                </Text>
+                <Text style={patientProfileTabStyles.alertText}>{patient.drug_allergies}</Text>
               </View>
             </View>
           )}
           {patient.medical_history && (
             <View
               style={[
-                s.alertBox,
+                patientProfileTabStyles.alertBox,
                 {
                   backgroundColor: theme.colors.primarySoft,
                   borderColor: theme.colors.tealBdr,
@@ -146,13 +208,67 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
               ]}
             >
               <View style={{ flex: 1 }}>
-                <Text style={[s.alertLabel, { color: theme.colors.primary }]}>Medical History</Text>
-                <Text style={s.alertText}>{patient.medical_history}</Text>
+                <Text style={[patientProfileTabStyles.alertLabel, { color: theme.colors.primary }]}>
+                  Medical History
+                </Text>
+                <Text style={patientProfileTabStyles.alertText}>{patient.medical_history}</Text>
               </View>
             </View>
           )}
         </View>
       )}
+      <View style={patientProfileTabStyles.card}>
+        <View style={patientProfileTabStyles.familyHeaderContainer}>
+          <View style={patientProfileTabStyles.familyHeaderLeft}>
+            <Text
+              style={[
+                patientProfileTabStyles.cardSectionTitle,
+                { marginHorizontal: 0, marginTop: 0, marginBottom: 0 },
+              ]}
+            >
+              Family Members
+            </Text>
+            <View style={patientProfileTabStyles.familySectionTag}>
+              <Text style={patientProfileTabStyles.familySectionTagText}>Family Members</Text>
+            </View>
+          </View>
+        </View>
+
+        {familyMemberListPending ? (
+          <ActivityIndicator
+            size="small"
+            color={theme.colors.primary}
+            style={{ paddingVertical: 20 }}
+          />
+        ) : (
+          <FlatList
+            data={familyMemberList || []}
+            keyExtractor={item => String(item.user_id || item.patient_id)}
+            scrollEnabled={false}
+            contentContainerStyle={patientProfileTabStyles.familyCardList}
+            renderItem={({ item }) => (
+              <FamilyMemberCard
+                dateOfBirth={item.date_of_birth}
+                gender={item.gender}
+                name={item.name}
+                patientId={item.patient_id}
+                phone={item.phone}
+                relation={item.relation}
+                email={item.email}
+              />
+            )}
+            ListEmptyComponent={() => (
+              <View style={patientProfileTabStyles.emptyFamilyContainer}>
+                <Text style={patientProfileTabStyles.emptyFamilyText}>
+                  {isFamilyMemberListError
+                    ? `${familyMemberListError?.message || 'Error loading family members'}`
+                    : 'No family members added'}
+                </Text>
+              </View>
+            )}
+          />
+        )}
+      </View>
 
       <View style={{ height: 24 }} />
     </ScrollView>

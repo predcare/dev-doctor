@@ -19,7 +19,6 @@ export const useStatesByCId = (params?: { cId?: number }) =>
     queryFn: () => getStates(params?.cId!),
     enabled: !!params?.cId,
     select: (v: any) => {
-      console.log('second', v);
       if (Array.isArray(v)) return v;
       if (Array.isArray(v?.states)) return v.states;
       return [];

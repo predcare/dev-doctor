@@ -23,6 +23,7 @@ export enum PatientsQueryKeys {
   EmrRecords = 'EmrRecords',
   Prescriptions = 'Prescriptions',
   MyConsults = 'MyConsults',
+  FamilyMembers = 'FamilyMembers',
 }
 
 export enum CommonQueryKeys {

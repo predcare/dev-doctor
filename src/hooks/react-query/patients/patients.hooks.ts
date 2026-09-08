@@ -8,16 +8,19 @@ import {
   getMyPatientsInfo,
   getMyPatientsList,
   getMyPatientsPrescriptions,
+  getPatientsFamilyMembers,
   linkExistingPatient,
   sendPatientCredentials,
   shareEmrDocument,
   sharePrescription,
+  updatePatient,
   uploadEmr,
 } from './patients.funcs';
 import {
   ICreatePatientPayload,
   ILinkExistingPatientPayload,
   ISendPatientCredentialsPayload,
+  IUpdatePatientInfo,
 } from './payload.interfaces';
 
 export const useMyPatientList = (params?: { doctorId?: number | string }) =>
@@ -132,3 +135,21 @@ export const useMyPatientConsults = (params?: { patientId?: number | string }) =
       return [];
     },
   });
+export const useMyPatientFamilyMembers = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.FamilyMembers, params],
+    queryFn: () => getPatientsFamilyMembers(params?.patientId!),
+    enabled: !!params?.patientId,
+    select: v => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.members)) return v.members;
+      return [];
+    },
+  });
+
+export const useUpdatePatientInfo = () => {
+  return useMutation({
+    mutationFn: ({ patientId, body }: { patientId: string | number; body: IUpdatePatientInfo }) =>
+      updatePatient(patientId, body),
+  });
+};

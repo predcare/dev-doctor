@@ -25,7 +25,7 @@ axiosInstance.interceptors.request.use(async config => {
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse<IBaseApiRoot>) => {
     const requestUrl = res.config?.url || '';
-    console.log('requestUrl', requestUrl);
+    console.log('requestUrl', res);
     const method = res.config?.method?.toLowerCase() || '';
     const successMethods = ['post', 'put', 'patch', 'delete'];
     const isSuccessEndpoint = successEndpoints.some(endpoint => requestUrl.includes(endpoint));
@@ -44,7 +44,7 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError<IBaseApiRoot>) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url || '';
-    console.log('requestUrl error', requestUrl);
+    console.log('requestUrl error', error?.response);
     const networkStatus = error?.code === NetworkRoot.ERR_NETWORK;
     const invalidTokenStatuses = [401];
     const isExcludedRoute = exclude401Routes.some(route => requestUrl.includes(route));

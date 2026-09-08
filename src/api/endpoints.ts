@@ -1,4 +1,4 @@
-export const baseUrl = 'https://api-stage.predcare.in';
+export const baseUrl = 'http://192.168.0.107:5000';
 export const baseUrlApi = `${baseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
@@ -39,6 +39,8 @@ export const endpoints = {
     prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
     emrUpload: '/doctor/emr/upload',
     consults: (uid: string | number) => `/doctor/appointments/doctor/patient-consult/${uid}`,
+    familyMembers: (uid: string | number) => `/doctor/patients/family-members/${uid}`,
+    patientUpdate: (uid: number | string) => `/doctor/patients/${uid}`,
   },
   appointments: {
     get: '/doctor/appointments/doctor',

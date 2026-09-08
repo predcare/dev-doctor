@@ -6,6 +6,7 @@ import {
   ICreatePatientResponse,
   ILinkExistingPatientResponse,
   IMyPatientListRoot,
+  IPatientFamilyMemberRoot,
   IPatientInfoRoot,
 } from '../../../typescripts/interfaces/patients.interfaces';
 import { IPatientPrescriptionListRoot } from '../../../typescripts/interfaces/prescriptions.interfaces';
@@ -14,6 +15,7 @@ import {
   ICreatePatientPayload,
   ILinkExistingPatientPayload,
   ISendPatientCredentialsPayload,
+  IUpdatePatientInfo,
 } from './payload.interfaces';
 
 export const getMyPatientsList = async (doctorId: number | string) => {
@@ -95,6 +97,21 @@ export const uploadEmr = async (body: FormData) => {
 export const getMyPatientsConsults = async (patientId: number | string) => {
   const res = await axiosInstance.get<IMyAppointmentsRoot>(
     `${endpoints.patients.consults(patientId)}`
+  );
+  return res.data;
+};
+
+export const getPatientsFamilyMembers = async (patientId: number | string) => {
+  const res = await axiosInstance.get<IPatientFamilyMemberRoot>(
+    `${endpoints.patients.familyMembers(patientId)}`
+  );
+  return res.data;
+};
+
+export const updatePatient = async (patientId: string | number, body: IUpdatePatientInfo) => {
+  const res = await axiosInstance.put<ICommonRoot>(
+    endpoints.patients.patientUpdate(patientId),
+    body
   );
   return res.data;
 };
