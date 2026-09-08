@@ -19,12 +19,18 @@ export const SupportSection = React.memo<SupportSectionProps>(
       <View style={profileStyles.menuGroup}>
         <SettingsRowItem
           icon={<HelpIcon size={18} color={theme.colors.primary} />}
+          label="Contact Support"
+          onPress={() => {}}
+        />
+        <SettingsRowItem
+          icon={<HelpIcon size={18} color={theme.colors.primary} />}
           label="Help Center"
           onPress={onHelpCenter}
         />
+
         <SettingsRowItem
           icon={<ShieldIcon size={18} color={theme.colors.primary} />}
-          label="Privacy Policy"
+          label="Policies"
           onPress={onPrivacyPolicy}
         />
         <SettingsRowItem

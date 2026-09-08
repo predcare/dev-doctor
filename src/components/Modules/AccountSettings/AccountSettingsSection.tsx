@@ -2,7 +2,13 @@ import React from 'react';
 import { View } from 'react-native';
 import { profileStyles } from '../../../styled/ProfileScreen.styled';
 import { theme } from '../../../styled/theme.styled';
-import { HospitalIcon, ProfessionalDetailsIcon } from '../../ui/icons';
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CreditCardIcon,
+  HospitalIcon,
+  ProfessionalDetailsIcon,
+} from '../../ui/icons';
 import SettingsRowItem from './SettingsRowItem';
 import SettingsSectionLabel from './SettingsSectionLabel';
 import SubscriptionPlanBlock from './SubscriptionPlanBlock';
@@ -18,7 +24,13 @@ export interface AccountSettingsSectionProps {
 }
 
 export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
-  ({ onNavigateProfile, subExpanded, onManageSubscription, onAddonPress }) => (
+  ({
+    onNavigateProfile,
+    subExpanded,
+    onManageSubscription,
+    onAddonPress,
+    onToggleSubscription,
+  }) => (
     <>
       <SettingsSectionLabel title="ACCOUNT SETTINGS" />
       <View style={profileStyles.menuGroup}>
@@ -34,7 +46,7 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
         />
 
         {/* Subscription Plan — expandable */}
-        {/* <SettingsRowItem
+        <SettingsRowItem
           icon={<CreditCardIcon size={18} color={theme.colors.primary} />}
           label="Subscription Plan"
           onPress={onToggleSubscription}
@@ -45,7 +57,7 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
               <ChevronDownIcon size={16} color={theme.colors.textMuted} />
             )
           }
-        /> */}
+        />
         {subExpanded && (
           <SubscriptionPlanBlock
             onManageSubscription={onManageSubscription}

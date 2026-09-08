@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { profileStyles } from '../../../styled/ProfileScreen.styled';
@@ -43,7 +44,7 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
       <View style={profileStyles.currentPlanCard}>
         <Text style={profileStyles.expandedMeta}>CURRENT PLAN</Text>
         <View style={profileStyles.planHeaderRow}>
-          <Text style={profileStyles.planName}>Prime Professional</Text>
+          <Text style={profileStyles.planName}>Trial Plan</Text>
           <View style={profileStyles.activeBadge}>
             <Text style={profileStyles.activeBadgeTxt}>ACTIVE</Text>
           </View>
@@ -51,7 +52,7 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
 
         <View style={profileStyles.renewalRow}>
           <ClockIcon size={14} color={theme.colors.textMuted} />
-          <Text style={profileStyles.renewalText}>Renews on Oct 12, 2024</Text>
+          <Text style={profileStyles.renewalText}>Renews on {dayjs().format('MMM DD, YYYY')}</Text>
         </View>
 
         <TouchableOpacity
@@ -63,7 +64,9 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
         </TouchableOpacity>
       </View>
 
-      <Text style={[profileStyles.sectionLabel, { marginTop: 14, marginBottom: 6, marginLeft: 20 }]}>
+      <Text
+        style={[profileStyles.sectionLabel, { marginTop: 14, marginBottom: 6, marginLeft: 20 }]}
+      >
         AVAILABLE ADD-ONS
       </Text>
 
@@ -89,7 +92,10 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
                 profileStyles.addonBtn,
                 item.actionFill
                   ? { backgroundColor: item.actionColor, borderColor: item.actionColor }
-                  : { backgroundColor: theme.colors.surface, borderColor: theme.colors.surfaceBorder },
+                  : {
+                      backgroundColor: theme.colors.surface,
+                      borderColor: theme.colors.surfaceBorder,
+                    },
               ]}
               onPress={() => item.actionFill && onAddonPress?.(item.name)}
               activeOpacity={item.actionFill ? 0.7 : 1}

@@ -6,6 +6,7 @@ import AccountSettingsSection from '../../components/Modules/AccountSettings/Acc
 import AppSettingsSection from '../../components/Modules/AccountSettings/AppSettingsSection';
 import SettingsProfileCard from '../../components/Modules/AccountSettings/SettingsProfileCard';
 import SupportSection from '../../components/Modules/AccountSettings/SupportSection';
+import WalletSection from '../../components/Modules/AccountSettings/WalletSection';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { resetToLogin } from '../../lib/common/navigation.utils';
 import {
@@ -71,9 +72,9 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           }
           onAddonPress={addonName => showComingSoon(`${addonName} add-on purchase is coming soon.`)}
         />
-        {/* <WalletSection
+        <WalletSection
           onTopUp={() => showComingSoon('Messaging credits top-up feature is coming soon.')}
-        /> */}
+        />
         <AppSettingsSection
           onGCToggle={() => showComingSoon('Google Calendar sync is coming soon.')}
           onNotifToggle={() => showComingSoon('Notification settings is coming soon.')}
