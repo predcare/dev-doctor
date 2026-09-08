@@ -9,7 +9,7 @@ import PatientTabBar, {
   TabItem,
 } from '../../components/Modules/PatientDetails/PatientTabBar';
 import PrescriptionsTabPanel from '../../components/Modules/PatientDetails/PrescriptionsTabPanel';
-import PatientProfileTabPanel from '../../components/Modules/PatientDetails/Profile/PatientProfileTabPanel';
+import PatientProfileTabPanel from '../../components/Modules/PatientDetails/PatientProfile/PatientProfileTabPanel';
 import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 import PatientDetailsSkeleton from '../../components/Skeletons/PatientDetailsSkeleton';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
@@ -126,8 +126,8 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
               />
             )}
 
-            {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
             {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />}
+            {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
           </View>
         </>
       )}

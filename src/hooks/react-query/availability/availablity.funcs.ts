@@ -18,7 +18,7 @@ export const deleteAvailability = async (id: number | string) => {
 
 // create
 export const createAvailability = async (doctorId: number | string, body: any) => {
-  const res = await axiosInstance.post(`${endpoints.availablity.create}${doctorId}`, body);
+  const res = await axiosInstance.post(`${endpoints.availablity.create}`, body);
   return res.data;
 };
 

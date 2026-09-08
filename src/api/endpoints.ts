@@ -52,7 +52,7 @@ export const endpoints = {
   availablity: {
     get: '/doctor/doctor-availability/doctor/',
     delete: '/doctor/doctor-availability/',
-    create: '/doctor/doctor-availability/',
+    create: '/doctor/doctor-availability',
     update: '/doctor/doctor-availability/',
     docAvailabilities: '/doctor/doctor-availability/doctor/',
   },

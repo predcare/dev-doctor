@@ -15,7 +15,7 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
   const navigation = useNavigation();
   const patient = useMemo(
     () => ({
-      patientId: patientInfo?.patient_id || 'PAT-1092',
+      patientId: patientInfo?.patient_id || '-',
       name: patientInfo?.name,
       email: patientInfo?.email,
       phone: patientInfo?.phone_number,

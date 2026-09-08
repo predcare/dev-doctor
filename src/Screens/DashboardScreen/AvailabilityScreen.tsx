@@ -86,8 +86,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
   const totalSlotsCount = availablityList?.length || 0;
 
   return (
-    <SafeAreaWrapper edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor={theme.colors.surface} />
+    <SafeAreaWrapper>
       <View style={S.container}>
         <View style={S.header}>
           <TouchableOpacity

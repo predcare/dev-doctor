@@ -12,8 +12,7 @@ import Toast from 'react-native-toast-message';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import type { EditPatientScreenProps } from '../../route';
 import { editPatientStyles as styles } from '../../styled/EditPatientScreen.styled';
-
-const TEAL = '#00897B';
+import theme from '../../styled/theme.styled';
 
 const LockedField = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.inputGroup}>
@@ -192,7 +191,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
           <LockedField label="Date of Birth" value={roDob} />
         </View>
         <View style={styles.sectionRow}>
-          <View style={[styles.sectionBar, { backgroundColor: TEAL }]} />
+          <View style={[styles.sectionBar, { backgroundColor: theme.colors.primary }]} />
           <Text style={styles.sectionTitle}>Address Information</Text>
         </View>
 
