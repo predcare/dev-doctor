@@ -90,7 +90,7 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
             }
 
             const dateStr = formatDateStr(day);
-            const isSelected = selectedDates.includes(dateStr);
+            const isSelected = (selectedDates || []).includes(dateStr);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const isPast = day < today;
@@ -127,13 +127,13 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
         </View>
 
         {/* Selected Dates Chips Row */}
-        {selectedDates.length > 0 && (
+        {(selectedDates || []).length > 0 && (
           <View style={s.chipsSection}>
             <Text style={s.chipsTitle}>
               {mode === 'specific' ? `Selected Dates (${selectedDates.length}):` : `Leave Dates (${selectedDates.length}):`}
             </Text>
             <View style={s.chipsRow}>
-              {selectedDates.map(dateStr => (
+              {(selectedDates || []).map(dateStr => (
                 <TouchableOpacity
                   key={dateStr}
                   style={[s.chipPill, mode === 'leave' && s.chipPillLeave]}

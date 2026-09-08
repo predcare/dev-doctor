@@ -128,7 +128,7 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
           <Text style={s.label}>RECURRING DAYS</Text>
           <View style={s.daysRow}>
             {DAYS_OF_WEEK.map(d => {
-              const isSel = recurringDays.includes(d.key);
+              const isSel = (recurringDays || []).includes(d.key);
               return (
                 <TouchableOpacity
                   key={d.key}
@@ -144,7 +144,6 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
           {Boolean(recurringDaysError) && <Text style={s.cellErrorTxt}>{recurringDaysError}</Text>}
         </View>
 
-        {/* Calendar Picker Modal */}
         <Modal
           visible={modalState.visible}
           transparent

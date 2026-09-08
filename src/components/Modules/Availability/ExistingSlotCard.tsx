@@ -64,13 +64,18 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     const [expandedLeaves, setExpandedLeaves] = useState(false);
     const [expandedRecurringDates, setExpandedRecurringDates] = useState(false);
 
+    const safeSelectedDates = useMemo(() => selected_dates || [], [selected_dates]);
+    const safeRecurringDays = useMemo(() => recurring_days || [], [recurring_days]);
+    const safeRecurringDates = useMemo(() => recurring_dates || [], [recurring_dates]);
+    const safeLeaveDates = useMemo(() => leave_dates || [], [leave_dates]);
+
     const isSpecific = useMemo(() => {
       return date_selection_mode === 'specific';
     }, [date_selection_mode]);
 
     const formattedRecurringDays = useMemo(() => {
-      return recurring_days.map(day => capitalizeFirstLetter(day)).join(', ');
-    }, [recurring_days]);
+      return safeRecurringDays.map(day => capitalizeFirstLetter(day)).join(', ');
+    }, [safeRecurringDays]);
 
     const formattedFromTime = useMemo(() => {
       return formatDisplayTime(from_time);
@@ -193,59 +198,59 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
             )}
           </View>
         </View>
-        {isSpecific && selected_dates.length > 0 && (
+        {isSpecific && safeSelectedDates.length > 0 && (
           <View style={s.slotDatesRow}>
             <Text style={s.slotDatesLabel}>AVAILABLE DATES</Text>
             <Text style={s.slotDatesValue}>
               {expandedDates
-                ? selected_dates.map(d => formatDisplayDate(d)).join(', ')
-                : selected_dates
+                ? safeSelectedDates.map(d => formatDisplayDate(d)).join(', ')
+                : safeSelectedDates
                     .slice(0, 3)
                     .map(d => formatDisplayDate(d))
                     .join(', ')}
-              {selected_dates.length > 3 && (
+              {safeSelectedDates.length > 3 && (
                 <Text style={s.moreDatesLink} onPress={() => setExpandedDates(!expandedDates)}>
-                  {expandedDates ? '  show less' : `  +${selected_dates.length - 3} more`}
+                  {expandedDates ? '  show less' : `  +${safeSelectedDates.length - 3} more`}
                 </Text>
               )}
             </Text>
           </View>
         )}
-        {!isSpecific && recurring_dates.length > 0 && (
+        {!isSpecific && safeRecurringDates.length > 0 && (
           <View style={s.slotDatesRow}>
-            <Text style={s.slotDatesLabel}>RECURRING DATES ({recurring_dates.length})</Text>
+            <Text style={s.slotDatesLabel}>RECURRING DATES ({safeRecurringDates.length})</Text>
             <Text style={s.slotDatesValue}>
               {expandedRecurringDates
-                ? recurring_dates.map(d => formatDisplayDate(d)).join(', ')
-                : recurring_dates
+                ? safeRecurringDates.map(d => formatDisplayDate(d)).join(', ')
+                : safeRecurringDates
                     .slice(0, 4)
                     .map(d => formatDisplayDate(d))
                     .join(', ')}
-              {recurring_dates.length > 4 && (
+              {safeRecurringDates.length > 4 && (
                 <Text
                   style={s.moreDatesLink}
                   onPress={() => setExpandedRecurringDates(!expandedRecurringDates)}
                 >
-                  {expandedRecurringDates ? '  show less' : `  +${recurring_dates.length - 4} more`}
+                  {expandedRecurringDates ? '  show less' : `  +${safeRecurringDates.length - 4} more`}
                 </Text>
               )}
             </Text>
           </View>
         )}
-        {leave_dates.length > 0 && (
+        {safeLeaveDates.length > 0 && (
           <View style={s.slotLeaveRow}>
             <View style={{ flex: 1 }}>
               <Text style={s.slotLeaveLabel}>LEAVES</Text>
               <Text style={s.slotLeaveValue}>
                 {expandedLeaves
-                  ? leave_dates.map(d => formatDisplayDate(d)).join(', ')
-                  : leave_dates
+                  ? safeLeaveDates.map(d => formatDisplayDate(d)).join(', ')
+                  : safeLeaveDates
                       .slice(0, 2)
                       .map(d => formatDisplayDate(d))
                       .join(', ')}
-                {leave_dates.length > 2 && (
+                {safeLeaveDates.length > 2 && (
                   <Text style={s.moreLeavesLink} onPress={() => setExpandedLeaves(!expandedLeaves)}>
-                    {expandedLeaves ? '  show less' : `  +${leave_dates.length - 2} more`}
+                    {expandedLeaves ? '  show less' : `  +${safeLeaveDates.length - 2} more`}
                   </Text>
                 )}
               </Text>

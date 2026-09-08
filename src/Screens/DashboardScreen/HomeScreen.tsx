@@ -135,7 +135,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <Header
         isHome
         onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
-        onProfilePress={() => navigation?.navigate(AppRoute.DOCTOR_PROFILE)}
+        onProfilePress={() =>
+          navigation?.navigate(AppRoute.MAIN_TABS, {
+            screen: AppRoute.ACCOUNT,
+          })
+        }
       />
       <ScrollView
         style={homeStyles.container}
