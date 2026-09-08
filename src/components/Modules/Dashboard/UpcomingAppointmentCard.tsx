@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { getInitials } from '../../../lib/common/common.utils';
+import { capitalize, getInitials } from '../../../lib/common/common.utils';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 import { ClockIcon } from '../../ui/icons';
@@ -30,13 +30,15 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
 }) => {
   return (
     <View style={homeStyles.appointmentCard}>
-      <View style={homeStyles.apptTimeRow}>
-        <View style={homeStyles.timeGroup}>
-          <ClockIcon size={14} color={theme.colors.primary} style={{ marginRight: 4 }} />
-          <Text style={homeStyles.apptTime}>{time}</Text>
+      {time && (
+        <View style={homeStyles.apptTimeRow}>
+          <View style={homeStyles.timeGroup}>
+            <ClockIcon size={14} color={theme.colors.primary} style={{ marginRight: 4 }} />
+            <Text style={homeStyles.apptTime}>{time}</Text>
+          </View>
+          <Text style={homeStyles.apptDistance}>{timeDistance}</Text>
         </View>
-        <Text style={homeStyles.apptDistance}>{timeDistance}</Text>
-      </View>
+      )}
 
       <View style={homeStyles.apptPatientRow}>
         <View style={[homeStyles.apptAvatar, { backgroundColor: theme.colors.primary }]}>
@@ -50,7 +52,7 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
           <Text style={homeStyles.patientMetaText}>{ageGender?.toUpperCase()}</Text>
           <View style={[homeStyles.consultChip, { backgroundColor: theme.colors.primarySoft }]}>
             <Text style={[homeStyles.consultChipText, { color: theme.colors.primary }]}>
-              {consultType.toUpperCase()}
+              {capitalize(consultType)}
             </Text>
           </View>
           {chiefComplaint && (

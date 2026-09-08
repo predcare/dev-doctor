@@ -153,7 +153,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <View style={homeStyles.insightsSection}>
           <View style={homeStyles.insightsHeader}>
             <Text style={homeStyles.insightsTitle}>Highlights & Insights</Text>
-            <View style={{ position: 'relative', zIndex: 10 }}>
+            <View style={{ position: 'relative' }}>
               <TouchableOpacity
                 style={homeStyles.periodPill}
                 onPress={() => setShowPeriodMenu(v => !v)}

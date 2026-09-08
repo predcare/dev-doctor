@@ -167,7 +167,12 @@ export const checkIsExpired = (
   return false;
 };
 
-export const getTimeUntilStart = (startTime: string): string => {
+export const getTimeUntilStart = (startTime?: string): string => {
+  if (!startTime || typeof startTime !== 'string') {
+    console.warn('Invalid startTime provided to getTimeUntilStart:', startTime);
+    return '';
+  }
+
   const now = new Date();
 
   const [hours, minutes, seconds] = startTime.split(':').map(Number);

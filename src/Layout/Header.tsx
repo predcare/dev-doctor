@@ -95,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
             </View>
 
             <View style={headerStyles.greetingContainer}>
-              <Text style={headerStyles.welcomeText}>Good morning 👋</Text>
+              {/* <Text style={headerStyles.welcomeText}>Good morning 👋</Text> */}
               <Text style={headerStyles.doctorName}>{userData?.name || 'Unknown'}</Text>
               <Text style={headerStyles.specialtyText}>
                 {userData?.specialization || 'Unknown'}
