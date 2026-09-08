@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Animated, PanResponder, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { formatDate } from '../../../lib/common/common.utils';
 import { theme } from '../../../styled/theme.styled';
 import {
   IMetadata,
@@ -176,7 +177,9 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 )}
                 {!!metadata.appointment_date && (
                   <View style={styles.metadataChip}>
-                    <Text style={styles.metadataChipText}>📅 {metadata.appointment_date}</Text>
+                    <Text style={styles.metadataChipText}>
+                      📅 {formatDate(metadata.appointment_date, 'DD MMM YYYY')}
+                    </Text>
                   </View>
                 )}
                 {!!metadata.appointment_slot_time && metadata.appointment_slot_time !== 'N/A' && (
@@ -192,7 +195,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 {!!metadata.new_date && (
                   <View style={styles.metadataChip}>
                     <Text style={styles.metadataChipText}>
-                      📅 {new Date(metadata.new_date).toLocaleDateString()}
+                      📅 {formatDate(metadata.new_date, 'DD MMM YYYY')}
                     </Text>
                   </View>
                 )}

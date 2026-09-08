@@ -119,54 +119,6 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
     const hideFee = useWatch({ control, name: 'hideFee' }) ?? false;
     const requirePayment = useWatch({ control, name: 'requirePayment' }) ?? false;
 
-    useEffect(() => {
-      if (editingSlot) {
-        reset({
-          editorTab:
-            editingSlot.date_selection_mode === 'recurring' ||
-            editingSlot.date_selection_mode === 'leave' ||
-            editingSlot.date_selection_mode === 'specific'
-              ? editingSlot.date_selection_mode
-              : 'specific',
-          selectedDates: editingSlot.selected_dates || [],
-          recurringDays: editingSlot.recurring_days || [],
-          startDate: editingSlot.recurring_start_date || null,
-          endDate: editingSlot.recurring_end_date || null,
-          leaveDates: editingSlot.leave_dates || [],
-          fromTime: parseTimeStringToTimeValue(editingSlot.from_time),
-          toTime: parseTimeStringToTimeValue(editingSlot.to_time),
-          consultationType:
-            editingSlot.consultation_type === 'video' ||
-            editingSlot.consultation_type === 'both' ||
-            editingSlot.consultation_type === 'in-person'
-              ? editingSlot.consultation_type
-              : 'in-person',
-          slotDuration: editingSlot.slot_duration || 30,
-          inPersonFee: editingSlot.in_person_fee ? String(editingSlot.in_person_fee) : '',
-          videoFee: editingSlot.video_fee ? String(editingSlot.video_fee) : '',
-          hideFee: Boolean(editingSlot.hide_fee),
-          requirePayment: Boolean(editingSlot.require_payment),
-        });
-      } else {
-        reset({
-          editorTab: 'specific',
-          selectedDates: [],
-          recurringDays: [],
-          startDate: null,
-          endDate: null,
-          leaveDates: [],
-          fromTime: { hour: '09', minute: '00', period: 'AM' },
-          toTime: { hour: '05', minute: '00', period: 'PM' },
-          consultationType: 'in-person',
-          slotDuration: 30,
-          inPersonFee: '',
-          videoFee: '',
-          hideFee: false,
-          requirePayment: false,
-        });
-      }
-    }, [editingSlot, reset]);
-
     const handleToggleDate = (dateStr: string) => {
       const current = selectedDates;
       const updated = current.includes(dateStr)
@@ -264,8 +216,6 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
           }
         }
       }
-
-      // 3. Single Slot Payload Construction
       const slotPayload: Record<string, any> = {
         date_selection_mode: data.editorTab,
         selected_dates: data.editorTab === 'specific' ? data.selectedDates : [],
@@ -318,7 +268,6 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
           }
         );
       } else {
-        // POST OPERATION: Wrap slotPayload inside { doctor_id, clinic_id, slots: [slotPayload] }
         const createPayload = {
           doctor_id: Number(userData.user_id),
           clinic_id: userData.clinic_id ? Number(userData.clinic_id) : 1,
@@ -354,6 +303,54 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
         );
       }
     };
+
+    useEffect(() => {
+      if (editingSlot) {
+        reset({
+          editorTab:
+            editingSlot.date_selection_mode === 'recurring' ||
+            editingSlot.date_selection_mode === 'leave' ||
+            editingSlot.date_selection_mode === 'specific'
+              ? editingSlot.date_selection_mode
+              : 'specific',
+          selectedDates: editingSlot.selected_dates || [],
+          recurringDays: editingSlot.recurring_days || [],
+          startDate: editingSlot.recurring_start_date || null,
+          endDate: editingSlot.recurring_end_date || null,
+          leaveDates: editingSlot.leave_dates || [],
+          fromTime: parseTimeStringToTimeValue(editingSlot.from_time),
+          toTime: parseTimeStringToTimeValue(editingSlot.to_time),
+          consultationType:
+            editingSlot.consultation_type === 'video' ||
+            editingSlot.consultation_type === 'both' ||
+            editingSlot.consultation_type === 'in-person'
+              ? editingSlot.consultation_type
+              : 'in-person',
+          slotDuration: editingSlot.slot_duration || 30,
+          inPersonFee: editingSlot.in_person_fee ? String(editingSlot.in_person_fee) : '',
+          videoFee: editingSlot.video_fee ? String(editingSlot.video_fee) : '',
+          hideFee: Boolean(editingSlot.hide_fee),
+          requirePayment: Boolean(editingSlot.require_payment),
+        });
+      } else {
+        reset({
+          editorTab: 'specific',
+          selectedDates: [],
+          recurringDays: [],
+          startDate: null,
+          endDate: null,
+          leaveDates: [],
+          fromTime: { hour: '09', minute: '00', period: 'AM' },
+          toTime: { hour: '05', minute: '00', period: 'PM' },
+          consultationType: 'in-person',
+          slotDuration: 30,
+          inPersonFee: '',
+          videoFee: '',
+          hideFee: false,
+          requirePayment: false,
+        });
+      }
+    }, [editingSlot, reset]);
 
     return (
       <View style={s.card}>
