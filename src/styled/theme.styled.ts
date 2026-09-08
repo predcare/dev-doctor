@@ -13,7 +13,7 @@ export const theme = {
     mintBg: '#CCFBF1', // Light Mint Badge Background
     mintBdr: '#99F6E4', // Mint Border
 
-    accent: '#0284C7', // Sky Blue Accent
+    accent: '#1D4ED8', // Sky Blue Accent
     accentLight: '#E0F2FE', // Light Sky Blue
 
     // Status colors
@@ -31,7 +31,7 @@ export const theme = {
     infoSoft: '#DBEAFE',
 
     // Neutral & Surface Colors
-    background: '#F8FAFC',
+    background: '#F1F5F9',
     surface: '#FFFFFF',
     surfaceSecondary: '#F1F5F9',
     surfaceBorder: '#E2E8F0',
