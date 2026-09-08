@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceBanner';
 import HomeStatsCard from '../../components/Modules/Dashboard/HomeStatsCard';
@@ -68,35 +68,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [showPeriodMenu, setShowPeriodMenu] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { userData } = useAuthStore(state => state);
-
-  const menuRef = useRef<View>(null);
-
-  useEffect(() => {
-    if (!showPeriodMenu) return;
-
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (menuRef.current) {
-        const node = menuRef.current as unknown as HTMLElement;
-        if (node && typeof node.contains === 'function') {
-          if (!node.contains(event.target as Node)) {
-            setShowPeriodMenu(false);
-          }
-        }
-      }
-    };
-
-    if (typeof document !== 'undefined') {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
-    }
-
-    return () => {
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('mousedown', handleClickOutside);
-        document.removeEventListener('touchstart', handleClickOutside);
-      }
-    };
-  }, [showPeriodMenu]);
 
   const {
     data: boardStats,
@@ -182,7 +153,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <View style={homeStyles.insightsSection}>
           <View style={homeStyles.insightsHeader}>
             <Text style={homeStyles.insightsTitle}>Highlights & Insights</Text>
-            <View  style={{ position: 'relative', zIndex: 10 }}>
+            <View style={{ position: 'relative', zIndex: 10 }}>
               <TouchableOpacity
                 style={homeStyles.periodPill}
                 onPress={() => setShowPeriodMenu(v => !v)}

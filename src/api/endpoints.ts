@@ -1,4 +1,4 @@
-export const baseUrl = 'http://192.168.0.107:5000';
+export const baseUrl = 'https://api-stage.predcare.in';
 export const baseUrlApi = `${baseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
