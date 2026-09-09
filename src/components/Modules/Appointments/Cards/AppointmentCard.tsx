@@ -139,7 +139,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           },
           {
             id: 'prescription',
-            label: 'Create Prescription',
+            label: 'Prescription',
             icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
             color: theme.colors.primary,
             onPress: () => onCreatePrescription?.(),
@@ -169,15 +169,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             onPress: () => onViewDetails?.(),
           },
           {
-            id: 'complete',
-            label: 'Mark as Completed',
-            icon: <CheckIcon size={18} color="#10B981" />,
-            color: '#10B981',
-            onPress: () => onComplete?.(),
-          },
-          {
             id: 'prescription',
-            label: 'Create Prescription',
+            label: 'Prescription',
             icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
             color: theme.colors.primary,
             onPress: () => onCreatePrescription?.(),

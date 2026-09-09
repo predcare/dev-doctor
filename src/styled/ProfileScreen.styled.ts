@@ -44,7 +44,7 @@ export const profileStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   doctorName: {
-    fontSize: theme.fontSize.md - 0.5,
+    fontSize: theme.fontSize.md,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.dark,
     marginBottom: 2,
@@ -121,7 +121,7 @@ export const profileStyles = StyleSheet.create({
     marginRight: 13,
   },
   rowLabel: {
-    fontSize: theme.fontSize.sm,
+    fontSize: theme.fontSize.xs,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     flex: 1,

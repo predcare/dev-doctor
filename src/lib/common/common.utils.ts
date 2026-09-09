@@ -252,3 +252,19 @@ export const maskValue = (value: string) => {
   if (value.length <= 2) return value;
   return value.slice(0, 2) + '*'.repeat(value.length - 2);
 };
+
+export const formatStatus = (status?: string): string => {
+  if (!status) return '';
+  const s = status.trim().toLowerCase();
+  if (s === 'in_progress' || s === 'in-progress' || s === 'inprogress') {
+    return 'In Progress';
+  }
+  if (s === 'completed') return 'Completed';
+  if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
+  if (s === 'pending') return 'Pending';
+  if (s === 'confirmed') return 'Confirmed';
+
+  return s
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+};

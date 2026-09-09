@@ -1,6 +1,14 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Svg, { Path, Rect } from 'react-native-svg';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Dimensions,
+  Modal,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceBanner';
 import HomeStatsCard from '../../components/Modules/Dashboard/HomeStatsCard';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
@@ -19,6 +27,7 @@ import {
   ScheduleIcon,
   WalletIcon,
 } from '../../components/ui/icons';
+import EmptyIcon from '../../components/ui/icons/EmptyIcon';
 import { useHomeStats, useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
 import { Header } from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
@@ -67,6 +76,8 @@ const quickAccessItems = [
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [period, setPeriod] = useState<PeriodKey>('week');
   const [showPeriodMenu, setShowPeriodMenu] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 155, right: 16 });
+  const pillRef = useRef<View>(null);
   const [refreshing, setRefreshing] = useState(false);
   const { userData } = useAuthStore(state => state);
 
@@ -86,6 +97,21 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   } = useHomeUpcomingAppts({
     doctorId: userData?.user_id || '',
   });
+
+  const togglePeriodMenu = useCallback(() => {
+    if (showPeriodMenu) {
+      setShowPeriodMenu(false);
+    } else {
+      pillRef.current?.measureInWindow((x, y, width, height) => {
+        const screenWidth = Dimensions.get('window').width;
+        setMenuPos({
+          top: y + height + 6,
+          right: Math.max(16, screenWidth - (x + width)),
+        });
+        setShowPeriodMenu(true);
+      });
+    }
+  }, [showPeriodMenu]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -127,9 +153,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     ];
   }, [boardStats, period]);
 
-  const filtersUpcomingAppts = useMemo(() => {
-    return upcomingAppts || [];
-  }, [upcomingAppts]);
+  useEffect(() => {
+    const unsubscribe = navigation?.addListener('blur', () => {
+      setShowPeriodMenu(false);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaWrapper>
@@ -142,156 +171,166 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           })
         }
       />
-      <ScrollView
-        style={homeStyles.container}
-        contentContainerStyle={homeStyles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[theme.colors.primary]}
-            tintColor={theme.colors.primary}
-          />
-        }
-      >
-        <View style={homeStyles.insightsSection}>
-          <View style={homeStyles.insightsHeader}>
-            <Text style={homeStyles.insightsTitle}>Highlights & Insights</Text>
-            <View style={{ position: 'relative' }}>
-              <TouchableOpacity
-                style={homeStyles.periodPill}
-                onPress={() => setShowPeriodMenu(v => !v)}
-                activeOpacity={0.8}
-              >
-                <Text style={homeStyles.periodPillText}>{PERIOD_LABELS[period]}</Text>
-                {showPeriodMenu ? (
-                  <ChevronUpIcon size={12} color={theme.colors.primary} />
-                ) : (
-                  <ChevronDownIcon size={12} color={theme.colors.primary} />
-                )}
-              </TouchableOpacity>
+      <View style={{ flex: 1, position: 'relative' }}>
+        <ScrollView
+          style={homeStyles.container}
+          contentContainerStyle={homeStyles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          onScrollBeginDrag={() => setShowPeriodMenu(false)}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+        >
+          <View style={homeStyles.insightsSection}>
+            <View style={homeStyles.insightsHeader}>
+              <Text style={homeStyles.insightsTitle}>Highlights & Insights</Text>
+              <View style={{ position: 'relative', zIndex: 100 }} ref={pillRef}>
+                <TouchableOpacity
+                  style={homeStyles.periodPill}
+                  onPress={togglePeriodMenu}
+                  activeOpacity={0.8}
+                >
+                  <Text style={homeStyles.periodPillText}>{PERIOD_LABELS[period]}</Text>
+                  {showPeriodMenu ? (
+                    <ChevronUpIcon size={12} color={theme.colors.primary} />
+                  ) : (
+                    <ChevronDownIcon size={12} color={theme.colors.primary} />
+                  )}
+                </TouchableOpacity>
 
-              {showPeriodMenu && (
-                <View style={homeStyles.periodDropdownMenu}>
-                  {(Object.entries(PERIOD_LABELS) as [PeriodKey, string][]).map(([key, label]) => (
-                    <TouchableOpacity
-                      key={key}
-                      onPress={() => {
-                        setPeriod(key);
-                        setShowPeriodMenu(false);
-                      }}
-                      activeOpacity={0.75}
-                      style={homeStyles.periodMenuItem}
+                {showPeriodMenu && (
+                  <Modal
+                    transparent
+                    visible={showPeriodMenu}
+                    animationType="fade"
+                    onRequestClose={() => setShowPeriodMenu(false)}
+                  >
+                    <Pressable
+                      style={homeStyles.screenBackdrop}
+                      onPress={() => setShowPeriodMenu(false)}
                     >
-                      <Text
+                      <View
                         style={[
-                          homeStyles.periodMenuItemText,
-                          period === key && homeStyles.periodMenuItemTextActive,
+                          homeStyles.periodDropdownMenu,
+                          { top: menuPos.top, right: menuPos.right },
                         ]}
                       >
-                        {label}
-                      </Text>
-                      {period === key && <CheckIcon size={14} color={theme.colors.primary} />}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
+                        {(Object.entries(PERIOD_LABELS) as [PeriodKey, string][]).map(
+                          ([key, label]) => (
+                            <TouchableOpacity
+                              key={key}
+                              onPress={() => {
+                                setPeriod(key);
+                                setShowPeriodMenu(false);
+                              }}
+                              activeOpacity={0.75}
+                              style={homeStyles.periodMenuItem}
+                            >
+                              <Text
+                                style={[
+                                  homeStyles.periodMenuItemText,
+                                  period === key && homeStyles.periodMenuItemTextActive,
+                                ]}
+                              >
+                                {label}
+                              </Text>
+                              {period === key && (
+                                <CheckIcon size={14} color={theme.colors.primary} />
+                              )}
+                            </TouchableOpacity>
+                          )
+                        )}
+                      </View>
+                    </Pressable>
+                  </Modal>
+                )}
+              </View>
             </View>
+
+            {statsPending ? (
+              <HomeStatSkeleton />
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: theme.spacing.lg }}
+              >
+                {homeStats.map(stat => (
+                  <HomeStatsCard
+                    key={stat.id}
+                    label={stat.label}
+                    value={stat.value}
+                    icon={stat.icon}
+                    iconBg={stat.iconBg}
+                  />
+                ))}
+              </ScrollView>
+            )}
           </View>
 
-          {statsPending ? (
-            <HomeStatSkeleton />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingRight: theme.spacing.lg }}
+          <View style={homeStyles.sectionHeader}>
+            <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
+            <TouchableOpacity
+              onPress={() => navigation?.navigate(AppRoute.PATIENTS)}
+              activeOpacity={0.7}
             >
-              {homeStats.map(stat => (
-                <HomeStatsCard
-                  key={stat.id}
-                  label={stat.label}
-                  value={stat.value}
-                  icon={stat.icon}
-                  iconBg={stat.iconBg}
+              <Text style={homeStyles.sectionLink}>See All</Text>
+            </TouchableOpacity>
+          </View>
+
+          {upcomiongApptsPending ? (
+            <AppointmentSkeleton />
+          ) : upcomingAppts && upcomingAppts?.length > 0 ? (
+            upcomingAppts?.slice(0, 3)?.map(apt => {
+              const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
+              return (
+                <UpcomingAppointmentCard
+                  key={apt.appointment_id}
+                  id={String(apt.id)}
+                  patientName={apt.patient_name || 'Patient'}
+                  ageGender={apt.patient_gender}
+                  time={formatTime12h(apt.start_time)}
+                  timeDistance={getTimeUntilStart(apt?.start_time)}
+                  consultType={apt.consultation_type || 'ONLINE'}
+                  chiefComplaint={apt.symptoms || apt.reason || ''}
+                  isExpired={isExpired}
+                  onActionPress={() => {
+                    navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
+                  }}
                 />
-              ))}
-            </ScrollView>
+              );
+            })
+          ) : (
+            <View style={homeStyles.emptyCard}>
+              <EmptyIcon />
+              <Text style={homeStyles.emptyText}>No upcoming appointments for today</Text>
+              <Text style={homeStyles.emptySub}>Tap here to add a new one</Text>
+            </View>
           )}
-        </View>
 
-        <View style={homeStyles.sectionHeader}>
-          <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
-          <TouchableOpacity
-            onPress={() => navigation?.navigate(AppRoute.PATIENTS)}
-            activeOpacity={0.7}
-          >
-            <Text style={homeStyles.sectionLink}>See All</Text>
-          </TouchableOpacity>
-        </View>
+          <AssistanceBanner onContactSupport={() => navigation?.navigate(AppRoute.ACCOUNT)} />
 
-        {upcomiongApptsPending ? (
-          <AppointmentSkeleton />
-        ) : filtersUpcomingAppts && filtersUpcomingAppts?.length > 0 ? (
-          filtersUpcomingAppts?.slice(0, 3)?.map(apt => {
-            const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
-            return (
-              <UpcomingAppointmentCard
-                key={apt.appointment_id}
-                id={String(apt.id)}
-                patientName={apt.patient_name || 'Patient'}
-                ageGender={apt.patient_gender}
-                time={formatTime12h(apt.start_time)}
-                timeDistance={getTimeUntilStart(apt?.start_time)}
-                consultType={apt.consultation_type || 'ONLINE'}
-                chiefComplaint={apt.symptoms || apt.reason || ''}
-                isExpired={isExpired}
-                onActionPress={() => {
-                  navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
-                }}
-              />
-            );
-          })
-        ) : (
-          <View style={homeStyles.emptyCard}>
-            <Svg
-              width={40}
-              height={40}
-              viewBox="0 0 24 24"
-              fill="none"
-              style={{ marginBottom: 10, opacity: 0.3 }}
-            >
-              <Rect x="3" y="4" width="18" height="18" rx="2" stroke="#888" strokeWidth="1.8" />
-              <Path
-                d="M16 2v4M8 2v4M3 10h18"
-                stroke="#888"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </Svg>
-            <Text style={homeStyles.emptyText}>No upcoming appointments for today</Text>
-            <Text style={homeStyles.emptySub}>Tap here to add a new one</Text>
+          <View style={homeStyles.sectionHeader}>
+            <Text style={homeStyles.sectionTitle}>Quick Access</Text>
           </View>
-        )}
 
-        <AssistanceBanner onContactSupport={() => navigation?.navigate(AppRoute.ACCOUNT)} />
-
-        <View style={homeStyles.sectionHeader}>
-          <Text style={homeStyles.sectionTitle}>Quick Access</Text>
-        </View>
-
-        <View style={homeStyles.quickAccessGrid}>
-          {quickAccessItems.map(item => (
-            <QuickAccessCard
-              key={item.id}
-              label={item.label}
-              icon={item.icon}
-              onPress={() => navigation?.navigate(item.screen)}
-            />
-          ))}
-        </View>
-      </ScrollView>
+          <View style={homeStyles.quickAccessGrid}>
+            {quickAccessItems.map(item => (
+              <QuickAccessCard
+                key={item.id}
+                label={item.label}
+                icon={item.icon}
+                onPress={() => navigation?.navigate(item.screen)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaWrapper>
   );
 };

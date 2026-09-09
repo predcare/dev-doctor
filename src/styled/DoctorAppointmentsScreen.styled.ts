@@ -289,14 +289,15 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // Chips Row
   chipsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    paddingHorizontal: 14,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
     paddingBottom: 10,
     gap: 3,
+    marginBottom: 5,
   },
   chip: {
     flexDirection: 'row',
@@ -308,7 +309,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderWidth: 1,
   },
   chipText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
   },
 

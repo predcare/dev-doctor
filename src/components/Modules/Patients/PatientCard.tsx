@@ -11,10 +11,11 @@ export interface PatientCardProps {
   gender: string;
   age: string;
   condition?: string;
+  phoneNumber?: string;
 }
 
 export const PatientCard: React.FC<PatientCardProps> = React.memo(
-  ({ onPress, name, patientId, gender, age, condition }) => {
+  ({ onPress, name, patientId, gender, age, condition, phoneNumber }) => {
     return (
       <TouchableOpacity style={styles.txCard} onPress={onPress} activeOpacity={0.75}>
         <View style={styles.avatar}>
@@ -32,8 +33,10 @@ export const PatientCard: React.FC<PatientCardProps> = React.memo(
             {age || 'N/A'}
             {condition ? `  •  ${condition}` : ''}
           </Text>
+          <Text style={styles.txSub} numberOfLines={1}>
+            Phone: +91-{phoneNumber || 'N/A'}
+          </Text>
         </View>
-
         <ChevronRightIcon size={16} color={theme.colors.textMuted} />
       </TouchableOpacity>
     );

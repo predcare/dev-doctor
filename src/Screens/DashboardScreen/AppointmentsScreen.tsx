@@ -34,7 +34,6 @@ import {
   formatTodayBannerDate,
 } from '../../lib/common/common.utils';
 import { showErrorToast } from '../../lib/common/toast.utils';
-import { MockAppointment } from '../../resources/mockData';
 import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
@@ -59,7 +58,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
     activeTarget: null,
   });
 
-  const [selectedDetailsApt, setSelectedDetailsApt] = useState<MockAppointment | null>(null);
+  const [selectedDetailsApt, setSelectedDetailsApt] = useState<IAppointmentDoc | null>(null);
   const [confirmCompleteAptId, setConfirmCompleteAptId] = useState<number | string | null>(null);
 
   const { userData } = useAuthStore(state => state);
@@ -518,7 +517,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
 
       <AppointmentInfoModal
         visible={selectedDetailsApt !== null}
-        appointment={selectedDetailsApt}
+        appointment={selectedDetailsApt || null}
         onClose={handleCloseDetailsModal}
       />
 

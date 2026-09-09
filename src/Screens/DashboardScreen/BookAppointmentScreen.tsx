@@ -18,7 +18,7 @@ import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { ChevronLeftIcon } from '../../components/ui/icons';
 import { useBookAppointments } from '../../hooks/react-query/appointments/appointments.hooks';
 import { ICreateAppointmentPayload } from '../../hooks/react-query/auth/payload.interfaces';
-import { useMyAvailablities } from '../../hooks/react-query/availability/availablity.hooks';
+import { useBookingAvailablities } from '../../hooks/react-query/availability/availablity.hooks';
 import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { capitalize } from '../../lib/common/common.utils';
@@ -28,10 +28,10 @@ import { bookAppointmentStyles as S } from '../../styled/BookAppointmentScreen.s
 import theme from '../../styled/theme.styled';
 import {
   formatTime12h,
-  groupSlotsByPeriod,
+  groupBookingSlotsByPeriod,
   ISlotItem,
   normalizeApiTime,
-  parseDoctorAvailableDates,
+  parseBookingAvailableDates,
   SlotPeriod,
 } from '../../utils/availabilityUtils';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
@@ -90,36 +90,30 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () =>
   });
 
   const {
-    data: myAvailblities,
-    isFetching: myAvailPending,
-    refetch: refetchAvailablities,
-  } = useMyAvailablities({
-    doctorId: selectedPatient?.patientGenId ? userData?.user_id : undefined,
+    data: bookingAvailablities,
+    isFetching: bookingAvailPending,
+    refetch: refetchBookingAvailablities,
+  } = useBookingAvailablities({
+    clinicId: userData?.clinic_id || 0,
+    doctorId: userData?.user_id || 0,
   });
 
   const { mutate: bookAppt, isPending: bookApptPending } = useBookAppointments();
 
-  const activeAvailabilityDoc = useMemo(() => {
-    if (myAvailblities?.[0]) {
-      return myAvailblities[0];
-    }
-    return [];
-  }, [myAvailblities]);
-
   const availableDates = useMemo<AvailableDateItem[]>(() => {
-    return parseDoctorAvailableDates(activeAvailabilityDoc);
-  }, [activeAvailabilityDoc]);
+    return parseBookingAvailableDates(bookingAvailablities);
+  }, [bookingAvailablities]);
 
   const periodWiseSlots = useMemo(() => {
-    if (!formStates.selectedDate || !activeAvailabilityDoc) {
+    if (!formStates.selectedDate || !bookingAvailablities?.dates) {
       return null;
     }
-    return groupSlotsByPeriod(
-      activeAvailabilityDoc.time_slots || [],
-      activeAvailabilityDoc.booked_slots || {},
-      formStates.selectedDate
+    const matchingDateObj = bookingAvailablities.dates.find(
+      d => d.date === formStates.selectedDate
     );
-  }, [formStates.selectedDate, activeAvailabilityDoc]);
+    if (!matchingDateObj) return null;
+    return groupBookingSlotsByPeriod(matchingDateObj.slots, formStates.selectedDate);
+  }, [formStates.selectedDate, bookingAvailablities]);
 
   const { totalAmount } = useMemo(() => {
     if (!formStates.appointmentFee || !formStates?.selectedSlots?.length) {
@@ -144,11 +138,11 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () =>
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await refetchAvailablities();
+      await refetchBookingAvailablities();
     } finally {
       setRefreshing(false);
     }
-  }, [refetchAvailablities]);
+  }, [refetchBookingAvailablities]);
 
   const areSlotsConsecutive = (slots: ISlotItem[]): boolean => {
     if (slots.length <= 1) return true;
@@ -334,17 +328,17 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () =>
           <View style={S.section}>
             <Text style={S.sectionTitle}>3. Select Date</Text>
             <TouchableOpacity
-              style={[S.selectButton, myAvailPending && { opacity: 0.7 }]}
+              style={[S.selectButton, bookingAvailPending && { opacity: 0.7 }]}
               onPress={() => {
-                if (myAvailPending) return;
+                if (bookingAvailPending) return;
                 if (!selectedPatient?.patientGenId) return showErrorToast('Select Patient First');
-                !myAvailPending && setShowDatePicker(true);
+                !bookingAvailPending && setShowDatePicker(true);
               }}
-              disabled={myAvailPending}
+              disabled={bookingAvailPending}
               activeOpacity={0.8}
             >
               <View style={S.selectButtonContent}>
-                {myAvailPending ? (
+                {bookingAvailPending ? (
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <ActivityIndicator size="small" color={theme.colors.primary} />
                     <Text style={S.placeholderText}>Loading available dates...</Text>
@@ -356,7 +350,7 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () =>
                 ) : (
                   <Text style={S.placeholderText}>Select appointment date</Text>
                 )}
-                {!myAvailPending && <Text style={S.selectButtonIcon}>▼</Text>}
+                {!bookingAvailPending && <Text style={S.selectButtonIcon}>▼</Text>}
               </View>
             </TouchableOpacity>
           </View>

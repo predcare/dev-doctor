@@ -32,7 +32,7 @@ export interface PatientsScreenProps {
   route?: PatientsScreenRouteProp;
 }
 
-export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) => {
+export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
   const appNavigation = useNavigation();
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -46,6 +46,18 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) =>
   } = useMyPatientList({
     doctorId: userData?.user_id,
   });
+
+  const displayPatients = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return myPatients;
+    return myPatients?.filter(
+      p =>
+        p.name?.toLowerCase().includes(q) ||
+        p.patient_id?.toLowerCase().includes(q) ||
+        p.phone_number?.includes(q) ||
+        p.condition?.toLowerCase().includes(q)
+    );
+  }, [search, myPatients]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -71,25 +83,13 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) =>
     [appNavigation]
   );
 
-  const displayPatients = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return myPatients;
-    return myPatients?.filter(
-      p =>
-        p.name?.toLowerCase().includes(q) ||
-        p.patient_id?.toLowerCase().includes(q) ||
-        p.phone_number?.includes(q) ||
-        p.condition?.toLowerCase().includes(q)
-    );
-  }, [search, myPatients]);
-
   return (
     <SafeAreaWrapper>
       <View style={S.container}>
         <Header
           title="Patients"
           description="Manage and view your patient records"
-          onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
+          onNotificationPress={() => appNavigation?.navigate(AppRoute.NOTIFICATIONS)}
         />
         <View style={S.searchRow}>
           <View style={[S.searchPill, myPatientPending && { opacity: 0.7 }]}>
@@ -157,6 +157,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = ({ navigation }) =>
                 name={item?.name}
                 patientId={item?.patient_id}
                 condition={item?.condition}
+                phoneNumber={item?.phone_number}
                 onPress={() =>
                   handlePatientDetails({
                     name: item?.name,
