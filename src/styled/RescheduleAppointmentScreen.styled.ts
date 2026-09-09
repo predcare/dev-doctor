@@ -1,8 +1,5 @@
-import { StyleSheet, Platform } from 'react-native';
-import { theme } from './theme.styled';
-
-export const TEAL = '#00685D';
-export const TEAL_PRIMARY = '#00897B';
+import { Platform, StyleSheet } from 'react-native';
+import theme from './theme.styled';
 
 export const rescheduleAppointmentStyles = StyleSheet.create({
   container: {
@@ -32,7 +29,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     flex: 1,
     fontSize: 22,
     fontWeight: '700',
-    color: TEAL,
+    color: theme.colors.primary,
     letterSpacing: -0.2,
   },
 
@@ -73,7 +70,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: TEAL,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -103,6 +100,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 6,
+    gap: 8,
   },
   detailLabel: {
     fontSize: 13,
@@ -112,6 +110,8 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#0F172A',
+    flexShrink: 1,
+    textAlign: 'right',
   },
 
   // Section Headers
@@ -148,7 +148,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
   },
   dateCardActive: {
     backgroundColor: '#E6F7F5',
-    borderColor: TEAL,
+    borderColor: theme.colors.primary,
   },
   dateDayLabel: {
     fontSize: 12,
@@ -156,7 +156,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     fontWeight: '600',
   },
   dateDayLabelActive: {
-    color: TEAL,
+    color: theme.colors.primary,
   },
   dateNum: {
     fontSize: 16,
@@ -165,7 +165,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     marginTop: 2,
   },
   dateNumActive: {
-    color: TEAL,
+    color: theme.colors.primary,
   },
   calendarPillBtn: {
     paddingHorizontal: 16,
@@ -212,17 +212,17 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   timeChipBooked: {
-    backgroundColor: '#F1F5F9',
-    borderColor: '#E2E8F0',
     opacity: 0.4,
+    borderWidth: 2,
+    borderColor: '#4D4D4D',
   },
   timeChipActive: {
     backgroundColor: '#E6F7F5',
-    borderColor: TEAL,
+    borderColor: theme.colors.primary,
   },
   timeChipCurrent: {
     backgroundColor: '#E6F7F5',
-    borderColor: TEAL,
+    borderColor: theme.colors.primary,
   },
   timeChipText: {
     fontSize: 13,
@@ -233,7 +233,31 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     color: '#94A3B8',
   },
   timeChipTextActive: {
-    color: TEAL,
+    color: theme.colors.primary,
+  },
+
+  // Empty Slots State
+  emptySlotsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginVertical: 10,
+  },
+  emptySlotsTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#334155',
+    marginTop: 6,
+  },
+  emptySlotsSubtext: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 4,
   },
 
   // Inputs Section
@@ -263,7 +287,7 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
   // Summary Strip Box (New Schedule vs Previous)
   bookingButtonRow: {
     flexDirection: 'row',
-    backgroundColor: TEAL,
+    backgroundColor: theme.colors.primary,
     borderRadius: 14,
     padding: 14,
     marginTop: 20,
@@ -297,14 +321,14 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
 
   // Confirm Button
   bookBtn: {
-    backgroundColor: TEAL,
+    backgroundColor: theme.colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
     elevation: 3,
-    shadowColor: TEAL,
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -408,10 +432,10 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
   },
   calCellToday: {
     borderWidth: 1.5,
-    borderColor: TEAL,
+    borderColor: theme.colors.primary,
   },
   calCellSelected: {
-    backgroundColor: TEAL,
+    backgroundColor: theme.colors.primary,
   },
   calCellText: {
     fontSize: 13,
@@ -422,11 +446,11 @@ export const rescheduleAppointmentStyles = StyleSheet.create({
     color: '#94A3B8',
   },
   calCellTextAvail: {
-    color: TEAL,
+    color: theme.colors.primary,
     fontWeight: '700',
   },
   calCellTextToday: {
-    color: TEAL,
+    color: theme.colors.primary,
     fontWeight: '800',
   },
   calCellTextSelected: {

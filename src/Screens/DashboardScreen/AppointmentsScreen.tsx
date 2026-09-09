@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -44,7 +45,8 @@ import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type TabType = 'both' | 'inperson' | 'video';
 
-export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ navigation }) => {
+export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () => {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState<TabType>('both');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -293,7 +295,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         callDurationSeconds: call_duration_seconds ?? 0,
       });
 
-      navigation?.navigate(AppRoute.DOCTOR_MEETING);
+      navigation.navigate(AppRoute.DOCTOR_MEETING);
     },
     [navigation, queryClient, setMeetingSession]
   );
@@ -323,7 +325,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
           }
         );
       } else {
-        navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+        navigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
           patientId: patientId,
           patientName: patientName,
         });
@@ -360,7 +362,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
       <Header
         title="Manage Appointments"
         description="View and manage patient schedule"
-        onNotificationPress={() => navigation?.navigate('Notifications')}
+        onNotificationPress={() => navigation.navigate(AppRoute.NOTIFICATIONS)}
       />
 
       <AppointmentStatsCard todayCount={stats.todayCount} upcoming3hCount={stats.upcoming3hCount} />
@@ -420,24 +422,16 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
         ))}
       </View>
 
-      {isCustomFilterApplied ? (
-        <View style={S.filterBanner}>
-          <Text style={S.filterBannerTxt}>
-            Filtered · {filteredAppointments.length} appointment
-            {filteredAppointments.length !== 1 ? 's' : ''}
-          </Text>
-          <TouchableOpacity onPress={handleResetFilters}>
-            <Text style={S.filterBannerClear}>Clear</Text>
-          </TouchableOpacity>
-        </View>
-      ) : filteredAppointments?.length > 0 ? (
-        <View style={S.filterBanner}>
-          <Text style={S.filterBannerTxt}>Today · {formatTodayBannerDate(new Date())}</Text>
-          <Text style={S.filterBannerCountTxt}>
-            {filteredAppointments.length} appointment{filteredAppointments.length !== 1 ? 's' : ''}
-          </Text>
-        </View>
-      ) : null}
+      <View style={S.filterBanner}>
+        <Text style={S.filterBannerTxt}>
+          {isCustomFilterApplied
+            ? `Filtered · ${filteredAppointments.length} appointment${filteredAppointments.length !== 1 ? 's' : ''}`
+            : `Today · ${formatTodayBannerDate(new Date())}`}
+        </Text>
+        <TouchableOpacity onPress={handleResetFilters} activeOpacity={0.7}>
+          <Text style={S.filterBannerClear}>Clear</Text>
+        </TouchableOpacity>
+      </View>
 
       {myAppointmentPending ? (
         <ScrollView
@@ -473,8 +467,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
             <CommonEmptyCard
               title={'No Appointments Found'}
               message={'No appointments match your search or filter criteria.'}
-              actionText={isCustomFilterApplied ? 'Clear Filters' : undefined}
-              onAction={isCustomFilterApplied ? handleResetFilters : undefined}
+              actionText={'Clear Filters'}
+              onAction={handleResetFilters}
             />
           }
           refreshControl={
@@ -502,7 +496,10 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
                 onVideoCall={() => handleJoinVideoCall(item)}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
                 onReschedule={() => {
-                  navigation?.navigate(AppRoute.RESCHEDULE_APPOINTMENT);
+                  navigation?.navigate(AppRoute.RESCHEDULE_APPOINTMENT, {
+                    appointmentId: item.id,
+                    patientId: Number(item.patient_id),
+                  });
                 }}
                 onStartConsultation={() => {
                   handleStartConsulation(
@@ -535,7 +532,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
           handleResetFilters();
         }}
         onClose={() => {
-          handleResetFilters();
+          setShowFilterPanel(false);
         }}
       />
 

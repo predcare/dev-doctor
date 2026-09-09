@@ -4,6 +4,7 @@ import {
   bookAppointments,
   changeAppointmentStatus,
   getApptToken,
+  getMyAppointmentInfo,
   getMyAppointments,
   sendHeartBeat,
 } from './appointments.func';
@@ -43,4 +44,15 @@ export const useChangeAppointmentStatus = () => {
 export const useBookAppointments = () =>
   useMutation({
     mutationFn: bookAppointments,
+  });
+
+export const useMyAppointmentInfo = (params?: { id?: number | string }) =>
+  useQuery({
+    queryKey: [MyAppointmentsQueryKeys.MyAppointments, params],
+    queryFn: () => getMyAppointmentInfo(params?.id!),
+    enabled: !!params?.id,
+    select: v => {
+      if (v) return v?.appointment;
+      return null;
+    },
   });

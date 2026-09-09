@@ -4,6 +4,11 @@ export interface IMyAppointmentsRoot {
   appointments: IAppointmentDoc[];
 }
 
+export interface IAppointmentInfoRoot {
+  success: boolean;
+  appointment: IAppointmentDoc;
+}
+
 export interface IAppointmentDoc {
   id: number;
   appointment_id: string;
@@ -39,6 +44,10 @@ export interface IAppointmentDoc {
   patient_phone: string;
   patient_alphanumeric_id: string;
   patient_record_id: number;
+  patient_date_of_birth: string;
+  patient_dob: string;
+  patient_gender: string;
+  date_of_birth: string;
 }
 
 export interface IAppointmentSlotTime {

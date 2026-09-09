@@ -94,14 +94,22 @@ export const formatTimeAgo = (date: string): string => {
   return d.format('MMM D');
 };
 
-export const getAge = (dob: string): string => {
+export const getAge = (
+  dob: string,
+  options?: {
+    large?: boolean;
+  }
+): string => {
   if (!dob) return '';
   const b = new Date(dob);
   const t = new Date();
   let age = t.getFullYear() - b.getFullYear();
   const m = t.getMonth() - b.getMonth();
   if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
-  return age > 0 ? `${age}y` : '< 1y';
+  if (age <= 0) {
+    return options?.large ? '< 1 year' : '< 1y';
+  }
+  return options?.large ? `${age} ${age === 1 ? 'year' : 'years'}` : `${age}y`;
 };
 
 export const capitalizeFirstLetter = (value?: string): string => {
@@ -264,7 +272,5 @@ export const formatStatus = (status?: string): string => {
   if (s === 'pending') return 'Pending';
   if (s === 'confirmed') return 'Confirmed';
 
-  return s
-    .replace(/[_-]+/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return s.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 };

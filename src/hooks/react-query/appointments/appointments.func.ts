@@ -1,6 +1,9 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
-import { IMyAppointmentsRoot } from '../../../typescripts/interfaces/appointments.interfaces';
+import {
+  IAppointmentInfoRoot,
+  IMyAppointmentsRoot,
+} from '../../../typescripts/interfaces/appointments.interfaces';
 import { ICreateAppointmentPayload } from '../auth/payload.interfaces';
 
 export const getMyAppointments = async (doctorId: number | string) => {
@@ -38,5 +41,12 @@ export const changeAppointmentStatus = async (body: {
 
 export const bookAppointments = async (body: ICreateAppointmentPayload) => {
   const res = await axiosInstance.post(endpoints.appointments.bookByDoc, body);
+  return res.data;
+};
+
+export const getMyAppointmentInfo = async (id: number | string) => {
+  const res = await axiosInstance.get<IAppointmentInfoRoot>(
+    `${endpoints.appointments.getdetails(id)}`
+  );
   return res.data;
 };

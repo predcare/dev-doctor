@@ -1,5 +1,9 @@
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { CompositeNavigationProp, NavigatorScreenParams, RouteProp } from '@react-navigation/native';
+import type {
+  CompositeNavigationProp,
+  NavigatorScreenParams,
+  RouteProp,
+} from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 /**
@@ -54,7 +58,7 @@ export type RootStackParamList = {
   Availability: { user?: any } | undefined;
   BookAppointment: { user?: any; patientId?: string } | undefined;
   DoctorAppointments: { user?: any; refresh?: boolean } | undefined;
-  RescheduleAppointment: { appointmentId?: number; patientId?: string } | undefined;
+  RescheduleAppointment: { appointmentId?: number; patientId?: string | number } | undefined;
   DoctorMeeting:
     | { appointmentId?: number | string; patientId?: string; token?: string; meetingId?: string }
     | undefined;

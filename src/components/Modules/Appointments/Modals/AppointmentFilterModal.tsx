@@ -99,22 +99,27 @@ export const AppointmentFilterModal: React.FC<AppointmentFilterModalProps> = Rea
       <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
         <View style={S.sheetOverlay}>
           <View style={S.sheetContent}>
-            {/* Top Sheet Drag Handle */}
             <View style={S.sheetHandle}>
               <View style={S.sheetHandleBar} />
             </View>
 
-            {/* Modal Header */}
             <View style={S.sheetHeader}>
               <Text style={S.sheetTitle}>Schedule Filters</Text>
-              <TouchableOpacity
-                style={S.closeBtnCircle}
-                onPress={onClose}
-                activeOpacity={0.7}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Text style={S.closeBtnTxt}>✕</Text>
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <TouchableOpacity onPress={handleResetAll} activeOpacity={0.7}>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: theme.colors.primary }}>
+                    Clear
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={S.closeBtnCircle}
+                  onPress={onClose}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Text style={S.closeBtnTxt}>✕</Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Scrollable Filter List */}
@@ -246,7 +251,6 @@ export const AppointmentFilterModal: React.FC<AppointmentFilterModalProps> = Rea
                             )}
                           </TouchableOpacity>
 
-                          {/* Inline Calendar rendered directly below TO input */}
                           {activeTarget === 'to' && (
                             <InlineCalendar
                               selectedDate={toDate}
@@ -261,7 +265,6 @@ export const AppointmentFilterModal: React.FC<AppointmentFilterModalProps> = Rea
                 );
               })}
 
-              {/* APPOINTMENT STATUS SECTION */}
               <Text style={S.sectionTitle}>APPOINTMENT STATUS</Text>
               {statusOptions.map(st => {
                 const selected = statuses.includes(st.key);
@@ -292,8 +295,6 @@ export const AppointmentFilterModal: React.FC<AppointmentFilterModalProps> = Rea
                 );
               })}
             </ScrollView>
-
-            {/* Footer Buttons */}
             <View style={S.filterFooter}>
               <TouchableOpacity style={S.btnReset} onPress={handleResetAll} activeOpacity={0.75}>
                 <Text style={S.btnResetTxt}>Reset</Text>
