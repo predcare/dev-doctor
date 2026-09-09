@@ -1,4 +1,4 @@
-import { PermissionsAndroid, Platform } from 'react-native';
+import { NativeModules, PermissionsAndroid, Platform } from 'react-native';
 import * as FileViewerModule from 'react-native-file-viewer';
 import * as RNFSModule from 'react-native-fs';
 import { showErrorToast, showSuccessToast } from './toast.utils';
@@ -123,12 +123,12 @@ export const saveOrOpenFile = async ({
       if (FileViewer && typeof FileViewer.open === 'function') {
         try {
           await FileViewer.open(cachePath, {
-            showOpenWithDialog: false,
+            showOpenWithDialog: true,
           });
         } catch (err: any) {
           try {
             await FileViewer.open(cachePath, {
-              showOpenWithDialog: true,
+              showOpenWithDialog: false,
             });
           } catch (viewerError: any) {
             showErrorToast(
@@ -142,32 +142,59 @@ export const saveOrOpenFile = async ({
     } else {
       await requestAndroidPermissions();
 
-      let dlDir = RNFS.DownloadDirectoryPath;
+      const candidateDirs = [
+        RNFS.DownloadDirectoryPath,
+        Platform.OS === 'android' ? `${RNFS.ExternalStorageDirectoryPath}/Download` : null,
+        RNFS.ExternalDirectoryPath,
+        RNFS.DocumentDirectoryPath,
+        RNFS.CachesDirectoryPath,
+      ].filter(Boolean) as string[];
 
-      if (!dlDir) {
-        if (Platform.OS === 'android') {
-          dlDir = `${RNFS.ExternalStorageDirectoryPath}/Download`;
-        } else {
-          dlDir = RNFS.DocumentDirectoryPath;
+      let destPath: string | null = null;
+      let lastError: any = null;
+
+      for (const dir of candidateDirs) {
+        try {
+          if (!(await RNFS.exists(dir))) {
+            await RNFS.mkdir(dir);
+          }
+          const testPath = `${dir}/${cleanFilename}`;
+          if (await RNFS.exists(testPath)) {
+            await RNFS.unlink(testPath);
+          }
+          await RNFS.copyFile(cachePath, testPath);
+          destPath = testPath;
+          break;
+        } catch (copyErr: any) {
+          lastError = copyErr;
+          console.log(`[file.utils] Could not save to ${dir}:`, copyErr?.message);
         }
       }
 
-      if (!(await RNFS.exists(dlDir))) {
-        await RNFS.mkdir(dlDir);
+      if (!destPath) {
+        throw lastError || new Error('Failed to save file to any accessible directory');
       }
 
-      const destPath = `${dlDir}/${cleanFilename}`;
+      if (Platform.OS === 'android') {
+        if (typeof RNFS.scanFile === 'function') {
+          try {
+            await RNFS.scanFile(destPath);
+          } catch {}
+        }
 
-      if (await RNFS.exists(destPath)) {
-        await RNFS.unlink(destPath);
-      }
-
-      await RNFS.copyFile(cachePath, destPath);
-
-      if (Platform.OS === 'android' && typeof RNFS.scanFile === 'function') {
-        try {
-          await RNFS.scanFile(destPath);
-        } catch {}
+        const { DownloadNotificationModule } = NativeModules;
+        if (DownloadNotificationModule && typeof DownloadNotificationModule.notifyDownloadComplete === 'function') {
+          try {
+            await DownloadNotificationModule.notifyDownloadComplete(
+              destPath,
+              cleanFilename,
+              'Invoice Downloaded',
+              `${cleanFilename} saved to Downloads. Tap to open.`
+            );
+          } catch (notifErr) {
+            console.log('[file.utils] Notification module error:', notifErr);
+          }
+        }
       }
 
       showSuccessToast(successMessage || `${cleanFilename} saved to Downloads`);
