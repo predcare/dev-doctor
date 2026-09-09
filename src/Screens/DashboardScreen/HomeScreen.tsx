@@ -307,9 +307,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             })
           ) : (
             <View style={homeStyles.emptyCard}>
-              <EmptyIcon />
+              <EmptyIcon color={theme.colors.primary} />
               <Text style={homeStyles.emptyText}>No upcoming appointments for today</Text>
-              <Text style={homeStyles.emptySub}>Tap here to add a new one</Text>
+              <Text style={homeStyles.emptySub}>Tap below to add a new one</Text>
+              <TouchableOpacity
+                style={homeStyles.bookNowBtn}
+                onPress={() => navigation?.navigate(AppRoute.BOOK_APPOINTMENT)}
+                activeOpacity={0.8}
+              >
+                <Text style={homeStyles.bookNowBtnText}>Book Now</Text>
+              </TouchableOpacity>
             </View>
           )}
 
