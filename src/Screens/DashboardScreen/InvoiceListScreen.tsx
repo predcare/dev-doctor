@@ -1,13 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { FlatList, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
 import SelectPatientModal, {
@@ -19,18 +11,12 @@ import InvoiceSkeleton from '../../components/Skeletons/InvoiceSkeleton';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  FileTextIcon,
   FilterIcon,
   PlusIcon,
   SearchIcon,
 } from '../../components/ui/icons';
-import {
-  useDownloadInvoicePdf,
-  useMyAllInvoices,
-} from '../../hooks/react-query/invoices/invoices.hooks';
+import { useMyAllInvoices } from '../../hooks/react-query/invoices/invoices.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { handleInvoicePdfAction } from '../../lib/common/file.utils';
-import { showErrorToast, showSuccessToast } from '../../lib/common/toast.utils';
 import type { InvoiceListScreenProps } from '../../route';
 import { invoiceListStyles as S } from '../../styled/InvoiceListScreen.styled';
 import { theme } from '../../styled/theme.styled';
@@ -136,7 +122,6 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
   const [selectedInvoiceForPreview, setSelectedInvoiceForPreview] = useState<IInvoiceDoc | null>(
     null
   );
-  const [downloadingId, setDownloadingId] = useState<number | string | null>(null);
 
   // Filter Modal State — Initial default Date Range is "Today" and Status is "All"
   const [dateRange, setDateRange] = useState<
@@ -156,43 +141,6 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
   } = useMyAllInvoices({
     doctorId: userData?.user_id,
   });
-
-  const { mutate: downloadPdfMutate } = useDownloadInvoicePdf();
-
-  // Helper function to download PDF to device
-  const downloadInvoicePDF = useCallback(
-    (inv: IInvoiceDoc, action: 'open' | 'save' = 'save') => {
-      if (!inv?.id) {
-        showErrorToast('Invoice ID is missing', 'Cannot Download PDF');
-        return;
-      }
-      setDownloadingId(inv.id);
-      downloadPdfMutate(inv.id, {
-        onSuccess: bytes => {
-          handleInvoicePdfAction(inv, action, bytes)
-            .then(() => {
-              if (action === 'save') {
-                showSuccessToast(
-                  `Invoice ${inv.invoice_number || inv.id} saved successfully!`,
-                  '✅ Downloaded'
-                );
-              }
-            })
-            .catch(err => {
-              showErrorToast(err?.message || 'Failed to save PDF', 'Download Error');
-            })
-            .finally(() => {
-              setDownloadingId(null);
-            });
-        },
-        onError: (err: any) => {
-          showErrorToast(err?.message || 'Could not fetch PDF from server', 'Download Failed');
-          setDownloadingId(null);
-        },
-      });
-    },
-    [downloadPdfMutate]
-  );
 
   // Date-filtered invoices base set
   const dateFilteredInvoices = useMemo(() => {
@@ -257,7 +205,7 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
 
   const handleSelectPatient = (patient: SelectablePatient) => {
     setShowPicker(false);
-    console.log('patient', patient)
+    console.log('patient', patient);
     navigation?.navigate('CreateInvoice', {
       patientId: patient.id,
       patientName: patient.name,
@@ -339,7 +287,6 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => {
           const { bg, txt, label } = getStatusStyle(item.payment_status);
-          const isDownloading = downloadingId === item.id;
           const grandTotalNum = parseFloat(item.grand_total || '0');
           return (
             <TouchableOpacity
@@ -368,28 +315,6 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
                 >
                   {fmtAmt(grandTotalNum)}
                 </Text>
-                <TouchableOpacity
-                  style={{
-                    marginLeft: 10,
-                    padding: 6,
-                    borderRadius: 6,
-                    backgroundColor: theme.colors.background,
-                    borderWidth: 1,
-                    borderColor: theme.colors.surfaceBorder,
-                  }}
-                  onPress={e => {
-                    e.stopPropagation();
-                    downloadInvoicePDF(item, 'save');
-                  }}
-                  disabled={isDownloading}
-                  activeOpacity={0.7}
-                >
-                  {isDownloading ? (
-                    <ActivityIndicator size="small" color={theme.colors.primary} />
-                  ) : (
-                    <FileTextIcon size={16} color={theme.colors.primary} />
-                  )}
-                </TouchableOpacity>
 
                 <View style={{ paddingLeft: 4 }}>
                   <ChevronRightIcon size={16} color="#9CA3AF" />

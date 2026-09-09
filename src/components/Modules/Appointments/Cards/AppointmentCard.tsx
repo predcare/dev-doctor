@@ -195,7 +195,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         },
         {
           id: 'cancel',
-          label: 'Cancel Appointment',
+          label: 'Cancel',
           icon: <CircleXIcon size={18} color="#EF4444" />,
           color: '#EF4444',
           onPress: () => onCancel?.(),
