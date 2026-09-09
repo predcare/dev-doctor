@@ -40,7 +40,6 @@ const ADDONS = [
 export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
   ({ onManageSubscription, onAddonPress }) => (
     <View style={profileStyles.expandedBlock}>
-      {/* Current Plan Card */}
       <View style={profileStyles.currentPlanCard}>
         <Text style={profileStyles.expandedMeta}>CURRENT PLAN</Text>
         <View style={profileStyles.planHeaderRow}>
@@ -70,7 +69,6 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
         AVAILABLE ADD-ONS
       </Text>
 
-      {/* Add-ons list */}
       <View style={{ backgroundColor: theme.colors.surface }}>
         {ADDONS.map((item, i) => (
           <View

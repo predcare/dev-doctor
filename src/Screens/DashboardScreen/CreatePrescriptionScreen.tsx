@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
@@ -28,6 +29,7 @@ import type {
 import {
   useCreatePrescription,
   useGetPrescriptionDetails,
+  useResendPrescriptionEmail,
   useUpdatePrescription,
 } from '../../hooks/react-query/prescriptions/prescriptions.hooks';
 import { PatientsQueryKeys, PrescriptionQueryKeys } from '../../hooks/react-query/query.keys';
@@ -38,7 +40,7 @@ import {
   createPrescriptionSchema,
   TCreatePrescriptionFormValues,
 } from '../../lib/schemas/createPrescription.schema';
-import type { CreatePrescriptionScreenProps } from '../../route';
+import { AppRoute, type CreatePrescriptionScreenProps } from '../../route';
 import { createPrescriptionStyles as S } from '../../styled/CreatePrescriptionScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
@@ -67,10 +69,44 @@ const PrescriptionSteps: PrescriptionStepItem[] = [
   { id: 'advice', title: 'Advice', stepNum: 6 },
 ];
 
-export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> = ({
-  navigation,
-  route,
-}) => {
+const defaultFormValues: TCreatePrescriptionFormValues = {
+  chief_complaints: '',
+  examination_notes: '',
+  diagnosis: '',
+  treatment_plan: '',
+  chronic_conditions: '',
+  drug_allergies: '',
+  blood_pressure: '',
+  pulse: '',
+  temperature: '',
+  spo2: '',
+  weight: '',
+  height: '',
+  bmi: '',
+  custom_vitals: [],
+  medications: [
+    {
+      name: '',
+      strength: '',
+      strengthUnit: 'mg',
+      dosage: '',
+      timing: '',
+      durationNum: '',
+      durationUnit: 'days',
+      instructions: '',
+    },
+  ],
+  lab_tests_structured: [],
+  general_advice: '',
+  follow_up_date: '',
+  referral_specialist: '',
+  referral_doctor_hospital: '',
+  referral_reason: '',
+  notes: '',
+};
+
+export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> = ({ route }) => {
+  const navigation = useNavigation();
   const patientId = route?.params?.patientId;
   const prescriptionId = route?.params?.prescriptionId;
   const [activeStep, setActiveStep] = useState<PrescriptionStep>('clinical');
@@ -110,44 +146,12 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     useCreatePrescription();
   const { mutate: updatePrescription, isPending: updatePrescriptionPending } =
     useUpdatePrescription();
+  const { mutate: resendEmailMutation, isPending: resendEmailLoading } =
+    useResendPrescriptionEmail();
 
   const methods = useForm<TCreatePrescriptionFormValues>({
     resolver: yupResolver(createPrescriptionSchema),
-    defaultValues: {
-      chief_complaints: '',
-      examination_notes: '',
-      diagnosis: '',
-      treatment_plan: '',
-      chronic_conditions: '',
-      drug_allergies: '',
-      blood_pressure: '',
-      pulse: '',
-      temperature: '',
-      spo2: '',
-      weight: '',
-      height: '',
-      bmi: '',
-      custom_vitals: [],
-      medications: [
-        {
-          name: '',
-          strength: '',
-          strengthUnit: 'mg',
-          dosage: '',
-          timing: '',
-          durationNum: '',
-          durationUnit: 'days',
-          instructions: '',
-        },
-      ],
-      lab_tests_structured: [],
-      general_advice: '',
-      follow_up_date: '',
-      referral_specialist: '',
-      referral_doctor_hospital: '',
-      referral_reason: '',
-      notes: '',
-    },
+    defaultValues: defaultFormValues,
   });
 
   const stepIndex = PrescriptionSteps.findIndex(s => s.id === activeStep);
@@ -343,7 +347,10 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             });
             showSuccessToast('Prescription updated successfully');
             hideLoader();
-            navigation?.goBack();
+            (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+              rxId: String(activeId),
+              patientName: patientInfo?.name || route?.params?.patientName || '',
+            });
           },
           onError: () => {
             hideLoader();
@@ -366,7 +373,10 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           });
           showSuccessToast('Prescription created successfully');
           hideLoader();
-          navigation?.goBack();
+          (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+            rxId: String(createId || currentPrescriptionId.current),
+            patientName: patientInfo?.name || route?.params?.patientName || '',
+          });
         },
         onError: () => {
           hideLoader();
@@ -375,8 +385,89 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     }
   };
 
-  const handleSaveDraft = () => {
-    showSuccessToast('Prescription draft saved successfully', 'Draft Saved');
+  const handleSendAndComplete = (_data: TCreatePrescriptionFormValues) => {
+    if (!hasAnyContent(_data)) {
+      showErrorToast(
+        'Please enter at least one detail (e.g. Diagnosis, Symptoms, Vitals, or Medications) to complete and send the prescription.',
+        'Prescription Empty'
+      );
+      return;
+    }
+
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    const payload = buildPrescriptionPayload(_data, 'completed');
+    const activeId =
+      currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+    showLoader('Sending prescription to patient...');
+
+    const triggerEmailAndNavigate = (rxId: string | number) => {
+      resendEmailMutation(rxId, {
+        onSuccess: async res => {
+          await queryClient.invalidateQueries({
+            queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: [PatientsQueryKeys.Prescriptions],
+          });
+          showSuccessToast(res?.message || "Prescription completed & sent to patient's email.");
+          hideLoader();
+          (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+            rxId: String(rxId),
+            patientName: patientInfo?.name || route?.params?.patientName || '',
+          });
+        },
+        onError: async (e: any) => {
+          await queryClient.invalidateQueries({
+            queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+          });
+          await queryClient.invalidateQueries({
+            queryKey: [PatientsQueryKeys.Prescriptions],
+          });
+          const msg =
+            e?.response?.data?.message || 'Prescription completed, but failed to send email.';
+          showErrorToast(msg, 'Email Error');
+          hideLoader();
+          (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+            rxId: String(rxId),
+            patientName: patientInfo?.name || route?.params?.patientName || '',
+          });
+        },
+      });
+    };
+
+    if (activeId) {
+      updatePrescription(
+        {
+          id: activeId,
+          payload: payload as unknown as IUpdatePrescriptionPayload,
+        },
+        {
+          onSuccess: () => {
+            triggerEmailAndNavigate(activeId);
+          },
+          onError: () => {
+            hideLoader();
+          },
+        }
+      );
+    } else {
+      createPrescription(payload, {
+        onSuccess: response => {
+          const createId = response?.id;
+          if (createId) {
+            currentPrescriptionId.current = Number(createId);
+          }
+          triggerEmailAndNavigate(createId || currentPrescriptionId.current || '');
+        },
+        onError: () => {
+          hideLoader();
+        },
+      });
+    }
   };
 
   const renderStepForm = () => {
@@ -453,6 +544,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
   }, [autoSaveStatus, lastSavedAt]);
 
   useEffect(() => {
+    setActiveStep('clinical');
     if (prescriptionId && prescriptionInfo?.prescription) {
       const rx = prescriptionInfo.prescription;
       currentPrescriptionId.current = Number(prescriptionId);
@@ -508,6 +600,11 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
         referral_reason: rx.referral_reason || '',
         notes: rx.notes || '',
       });
+    } else if (!prescriptionId) {
+      currentPrescriptionId.current = null;
+      setAutoSaveStatus('idle');
+      setLastSavedAt(null);
+      methods.reset(defaultFormValues);
     }
   }, [prescriptionId, prescriptionInfo?.prescription, methods]);
 
@@ -637,11 +734,6 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
               >
                 {renderStepForm()}
               </ScrollView>
-              {isLastStep && !route?.params?.appointmentId && (
-                <TouchableOpacity style={S.draftBtn} onPress={handleSaveDraft} activeOpacity={0.8}>
-                  <Text style={S.draftBtnText}>💾 Save Draft</Text>
-                </TouchableOpacity>
-              )}
               <View style={S.stickyBottomBar}>
                 <View style={S.autoSaveRow}>
                   <View style={[S.autoSaveDot, { backgroundColor: currentAutoSave.color }]} />
@@ -661,7 +753,9 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                     <TouchableOpacity
                       style={S.btnComplete}
                       onPress={methods.handleSubmit(handleFinalSubmit)}
-                      disabled={createPrescriptionPending || updatePrescriptionPending}
+                      disabled={
+                        createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
+                      }
                       activeOpacity={0.85}
                     >
                       <Text style={S.btnCompleteText}>
@@ -669,7 +763,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                           ? 'Saving...'
                           : prescriptionId
                           ? '✓ Update Prescription'
-                          : '✓ Complete & Save'}
+                          : '✓ Complete'}
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -679,6 +773,20 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                       activeOpacity={0.85}
                     >
                       <Text style={S.btnNextText}>Next ›</Text>
+                    </TouchableOpacity>
+                  )}
+                  {isLastStep && (
+                    <TouchableOpacity
+                      style={S.btnComplete}
+                      onPress={methods.handleSubmit(handleSendAndComplete)}
+                      disabled={
+                        createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
+                      }
+                      activeOpacity={0.85}
+                    >
+                      <Text style={S.btnCompleteText}>
+                        {resendEmailLoading ? 'Sending...' : 'Send'}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 </View>

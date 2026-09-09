@@ -619,7 +619,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
               <ActivityIndicator color="#FFFFFF" size="small" />
             ) : (
               <>
-                <Text style={{ fontSize: 16, color: '#FFFFFF' }}>✉</Text>
+                <Text style={{ fontSize: 16, color: '#FFFFFF' }}>📧</Text>
                 <Text style={S.shareBtnTxt}>Resend to Patient</Text>
               </>
             )}

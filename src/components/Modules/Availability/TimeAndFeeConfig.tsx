@@ -60,7 +60,6 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
 
     return (
       <View style={s.container}>
-        {/* ── 1. Time Range Section Component ── */}
         <TimeRangePicker
           fromTime={fromTime}
           toTime={toTime}
@@ -68,18 +67,13 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
           onChangeToTime={onChangeToTime}
         />
 
-        {/* ── 2. Consultation Type Radio Card Buttons ── */}
         <View style={[s.sectionHeader, { marginTop: 14 }]}>
           <Text style={{ fontSize: 14, marginRight: 6 }}>💼</Text>
           <Text style={s.sectionTitle}>Consultation Type</Text>
         </View>
         <View style={s.radioGroup}>
-          {/* In-Person */}
           <TouchableOpacity
-            style={[
-              s.radioOption,
-              consultationType === 'in-person' && s.radioOptionSelected,
-            ]}
+            style={[s.radioOption, consultationType === 'in-person' && s.radioOptionSelected]}
             onPress={() => onChangeConsultationType('in-person')}
             activeOpacity={0.8}
           >
@@ -89,22 +83,12 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
               </View>
             )}
             <Text style={s.radioOptionIcon}>🏥</Text>
-            <Text
-              style={[
-                s.radioLabel,
-                consultationType === 'in-person' && s.radioLabelSelected,
-              ]}
-            >
+            <Text style={[s.radioLabel, consultationType === 'in-person' && s.radioLabelSelected]}>
               In-Person
             </Text>
           </TouchableOpacity>
-
-          {/* Video Call */}
           <TouchableOpacity
-            style={[
-              s.radioOption,
-              consultationType === 'video' && s.radioOptionSelected,
-            ]}
+            style={[s.radioOption, consultationType === 'video' && s.radioOptionSelected]}
             onPress={() => onChangeConsultationType('video')}
             activeOpacity={0.8}
           >
@@ -114,22 +98,12 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
               </View>
             )}
             <Text style={s.radioOptionIcon}>📹</Text>
-            <Text
-              style={[
-                s.radioLabel,
-                consultationType === 'video' && s.radioLabelSelected,
-              ]}
-            >
+            <Text style={[s.radioLabel, consultationType === 'video' && s.radioLabelSelected]}>
               Video Call
             </Text>
           </TouchableOpacity>
-
-          {/* Both */}
           <TouchableOpacity
-            style={[
-              s.radioOption,
-              consultationType === 'both' && s.radioOptionSelected,
-            ]}
+            style={[s.radioOption, consultationType === 'both' && s.radioOptionSelected]}
             onPress={() => onChangeConsultationType('both')}
             activeOpacity={0.8}
           >
@@ -138,19 +112,12 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                 <Text style={s.consultationCheckText}>✓</Text>
               </View>
             )}
-            <Text style={s.radioOptionIcon}>🌐</Text>
-            <Text
-              style={[
-                s.radioLabel,
-                consultationType === 'both' && s.radioLabelSelected,
-              ]}
-            >
+            <Text style={s.radioOptionIcon}>🏥📹</Text>
+            <Text style={[s.radioLabel, consultationType === 'both' && s.radioLabelSelected]}>
               Both
             </Text>
           </TouchableOpacity>
         </View>
-
-        {/* ── 3. Slot Duration ── */}
         <View style={[s.sectionHeader, { marginTop: 18 }]}>
           <Text style={{ fontSize: 14, marginRight: 6 }}>⏱️</Text>
           <Text style={s.sectionTitle}>Slot Duration</Text>
@@ -177,9 +144,7 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                   setShowDurPicker(false);
                 }}
               >
-                <Text
-                  style={[s.durationItemTxt, slotDuration === d.value && s.durationItemTxtSel]}
-                >
+                <Text style={[s.durationItemTxt, slotDuration === d.value && s.durationItemTxtSel]}>
                   {d.label}
                 </Text>
               </TouchableOpacity>
@@ -187,83 +152,115 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
           </View>
         )}
 
-        {/* ── 4. Consultation Fees ── */}
         <View style={[s.sectionHeader, { marginTop: 18 }]}>
           <Text style={{ fontSize: 14, marginRight: 6 }}>💳</Text>
-          <Text style={s.sectionTitle}>Consultation Fee</Text>
+          <Text style={s.sectionTitle}>Consultation Fee & Options</Text>
         </View>
 
-        {(consultationType === 'in-person' || consultationType === 'both') && (
-          <View style={s.feeInputGroup}>
-            <Text style={s.feeLabel}>In-Person Fee (INR) *</Text>
-            <TextInput
-              style={[s.feeInput, Boolean(inPersonFeeError) && { borderColor: theme.colors.danger }]}
-              value={inPersonFee}
-              onChangeText={onChangeInPersonFee}
-              keyboardType="numeric"
-              placeholder="Enter in-person consultation fee"
-              placeholderTextColor={theme.colors.textMuted}
-            />
-            {Boolean(inPersonFeeError) && (
-              <Text style={{ color: theme.colors.danger, fontSize: 12, marginTop: 4 }}>
-                {inPersonFeeError}
-              </Text>
-            )}
-          </View>
-        )}
-
-        {(consultationType === 'video' || consultationType === 'both') && (
-          <View style={s.feeInputGroup}>
-            <Text style={s.feeLabel}>Video Fee (INR) *</Text>
-            <TextInput
-              style={[s.feeInput, Boolean(videoFeeError) && { borderColor: theme.colors.danger }]}
-              value={videoFee}
-              onChangeText={onChangeVideoFee}
-              keyboardType="numeric"
-              placeholder="Enter video consultation fee"
-              placeholderTextColor={theme.colors.textMuted}
-            />
-            {Boolean(videoFeeError) && (
-              <Text style={{ color: theme.colors.danger, fontSize: 12, marginTop: 4 }}>
-                {videoFeeError}
-              </Text>
-            )}
-          </View>
-        )}
-
-        {/* Hide fee checkbox */}
-        {(consultationType === 'in-person' || consultationType === 'both') && (
-          <View style={s.checkboxRow}>
-            <TouchableOpacity
-              style={s.checkbox}
-              onPress={() => onToggleHideFee && onToggleHideFee(!hideFee)}
-              activeOpacity={0.8}
-            >
-              <View style={[s.checkboxBox, hideFee && s.checkboxBoxChecked]}>
-                {hideFee && <Text style={s.checkmark}>✓</Text>}
+        <View style={s.feeCardsContainer}>
+          {(consultationType === 'in-person' || consultationType === 'both') && (
+            <View style={s.feeCard}>
+              <View style={s.feeCardHeader}>
+                <View style={s.feeCardTitleRow}>
+                  <Text style={s.feeCardIcon}>🏥</Text>
+                  <Text style={s.feeCardTitle}>In-Person Consultation</Text>
+                </View>
+                <View style={s.inPersonBadge}>
+                  <Text style={s.inPersonBadgeTxt}>In-Person Only</Text>
+                </View>
               </View>
-              <Text style={s.checkboxLabel}>Hide fee from patients</Text>
-            </TouchableOpacity>
-          </View>
-        )}
 
-        {/* Require payment checkbox */}
-        {(consultationType === 'in-person' || consultationType === 'both') && (
-          <View style={s.checkboxRow}>
-            <TouchableOpacity
-              style={s.checkbox}
-              onPress={() =>
-                onToggleRequirePayment && onToggleRequirePayment(!requirePayment)
-              }
-              activeOpacity={0.8}
-            >
-              <View style={[s.checkboxBox, requirePayment && s.checkboxBoxChecked]}>
-                {requirePayment && <Text style={s.checkmark}>✓</Text>}
+              <View style={s.feeInputGroup}>
+                <Text style={s.feeLabel}>In-Person Fee (INR) {requirePayment ? '*' : ''}</Text>
+                <TextInput
+                  style={[
+                    s.feeInput,
+                    Boolean(inPersonFeeError) && { borderColor: theme.colors.danger },
+                  ]}
+                  value={inPersonFee}
+                  onChangeText={onChangeInPersonFee}
+                  keyboardType="numeric"
+                  placeholder={requirePayment ? 'Enter in-person fee' : 'Enter in-person fee'}
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+                {Boolean(inPersonFeeError) && <Text style={s.errorText}>{inPersonFeeError}</Text>}
               </View>
-              <Text style={s.checkboxLabel}>Require online payment</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+
+              <View style={s.cardDivider} />
+
+              <Text style={s.optionsSubheader}>In-Person Options</Text>
+
+              {!requirePayment && (
+                <View style={s.checkboxRow}>
+                  <TouchableOpacity
+                    style={s.checkbox}
+                    onPress={() => onToggleHideFee && onToggleHideFee(!hideFee)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={[s.checkboxBox, hideFee && s.checkboxBoxChecked]}>
+                      {hideFee && <Text style={s.checkmark}>✓</Text>}
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.checkboxLabel}>Hide fee from patients</Text>
+                      <Text style={s.checkboxHint}>
+                        Don't display in-person fee on doctor profile
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {!hideFee && (
+                <View style={s.checkboxRow}>
+                  <TouchableOpacity
+                    style={s.checkbox}
+                    onPress={() =>
+                      onToggleRequirePayment && onToggleRequirePayment(!requirePayment)
+                    }
+                    activeOpacity={0.8}
+                  >
+                    <View style={[s.checkboxBox, requirePayment && s.checkboxBoxChecked]}>
+                      {requirePayment && <Text style={s.checkmark}>✓</Text>}
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.checkboxLabel}>Require online payment</Text>
+                      <Text style={s.checkboxHint}>
+                        Patients must pay online during slot booking
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+
+          {(consultationType === 'video' || consultationType === 'both') && (
+            <View style={s.feeCard}>
+              <View style={s.feeCardHeader}>
+                <View style={s.feeCardTitleRow}>
+                  <Text style={s.feeCardIcon}>📹</Text>
+                  <Text style={s.feeCardTitle}>Video Consultation</Text>
+                </View>
+              </View>
+
+              <View style={s.feeInputGroup}>
+                <Text style={s.feeLabel}>Video Fee (INR) *</Text>
+                <TextInput
+                  style={[
+                    s.feeInput,
+                    Boolean(videoFeeError) && { borderColor: theme.colors.danger },
+                  ]}
+                  value={videoFee}
+                  onChangeText={onChangeVideoFee}
+                  keyboardType="numeric"
+                  placeholder="Enter video consultation fee"
+                  placeholderTextColor={theme.colors.textMuted}
+                />
+                {Boolean(videoFeeError) && <Text style={s.errorText}>{videoFeeError}</Text>}
+              </View>
+            </View>
+          )}
+        </View>
       </View>
     );
   }
@@ -377,8 +374,50 @@ const s = StyleSheet.create({
     color: theme.colors.primary,
     fontWeight: theme.fontWeight.bold,
   },
-  feeInputGroup: {
+  feeCardsContainer: {
+    gap: 12,
+  },
+  feeCard: {
+    backgroundColor: theme.colors.background,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    padding: 14,
+  },
+  feeCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 12,
+  },
+  feeCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  feeCardIcon: {
+    fontSize: 15,
+  },
+  feeCardTitle: {
+    fontSize: 13,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.dark,
+  },
+  inPersonBadge: {
+    backgroundColor: theme.colors.primarySoft,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.tealBdr,
+  },
+  inPersonBadgeTxt: {
+    fontSize: 10,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.primary,
+  },
+  feeInputGroup: {
+    marginBottom: 4,
   },
   feeLabel: {
     fontSize: 11,
@@ -399,12 +438,25 @@ const s = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: theme.colors.surfaceBorder,
   },
+  cardDivider: {
+    height: 1,
+    backgroundColor: theme.colors.surfaceBorder,
+    marginVertical: 12,
+  },
+  optionsSubheader: {
+    fontSize: 11,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.textSlate,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
   checkboxRow: {
     marginTop: 6,
   },
   checkbox: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: 4,
   },
   checkboxBox: {
@@ -414,8 +466,10 @@ const s = StyleSheet.create({
     borderWidth: 2,
     borderColor: theme.colors.surfaceBorder,
     marginRight: 10,
+    marginTop: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: theme.colors.surface,
   },
   checkboxBoxChecked: {
     backgroundColor: theme.colors.primary,
@@ -429,7 +483,17 @@ const s = StyleSheet.create({
   checkboxLabel: {
     fontSize: 13,
     color: theme.colors.dark,
-    fontWeight: '500',
+    fontWeight: '600',
+  },
+  checkboxHint: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+    marginTop: 1,
+  },
+  errorText: {
+    color: theme.colors.danger,
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

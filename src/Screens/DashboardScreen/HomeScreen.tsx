@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Path, Rect } from 'react-native-svg';
 import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceBanner';
 import HomeStatsCard from '../../components/Modules/Dashboard/HomeStatsCard';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
@@ -253,10 +254,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             );
           })
         ) : (
-          <View style={{ paddingVertical: theme.spacing.lg, alignItems: 'center' }}>
-            <Text style={{ color: theme.colors.textSecondary, fontSize: theme.fontSize.sm }}>
-              No upcoming appointments found.
-            </Text>
+          <View style={homeStyles.emptyCard}>
+            <Svg
+              width={40}
+              height={40}
+              viewBox="0 0 24 24"
+              fill="none"
+              style={{ marginBottom: 10, opacity: 0.3 }}
+            >
+              <Rect x="3" y="4" width="18" height="18" rx="2" stroke="#888" strokeWidth="1.8" />
+              <Path
+                d="M16 2v4M8 2v4M3 10h18"
+                stroke="#888"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </Svg>
+            <Text style={homeStyles.emptyText}>No upcoming appointments for today</Text>
+            <Text style={homeStyles.emptySub}>Tap here to add a new one</Text>
           </View>
         )}
 

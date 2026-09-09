@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDownloadInvoicePdf } from '../../../hooks/react-query/invoices/invoices.hooks';
+import { formatDate } from '../../../lib/common/common.utils';
 import { handleInvoicePdfAction } from '../../../lib/common/file.utils';
 import { showErrorToast } from '../../../lib/common/toast.utils';
 import { theme } from '../../../styled/theme.styled';
@@ -20,7 +21,7 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
   patientGeneratedId,
 }) => {
   const { mutate: downloadPdf, isPending: isDownloading } = useDownloadInvoicePdf();
-
+  console.log('selectedInvoiceForPreview', invoice);
   if (!invoice) return null;
 
   const invoiceNumber = invoice.invoice_number || '';
@@ -75,36 +76,28 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.paperScroll} contentContainerStyle={styles.paperContent}>
-            {/* <View style={styles.paperHeader}>
-              <View style={styles.clinicDetails}>
-                <Text style={styles.paperClinicName}>{clinicName}</Text>
-                <Text style={styles.paperClinicSub}>{clinicAddress}</Text>
-                <Text style={styles.paperClinicSub}>Phone: +91 98765 43210 • Reg: MED-KA-9921</Text>
-              </View>
-              <View style={styles.invoiceBadgeBox}>
-                <Text style={styles.paperInvTitle}>TAX INVOICE</Text>
-                <Text style={styles.paperInvNum}>{invoiceNumber}</Text>
-                <Text style={styles.paperInvDate}>Date: {dateOnly(createdAt)}</Text>
-              </View>
-            </View>
-
-            <View style={styles.paperDivider} /> */}
-
             <View style={styles.billedToRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.labelTitle}>BILLED TO:</Text>
-                <Text style={styles.paperInvNum}>{invoiceNumber}</Text>
                 <Text style={styles.patientName}>{patientName}</Text>
-                {patientId && <Text style={styles.patientMeta}>ID: {patientId}</Text>}
+                {patientId ? <Text style={styles.patientMeta}>ID: {patientId}</Text> : null}
               </View>
               <View style={{ alignItems: 'flex-end' }}>
-                <Text style={styles.labelTitle}>PAYMENT STATUS:</Text>
-                <View style={[styles.statusPill, { backgroundColor: statusBg }]}>
-                  <Text style={[styles.statusTxt, { color: statusColor }]}>
-                    {String(paymentStatus).toUpperCase()}
+                <Text style={styles.labelTitle}>INVOICE NUMBER:</Text>
+                {invoiceNumber ? <Text style={styles.paperInvNum}>{invoiceNumber}</Text> : null}
+                {invoice.created_at ? (
+                  <Text style={styles.paperInvDate}>
+                    Date: {formatDate(invoice.created_at, 'DD MMM YYYY')}
                   </Text>
+                ) : null}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                  <View style={[styles.statusPill, { backgroundColor: statusBg }]}>
+                    <Text style={[styles.statusTxt, { color: statusColor }]}>
+                      {String(paymentStatus).toUpperCase()}
+                    </Text>
+                  </View>
+                  <Text style={styles.modeTxt}>Mode: {paymentMode}</Text>
                 </View>
-                <Text style={styles.modeTxt}>Mode: {paymentMode}</Text>
               </View>
             </View>
             <View style={styles.tableContainer}>
@@ -311,7 +304,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
-    marginTop: 2,
   },
   statusTxt: {
     fontSize: 10,
@@ -321,7 +313,6 @@ const styles = StyleSheet.create({
   modeTxt: {
     fontSize: 10,
     color: '#64748B',
-    marginTop: 2,
   },
   tableContainer: {
     borderWidth: 1,

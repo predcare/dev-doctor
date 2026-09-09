@@ -99,12 +99,12 @@ export const PrescriptionsTabPanel: React.FC<PrescriptionsTabPanelProps> = ({ pa
                 id={item.id}
                 prescriptionGenId={item.prescription_id}
                 diagnosis={item.diagnosis}
-                doctor_name={item.doctor_name}
-                doctor_specialization={item.doctor_specialization}
-                consultation_date={item.consultation_date || item.appointment_date}
+                patient_name={item?.patient_name}
+                created_at={item.created_at}
                 status={item.status}
                 visible_to_patient={item.visible_to_patient}
                 onPress={() => handleView(item?.id)}
+                isSent={Boolean(item?.email_sent_at)}
               />
             );
           }}

@@ -17,7 +17,7 @@ export const WalletSection = React.memo<WalletSectionProps>(({ onTopUp }) => (
       <SettingsRowItem
         icon={<WalletIcon size={18} color={theme.colors.primary} />}
         label="Messaging Credits"
-        value="2,450 Credits"
+        value="200 Credits"
         onPress={onTopUp}
         last
         right={

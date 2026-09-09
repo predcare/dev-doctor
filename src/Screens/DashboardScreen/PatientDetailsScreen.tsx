@@ -4,12 +4,12 @@ import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErro
 import ConsultTabPanel from '../../components/Modules/PatientDetails/Consult/ConsultTabPanel';
 import PatientInvoiceTabPanel from '../../components/Modules/PatientDetails/Invoice/PatientInvoiceTabPanel';
 import PatientHeaderCard from '../../components/Modules/PatientDetails/PatientHeaderCard';
+import PatientProfileTabPanel from '../../components/Modules/PatientDetails/PatientProfile/PatientProfileTabPanel';
 import PatientTabBar, {
   MainTabKey,
   TabItem,
 } from '../../components/Modules/PatientDetails/PatientTabBar';
 import PrescriptionsTabPanel from '../../components/Modules/PatientDetails/PrescriptionsTabPanel';
-import PatientProfileTabPanel from '../../components/Modules/PatientDetails/PatientProfile/PatientProfileTabPanel';
 import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 import PatientDetailsSkeleton from '../../components/Skeletons/PatientDetailsSkeleton';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
@@ -40,15 +40,6 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
   const { patientId, patientName } = route?.params as PageProps;
   const [activeMainTab, setActiveMainTab] = useState<MainTabKey>('records');
 
-  // Static Patient Mock Data
-  const patient = {
-    name: 'Eleanor Vance',
-    patientId: 'PAT-1092',
-    gender: 'Female',
-    age: '34 yrs',
-    bloodGroup: 'O+',
-    avatarBgColor: theme.colors.primary,
-  };
   const {
     data: patientInfo,
     isFetching: patientInfoPending,

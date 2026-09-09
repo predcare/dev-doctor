@@ -4,6 +4,14 @@ export interface IMyAvailabilityRoot {
   data: IMyAvailabilityDoc[];
 }
 
+export interface IDocBookingAvailRoot {
+  success: boolean;
+  doctor_id: number;
+  clinic_id: number;
+  total_dates: number;
+  dates: IDocBookingAvailDates[];
+}
+
 export interface IMyAvailabilityDoc {
   id: number;
   created_from: string;
@@ -41,4 +49,26 @@ export interface TimeSlot {
 
 export interface BookedSlots {
   [date: string]: string[];
+}
+
+export interface IDocBookingAvailDates {
+  date: string;
+  day_name: string;
+  total_slots: number;
+  available_slots_count: number;
+  booked_slots_count: number;
+  slots: IDocBookingAvailSlot[];
+}
+
+export interface IDocBookingAvailSlot {
+  start: string;
+  end: string;
+  booked: boolean;
+  availability_id: number;
+  consultation_type: string;
+  in_person_fee: string;
+  video_fee: string;
+  slot_duration: number;
+  hide_fee: boolean;
+  require_payment: boolean;
 }

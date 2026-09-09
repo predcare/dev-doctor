@@ -82,8 +82,11 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           onThemePress={() => showComingSoon('Theme customization feature is coming soon.')}
         />
         <SupportSection
+          onContactSupport={() => showComingSoon('Contact Support is coming soon.')}
           onHelpCenter={() => showComingSoon('Help Center feature is coming soon.')}
           onPrivacyPolicy={() => showComingSoon('Privacy Policy feature is coming soon.')}
+          onTermsOfService={() => showComingSoon('Terms of Service feature is coming soon.')}
+          onCompliance={() => showComingSoon('HIPAA & Data Compliance feature is coming soon.')}
           onLogout={handleLogout}
         />
       </ScrollView>

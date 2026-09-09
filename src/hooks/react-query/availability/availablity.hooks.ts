@@ -4,6 +4,7 @@ import {
   createAvailability,
   deleteAvailability,
   getAvailablity,
+  getDocBookingAvails,
   getMyAvailablities,
   updateAvailability,
 } from './availablity.funcs';
@@ -49,4 +50,11 @@ export const useMyAvailablities = (params?: { doctorId?: number | string }) =>
       if (Array.isArray(v?.data)) return v.data;
       return [];
     },
+  });
+
+export const useBookingAvailablities = (params: { doctorId: number; clinicId: number }) =>
+  useQuery({
+    queryKey: [AvailbilityQueryKeys.GetMyAvailablity, params],
+    queryFn: () => getDocBookingAvails(params?.doctorId, params?.clinicId),
+    enabled: !!params?.doctorId && !!params?.clinicId,
   });

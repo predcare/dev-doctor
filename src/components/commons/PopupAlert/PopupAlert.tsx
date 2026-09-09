@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import theme from '../../../styled/theme.styled';
 
 interface IconProps {
   size?: number;
@@ -142,7 +143,7 @@ const ALERT_CONFIG = {
   },
   confirm: {
     icon: HelpCircle,
-    color: '#6366F1',
+    color: theme.colors.success,
     softBackground: '#EEF2FF',
     ringBackground: '#E0E7FF',
     defaultTitle: 'Confirmation',

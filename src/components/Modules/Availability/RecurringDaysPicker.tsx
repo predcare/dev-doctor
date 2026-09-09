@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { theme } from '../../../styled/theme.styled';
 
 export interface RecurringDaysPickerProps {
@@ -126,7 +126,11 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
         {/* Days of Week Pills */}
         <View style={{ marginTop: 12 }}>
           <Text style={s.label}>RECURRING DAYS</Text>
-          <View style={s.daysRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={s.daysScrollContent}
+          >
             {DAYS_OF_WEEK.map(d => {
               const isSel = (recurringDays || []).includes(d.key);
               return (
@@ -140,7 +144,7 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </ScrollView>
           {Boolean(recurringDaysError) && <Text style={s.cellErrorTxt}>{recurringDaysError}</Text>}
         </View>
 
@@ -272,24 +276,25 @@ const s = StyleSheet.create({
     fontSize: 13,
     color: theme.colors.textMuted,
   },
-  daysRow: {
+  daysScrollContent: {
     flexDirection: 'row',
-    gap: 6,
-    flexWrap: 'wrap',
+    gap: 8,
+    paddingVertical: 4,
   },
   dayPill: {
-    flex: 1,
-    minWidth: 40,
+    paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 20,
     borderWidth: 1.5,
     borderColor: theme.colors.surfaceBorder,
     backgroundColor: theme.colors.surface,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   dayPillSel: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
+    borderRadius: 20,
   },
   dayPillTxt: {
     fontSize: 12,
@@ -386,14 +391,15 @@ const s = StyleSheet.create({
     opacity: 0.3,
   },
   dayInner: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   daySelected: {
     backgroundColor: theme.colors.primary,
+    borderRadius: 18,
   },
   dayTxt: {
     fontSize: 13,

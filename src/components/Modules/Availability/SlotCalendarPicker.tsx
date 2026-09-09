@@ -5,6 +5,7 @@ import { theme } from '../../../styled/theme.styled';
 export interface SlotCalendarPickerProps {
   mode: 'specific' | 'leave';
   selectedDates: string[];
+  leaveDates?: string[];
   onToggleDate: (dateStr: string) => void;
 }
 
@@ -44,7 +45,7 @@ const formatChipDate = (dateStr: string): string => {
 };
 
 export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
-  ({ mode, selectedDates, onToggleDate }) => {
+  ({ mode, selectedDates, leaveDates = [], onToggleDate }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const days = getDaysInMonth(currentMonth);
 
@@ -60,9 +61,12 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
       setCurrentMonth(nm);
     };
 
+    const activeSelectedDates = (selectedDates || []).filter(
+      d => !(leaveDates || []).includes(d)
+    );
+
     return (
       <View style={s.calendarContainer}>
-        {/* Month Header Navigation */}
         <View style={s.header}>
           <TouchableOpacity onPress={prevMonth} style={s.navBtn} activeOpacity={0.7}>
             <Text style={s.navTxt}>◀</Text>
@@ -74,15 +78,13 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
             <Text style={s.navTxt}>▶</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Week Days Header */}
         <View style={s.weekRow}>
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-            <Text key={d} style={s.weekTxt}>{d}</Text>
+            <Text key={d} style={s.weekTxt}>
+              {d}
+            </Text>
           ))}
         </View>
-
-        {/* Calendar Days Grid */}
         <View style={s.grid}>
           {days.map((day, idx) => {
             if (!day) {
@@ -91,6 +93,7 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
 
             const dateStr = formatDateStr(day);
             const isSelected = (selectedDates || []).includes(dateStr);
+            const isLeave = (leaveDates || []).includes(dateStr);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const isPast = day < today;
@@ -108,13 +111,19 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
                 <View
                   style={[
                     s.dayInner,
-                    isSelected && (mode === 'specific' ? s.daySelected : s.dayLeave),
+                    isLeave
+                      ? s.dayLeave
+                      : isSelected
+                      ? mode === 'specific'
+                        ? s.daySelected
+                        : s.dayLeave
+                      : null,
                   ]}
                 >
                   <Text
                     style={[
                       s.dayTxt,
-                      isSelected && s.dayTxtSelected,
+                      (isSelected || isLeave) && s.dayTxtSelected,
                       isPast && s.dayTxtPast,
                     ]}
                   >
@@ -126,26 +135,49 @@ export const SlotCalendarPicker: React.FC<SlotCalendarPickerProps> = React.memo(
           })}
         </View>
 
-        {/* Selected Dates Chips Row */}
-        {(selectedDates || []).length > 0 && (
-          <View style={s.chipsSection}>
-            <Text style={s.chipsTitle}>
-              {mode === 'specific' ? `Selected Dates (${selectedDates.length}):` : `Leave Dates (${selectedDates.length}):`}
-            </Text>
-            <View style={s.chipsRow}>
-              {(selectedDates || []).map(dateStr => (
-                <TouchableOpacity
-                  key={dateStr}
-                  style={[s.chipPill, mode === 'leave' && s.chipPillLeave]}
-                  onPress={() => onToggleDate(dateStr)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={s.chipTxt}>{formatChipDate(dateStr)}</Text>
-                  <Text style={s.chipX}>✕</Text>
-                </TouchableOpacity>
-              ))}
+        {/* Selected / Leave Dates Chips Row */}
+        {mode === 'specific' ? (
+          activeSelectedDates.length > 0 && (
+            <View style={s.chipsSection}>
+              <Text style={s.chipsTitle}>
+                Selected Dates ({activeSelectedDates.length}):
+              </Text>
+              <View style={s.chipsRow}>
+                {activeSelectedDates.map(dateStr => (
+                  <TouchableOpacity
+                    key={dateStr}
+                    style={s.chipPill}
+                    onPress={() => onToggleDate(dateStr)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={s.chipTxt}>{formatChipDate(dateStr)}</Text>
+                    <Text style={s.chipX}>✕</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
+          )
+        ) : (
+          (selectedDates || []).length > 0 && (
+            <View style={s.chipsSection}>
+              <Text style={s.chipsTitle}>
+                Leave Dates ({selectedDates.length}):
+              </Text>
+              <View style={s.chipsRow}>
+                {(selectedDates || []).map(dateStr => (
+                  <TouchableOpacity
+                    key={dateStr}
+                    style={[s.chipPill, s.chipPillLeave]}
+                    onPress={() => onToggleDate(dateStr)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={s.chipTxt}>{formatChipDate(dateStr)}</Text>
+                    <Text style={s.chipX}>✕</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )
         )}
       </View>
     );
@@ -213,17 +245,19 @@ const s = StyleSheet.create({
     opacity: 0.3,
   },
   dayInner: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   daySelected: {
     backgroundColor: theme.colors.primary,
+    borderRadius: 18,
   },
   dayLeave: {
     backgroundColor: theme.colors.danger,
+    borderRadius: 18,
   },
   dayTxt: {
     fontSize: 13,

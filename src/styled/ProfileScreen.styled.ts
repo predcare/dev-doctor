@@ -145,7 +145,7 @@ export const profileStyles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 4,
     borderRadius: theme.borderRadius.md,
-    padding: 14,
+    padding: 10,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
   },
@@ -264,7 +264,69 @@ export const profileStyles = StyleSheet.create({
     borderRadius: 9,
   },
 
-  // Version Footer
+  // Policy Expanded Sub-items
+  policySubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.bg,
+    paddingLeft: theme.spacing.xl + 6,
+  },
+  policyIconBox: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    backgroundColor: theme.colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  policyTitle: {
+    fontSize: theme.fontSize.xs + 1,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.dark,
+    marginBottom: 1,
+  },
+  policySub: {
+    fontSize: 11,
+    color: theme.colors.textMuted,
+  },
+
+  // Logout Card
+  logoutCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF5F5',
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.lg,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: '#FED7D7',
+    ...globalShadows.card,
+  },
+  logoutIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: '#FED7D7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 13,
+  },
+  logoutInfo: {
+    flex: 1,
+  },
+  logoutTitle: {
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.danger,
+    marginBottom: 2,
+  },
+
   versionText: {
     textAlign: 'center',
     fontSize: 11,

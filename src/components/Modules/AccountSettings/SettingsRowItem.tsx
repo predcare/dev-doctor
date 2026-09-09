@@ -13,15 +13,27 @@ export interface SettingsRowItemProps {
   danger?: boolean;
   last?: boolean;
   noBg?: boolean;
+  indent?: boolean;
 }
 
 export const SettingsRowItem = React.memo<SettingsRowItemProps>(
-  ({ icon, label, value, onPress, right, danger = false, last = false, noBg = false }) => (
+  ({
+    icon,
+    label,
+    value,
+    onPress,
+    right,
+    danger = false,
+    last = false,
+    noBg = false,
+    indent = false,
+  }) => (
     <TouchableOpacity
       style={[
         profileStyles.row,
         !last && profileStyles.rowBorder,
         danger && profileStyles.rowDanger,
+        indent && { paddingLeft: 28 },
       ]}
       onPress={onPress}
       activeOpacity={onPress ? 0.6 : 1}
@@ -30,11 +42,19 @@ export const SettingsRowItem = React.memo<SettingsRowItemProps>(
       <View style={[profileStyles.rowIconBox, noBg && { backgroundColor: 'transparent' }]}>
         {icon}
       </View>
-      <Text style={[profileStyles.rowLabel, danger && { color: theme.colors.danger }]}>
+      <Text
+        style={[profileStyles.rowLabel, danger && { color: theme.colors.danger }]}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
         {label}
       </Text>
-      {value ? <Text style={profileStyles.rowValue}>{value}</Text> : null}
-      <View style={{ marginLeft: 'auto', paddingLeft: 8 }}>
+      {value ? (
+        <Text style={profileStyles.rowValue} numberOfLines={1} ellipsizeMode="tail">
+          {value}
+        </Text>
+      ) : null}
+      <View style={{ marginLeft: 'auto', paddingLeft: 8, flexDirection: 'row', alignItems: 'center' }}>
         {right ??
           (onPress && !danger ? <ChevronRightIcon size={16} color={theme.colors.textMuted} /> : null)}
       </View>

@@ -45,7 +45,6 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
           onPress={onNavigateProfile}
         />
 
-        {/* Subscription Plan — expandable */}
         <SettingsRowItem
           icon={<CreditCardIcon size={18} color={theme.colors.primary} />}
           label="Subscription Plan"

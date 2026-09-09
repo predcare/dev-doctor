@@ -1,4 +1,4 @@
-export const baseUrl = 'https://api-stage.predcare.in';
+export const baseUrl = 'https://chant-abrasion-sustainer.ngrok-free.dev';
 export const baseUrlApi = `${baseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
@@ -57,6 +57,7 @@ export const endpoints = {
     create: '/doctor/doctor-availability',
     update: '/doctor/doctor-availability/',
     docAvailabilities: '/doctor/doctor-availability/doctor/',
+    fullAvailability: '/doctor/availability/full-overview',
   },
   commons: {
     country: '/doctor/patients/locations/countries',

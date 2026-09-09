@@ -374,25 +374,6 @@ export const createPrescriptionStyles = StyleSheet.create({
     fontWeight: '600',
     color: theme.colors.primary,
   },
-  draftBtn: {
-    backgroundColor: theme.colors.surfaceSecondary,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    borderRadius: theme.borderRadius.lg,
-    paddingVertical: 12,
-    marginHorizontal: theme.spacing.lg,
-    marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  draftBtnText: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.textSecondary,
-    fontFamily: 'Inter_600SemiBold',
-  },
 
   // ----------------------------------------------------
   // Sticky Bottom Navigation Bar

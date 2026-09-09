@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { formatDate } from '../../../lib/common/common.utils';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 
@@ -20,11 +21,11 @@ export interface PrescriptionCardProps {
   id?: string | number;
   prescriptionGenId?: string;
   diagnosis?: string;
-  doctor_name?: string;
-  doctor_specialization?: string;
+  patient_name?: string;
   consultation_date?: string;
   appointment_date?: string;
   created_at?: string;
+  isSent?: boolean;
   status?: 'completed' | 'draft' | string;
   visible_to_patient?: boolean | number;
   onPress?: () => void;
@@ -34,19 +35,14 @@ export interface PrescriptionCardProps {
 export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
   prescriptionGenId,
   diagnosis,
-  doctor_name,
-  doctor_specialization,
-  consultation_date,
-  appointment_date,
+  patient_name,
   created_at,
   status,
+  isSent,
   onPress,
 }) => {
-  const itemDate =
-    consultation_date || appointment_date || (created_at ? String(created_at).split('T')[0] : '');
-  const rawStatus = (status || 'draft').toLowerCase();
-  const isCompleted = rawStatus === 'completed';
-
+  const itemDate = created_at ? String(created_at).split('T')[0] : '';
+  console.log('created_at', itemDate);
   return (
     <View style={patientDetailsStyles.recordCard}>
       <TouchableOpacity
@@ -83,62 +79,37 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
               {diagnosis}
             </Text>
           )}
-          {!!doctor_name && (
-            <Text style={patientDetailsStyles.recordSub}>
-              Dr. {doctor_name}
-              {doctor_specialization ? ` · ${doctor_specialization}` : ''}
+          {!!patient_name && (
+            <Text style={[patientDetailsStyles.recordSub, { textTransform: 'capitalize' }]}>
+              {patient_name}
             </Text>
           )}
-          {!!itemDate && <Text style={patientDetailsStyles.recordMeta}>{itemDate}</Text>}
+          {!!itemDate && (
+            <Text style={patientDetailsStyles.recordMeta}>{formatDate(itemDate)}</Text>
+          )}
 
           <View
             style={[
               patientDetailsStyles.pill,
               {
                 marginTop: 6,
-                backgroundColor: isCompleted ? '#DBEAFE' : theme.colors.warningLight,
+                backgroundColor: isSent ? '#DBEAFE' : theme.colors.warningLight,
               },
             ]}
           >
             <Text
               style={[
                 patientDetailsStyles.pillText,
-                { color: isCompleted ? '#1E40AF' : theme.colors.warning },
+                { color: isSent ? '#1E40AF' : theme.colors.warning },
               ]}
             >
-              {rawStatus.toUpperCase()}
+              {isSent ? 'Sent' : 'Not Sent'}
             </Text>
           </View>
         </View>
 
         <Text style={patientDetailsStyles.chevronText}>›</Text>
       </TouchableOpacity>
-
-      {/* <View
-        style={[
-          patientDetailsStyles.shareRow,
-          { backgroundColor: isShared ? theme.colors.primarySoft : theme.colors.background },
-        ]}
-      >
-        <View>
-          <Text
-            style={[
-              patientDetailsStyles.shareLabel,
-              { color: isShared ? theme.colors.primary : theme.colors.textMuted },
-            ]}
-          >
-            {isShared ? 'Visible to patient' : 'Hidden from patient'}
-          </Text>
-          <Text style={patientDetailsStyles.shareSub}>Tap to {isShared ? 'hide' : 'share'}</Text>
-        </View>
-
-        <Switch
-          value={isShared}
-          onValueChange={val => onToggleShare?.(val)}
-          trackColor={{ false: '#E2E8F0', true: theme.colors.mintBdr }}
-          thumbColor={isShared ? theme.colors.primary : '#CBD5E1'}
-        />
-      </View> */}
     </View>
   );
 };

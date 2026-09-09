@@ -1,6 +1,9 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
-import { IMyAvailabilityRoot } from '../../../typescripts/interfaces/availability.interfaces';
+import {
+  IDocBookingAvailRoot,
+  IMyAvailabilityRoot,
+} from '../../../typescripts/interfaces/availability.interfaces';
 
 // get
 export const getAvailablity = async (doctorId: number | string) => {
@@ -31,6 +34,13 @@ export const updateAvailability = async (id: number | string, body: any) => {
 export const getMyAvailablities = async (doctorId: number | string) => {
   const res = await axiosInstance.get<IMyAvailabilityRoot>(
     `${endpoints.availablity.docAvailabilities}${doctorId}`
+  );
+  return res.data;
+};
+
+export const getDocBookingAvails = async (doctorId: number, clinicId: number) => {
+  const res = await axiosInstance.get<IDocBookingAvailRoot>(
+    `${endpoints.availablity.fullAvailability}?doctor_id=${doctorId}&clinic_id=${clinicId}`
   );
   return res.data;
 };

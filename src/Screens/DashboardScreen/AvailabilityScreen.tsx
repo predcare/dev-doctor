@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { RefreshControl, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
-import PopupAlert from '../../components/commons/PopupAlert/PopupAlert';
 import ExistingSlotCard from '../../components/Modules/Availability/ExistingSlotCard';
 import SlotEditorCard from '../../components/Modules/Availability/SlotEditorCard';
 import AvailabilitySkeleton from '../../components/Skeletons/AvailabilitySkeleton';
@@ -11,10 +10,12 @@ import {
   useDeleteAvailability,
 } from '../../hooks/react-query/availability/availablity.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import { showSuccessToast } from '../../lib/common/toast.utils';
 import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
 import { availabilityStyles as S } from '../../styled/DoctorAvailabilityScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { IMyAvailabilityDoc } from '../../typescripts/interfaces/availability.interfaces';
+import { useAlertStore } from '../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
 export interface AvailabilityScreenProps {
@@ -26,9 +27,9 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
   const [showExistingSlots, setShowExistingSlots] = useState(true);
   const [showNewSlotForm, setShowNewSlotForm] = useState(false);
   const [editingSlot, setEditingSlot] = useState<IMyAvailabilityDoc | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
 
   const { userData } = useAuthStore(state => state);
+  const { showConfirm } = useAlertStore(state => state);
 
   const {
     data: availablityList,
@@ -40,45 +41,19 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
 
   const { mutate: deleteAvailabilityMutation } = useDeleteAvailability();
 
-  const [alertConfig, setAlertConfig] = useState<{
-    visible: boolean;
-    type?: 'success' | 'error' | 'warning' | 'info';
-    title?: string;
-    message?: string;
-    onPress?: () => void;
-  }>({
-    visible: false,
-    type: 'info',
-    title: '',
-    message: '',
-  });
-
-  const showAlert = (
-    type: 'success' | 'error' | 'warning' | 'info',
-    title: string,
-    message?: string,
-    onPress?: () => void
-  ) => {
-    setAlertConfig({
-      visible: true,
-      type,
-      title,
-      message,
-      onPress: () => {
-        setAlertConfig(prev => ({ ...prev, visible: false }));
-        if (onPress) onPress();
-      },
-    });
-  };
-
   const handleDeleteSlot = (id: number) => {
-    deleteAvailabilityMutation(id, {
-      onSuccess: () => {
-        showAlert('info', 'Slot Removed', 'Availability slot has been removed.');
-        refetch();
-      },
-      onError: () => {
-        showAlert('error', 'Error', 'Failed to delete availability slot.');
+    showConfirm({
+      title: 'Delete Availability Slot',
+      message: 'Are you sure you want to delete this availability slot?',
+      buttonText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        deleteAvailabilityMutation(id, {
+          onSuccess: async () => {
+            showSuccessToast('Availability slot has been removed.');
+            await refetch();
+          },
+        });
       },
     });
   };
@@ -189,19 +164,10 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
                 setShowNewSlotForm(false);
                 setShowExistingSlots(true);
               }}
-              isSaving={isSaving}
             />
           )}
         </ScrollView>
       </View>
-      <PopupAlert
-        visible={alertConfig.visible}
-        type={alertConfig.type}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        onPress={alertConfig.onPress}
-        onCancel={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
-      />
     </SafeAreaWrapper>
   );
 };

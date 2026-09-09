@@ -126,4 +126,107 @@ export const availabilityStyles = StyleSheet.create({
   },
 });
 
+export const SlotEditCardStyles = StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    shadowColor: theme.colors.dark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+  slotTitle: {
+    fontSize: 16,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.dark,
+  },
+  removeBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: '#FEF2F2',
+  },
+  removeTxt: {
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.danger,
+  },
+  tabRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: theme.colors.surfaceBorder,
+    backgroundColor: theme.colors.surface,
+    alignItems: 'center',
+  },
+  tabActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+    borderRadius: 20,
+  },
+  tabTxt: {
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.textSlate,
+  },
+  tabTxtActive: {
+    color: theme.colors.surface,
+    fontWeight: theme.fontWeight.bold,
+  },
+  errorTxt: {
+    color: theme.colors.danger,
+    fontSize: 12,
+    marginTop: 4,
+    marginBottom: 8,
+    fontWeight: theme.fontWeight.semibold,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 18,
+  },
+  saveBtn: {
+    flex: 2,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveBtnTxt: {
+    color: theme.colors.surface,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.bold,
+  },
+  cancelBtn: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelBtnTxt: {
+    color: theme.colors.textSlate,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
+  },
+});
 export default availabilityStyles;

@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import {
   useCreateAvailability,
   useUpdateAvailability,
@@ -12,6 +12,7 @@ import {
   AvailabilityFormSchema,
   TAvailabilityFormValues,
 } from '../../../lib/schemas/availability.schema';
+import { SlotEditCardStyles } from '../../../styled/DoctorAvailabilityScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 import { IMyAvailabilityDoc } from '../../../typescripts/interfaces/availability.interfaces';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
@@ -185,7 +186,13 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
           );
 
           if (sameTime && sameDuration && sameConsult) {
-            if (data.editorTab === 'specific' && existing.date_selection_mode === 'specific') {
+            const currentMode =
+              data.editorTab === 'leave'
+                ? (editingSlot?.date_selection_mode as string) ||
+                  (data.recurringDays && data.recurringDays.length > 0 ? 'recurring' : 'specific')
+                : data.editorTab;
+
+            if (currentMode === 'specific' && existing.date_selection_mode === 'specific') {
               const existingDates = existing.selected_dates || [];
               const overlap = data.selectedDates.filter(d => existingDates.includes(d));
               if (overlap.length > 0) {
@@ -198,7 +205,7 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
                 return;
               }
             } else if (
-              data.editorTab === 'recurring' &&
+              currentMode === 'recurring' &&
               existing.date_selection_mode === 'recurring'
             ) {
               const existingDays = existing.recurring_days || [];
@@ -216,19 +223,24 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
           }
         }
       }
+
+      console.log('userData.user_id', userData.user_id);
+
+      const targetMode =
+        data.editorTab === 'leave'
+          ? (editingSlot?.date_selection_mode as string) ||
+            (data.recurringDays && data.recurringDays.length > 0 ? 'recurring' : 'specific')
+          : data.editorTab;
+
       const slotPayload: Record<string, any> = {
-        date_selection_mode: data.editorTab,
-        selected_dates: data.editorTab === 'specific' ? data.selectedDates : [],
-        recurring_days: data.editorTab === 'recurring' ? data.recurringDays : [],
+        date_selection_mode: targetMode,
+        selected_dates: data.selectedDates || [],
+        recurring_days: data.recurringDays || [],
         recurring_start_date:
-          data.editorTab === 'recurring' && data.startDate && data.startDate.trim() !== ''
-            ? data.startDate
-            : null,
+          data.startDate && data.startDate.trim() !== '' ? data.startDate : null,
         recurring_end_date:
-          data.editorTab === 'recurring' && data.endDate && data.endDate.trim() !== ''
-            ? data.endDate
-            : null,
-        leave_dates: data.editorTab === 'leave' ? data.leaveDates : [],
+          data.endDate && data.endDate.trim() !== '' ? data.endDate : null,
+        leave_dates: data.leaveDates || [],
         from_time: fromTimeHHMM,
         to_time: toTimeHHMM,
         consultation_type: data.consultationType,
@@ -353,48 +365,51 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
     }, [editingSlot, reset]);
 
     return (
-      <View style={s.card}>
+      <View style={SlotEditCardStyles.card}>
         {/* Editor Card Header */}
-        <View style={s.cardHeader}>
-          <Text style={s.slotTitle}>
+        <View style={SlotEditCardStyles.cardHeader}>
+          <Text style={SlotEditCardStyles.slotTitle}>
             {editingSlot ? `Edit Slot #${editingSlot.id}` : `Slot Configuration #${slotIndex + 1}`}
           </Text>
-          <TouchableOpacity onPress={onCancel} style={s.removeBtn} activeOpacity={0.7}>
-            <Text style={s.removeTxt}>✕ Remove</Text>
+          <TouchableOpacity
+            onPress={onCancel}
+            style={SlotEditCardStyles.removeBtn}
+            activeOpacity={0.7}
+          >
+            <Text style={SlotEditCardStyles.removeTxt}>✕ Remove</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Mode Tabs */}
-        <View style={s.tabRow}>
+        <View style={SlotEditCardStyles.tabRow}>
           {(['specific', 'recurring', 'leave'] as const).map(tab => {
             const isActive = activeTab === tab;
             return (
               <TouchableOpacity
                 key={tab}
-                style={[s.tab, isActive && s.tabActive]}
+                style={[SlotEditCardStyles.tab, isActive && SlotEditCardStyles.tabActive]}
                 onPress={() =>
                   setValue('editorTab', tab, { shouldValidate: true, shouldDirty: true })
                 }
                 activeOpacity={0.8}
               >
-                <Text style={[s.tabTxt, isActive && s.tabTxtActive]}>
+                <Text
+                  style={[SlotEditCardStyles.tabTxt, isActive && SlotEditCardStyles.tabTxtActive]}
+                >
                   {tab === 'specific' ? 'Specific' : tab === 'recurring' ? 'Recurring' : 'Leave'}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </View>
-
-        {/* Mode Calendar / Schedule Config */}
         {activeTab === 'specific' && (
           <View>
             <SlotCalendarPicker
               mode="specific"
               selectedDates={selectedDates}
+              leaveDates={leaveDates}
               onToggleDate={handleToggleDate}
             />
             {Boolean(errors.selectedDates?.message) && (
-              <Text style={s.errorTxt}>{errors.selectedDates?.message}</Text>
+              <Text style={SlotEditCardStyles.errorTxt}>{errors.selectedDates?.message}</Text>
             )}
           </View>
         )}
@@ -424,15 +439,15 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
             <SlotCalendarPicker
               mode="leave"
               selectedDates={leaveDates}
+              leaveDates={leaveDates}
               onToggleDate={handleToggleLeaveDate}
             />
             {Boolean(errors.leaveDates?.message) && (
-              <Text style={s.errorTxt}>{errors.leaveDates?.message}</Text>
+              <Text style={SlotEditCardStyles.errorTxt}>{errors.leaveDates?.message}</Text>
             )}
           </View>
         )}
 
-        {/* Time, Mode, Duration & Fee Config */}
         <TimeAndFeeConfig
           fromTime={fromTime}
           toTime={toTime}
@@ -470,18 +485,23 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
           onChangeVideoFee={fee =>
             setValue('videoFee', fee, { shouldValidate: true, shouldDirty: true })
           }
-          onToggleHideFee={val =>
-            setValue('hideFee', val, { shouldValidate: true, shouldDirty: true })
-          }
-          onToggleRequirePayment={val =>
-            setValue('requirePayment', val, { shouldValidate: true, shouldDirty: true })
-          }
+          onToggleHideFee={val => {
+            setValue('hideFee', val, { shouldValidate: true, shouldDirty: true });
+            if (val) {
+              setValue('requirePayment', false, { shouldValidate: true, shouldDirty: true });
+            }
+          }}
+          onToggleRequirePayment={val => {
+            setValue('requirePayment', val, { shouldValidate: true, shouldDirty: true });
+            if (val) {
+              setValue('hideFee', false, { shouldValidate: true, shouldDirty: true });
+            }
+          }}
         />
 
-        {/* Save & Cancel Action Buttons Inside Card */}
-        <View style={s.actionRow}>
+        <View style={SlotEditCardStyles.actionRow}>
           <TouchableOpacity
-            style={[s.saveBtn, isSubmitting && { opacity: 0.6 }]}
+            style={[SlotEditCardStyles.saveBtn, isSubmitting && { opacity: 0.6 }]}
             onPress={handleSubmit(handleFormSave)}
             disabled={isSubmitting}
             activeOpacity={0.85}
@@ -489,122 +509,23 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
             {isSubmitting ? (
               <ActivityIndicator color={theme.colors.surface} />
             ) : (
-              <Text style={s.saveBtnTxt}>
+              <Text style={SlotEditCardStyles.saveBtnTxt}>
                 {editingSlot?.id ? '💾 Update Availability' : '💾 Add Availability'}
               </Text>
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={s.cancelBtn} onPress={onCancel} activeOpacity={0.75}>
-            <Text style={s.cancelBtnTxt}>✕ Cancel</Text>
+          <TouchableOpacity
+            style={SlotEditCardStyles.cancelBtn}
+            onPress={onCancel}
+            activeOpacity={0.75}
+          >
+            <Text style={SlotEditCardStyles.cancelBtnTxt}>✕ Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   }
 );
-
-const s = StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  slotTitle: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-  },
-  removeBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-    backgroundColor: '#FEF2F2',
-  },
-  removeTxt: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.danger,
-  },
-  tabRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 10,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: theme.colors.surfaceBorder,
-    backgroundColor: theme.colors.surface,
-    alignItems: 'center',
-  },
-  tabActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  tabTxt: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.textSlate,
-  },
-  tabTxtActive: {
-    color: theme.colors.surface,
-    fontWeight: theme.fontWeight.bold,
-  },
-  errorTxt: {
-    color: theme.colors.danger,
-    fontSize: 12,
-    marginTop: 4,
-    marginBottom: 8,
-    fontWeight: theme.fontWeight.semibold,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 18,
-  },
-  saveBtn: {
-    flex: 2,
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveBtnTxt: {
-    color: theme.colors.surface,
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
-  },
-  cancelBtn: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cancelBtnTxt: {
-    color: theme.colors.textSlate,
-    fontSize: 14,
-    fontWeight: theme.fontWeight.semibold,
-  },
-});
 
 export default SlotEditorCard;
