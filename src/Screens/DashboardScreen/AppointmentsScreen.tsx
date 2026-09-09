@@ -498,9 +498,12 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = ({ na
                 startTime={item.start_time}
                 endTime={item.end_time}
                 isExpired={isExpired}
-                onViewDetails={() => setSelectedDetailsApt(item as any)}
+                onViewDetails={() => setSelectedDetailsApt(item)}
                 onVideoCall={() => handleJoinVideoCall(item)}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
+                onReschedule={() => {
+                  navigation?.navigate(AppRoute.RESCHEDULE_APPOINTMENT);
+                }}
                 onStartConsultation={() => {
                   handleStartConsulation(
                     item?.id,

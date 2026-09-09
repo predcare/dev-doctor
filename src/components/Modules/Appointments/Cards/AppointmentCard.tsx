@@ -187,13 +187,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           onPress: () => onViewDetails?.(),
         },
         {
-          id: 'complete',
-          label: 'Mark as Completed',
-          icon: <CheckIcon size={18} color="#10B981" />,
-          color: '#10B981',
-          onPress: () => onComplete?.(),
-        },
-        {
           id: 'reschedule',
           label: 'Reschedule',
           icon: <RescheduleIcon size={18} color="#64748B" />,
