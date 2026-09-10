@@ -220,6 +220,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
     }));
   }, []);
 
+  console.log('filteredAppointments', filteredAppointments);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchMyAppointments();
@@ -425,12 +426,16 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
       <View style={S.filterBanner}>
         <Text style={S.filterBannerTxt}>
           {isCustomFilterApplied
-            ? `Filtered · ${filteredAppointments.length} appointment${filteredAppointments.length !== 1 ? 's' : ''}`
+            ? `Filtered · ${filteredAppointments.length} appointment${
+                filteredAppointments.length !== 1 ? 's' : ''
+              }`
             : `Today · ${formatTodayBannerDate(new Date())}`}
         </Text>
-        <TouchableOpacity onPress={handleResetFilters} activeOpacity={0.7}>
-          <Text style={S.filterBannerClear}>Clear</Text>
-        </TouchableOpacity>
+        {isCustomFilterApplied && (
+          <TouchableOpacity onPress={handleResetFilters} activeOpacity={0.7}>
+            <Text style={S.filterBannerClear}>Clear</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {myAppointmentPending ? (
@@ -486,6 +491,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                 appointmentGeneratedId={item.appointment_id}
                 appointmentId={item.id}
                 patientName={item.patient_name}
+                patientGender={item.patient_gender}
+                patientDateOfBirth={item.patient_date_of_birth}
                 appointmentStatus={item.appointment_status}
                 appointment_date={item.appointment_date}
                 consultation_type={item.consultation_type}

@@ -107,7 +107,7 @@ export const getAge = (
   const m = t.getMonth() - b.getMonth();
   if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
   if (age <= 0) {
-    return options?.large ? '< 1 year' : '< 1y';
+    return options?.large ? '< 1 year' : '< 1yrs';
   }
   return options?.large ? `${age} ${age === 1 ? 'year' : 'years'}` : `${age}y`;
 };

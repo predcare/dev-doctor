@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { formatTimeSlot, getInitials } from '../../../../lib/common/common.utils';
+import {
+  capitalize,
+  formatTimeSlot,
+  getAge,
+  getInitials,
+} from '../../../../lib/common/common.utils';
 import {
   doctorAppointmentsStyles as S,
   TEAL,
@@ -21,6 +26,8 @@ import {
 
 interface AppointmentCardProps {
   patientName: string;
+  patientGender: string;
+  patientDateOfBirth: string;
   appointmentStatus: string;
   appointment_date: string;
   consultation_type: string;
@@ -83,6 +90,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     startTime,
     endTime,
     isExpired,
+    patientDateOfBirth,
+    patientGender,
     onStartConsultation,
     onReschedule,
     onCancel,
@@ -220,7 +229,12 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             </View>
             <View style={{ flex: 1 }}>
               <Text style={S.patientName}>{patientName}</Text>
-              <Text style={S.patientAge}>Female / 34 yrs</Text>
+              <Text style={S.patientAge}>
+                {capitalize(patientGender || '')} /{' '}
+                {getAge(patientDateOfBirth, {
+                  large: true,
+                })}
+              </Text>
               <Text style={S.aptIdText}>APT ID: {appointmentGeneratedId}</Text>
             </View>
           </View>

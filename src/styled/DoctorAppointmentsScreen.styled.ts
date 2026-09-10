@@ -194,7 +194,6 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 8,
-    marginBottom: 6,
   },
   filterBannerTxt: {
     fontSize: 12,
@@ -215,7 +214,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
 
   // List & Cards
   listContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingBottom: 120,
   },
   card: {
