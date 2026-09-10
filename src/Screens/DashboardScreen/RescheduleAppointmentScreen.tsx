@@ -1,24 +1,32 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { AppointmentCalendarModal } from '../../components/Modules/Appointments/Modals/AppointmentCalendarModal';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { RescheduleSkeleton } from '../../components/Skeletons/RescheduleSkeleton';
 import { ChevronLeftIcon } from '../../components/ui/icons';
-import { useMyAppointmentInfo } from '../../hooks/react-query/appointments/appointments.hooks';
+import {
+  useMyAppointmentInfo,
+  useRescheduleAppointment,
+} from '../../hooks/react-query/appointments/appointments.hooks';
 import { useBookingAvailablities } from '../../hooks/react-query/availability/availablity.hooks';
+import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { formatDate, formatTimeSlot, getAge, getInitials } from '../../lib/common/common.utils';
-import { showSuccessToast } from '../../lib/common/toast.utils';
-import type { RescheduleAppointmentScreenProps } from '../../route';
+import { showErrorToast } from '../../lib/common/toast.utils';
+import { AppRoute, type RescheduleAppointmentScreenProps } from '../../route';
 import { rescheduleAppointmentStyles as S } from '../../styled/RescheduleAppointmentScreen.styled';
 import theme from '../../styled/theme.styled';
 import {
+  areSlotsConsecutive,
   groupBookingSlotsByPeriod,
   ISlotItem,
+  normalizeApiTime,
   parseBookingAvailableDates,
   ParsedAvailableDate,
   SlotPeriod,
 } from '../../utils/availabilityUtils';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 const PERIOD_ORDER: SlotPeriod[] = ['MORNING', 'AFTERNOON', 'EVENING', 'NIGHT'];
 
@@ -31,6 +39,22 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
     patientId?: string;
   };
   const { userData } = useAuthStore(state => state);
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [formStates, setFormStates] = useState<{
+    selectedDate: string;
+    selectedSlot: ISlotItem[] | null;
+    visitReason: string;
+    symptoms: string;
+    rescheduleReason: string;
+  }>({
+    selectedDate: '',
+    selectedSlot: null,
+    visitReason: '',
+    symptoms: '',
+    rescheduleReason: '',
+  });
 
   const {
     data: apptInfo,
@@ -49,24 +73,10 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
     doctorId: userData?.user_id || 0,
   });
 
+  const { mutate: rescheduleAppointment, isPending: reschedulePending } =
+    useRescheduleAppointment();
+
   const isLoading = apptInfoPending || bookingAvailPending;
-
-  const [showCalendar, setShowCalendar] = useState<boolean>(false);
-  const [refreshing, setRefreshing] = useState<boolean>(false);
-
-  const [formStates, setFormStates] = useState<{
-    selectedDate: string;
-    selectedSlot: ISlotItem | null;
-    visitReason: string;
-    symptoms: string;
-    rescheduleReason: string;
-  }>({
-    selectedDate: '',
-    selectedSlot: null,
-    visitReason: '',
-    symptoms: '',
-    rescheduleReason: '',
-  });
 
   const updateFormState = (
     key: keyof typeof formStates,
@@ -126,13 +136,110 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
     return PERIOD_ORDER.some(period => (periodWiseSlots[period]?.length || 0) > 0);
   }, [periodWiseSlots]);
 
+  const handleSlotPress = (slot: ISlotItem) => {
+    if (slot.booked) return;
+
+    const currentSelected = formStates?.selectedSlot || [];
+    const isSelected = currentSelected.some(selectedSlot => selectedSlot.start === slot.start);
+
+    if (isSelected) {
+      const updated = currentSelected.filter(selectedSlot => selectedSlot.start !== slot.start);
+
+      if (updated.length > 0 && !areSlotsConsecutive(updated)) {
+        showErrorToast('Please select consecutive slots only.');
+        return;
+      }
+
+      setFormStates(prev => ({
+        ...prev,
+        selectedSlot: updated.length > 0 ? updated : null,
+      }));
+
+      return;
+    }
+
+    if (currentSelected.length === 0) {
+      setFormStates(prev => ({
+        ...prev,
+        selectedSlot: [slot],
+      }));
+      return;
+    }
+
+    const sorted = [...currentSelected].sort((a, b) => a.start.localeCompare(b.start));
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+
+    const isBeforeFirst = slot.end === first.start;
+    const isAfterLast = slot.start === last.end;
+
+    if (isAfterLast || isBeforeFirst) {
+      setFormStates(prev => ({
+        ...prev,
+        selectedSlot: [...currentSelected, slot],
+      }));
+    } else {
+      showErrorToast('Please select consecutive slots only.');
+    }
+  };
+
   const handleConfirmReschedule = () => {
-    if (!formStates?.selectedSlot) return;
-    showSuccessToast(
-      `Appointment rescheduled to ${formStates?.selectedDate} at ${formStates?.selectedSlot?.start}`,
-      'Rescheduled'
+    if (!formStates?.selectedSlot || formStates.selectedSlot.length === 0)
+      return showErrorToast('Please select at least one slot');
+    if (!areSlotsConsecutive(formStates.selectedSlot))
+      return showErrorToast('Please select consecutive slots only.');
+    if (!userData?.user_id) return showErrorToast('Doctor not found');
+    if (!appointmentId) return showErrorToast('Appointment not found');
+    if (!apptInfo?.appointment_type) return showErrorToast('Appointment type not found');
+
+    const sorted = [...formStates.selectedSlot].sort((a, b) => a.start.localeCompare(b.start));
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+
+    const slotTimeJson = JSON.stringify(
+      sorted.map(s => ({ start: s.start, end: s.end, booked: false }))
     );
-    navigation?.navigate('DoctorAppointments', { refresh: true });
+
+    const payload = {
+      new_date: formStates?.selectedDate,
+      new_start_time: normalizeApiTime(first.start),
+      new_end_time: normalizeApiTime(last.end),
+      new_slot_time: slotTimeJson,
+      // new_consultation_type: apptInfo?.appointment_type,
+      new_doctor_id: userData?.user_id,
+      symptoms: formStates?.symptoms.trim() || '',
+      reason: formStates?.visitReason.trim() || formStates?.rescheduleReason.trim() || '',
+    };
+
+    console.log('payload', payload);
+    showLoader('Rescheduling appointment...');
+
+    rescheduleAppointment(
+      {
+        id: appointmentId,
+        body: payload,
+      },
+      {
+        onSuccess: async () => {
+          try {
+            await queryClient.invalidateQueries({
+              queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+            });
+          } finally {
+            hideLoader();
+            navigation?.navigate(AppRoute.MAIN_TABS, {
+              screen: AppRoute.SCHEDULE,
+              params: {
+                refresh: true,
+              },
+            });
+          }
+        },
+        onError: () => {
+          hideLoader();
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -171,6 +278,7 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
       <ScrollView
         contentContainerStyle={S.scrollContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -269,7 +377,7 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
                 <Text style={S.periodHeader}>{period}</Text>
                 <View style={S.slotsGrid}>
                   {slots.map((slot, idx) => {
-                    const isSelected = formStates?.selectedSlot?.start === slot.start;
+                    const isSelected = formStates?.selectedSlot?.some(s => s.start === slot.start);
                     const isBooked = slot.booked;
                     return (
                       <TouchableOpacity
@@ -280,7 +388,7 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
                           isBooked && S.timeChipBooked,
                           isSelected && S.timeChipActive,
                         ]}
-                        onPress={() => updateFormState('selectedSlot', slot)}
+                        onPress={() => handleSlotPress(slot)}
                         activeOpacity={0.8}
                       >
                         <Text
@@ -340,12 +448,18 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
         <View style={S.bookingButtonRow}>
           <View style={S.bookingButton}>
             <Text style={S.bookingButtonText}>New Schedule</Text>
-            {formStates?.selectedSlot ? (
+            {formStates?.selectedSlot && formStates.selectedSlot.length > 0 ? (
               <>
                 <Text style={S.bookingButtonValue}>{formStates?.selectedDate}</Text>
                 <Text style={{ fontSize: 12, color: '#FFFFFF', fontWeight: '600', marginTop: 2 }}>
-                  {formStates?.selectedSlot?.displayTime ||
-                    `${formStates?.selectedSlot?.start} - ${formStates?.selectedSlot?.end}`}
+                  {(() => {
+                    const sorted = [...formStates.selectedSlot].sort((a, b) =>
+                      a.start.localeCompare(b.start)
+                    );
+                    const first = sorted[0];
+                    const last = sorted[sorted.length - 1];
+                    return `${first.start} - ${last.end}`;
+                  })()}
                 </Text>
               </>
             ) : (
@@ -367,8 +481,16 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
         </View>
 
         <TouchableOpacity
-          style={[S.bookBtn, !formStates?.selectedSlot && S.bookBtnDisabled]}
-          disabled={!formStates?.selectedSlot}
+          style={[
+            S.bookBtn,
+            (!formStates?.selectedSlot ||
+              formStates.selectedSlot.length === 0 ||
+              reschedulePending) &&
+              S.bookBtnDisabled,
+          ]}
+          disabled={
+            !formStates?.selectedSlot || formStates.selectedSlot.length === 0 || reschedulePending
+          }
           onPress={handleConfirmReschedule}
           activeOpacity={0.85}
         >

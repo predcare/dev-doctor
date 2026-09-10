@@ -239,3 +239,14 @@ export const normalizeApiTime = (time?: string | null): string => {
   const s = String(time).trim();
   return s.length === 5 ? `${s}:00` : s;
 };
+
+export const areSlotsConsecutive = (slots: ISlotItem[]): boolean => {
+  if (slots.length <= 1) return true;
+  const sorted = [...slots].sort((a, b) => a.start.localeCompare(b.start));
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i].end !== sorted[i + 1].start) {
+      return false;
+    }
+  }
+  return true;
+};

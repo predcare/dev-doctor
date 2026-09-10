@@ -50,3 +50,8 @@ export const getMyAppointmentInfo = async (id: number | string) => {
   );
   return res.data;
 };
+
+export const rescheduleAppointment = async (id: number | string, body: any) => {
+  const res = await axiosInstance.patch(endpoints.appointments.reschedule(id), body);
+  return res.data;
+};

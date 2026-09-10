@@ -27,6 +27,7 @@ import { AppRoute, type BookAppointmentScreenProps } from '../../route';
 import { bookAppointmentStyles as S } from '../../styled/BookAppointmentScreen.styled';
 import theme from '../../styled/theme.styled';
 import {
+  areSlotsConsecutive,
   formatTime12h,
   groupBookingSlotsByPeriod,
   ISlotItem,
@@ -144,16 +145,7 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () =>
     }
   }, [refetchBookingAvailablities]);
 
-  const areSlotsConsecutive = (slots: ISlotItem[]): boolean => {
-    if (slots.length <= 1) return true;
-    const sorted = [...slots].sort((a, b) => a.start.localeCompare(b.start));
-    for (let i = 0; i < sorted.length - 1; i++) {
-      if (sorted[i].end !== sorted[i + 1].start) {
-        return false;
-      }
-    }
-    return true;
-  };
+
 
   const handleSlotPress = (slot: ISlotItem, currentSelected: ISlotItem[]) => {
     if (slot.booked) return;

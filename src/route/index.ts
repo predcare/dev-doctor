@@ -90,7 +90,7 @@ export type RootStackParamList = {
 export type DashboardTabParamList = {
   Home: undefined;
   Patients: undefined;
-  Schedule: undefined;
+  Schedule: { refresh?: boolean } | undefined;
   Reports: undefined;
   Account: undefined;
 };
