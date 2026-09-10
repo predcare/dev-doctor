@@ -7,6 +7,7 @@ import {
   getMyAppointmentInfo,
   getMyAppointments,
   rescheduleAppointment,
+  saveCall,
   sendHeartBeat,
 } from './appointments.func';
 
@@ -62,4 +63,9 @@ export const useRescheduleAppointment = () =>
   useMutation({
     mutationFn: (params?: { id?: number | string; body?: any }) =>
       rescheduleAppointment(params?.id!, params?.body!),
+  });
+
+export const useSaveCalled = () =>
+  useMutation({
+    mutationFn: (params?: { body?: any }) => saveCall(params?.body!),
   });

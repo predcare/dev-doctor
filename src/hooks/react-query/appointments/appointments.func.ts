@@ -79,3 +79,8 @@ export const rescheduleAppointment = async (id: number | string, body: any) => {
   const res = await axiosInstance.patch(endpoints.appointments.reschedule(id), body);
   return res.data;
 };
+
+export const saveCall = async (body: any) => {
+  const res = await axiosInstance.post(endpoints.appointments.saveCall, body);
+  return res.data;
+};
