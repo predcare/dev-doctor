@@ -42,24 +42,6 @@ class MainActivity : ReactActivity() {
         }
     }
 
-    /**
-     * Triggered when Back button / Back gesture is pressed on Android.
-     * Enters OS Picture-in-Picture mode whenever a call is active instead of exiting app.
-     */
-    override fun onBackPressed() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && PiPModule.isCallActive) {
-            try {
-                val params = PictureInPictureParams.Builder()
-                    .setAspectRatio(Rational(9, 16))
-                    .build()
-                enterPictureInPictureMode(params)
-                return
-            } catch (e: Exception) {
-                // Safe fallback to default onBackPressed behavior
-            }
-        }
-        super.onBackPressed()
-    }
 
     /**
      * Triggered when Home button / Home swipe gesture is pressed on Android.

@@ -53,6 +53,7 @@ export const endpoints = {
     getdetails: (id: string | number) => `/doctor/appointments/${id}`,
     reschedule: (id: string | number) => `/doctor/appointments/${id}/reschedule`,
     heartBeat: '/doctor/appointments/heartbeat',
+    saveCall: '/doctor/appointments/save-call',
   },
   availablity: {
     get: '/doctor/doctor-availability/doctor/',

@@ -46,7 +46,9 @@ export interface IHeartbeatApiResponse {
   data: IHeartbeatResponseData;
 }
 
-export const sendHeartBeat = async (body: ISendHeartbeatPayload): Promise<IHeartbeatApiResponse> => {
+export const sendHeartBeat = async (
+  body: ISendHeartbeatPayload
+): Promise<IHeartbeatApiResponse> => {
   const res = await axiosInstance.post(`${endpoints.appointments.heartbeat}`, body);
   return res.data;
 };

@@ -1,6 +1,6 @@
 import { MeetingProvider } from '@videosdk.live/react-native-sdk';
 import React, { useEffect } from 'react';
-import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { BackHandler, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { navigationRef } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
@@ -37,8 +37,40 @@ export const GlobalMeetingManager: React.FC = () => {
       }
     });
 
+    let backSubscription: any;
+    if (isCalling) {
+      backSubscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (navigationRef.isReady()) {
+          const currentRouteName = navigationRef.getCurrentRoute()?.name;
+          const canGoBack = navigationRef.canGoBack();
+
+          if (currentRouteName === 'DoctorMeeting') {
+            if (canGoBack) {
+              // Standard back navigation will fire DoctorMeetingScreen's beforeRemove, enabling In-App PiP
+              return false;
+            } else {
+              // Fallback if DoctorMeeting is root: navigate to DoctorAppointments in app with In-App PiP
+              useMeetingStore.getState().setIsInAppPip(true);
+              (navigationRef as any).navigate('DoctorAppointments');
+              return true;
+            }
+          }
+
+          if (!canGoBack) {
+            // Root screen reached while call is active -> enter Native OS PiP mode
+            if (PiPModule.enterPiP) {
+              PiPModule.enterPiP().catch?.(() => {});
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+    }
+
     return () => {
       subscription.remove();
+      backSubscription?.remove();
       if (PiPModule.setCallActive) {
         PiPModule.setCallActive(false).catch?.(() => {});
       }
