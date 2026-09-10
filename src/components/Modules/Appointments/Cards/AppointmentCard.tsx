@@ -4,6 +4,7 @@ import {
   capitalize,
   formatTimeSlot,
   getAge,
+  getCallDisconnectedInfo,
   getInitials,
 } from '../../../../lib/common/common.utils';
 import {
@@ -34,6 +35,8 @@ interface AppointmentCardProps {
   consultation_type: string;
   appointmentId: number;
   appointmentGeneratedId: string;
+  isJoinedOnce?: boolean;
+  callDurationSeconds?: number;
   startTime?: string;
   endTime?: string;
   isExpired?: boolean;
@@ -94,6 +97,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     isExpired,
     patientDateOfBirth,
     patientGender,
+    isJoinedOnce,
+    callDurationSeconds,
     onStartConsultation,
     onReschedule,
     onCancel,
@@ -126,6 +131,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       isCallActive &&
       (String(activeApptId) === String(appointmentId) ||
         (Boolean(appointmentGeneratedId) && activeApptGeneratedId === appointmentGeneratedId));
+
+    const disconnectedInfo = useMemo(
+      () => getCallDisconnectedInfo(startTime, endTime, callDurationSeconds),
+      [startTime, endTime, callDurationSeconds]
+    );
 
     const {
       isVideo,
@@ -302,6 +312,20 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           </View>
         </View>
 
+        {isVideo && isJoinedOnce && !isCurrentApptInCall && disconnectedInfo && (
+          <View style={S.disconnectedBanner}>
+            <Text style={S.disconnectedText}>
+              Call disconnected · used {disconnectedInfo.usedText} · {disconnectedInfo.leftText}
+            </Text>
+          </View>
+        )}
+
+        {isCurrentApptInCall && (
+          <Text style={S.activeCallNotice}>
+            Reschedule & Cancel unavailable while call is active.
+          </Text>
+        )}
+
         {isCancelled && (
           <View style={S.cancelledBox}>
             <View style={S.cancelledIconCircle}>
@@ -320,7 +344,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
               style={[
                 S.joinButton,
                 isInProgress && { flex: 1 },
-                isCurrentApptInCall && { backgroundColor: '#0F766E' },
+                isCurrentApptInCall && { backgroundColor: theme.colors.primary },
+                isJoinedOnce && { backgroundColor: theme.colors.brandBlueDark },
               ]}
               onPress={() =>
                 isVideo || isCurrentApptInCall ? onVideoCall?.() : onStartConsultation?.()
@@ -331,6 +356,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
               <Text style={S.joinButtonText}>
                 {isCurrentApptInCall
                   ? 'Already in Call'
+                  : isJoinedOnce
+                  ? 'Re-join Call'
                   : isVideo
                   ? 'Join Call'
                   : 'Start Consultation'}

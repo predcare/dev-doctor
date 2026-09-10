@@ -274,3 +274,58 @@ export const formatStatus = (status?: string): string => {
 
   return s.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 };
+
+export const formatMMSS = (totalSeconds: number): string => {
+  const clamped = Math.max(0, Math.floor(totalSeconds));
+  const mins = Math.floor(clamped / 60);
+  const secs = clamped % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+};
+
+export const calculateRemainingCallTime = (
+  startTime?: string,
+  endTime?: string,
+  callDurationSeconds?: number
+): string | null => {
+  if (!startTime || !endTime) return null;
+
+  const parseTimeToSeconds = (t: string) => {
+    const parts = t.split(':').map(Number);
+    return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
+  };
+
+  const scheduledSec = Math.max(0, parseTimeToSeconds(endTime) - parseTimeToSeconds(startTime));
+  const accumulatedSec = Number(callDurationSeconds) || 0;
+  const remSec = Math.max(0, scheduledSec - accumulatedSec);
+
+  if (remSec <= 0) return '00:00 (Time Up)';
+
+  const mins = Math.floor(remSec / 60);
+  const secs = remSec % 60;
+  const mm = String(mins).padStart(2, '0');
+  const ss = String(secs).padStart(2, '0');
+
+  return `${mm}:${ss} mins remaining`;
+};
+
+export const getCallDisconnectedInfo = (
+  startTime?: string,
+  endTime?: string,
+  callDurationSeconds?: number
+): { usedText: string; leftText: string } | null => {
+  if (!startTime || !endTime) return null;
+
+  const parseTimeToSeconds = (t: string) => {
+    const parts = t.split(':').map(Number);
+    return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
+  };
+
+  const scheduledSec = Math.max(0, parseTimeToSeconds(endTime) - parseTimeToSeconds(startTime));
+  const usedSec = Math.max(0, Number(callDurationSeconds) || 0);
+  const leftSec = Math.max(0, scheduledSec - usedSec);
+
+  return {
+    usedText: formatMMSS(usedSec),
+    leftText: `${formatMMSS(leftSec)} left`,
+  };
+};

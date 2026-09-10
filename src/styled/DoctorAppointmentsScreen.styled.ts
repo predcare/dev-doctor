@@ -601,6 +601,32 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
   },
+  disconnectedBanner: {
+    backgroundColor: '#F5F3FF',
+    borderColor: '#DDD6FE',
+    borderWidth: 1,
+    borderRadius: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 14,
+    marginVertical: 10,
+  },
+  disconnectedText: {
+    color: '#6D28D9',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  activeCallNotice: {
+    color: '#9A3412',
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 8,
+    marginHorizontal: 14,
+  },
 });
 
 export default doctorAppointmentsStyles;

@@ -214,7 +214,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
       filteredAppointments: filtered,
     };
   }, [myAppointments, activeTab, searchQuery, filterStates]);
-
   const updateFilterState = useCallback((updates: Partial<FilterStates>) => {
     setFilterStates(prev => ({
       ...prev,
@@ -535,6 +534,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                 startTime={item.start_time}
                 endTime={item.end_time}
                 isExpired={isExpired}
+                isJoinedOnce={Number(item?.call_duration_seconds) > 0}
+                callDurationSeconds={Number(item?.call_duration_seconds) || 0}
                 onViewDetails={() => setSelectedDetailsApt(item)}
                 onVideoCall={() => handleJoinVideoCall(item)}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
