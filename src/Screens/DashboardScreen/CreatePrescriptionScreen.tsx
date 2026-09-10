@@ -788,8 +788,8 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                         {createPrescriptionPending || updatePrescriptionPending
                           ? 'Saving...'
                           : prescriptionId
-                          ? '✓ Update Prescription'
-                          : '✓ Complete'}
+                          ? 'Update Prescription'
+                          : 'Complete'}
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -801,21 +801,24 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                       <Text style={S.btnNextText}>Next ›</Text>
                     </TouchableOpacity>
                   )}
-                  {isLastStep && (
-                    <TouchableOpacity
-                      style={S.btnComplete}
-                      onPress={methods.handleSubmit(handleSendAndComplete)}
-                      disabled={
-                        createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
-                      }
-                      activeOpacity={0.85}
-                    >
-                      <Text style={S.btnCompleteText}>
-                        {resendEmailLoading ? 'Sending...' : 'Send'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
                 </View>
+
+                {isLastStep && (
+                  <TouchableOpacity
+                    style={S.btnSend}
+                    onPress={methods.handleSubmit(handleSendAndComplete)}
+                    disabled={
+                      createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
+                    }
+                    activeOpacity={0.85}
+                  >
+                    <Text style={S.btnSendText}>
+                      {resendEmailLoading
+                        ? 'Sending Prescription...'
+                        : 'Send Prescription to Patient'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </KeyboardAvoidingView>
           </FormProvider>

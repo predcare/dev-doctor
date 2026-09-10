@@ -464,6 +464,29 @@ export const createPrescriptionStyles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.surface,
   },
+  btnSend: {
+    width: '100%',
+    paddingVertical: 13,
+    borderRadius: 12,
+    backgroundColor: theme.colors.primarySoft,
+    borderWidth: 1,
+    borderColor: theme.colors.mintBdr,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    flexDirection: 'row',
+    gap: 6,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  btnSendText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
 });
 
 export default createPrescriptionStyles;

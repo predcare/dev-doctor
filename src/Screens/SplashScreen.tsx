@@ -26,11 +26,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
   const logout = useAuthStore(state => state.logout);
 
   useEffect(() => {
-    // 1. Fade in and scale animations
+    // Fade in and scale animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 800,
+        duration: 500,
         useNativeDriver: true,
       }),
       Animated.spring(scaleAnim, {
@@ -41,8 +41,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
       }),
     ]).start();
 
-    // 2. Pulse animation loop
-    Animated.loop(
+    // Pulse animation
+    const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1.1,
@@ -55,25 +55,30 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
           useNativeDriver: true,
         }),
       ])
-    ).start();
+    );
+
+    pulseLoop.start();
 
     let isAuthenticated = false;
+    let isMounted = true;
 
     const authenticateAndLoad = async () => {
       try {
         const token = await getItem(STORAGE_KEYS.AUTH_TOKEN);
-        if (token) {
-          const res = await queryClient.fetchQuery({
-            queryKey: [ProfileQueryKeys.Profile],
-            queryFn: getProfile,
-          });
 
-          if (res?.doctor) {
-            setUserData(res.doctor);
-            isAuthenticated = true;
-          } else {
-            logout();
-          }
+        if (!token) {
+          logout();
+          return;
+        }
+
+        const res = await queryClient.fetchQuery({
+          queryKey: [ProfileQueryKeys.Profile],
+          queryFn: getProfile,
+        });
+
+        if (res?.doctor) {
+          setUserData(res.doctor);
+          isAuthenticated = true;
         } else {
           logout();
         }
@@ -83,9 +88,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
       }
     };
 
-    const minTimer = new Promise<void>(resolve => setTimeout(() => resolve(), 2200));
+    const startAuthentication = async () => {
+      await authenticateAndLoad();
 
-    Promise.all([authenticateAndLoad(), minTimer]).then(() => {
+      if (!isMounted) return;
+
+      // Move immediately after authentication/API completes
       if (onFinish) {
         onFinish(isAuthenticated);
       } else if (navigation) {
@@ -95,7 +103,17 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
           resetToLogin(navigation);
         }
       }
-    });
+    };
+
+    startAuthentication();
+
+    return () => {
+      isMounted = false;
+      pulseLoop.stop();
+      fadeAnim.stopAnimation();
+      scaleAnim.stopAnimation();
+      pulseAnim.stopAnimation();
+    };
   }, [fadeAnim, scaleAnim, pulseAnim, navigation, onFinish, setUserData, logout]);
 
   return (
@@ -106,6 +124,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
           <View style={[Splashstyles.circle, Splashstyles.circle2]} />
           <View style={[Splashstyles.circle, Splashstyles.circle3]} />
         </View>
+
         <Animated.View
           style={[
             Splashstyles.contentContainer,

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { formatDate } from '../../../lib/common/common.utils';
 import { TCreatePrescriptionFormValues } from '../../../lib/schemas/createPrescription.schema';
 import { patientDetailsStyles as S } from '../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../styled/theme.styled';
+import PredDatePickerModal from '../../commons/PredDatePickerModal/PredDatePickerModal';
 
 export const PrescriptionAdviceStep: React.FC = () => {
   const { control, setValue, getValues } = useFormContext<TCreatePrescriptionFormValues>();
@@ -31,7 +33,9 @@ export const PrescriptionAdviceStep: React.FC = () => {
                   : theme.colors.textMuted,
               }}
             >
-              {getValues('follow_up_date') || 'Tap to select follow-up date'}
+              {getValues('follow_up_date')
+                ? formatDate(getValues('follow_up_date'), 'DD MMM YYYY')
+                : 'Tap to select follow-up date'}
             </Text>
             <Text style={{ fontSize: 16 }}>📅</Text>
           </TouchableOpacity>
@@ -151,62 +155,26 @@ export const PrescriptionAdviceStep: React.FC = () => {
       </View>
 
       {/* Follow-up Date Modal Picker */}
-      <Modal
+      <PredDatePickerModal
         visible={showDatePicker}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDatePicker(false)}
-      >
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-          }}
-          activeOpacity={1}
-          onPress={() => setShowDatePicker(false)}
-        >
-          <View
-            style={{
-              backgroundColor: theme.colors.surface,
-              borderRadius: 16,
-              width: '85%',
-              padding: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: theme.colors.textPrimary,
-                marginBottom: 14,
-              }}
-            >
-              Select Follow-up Date
-            </Text>
-            {dates.map(d => (
-              <TouchableOpacity
-                key={d}
-                onPress={() => {
-                  setValue('follow_up_date', d);
-                  setShowDatePicker(false);
-                }}
-                style={{
-                  paddingVertical: 12,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.colors.surfaceSecondary,
-                }}
-              >
-                <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.textPrimary }}>
-                  {d}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+        value={
+          getValues('follow_up_date') && !isNaN(new Date(getValues('follow_up_date') || '').getTime())
+            ? new Date(getValues('follow_up_date') || '')
+            : new Date()
+        }
+        title="Select Follow-up Date"
+        onConfirm={selectedDate => {
+          console.log('selectedDate', selectedDate)
+          setValue('follow_up_date', formatDate(selectedDate, 'YYYY-MM-DD'), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          setShowDatePicker(false);
+        }}
+        onCancel={() => setShowDatePicker(false)}
+        minYear={new Date().getFullYear()}
+        maxYear={new Date().getFullYear() + 5}
+      />
     </View>
   );
 };
