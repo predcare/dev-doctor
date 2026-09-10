@@ -82,6 +82,11 @@ export const useMeetingHeartbeat = (onServerEndCall?: () => void) => {
     [appointmentId, isBothConnected, sendHeartbeatMutation, applyHeartbeatResponse]
   );
 
+  const sendHeartbeatOnceRef = useRef(sendHeartbeatOnce);
+  useEffect(() => {
+    sendHeartbeatOnceRef.current = sendHeartbeatOnce;
+  }, [sendHeartbeatOnce]);
+
   // 30-Second Interval timer loop - Runs ONLY when BOTH doctor and patient are connected
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -92,10 +97,10 @@ export const useMeetingHeartbeat = (onServerEndCall?: () => void) => {
       }
 
       // Initial immediate trigger
-      sendHeartbeatOnce();
+      sendHeartbeatOnceRef.current();
 
       intervalId = setInterval(() => {
-        sendHeartbeatOnce();
+        sendHeartbeatOnceRef.current();
       }, 30000); // 30 seconds gap
     } else {
       // Pause/Stop interval when patient leaves or call drops out of CONNECTED
@@ -112,7 +117,7 @@ export const useMeetingHeartbeat = (onServerEndCall?: () => void) => {
         clearInterval(intervalId);
       }
     };
-  }, [isBothConnected, callState, sendHeartbeatOnce]);
+  }, [isBothConnected, callState]);
 
   return {
     sendHeartbeatOnce,
