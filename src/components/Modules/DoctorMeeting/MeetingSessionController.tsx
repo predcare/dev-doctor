@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
+import { useMeetingHeartbeat } from '../../../hooks/commons/useMeetingHeartbeat';
 import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
 import { showErrorToast } from '../../../lib/common/toast.utils';
 import { navigationRef } from '../../../navigation/navigationRef';
@@ -60,6 +61,8 @@ const MeetingSessionController: React.FC = () => {
   const handleEndCall = useCallback(() => {
     endCall();
   }, [endCall]);
+
+  useMeetingHeartbeat(handleEndCall);
 
   if (isNativePip) {
     return (

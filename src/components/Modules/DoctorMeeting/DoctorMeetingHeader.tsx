@@ -28,9 +28,9 @@ export const DoctorMeetingHeader: React.FC<DoctorMeetingHeaderProps> = React.mem
           </Text>
           <Text style={S.doctorStatus}>
             {appointmentId
-              ? `${appointmentId} · ${isConnected ? 'IN CONSULTATION' : 'CONNECTING TO DOCTOR...'}`
+              ? `${appointmentId} · ${isConnected ? '' : 'CONNECTING TO DOCTOR...'}`
               : isConnected
-              ? 'IN CONSULTATION'
+              ? ''
               : 'CONNECTING TO DOCTOR...'}
           </Text>
         </View>

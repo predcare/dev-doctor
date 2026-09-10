@@ -18,13 +18,35 @@ export const getApptToken = async (appointmentId: number | string) => {
   return res.data;
 };
 
-export const sendHeartBeat = async (body: {
+export interface ISendHeartbeatPayload {
   appointment_id: string | number;
   role: 'doctor';
   call_timer_started_at: string;
   call_elapsed_seconds: number;
   call_timer_paused: boolean;
-}) => {
+}
+
+export interface IHeartbeatResponseData {
+  appointmentId: number;
+  appointment_status: string;
+  call_elapsed_seconds: number;
+  call_timer_paused: boolean;
+  presence: {
+    patient_active: boolean;
+    doctor_active: boolean;
+    stale_roles: string[];
+  };
+  remote_party_stale: boolean;
+}
+
+export interface IHeartbeatApiResponse {
+  ok: boolean;
+  message: string;
+  timestamp: string;
+  data: IHeartbeatResponseData;
+}
+
+export const sendHeartBeat = async (body: ISendHeartbeatPayload): Promise<IHeartbeatApiResponse> => {
   const res = await axiosInstance.post(`${endpoints.appointments.heartbeat}`, body);
   return res.data;
 };
