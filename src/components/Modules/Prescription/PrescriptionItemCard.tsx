@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { ChevronRightIcon } from '../../../components/ui/icons';
 import { dateOnly } from '../../../lib/common/common.utils';
@@ -10,16 +10,14 @@ export interface IPrescriptionItemCardProps {
   onPress: () => void;
 }
 
-export const PrescriptionItemCard: React.FC<IPrescriptionItemCardProps> = ({
-  item,
-  onPress,
-}) => {
+export const PrescriptionItemCard: React.FC<IPrescriptionItemCardProps> = ({ item, onPress }) => {
   const rxIdStr = item.prescription_id || `#${String(item.id).padStart(4, '0')}`;
   const patientName = item.patient_name || 'Patient';
   const status = (item.status || 'completed').toLowerCase();
-  const isCompleted = status === 'completed';
   const displayDate = dateOnly(item.created_at || item.consultation_date || item.appointment_date);
-
+  const isSent = useMemo(() => {
+    return item?.email_sent_at ? true : false;
+  }, [item?.email_sent_at]);
   return (
     <TouchableOpacity style={S.txCard} onPress={onPress} activeOpacity={0.75}>
       <View style={{ flex: 1 }}>
@@ -29,18 +27,13 @@ export const PrescriptionItemCard: React.FC<IPrescriptionItemCardProps> = ({
             style={[
               S.badge,
               {
-                backgroundColor: isCompleted ? '#D1FAE5' : '#FEF3C7',
+                backgroundColor: isSent ? '#D1FAE5' : '#FEF3C7',
                 marginLeft: 8,
               },
             ]}
           >
-            <Text
-              style={[
-                S.badgeTxt,
-                { color: isCompleted ? '#059669' : '#D97706' },
-              ]}
-            >
-              {status.toUpperCase()}
+            <Text style={[S.badgeTxt, { color: isSent ? '#059669' : '#D97706' }]}>
+              {isSent ? 'SENT' : 'NOT SENT'}
             </Text>
           </View>
         </View>

@@ -105,6 +105,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
       clinicAddress: rxDoc.resolved_clinic_address || rxDoc.clinic_address,
       date: dateOnly(rxDoc.created_at),
       status: rxDoc.status || 'completed',
+      isSent: Boolean(rxDoc?.email_sent_at) ? true : false,
 
       // Patient Info
       patientName: rxDoc.patient_name || route?.params?.patientName || 'Patient',
@@ -269,7 +270,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Clinic Card */}
+        {' '}
         <View style={S.clinicCard}>
           <View style={{ flex: 1 }}>
             <Text style={S.clinicName}>{displayData.clinicName}</Text>
@@ -282,15 +283,20 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={S.clinicDate}>{displayData.date}</Text>
             <View style={{ height: 4 }} />
-            <View style={[S.statusChip, { backgroundColor: isCompleted ? '#D1FAE5' : '#FEF3C7' }]}>
-              <Text style={[S.statusChipTxt, { color: isCompleted ? '#059669' : '#D97706' }]}>
-                {isCompleted ? 'CONFIRMED' : 'DRAFT'}
+            <View
+              style={[
+                S.statusChip,
+                { backgroundColor: displayData?.isSent ? '#D1FAE5' : '#FEF3C7' },
+              ]}
+            >
+              <Text
+                style={[S.statusChipTxt, { color: displayData?.isSent ? '#059669' : '#D97706' }]}
+              >
+                {displayData?.isSent ? 'SENT' : 'NOT SENT'}
               </Text>
             </View>
           </View>
         </View>
-
-        {/* Patient Card */}
         <View style={S.patientCard}>
           <View style={S.patientAvatarBox}>
             <PatientAvatarIcon size={24} color={TEAL} />
@@ -315,8 +321,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             <Text style={S.patientIdBadgeTxt}>{displayData.patientId}</Text>
           </View>
         </View>
-
-        {/* Medical Background (Drug Allergies & Chronic Conditions) - Full Width Stacked */}
         {(displayData.drugAllergies || displayData.chronicConditions) && (
           <View style={S.outerSection}>
             <View style={S.medicalBadgesColumn}>
@@ -336,7 +340,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Standard Vitals Section */}
         {displayData.standardVitals.length > 0 && (
           <View style={S.outerSection}>
@@ -357,7 +360,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Custom Vitals Section (Separated!) */}
         {displayData.customVitals.length > 0 && (
           <View style={S.outerSection}>
@@ -376,7 +378,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Chief Complaints Section */}
         {(displayData.chiefComplaints || displayData.symptoms) && (
           <View style={S.outerSection}>
@@ -394,7 +395,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Examination Notes */}
         {displayData.examinationNotes && (
           <View style={S.outerSection}>
@@ -410,7 +410,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Diagnosis Section */}
         {displayData.diagnosis && (
           <View style={S.outerSection}>
@@ -428,7 +427,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Treatment Plan Section */}
         {displayData.treatmentPlan && (
           <View style={S.outerSection}>
@@ -444,7 +442,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Medications Section */}
         {displayData.medications.length > 0 && (
           <View style={S.outerSection}>
@@ -499,7 +496,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Instructions & Advice Card */}
         {displayData.generalAdvice && (
           <View style={S.instructionsCard}>
@@ -510,7 +506,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             <Text style={S.instructionsTxt}>{displayData.generalAdvice}</Text>
           </View>
         )}
-
         {/* Doctor Notes Card */}
         {displayData.notes && (
           <View style={S.outerSection}>
@@ -525,7 +520,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Follow-up Card */}
         {displayData.followUp && (
           <View style={S.followUpCard}>
@@ -538,7 +532,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Referral Card */}
         {(displayData.referralSpecialist ||
           displayData.referralDoctorHospital ||
@@ -565,7 +558,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Lab Tests Section */}
         {displayData.labTests.length > 0 && (
           <View style={S.outerSection}>
@@ -595,7 +587,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             </View>
           </View>
         )}
-
         {/* Promo Row */}
         <TouchableOpacity style={S.promoRow} activeOpacity={0.7}>
           <View style={S.promoIconBox}>

@@ -64,6 +64,19 @@ export interface IPatientPrescriptionDoc {
   doctor_phone: string;
   resolved_clinic_name: any;
   resolved_clinic_address: any;
+  //
+  clinic_phone: any;
+  clinic_email?: string;
+  clinic_gstin?: string;
+  clinic_reg_no: any;
+  doctor_qualifications?: string;
+  doctor_experience_years?: string;
+  doctor_license_number?: string;
+  doctor_teleconsult_available?: number;
+  patient_phone?: string;
+  patient_display_id?: string;
+  visit_no?: number;
+  email_sent_at?: string;
 }
 
 export interface IPatientCustomVital {

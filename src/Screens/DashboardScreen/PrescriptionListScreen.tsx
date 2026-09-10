@@ -112,6 +112,7 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
     return prescriptionListData?.prescriptions || [];
   }, [prescriptionListData]);
 
+  console.log('prescriptions', prescriptions);
   // Filtering Logic
   const filteredPrescriptions = useMemo(() => {
     return prescriptions.filter(item => {
@@ -127,14 +128,14 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
       const matchChip =
         activeFilter === 'All' ||
         (activeFilter === 'Draft' && statusLower === 'draft') ||
-        (activeFilter === 'Sent' && (statusLower === 'sent' || statusLower === 'completed')) ||
+        (activeFilter === 'Sent' && (statusLower === 'sent' || Boolean(item.email_sent_at))) ||
         (activeFilter === 'Active' && statusLower === 'active');
 
       // 3. Modal Status Match
       const matchModalStatus =
         statusFilter.has('All') ||
         (statusFilter.has('Draft') && statusLower === 'draft') ||
-        (statusFilter.has('Sent') && (statusLower === 'sent' || statusLower === 'completed')) ||
+        (statusFilter.has('Sent') && (statusLower === 'sent' || Boolean(item.email_sent_at))) ||
         (statusFilter.has('Active') && statusLower === 'active');
 
       // 4. Date Range Match

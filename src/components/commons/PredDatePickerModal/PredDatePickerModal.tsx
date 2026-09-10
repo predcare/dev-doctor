@@ -84,7 +84,7 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
   };
 
   return (
-    <View style={styles.columnContainer}>
+    <View style={PredDatePickerstyles.columnContainer}>
       <FlatList
         ref={flatListRef}
         data={data}
@@ -106,13 +106,15 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
           return (
             <TouchableOpacity
               activeOpacity={0.7}
-              style={styles.wheelItem}
+              style={PredDatePickerstyles.wheelItem}
               onPress={() => handleItemPress(index)}
             >
               <Text
                 style={[
-                  styles.wheelText,
-                  isSelected ? styles.selectedWheelText : styles.unselectedWheelText,
+                  PredDatePickerstyles.wheelText,
+                  isSelected
+                    ? PredDatePickerstyles.selectedWheelText
+                    : PredDatePickerstyles.unselectedWheelText,
                 ]}
                 numberOfLines={1}
               >
@@ -233,45 +235,34 @@ export const PredDatePickerModal: React.FC<PredDatePickerModalProps> = React.mem
     return (
       <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
         <TouchableOpacity
-          style={styles.overlay}
+          style={PredDatePickerstyles.overlay}
           activeOpacity={1}
           onPress={closeOnTouchOutside ? onCancel : undefined}
         >
           <TouchableWithoutFeedback>
-            <View style={styles.cardContainer}>
-              {/* Header Title */}
-              <Text style={styles.modalTitle}>{title}</Text>
-
-              {/* Wheel Sub-headers (Day, Month, Year) */}
-              <View style={styles.columnHeaderRow}>
-                <Text style={styles.columnHeaderText}>Day</Text>
-                <Text style={styles.columnHeaderText}>Month</Text>
-                <Text style={styles.columnHeaderText}>Year</Text>
+            <View style={PredDatePickerstyles.cardContainer}>
+              <Text style={PredDatePickerstyles.modalTitle}>{title}</Text>
+              <View style={PredDatePickerstyles.columnHeaderRow}>
+                <Text style={PredDatePickerstyles.columnHeaderText}>Day</Text>
+                <Text style={PredDatePickerstyles.columnHeaderText}>Month</Text>
+                <Text style={PredDatePickerstyles.columnHeaderText}>Year</Text>
               </View>
+              <View style={PredDatePickerstyles.pickerWrapper}>
+                <View style={PredDatePickerstyles.selectionHighlightPill} pointerEvents="none" />
 
-              {/* 3-Column Wheels with Center Selection Pill Overlay */}
-              <View style={styles.pickerWrapper}>
-                {/* Horizontal Center Selection Bar */}
-                <View style={styles.selectionHighlightPill} pointerEvents="none" />
-
-                <View style={styles.wheelsRow}>
-                  {/* Day Wheel */}
+                <View style={PredDatePickerstyles.wheelsRow}>
                   <WheelColumn
                     data={days}
                     selectedIndex={dayIndex}
                     onSelect={handleDaySelect}
                     renderLabel={item => item.toString()}
                   />
-
-                  {/* Month Wheel */}
                   <WheelColumn
                     data={MONTH_NAMES}
                     selectedIndex={selectedMonth}
                     onSelect={handleMonthSelect}
                     renderLabel={item => item}
                   />
-
-                  {/* Year Wheel */}
                   <WheelColumn
                     data={years}
                     selectedIndex={yearIndex}
@@ -280,19 +271,21 @@ export const PredDatePickerModal: React.FC<PredDatePickerModalProps> = React.mem
                   />
                 </View>
               </View>
-
-              {/* Footer Action Buttons */}
-              <View style={styles.footerRow}>
-                <TouchableOpacity style={styles.actionBtn} onPress={onCancel} activeOpacity={0.7}>
-                  <Text style={styles.cancelBtnText}>{cancelText}</Text>
+              <View style={PredDatePickerstyles.footerRow}>
+                <TouchableOpacity
+                  style={PredDatePickerstyles.actionBtn}
+                  onPress={onCancel}
+                  activeOpacity={0.7}
+                >
+                  <Text style={PredDatePickerstyles.cancelBtnText}>{cancelText}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.actionBtn}
+                  style={PredDatePickerstyles.actionBtn}
                   onPress={handleConfirmPress}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.confirmBtnText}>{confirmText}</Text>
+                  <Text style={PredDatePickerstyles.confirmBtnText}>{confirmText}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -303,7 +296,7 @@ export const PredDatePickerModal: React.FC<PredDatePickerModalProps> = React.mem
   }
 );
 
-const styles = StyleSheet.create({
+export const PredDatePickerstyles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.45)',
