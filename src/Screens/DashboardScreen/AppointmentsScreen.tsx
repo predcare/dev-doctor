@@ -35,7 +35,7 @@ import {
   formatDateToYYYYMMDD,
   formatTodayBannerDate,
 } from '../../lib/common/common.utils';
-import { showErrorToast } from '../../lib/common/toast.utils';
+import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
@@ -252,6 +252,31 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const handleJoinVideoCall = useCallback(
     async (appointment: IAppointmentDoc) => {
       if (!appointment) return;
+
+      const storeState = useMeetingStore.getState();
+      const isCallActive =
+        (storeState.callState === 'CONNECTED' || storeState.callState === 'CONNECTING') &&
+        Boolean(storeState.token && storeState.meetingId);
+
+      const isCurrentAppt =
+        isCallActive &&
+        (String(storeState.appointmentId) === String(appointment.id) ||
+          (Boolean(appointment.appointment_id) &&
+            storeState.appointmentGeneratedId === appointment.appointment_id));
+
+      if (isCurrentAppt) {
+        storeState.setIsInAppPip(false);
+        navigation.navigate(AppRoute.DOCTOR_MEETING);
+        return;
+      }
+
+      if (isCallActive) {
+        showInfoToast(
+          'You are currently in an active consultation. Please end that call first.',
+          'Active Call Ongoing'
+        );
+        return;
+      }
 
       const hasPermissions = await requestAudioVideoPermissions();
       if (!hasPermissions) {

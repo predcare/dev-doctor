@@ -22,6 +22,7 @@ export * from './EditIcon';
 export * from './EndPhoneIcon';
 export * from './ExperienceIcon';
 export * from './FileDocumentIcon';
+export * from './FileIcon';
 export * from './FileTextIcon';
 export * from './FilterIcon';
 export * from './FlipCameraIcon';

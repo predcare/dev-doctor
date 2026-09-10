@@ -1,7 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Linking, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import { useMyPatientEmrs } from '../../../hooks/react-query/patients/patients.hooks';
 import { showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
+import { RootStackParamList } from '../../../route';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
@@ -12,11 +14,15 @@ import DocumentActionsModal from './DocumentActionsModal';
 import EMRUploadModal from './EMRUploadModal';
 import MedicalDocumentCard, { MedicalDocument } from './MedicalDocumentCard';
 
+type RecordsTabRouteProp = RouteProp<RootStackParamList, 'PatientDetails'>;
+
 export interface RecordsTabPanelProps {
   patientId: number | string;
 }
 
 export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) => {
+  const route = useRoute<RecordsTabRouteProp>();
+  const navigation = useNavigation();
   const { userData } = useAuthStore(state => state);
   const {
     data: emrData,
@@ -30,6 +36,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
 
   const [refreshing, setRefreshing] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+
   const [selectedDocForAction, setSelectedDocForAction] = useState<MedicalDocument | null>(null);
   const [showActionsModal, setShowActionsModal] = useState(false);
   const [localShareOverrides, setLocalShareOverrides] = useState<Record<string | number, boolean>>(
@@ -74,6 +81,13 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
       );
     }
   };
+
+  useEffect(() => {
+    if (route.params?.openUploadModal) {
+      setShowUploadModal(true);
+      navigation.setParams({ openUploadModal: undefined } as any);
+    }
+  }, [route.params?.openUploadModal, navigation]);
 
   return (
     <View style={{ flex: 1 }}>

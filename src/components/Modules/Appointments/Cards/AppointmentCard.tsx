@@ -11,6 +11,7 @@ import {
   TEAL,
 } from '../../../../styled/DoctorAppointmentsScreen.styled';
 import theme from '../../../../styled/theme.styled';
+import { useMeetingStore } from '../../../../zustand/stores/useMeetingStore';
 import CustomKebabMenu from '../../../ui/CustomMenu/CustomKebabMenu';
 import {
   CheckIcon,
@@ -86,6 +87,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     appointmentStatus,
     appointment_date,
     consultation_type,
+    appointmentId,
     appointmentGeneratedId,
     startTime,
     endTime,
@@ -109,6 +111,21 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       }
       return rawStatus;
     }, [appointmentStatus, isExpired]);
+
+    const activeApptId = useMeetingStore(state => state.appointmentId);
+    const activeApptGeneratedId = useMeetingStore(state => state.appointmentGeneratedId);
+    const activeCallState = useMeetingStore(state => state.callState);
+    const activeToken = useMeetingStore(state => state.token);
+    const activeMeetingId = useMeetingStore(state => state.meetingId);
+
+    const isCallActive =
+      (activeCallState === 'CONNECTED' || activeCallState === 'CONNECTING') &&
+      Boolean(activeToken && activeMeetingId);
+
+    const isCurrentApptInCall =
+      isCallActive &&
+      (String(activeApptId) === String(appointmentId) ||
+        (Boolean(appointmentGeneratedId) && activeApptGeneratedId === appointmentGeneratedId));
 
     const {
       isVideo,
@@ -243,7 +260,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             <View style={[S.statusBadge, { backgroundColor: statusBg }]}>
               <View style={[S.statusDot, { backgroundColor: statusColor }]} />
               <Text style={[S.statusText, { color: statusColor }]}>
-                {effectiveStatus.replace(/[-_]/g, ' ').toUpperCase()}
+                {effectiveStatus?.replace(/[-_]/g, ' ').toUpperCase()}
               </Text>
             </View>
             {menuItems.length > 0 && (
@@ -300,12 +317,24 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         {!isCompleted && !isCancelled && (
           <View style={[S.cardFooterActions, isInProgress && { flexDirection: 'row', gap: 10 }]}>
             <TouchableOpacity
-              style={[S.joinButton, isInProgress && { flex: 1 }]}
-              onPress={() => (isVideo ? onVideoCall?.() : onStartConsultation?.())}
+              style={[
+                S.joinButton,
+                isInProgress && { flex: 1 },
+                isCurrentApptInCall && { backgroundColor: '#0F766E' },
+              ]}
+              onPress={() =>
+                isVideo || isCurrentApptInCall ? onVideoCall?.() : onStartConsultation?.()
+              }
               activeOpacity={0.85}
             >
               <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-              <Text style={S.joinButtonText}>{isVideo ? 'Join Call' : 'Start Consultation'}</Text>
+              <Text style={S.joinButtonText}>
+                {isCurrentApptInCall
+                  ? 'Already in Call'
+                  : isVideo
+                  ? 'Join Call'
+                  : 'Start Consultation'}
+              </Text>
             </TouchableOpacity>
             {isInProgress && (
               <TouchableOpacity

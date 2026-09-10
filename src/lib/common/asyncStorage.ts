@@ -48,7 +48,7 @@ export async function getObject<T>(
 ): Promise<T | null> {
   try {
     const jsonValue = await AsyncStorage.getItem(key);
-    if (jsonValue !== null) {
+    if (jsonValue !== null && jsonValue !== undefined && jsonValue !== 'undefined') {
       return JSON.parse(jsonValue) as T;
     }
     return defaultValue;

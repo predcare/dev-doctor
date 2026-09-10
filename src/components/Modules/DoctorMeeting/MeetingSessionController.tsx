@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect } from 'react';
-import { NativeModules, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
 import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
 import { showErrorToast } from '../../../lib/common/toast.utils';
 import { navigationRef } from '../../../navigation/navigationRef';
+import { AppRoute } from '../../../route';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import { DoctorMeetingContainer } from './DoctorMeetingContainer';
 import { InAppPipOverlay } from './InAppPipOverlay';
 import { MeetingStageContainer } from './MeetingStageContainer';
-
-const { PiPModule } = NativeModules;
 
 const MeetingSessionController: React.FC = () => {
   const {
@@ -24,11 +23,7 @@ const MeetingSessionController: React.FC = () => {
 
   const { joinCall, endCall } = useVideoCallControls(() => {
     if (navigationRef.isReady()) {
-      if (navigationRef.canGoBack()) {
-        navigationRef.goBack();
-      } else {
-        (navigationRef as any).navigate('DoctorAppointments');
-      }
+      (navigationRef as any).navigate('DoctorAppointments');
     }
   });
 
@@ -42,11 +37,7 @@ const MeetingSessionController: React.FC = () => {
         showErrorToast('Camera and Microphone permissions are required for the consultation.');
         resetMeetingStore();
         if (navigationRef.isReady()) {
-          if (navigationRef.canGoBack()) {
-            navigationRef.goBack();
-          } else {
-            (navigationRef as any).navigate('DoctorAppointments');
-          }
+          (navigationRef as any).navigate('DoctorAppointments');
         }
         return;
       }
@@ -62,7 +53,7 @@ const MeetingSessionController: React.FC = () => {
   const handleExpandFromPip = useCallback(() => {
     setIsInAppPip(false);
     if (navigationRef.isReady()) {
-      (navigationRef as any).navigate('DoctorMeeting');
+      (navigationRef as any).navigate(AppRoute.DOCTOR_MEETING);
     }
   }, [setIsInAppPip]);
 

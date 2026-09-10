@@ -62,7 +62,9 @@ export type RootStackParamList = {
   DoctorMeeting:
     | { appointmentId?: number | string; patientId?: string; token?: string; meetingId?: string }
     | undefined;
-  PatientDetails: { patientId?: string | number; patientName?: string } | undefined;
+  PatientDetails:
+    | { patientId?: string | number; patientName?: string; openUploadModal?: boolean }
+    | undefined;
   InvoiceList: { user?: any } | undefined;
   CreateInvoice:
     | {

@@ -45,6 +45,7 @@ import { createPrescriptionStyles as S } from '../../styled/CreatePrescriptionSc
 import { theme } from '../../styled/theme.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
+import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 export type PrescriptionStep =
   | 'clinical'
@@ -122,6 +123,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
   const isInitialLoadRef = useRef<boolean>(true);
 
   const { showLoader, hideLoader } = useLoadingStore(state => state);
+  const { appointmentId } = useMeetingStore(state => state);
   const {
     data: patientInfo,
     isFetching: patientInfoPending,
@@ -217,7 +219,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     const rawPayload: Record<string, any> = {
       doctor_id: userData?.user_id || '',
       patient_id: patientId ?? rx?.patient_id ?? '',
-      appointment_id: route?.params?.appointmentId || '',
+      appointment_id: appointmentId ? appointmentId : '',
       type: 'doctor',
       patient_name: patientInfo?.name ?? route?.params?.patientName ?? rx?.patient_name,
       patient_age: patientInfo?.date_of_birth ? getAge(patientInfo.date_of_birth) : rx?.patient_age,
@@ -648,7 +650,19 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       <View style={S.headerContainer}>
         <TouchableOpacity
           style={S.backButton}
-          onPress={() => navigation?.goBack()}
+          onPress={() => {
+            if (prescriptionId) {
+              navigation?.navigate(AppRoute.PRESCRIPTION_VIEW, {
+                rxId: Number(prescriptionId),
+                patientName: patientInfo?.name,
+              });
+            } else {
+              navigation?.navigate(AppRoute.PATIENT_DETAILS, {
+                patientId: patientId,
+                patientName: patientInfo?.name,
+              });
+            }
+          }}
           activeOpacity={0.8}
         >
           <ChevronLeftIcon size={22} color={theme.colors.textPrimary} strokeWidth={2} />

@@ -21,6 +21,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     facingMode,
     remoteParticipantId,
     patientName,
+    appointmentId,
     appointmentGeneratedId,
     startTime,
     endTime,
@@ -41,13 +42,9 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
   const hasShownThreeMinWarningRef = useRef(false);
   const hasAutoEndedRef = useRef(false);
 
-  const { joinCall, toggleAudio, toggleVideo, switchCamera, endCall, localParticipant } =
+  const { toggleAudio, toggleVideo, switchCamera, endCall, localParticipant } =
     useVideoCallControls(() => {
-      if (navigation?.canGoBack?.()) {
-        navigation.goBack();
-      } else {
-        navigation?.navigate('DoctorAppointments');
-      }
+      navigation?.navigate('DoctorAppointments');
     });
 
   const handleEnterPip = React.useCallback(() => {
@@ -64,12 +61,42 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
   }, [callState, setIsInAppPip, navigation, endCall]);
 
   const handleMovedToPatient = useCallback(() => {
-    if (callState === 'CONNECTED') {
+    if (callState === 'CONNECTED' || callState === 'CONNECTING') {
       setIsInAppPip(true);
       if (navigation && patientUserId) {
         navigation.navigate(AppRoute.PATIENT_DETAILS, {
           patientId: patientUserId,
           patientName: patientName ?? undefined,
+        });
+      }
+    } else {
+      showInfoToast('Please wait for the call to be connected.');
+    }
+  }, [callState, setIsInAppPip, navigation, patientUserId, patientName]);
+
+  const handleRxPress = useCallback(() => {
+    if (callState === 'CONNECTED' || callState === 'CONNECTING') {
+      setIsInAppPip(true);
+      if (navigation && patientUserId) {
+        navigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
+          patientId: Number(patientUserId),
+          patientName: patientName ?? undefined,
+          appointmentId: appointmentId ?? undefined,
+        });
+      }
+    } else {
+      showInfoToast('Please wait for the call to be connected.');
+    }
+  }, [callState, setIsInAppPip, navigation, patientUserId, patientName, appointmentId]);
+
+  const handleUploadPress = useCallback(() => {
+    if (callState === 'CONNECTED' || callState === 'CONNECTING') {
+      setIsInAppPip(true);
+      if (navigation && patientUserId) {
+        navigation.navigate(AppRoute.PATIENT_DETAILS, {
+          patientId: patientUserId,
+          patientName: patientName ?? undefined,
+          openUploadModal: true,
         });
       }
     } else {
@@ -95,8 +122,6 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
       return () => clearTimeout(timer);
     }
   }, [callState, errorMessage, navigation, resetMeetingStore]);
-
-
 
   // 3-minute warning toast
   useEffect(() => {
@@ -164,8 +189,8 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
           onSwitchCamera={switchCamera}
           onEndCall={endCall}
           onPipPress={handleEnterPip}
-          onRxPress={handleMovedToPatient}
-          onUploadPress={handleMovedToPatient}
+          onRxPress={handleRxPress}
+          onUploadPress={handleUploadPress}
           onPatientPress={handleMovedToPatient}
         />
       </View>

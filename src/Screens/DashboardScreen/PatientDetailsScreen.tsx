@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
 import ConsultTabPanel from '../../components/Modules/PatientDetails/Consult/ConsultTabPanel';
@@ -31,14 +31,21 @@ const PatientMainTabs: TabItem[] = [
 interface PageProps {
   patientId: string;
   patientName: string;
+  openUploadModal?: boolean;
 }
 
 export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
   navigation,
   route,
 }) => {
-  const { patientId, patientName } = route?.params as PageProps;
+  const { patientId, patientName, openUploadModal } = (route?.params as PageProps) || {};
   const [activeMainTab, setActiveMainTab] = useState<MainTabKey>('records');
+
+  useEffect(() => {
+    if (openUploadModal) {
+      setActiveMainTab('records');
+    }
+  }, [openUploadModal]);
 
   const {
     data: patientInfo,
