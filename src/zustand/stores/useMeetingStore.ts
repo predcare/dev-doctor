@@ -10,6 +10,7 @@ interface IMeetingStoreState {
 
   // Appointment context (for header display & timer)
   patientName: string | null;
+  patientUserId: string | null;
   patientAlphanumericId: string | null;
   appointmentGeneratedId: string | null;
   startTime: string | null;
@@ -33,6 +34,7 @@ interface IMeetingStoreState {
     meetingId: string;
     appointmentId?: number | string;
     patientName?: string;
+    patientUserId?: string;
     patientAlphanumericId?: string;
     appointmentGeneratedId?: string;
     startTime?: string;
@@ -55,6 +57,7 @@ const initialState = {
   meetingId: null,
   appointmentId: null,
   patientName: null,
+  patientUserId: null,
   patientAlphanumericId: null,
   appointmentGeneratedId: null,
   startTime: null,
@@ -78,6 +81,7 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
     meetingId,
     appointmentId,
     patientName,
+    patientUserId,
     patientAlphanumericId,
     appointmentGeneratedId,
     startTime,
@@ -89,6 +93,7 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
       meetingId,
       appointmentId: appointmentId ?? null,
       patientName: patientName ?? null,
+      patientUserId: patientUserId ?? null,
       patientAlphanumericId: patientAlphanumericId ?? null,
       appointmentGeneratedId: appointmentGeneratedId ?? null,
       startTime: startTime ?? null,

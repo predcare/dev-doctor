@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, View } from 'react-native';
+import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
 import { useMeetingTimer } from '../../../hooks/commons/useMeetingTimer';
 import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
 import { SafeAreaWrapper } from '../../../Layout/SafeAreaWrapper';
 import { showErrorToast, showInfoToast } from '../../../lib/common/toast.utils';
-import type { DoctorMeetingScreenProps } from '../../../route';
+import { AppRoute, type DoctorMeetingScreenProps } from '../../../route';
 import { doctorMeetingStyles as S } from '../../../styled/DoctorMeetingScreen.styled';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import { DoctorMeetingHeader } from './DoctorMeetingHeader';
@@ -24,11 +25,12 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     appointmentGeneratedId,
     startTime,
     endTime,
+    patientUserId,
     callDurationSeconds,
     isNativePip,
     setIsInAppPip,
+    resetMeetingStore,
   } = useMeetingStore();
-  const { resetMeetingStore } = useMeetingStore(state => state);
 
   const { elapsedText, remainingText, remainingSeconds, isTimeUp } = useMeetingTimer(
     callState,
@@ -62,6 +64,20 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     }
   }, [callState, setIsInAppPip, navigation, endCall]);
 
+  const handleMovedToPatient = useCallback(() => {
+    if (callState === 'CONNECTED') {
+      setIsInAppPip(true);
+      if (navigation && patientUserId) {
+        navigation.navigate(AppRoute.PATIENT_DETAILS, {
+          patientId: patientUserId,
+          patientName: patientName ?? undefined,
+        });
+      }
+    } else {
+      showInfoToast('Please wait for the call to be connected.');
+    }
+  }, [callState, setIsInAppPip, navigation, patientUserId, patientName]);
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       handleEnterPip();
@@ -81,9 +97,29 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     }
   }, [callState, errorMessage, navigation, resetMeetingStore]);
 
+  const { requestAudioVideoPermissions } = useDevicePermissions();
+
   useEffect(() => {
-    joinCall();
-  }, [joinCall]);
+    let isMounted = true;
+    (async () => {
+      const granted = await requestAudioVideoPermissions();
+      if (!granted) {
+        showErrorToast('Camera and Microphone permissions are required for the consultation.');
+        if (navigation?.canGoBack?.()) {
+          navigation.goBack();
+        } else {
+          navigation?.navigate('DoctorAppointments');
+        }
+        return;
+      }
+      if (isMounted) {
+        joinCall();
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [joinCall, requestAudioVideoPermissions, navigation]);
 
   // 3-minute warning toast
   useEffect(() => {
@@ -151,12 +187,9 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
           onSwitchCamera={switchCamera}
           onEndCall={endCall}
           onPipPress={handleEnterPip}
-          onRxPress={() => {
-            showInfoToast('RX mode is under development');
-          }}
-          onUploadPress={() => {
-            showInfoToast('Upload mode is under development');
-          }}
+          onRxPress={handleMovedToPatient}
+          onUploadPress={handleMovedToPatient}
+          onPatientPress={handleMovedToPatient}
         />
       </View>
     </SafeAreaWrapper>

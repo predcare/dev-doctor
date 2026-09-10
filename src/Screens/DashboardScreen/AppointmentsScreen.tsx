@@ -21,6 +21,7 @@ import AppointmentInfoModal from '../../components/Modules/Appointments/Modals/A
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import AppointmentSkeleton from '../../components/Skeletons/AppointmentSkeleton';
 import { CircleXIcon, FilterIcon, SearchIcon } from '../../components/ui/icons';
+import { useDevicePermissions } from '../../hooks/commons/useDevicePermissions';
 import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
 import {
   useChangeAppointmentStatus,
@@ -66,6 +67,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const { userData } = useAuthStore(state => state);
   const { showLoader, hideLoader } = useLoadingStore(state => state);
   const { setMeetingSession } = useMeetingStore(state => state);
+  const { requestAudioVideoPermissions } = useDevicePermissions();
 
   const {
     data: myAppointments,
@@ -220,7 +222,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
     }));
   }, []);
 
-  console.log('filteredAppointments', filteredAppointments);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchMyAppointments();
@@ -251,6 +252,13 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const handleJoinVideoCall = useCallback(
     async (appointment: IAppointmentDoc) => {
       if (!appointment) return;
+
+      const hasPermissions = await requestAudioVideoPermissions();
+      if (!hasPermissions) {
+        showErrorToast('Camera and Microphone permissions are required to join the consultation.');
+        return;
+      }
+
       const apptId = appointment.id;
       let token: string | undefined;
       let meetingId: string | undefined = appointment.meeting_id;
@@ -259,6 +267,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
         showErrorToast('No valid appointment ID found to fetch token');
         return;
       }
+      if (!appointment?.patient_id)
+        return showErrorToast('No valid patient ID found to fetch token');
 
       try {
         const tokenResponse = await queryClient.fetchQuery({
@@ -294,11 +304,12 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
         startTime: appointment.start_time,
         endTime: appointment.end_time,
         callDurationSeconds: call_duration_seconds ?? 0,
+        patientUserId: String(appointment?.patient_id),
       });
 
       navigation.navigate(AppRoute.DOCTOR_MEETING);
     },
-    [navigation, queryClient, setMeetingSession]
+    [navigation, queryClient, setMeetingSession, requestAudioVideoPermissions]
   );
 
   const handleStartConsulation = useCallback(

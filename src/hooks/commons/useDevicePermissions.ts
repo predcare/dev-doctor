@@ -138,12 +138,38 @@ export const useDevicePermissions = () => {
     return true;
   };
 
+  /**
+   * Request both Camera and Microphone permissions for video calls
+   */
+  const requestAudioVideoPermissions = async (): Promise<boolean> => {
+    if (Platform.OS === 'android') {
+      try {
+        const grants = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ]);
+
+        const cameraGranted =
+          grants[PermissionsAndroid.PERMISSIONS.CAMERA] === PermissionsAndroid.RESULTS.GRANTED;
+        const micGranted =
+          grants[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === PermissionsAndroid.RESULTS.GRANTED;
+
+        return cameraGranted && micGranted;
+      } catch (err) {
+        console.warn('Audio/Video permission request error:', err);
+        return false;
+      }
+    }
+    return true;
+  };
+
   return {
     requestAndroidPermission,
     requestCameraPermission,
     requestStoragePermission,
     requestMicrophonePermission,
     requestLocationPermission,
+    requestAudioVideoPermissions,
   };
 };
 

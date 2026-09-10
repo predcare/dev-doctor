@@ -24,6 +24,7 @@ interface MeetingControlBarProps {
   onRxPress?: () => void;
   onUploadPress?: () => void;
   onPipPress?: () => void;
+  onPatientPress?: () => void;
 }
 
 export const MeetingControlBar: React.FC<MeetingControlBarProps> = ({
@@ -36,6 +37,7 @@ export const MeetingControlBar: React.FC<MeetingControlBarProps> = ({
   onRxPress,
   onUploadPress,
   onPipPress,
+  onPatientPress,
 }) => {
   return (
     <View style={S.controlBarContainer}>
@@ -62,11 +64,15 @@ export const MeetingControlBar: React.FC<MeetingControlBarProps> = ({
           <FlipCameraIcon size={22} color="#94A3B8" />
           <Text style={[S.controlBtnTxt, S.controlBtnTxtMuted]}>FLIP</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onPipPress}>
+          <PipIcon size={22} color="#94A3B8" />
+          <Text style={S.controlBtnTxt}>PIP</Text>
+        </TouchableOpacity>
       </View>
       <View style={S.controlRow}>
-        <TouchableOpacity style={S.controlBtn} activeOpacity={0.8}>
+        <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onPatientPress}>
           <PatientsIcon size={22} color="#94A3B8" />
-          <Text style={S.controlBtnTxt}>Patient</Text>
+          <Text style={S.controlBtnTxt}>PATIENT</Text>
         </TouchableOpacity>
         <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onRxPress}>
           <RxIcon size={22} color="#94A3B8" />
@@ -76,10 +82,7 @@ export const MeetingControlBar: React.FC<MeetingControlBarProps> = ({
           <UploadIcon size={22} color="#94A3B8" />
           <Text style={S.controlBtnTxt}>UPLOAD</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={S.controlBtn} activeOpacity={0.8} onPress={onPipPress}>
-          <PipIcon size={22} color="#94A3B8" />
-          <Text style={S.controlBtnTxt}>PIP</Text>
-        </TouchableOpacity>
+
         <TouchableOpacity
           style={[S.controlBtn, S.controlBtnEnd]}
           activeOpacity={0.8}
