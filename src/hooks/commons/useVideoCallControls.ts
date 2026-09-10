@@ -1,7 +1,10 @@
 import { useMeeting } from '@videosdk.live/react-native-sdk';
 import { useCallback, useEffect, useRef } from 'react';
 import { NativeModules, Platform } from 'react-native';
+import { showErrorToast } from '../../lib/common/toast.utils';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
+import { ISaveCallPayload, saveCall } from '../react-query/appointments/appointments.func';
 
 const { PiPModule } = NativeModules;
 
@@ -10,6 +13,9 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   const isJoiningRef = useRef(false);
   const isLeavingRef = useRef(false);
   const isMountedRef = useRef(true);
+  const callStartTimeRef = useRef<string | null>(null);
+  const maxParticipantsRef = useRef<number>(1);
+
 
   const {
     setCallState,
@@ -41,6 +47,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     onMeetingJoined: async () => {
       hasJoinedRef.current = true;
       isJoiningRef.current = false;
+      callStartTimeRef.current = new Date().toISOString();
       if (!isMountedRef.current) return;
       setCallState('CONNECTING');
 
@@ -163,12 +170,18 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   }, [localParticipant]);
 
   useEffect(() => {
-    if (participants && participants.size > 0 && isMountedRef.current) {
-      const remote = Array.from(participants.values()).find((p: any) => !p.local);
-      if (remote && remote.id) {
-        const currentRemoteId = useMeetingStore.getState().remoteParticipantId;
-        if (currentRemoteId !== remote.id) {
-          useMeetingStore.getState().setRemoteParticipantId(remote.id);
+    if (participants && isMountedRef.current) {
+      const totalCount = participants.size + 1;
+      if (totalCount > maxParticipantsRef.current) {
+        maxParticipantsRef.current = totalCount;
+      }
+      if (participants.size > 0) {
+        const remote = Array.from(participants.values()).find((p: any) => !p.local);
+        if (remote && remote.id) {
+          const currentRemoteId = useMeetingStore.getState().remoteParticipantId;
+          if (currentRemoteId !== remote.id) {
+            useMeetingStore.getState().setRemoteParticipantId(remote.id);
+          }
         }
       }
     }
@@ -196,11 +209,15 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   }, [join, localParticipant]);
 
   const toggleAudio = useCallback(() => {
+    if (!localParticipant) {
+      showErrorToast('Microphone is initializing, please wait...');
+      return;
+    }
     if (toggleMic) {
       toggleMic();
       setMicState(!isMicOn);
     }
-  }, [toggleMic, isMicOn, setMicState]);
+  }, [toggleMic, isMicOn, setMicState, localParticipant]);
 
   const muteAudio = useCallback(() => {
     if (muteMic) {
@@ -217,11 +234,15 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   }, [unmuteMic, setMicState]);
 
   const toggleVideo = useCallback(() => {
+    if (!localParticipant) {
+      showErrorToast('Camera is initializing, please wait...');
+      return;
+    }
     if (toggleWebcam) {
       toggleWebcam();
       setCameraState(!isCameraOn);
     }
-  }, [toggleWebcam, isCameraOn, setCameraState]);
+  }, [toggleWebcam, isCameraOn, setCameraState, localParticipant]);
 
   const stopCamera = useCallback(() => {
     if (disableWebcam) {
@@ -263,29 +284,75 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     }
   }, [changeWebcam, getWebcams, facingMode, setFacingMode]);
 
-  const endCall = useCallback(() => {
-    if (isLeavingRef.current) return;
-    isLeavingRef.current = true;
-    hasJoinedRef.current = false;
-    isJoiningRef.current = false;
+  const endCall = useCallback(
+    async (
+      reason: 'time_up' | 'doctor_ended_early' | 'patient_left' | 'error' = 'doctor_ended_early'
+    ) => {
+      if (isLeavingRef.current) return;
+      isLeavingRef.current = true;
+      hasJoinedRef.current = false;
+      isJoiningRef.current = false;
 
-    if (leave) {
+      useLoadingStore.getState().showLoader('Ending call and saving record...');
+
+      const storeState = useMeetingStore.getState();
+      const appointmentId = storeState.appointmentId;
+      const callDurationSeconds = storeState.callDurationSeconds;
+
       try {
-        leave();
+        if (appointmentId) {
+          const callEndTime = new Date().toISOString();
+          const callStartTime = callStartTimeRef.current || callEndTime;
+          const startedMs = Date.parse(callStartTime);
+          const accumulatedSeconds = !isNaN(startedMs)
+            ? Math.max(0, Math.floor((Date.now() - startedMs) / 1000))
+            : 0;
+
+          const isTimeUp = reason === 'time_up';
+          const scheduledSeconds = callDurationSeconds || 0;
+          const markCompleted =
+            isTimeUp || (scheduledSeconds > 0 && accumulatedSeconds >= scheduledSeconds);
+
+          const payload: ISaveCallPayload = {
+            appointment_id: appointmentId,
+            call_start_time: callStartTime,
+            call_end_time: callEndTime,
+            call_duration_seconds: accumulatedSeconds,
+            accumulated_call_seconds: accumulatedSeconds,
+            call_end_reason: reason,
+            max_participants: Math.max(1, maxParticipantsRef.current || 1),
+            mark_completed: markCompleted,
+            call_timer_started_at: callStartTime,
+            call_elapsed_seconds: accumulatedSeconds,
+            call_timer_paused: false,
+            doctor_last_heartbeat: callEndTime,
+            patient_last_heartbeat: null,
+          };
+
+          await saveCall(payload);
+        }
       } catch (err) {
-        console.warn('[VideoSDK]: Error executing leave():', err);
+        console.warn('[saveCall Error]:', err);
+      } finally {
+        if (Platform.OS === 'android' && PiPModule?.setCallActive) {
+          PiPModule.setCallActive(false).catch?.(() => {});
+        }
+        try {
+          if (leave) {
+            leave();
+          }
+        } catch (err) {
+          console.warn('[VideoSDK]: Error executing leave():', err);
+        }
         resetMeetingStore();
+        useLoadingStore.getState().hideLoader();
         if (onLeaveCallback) {
           onLeaveCallback();
         }
       }
-    } else {
-      resetMeetingStore();
-      if (onLeaveCallback) {
-        onLeaveCallback();
-      }
-    }
-  }, [leave, resetMeetingStore, onLeaveCallback]);
+    },
+    [leave, resetMeetingStore, onLeaveCallback]
+  );
 
   return {
     joinCall,

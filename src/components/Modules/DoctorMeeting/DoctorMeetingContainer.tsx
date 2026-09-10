@@ -139,7 +139,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
       hasAutoEndedRef.current = true;
       showInfoToast('Consultation time has ended. The call will disconnect now.', '⏱ Time Up');
       const timer = setTimeout(() => {
-        endCall();
+        endCall('time_up');
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -187,7 +187,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
           onToggleAudio={toggleAudio}
           onToggleVideo={toggleVideo}
           onSwitchCamera={switchCamera}
-          onEndCall={endCall}
+          onEndCall={() => endCall('doctor_ended_early')}
           onPipPress={handleEnterPip}
           onRxPress={handleRxPress}
           onUploadPress={handleUploadPress}

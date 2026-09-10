@@ -80,7 +80,24 @@ export const rescheduleAppointment = async (id: number | string, body: any) => {
   return res.data;
 };
 
-export const saveCall = async (body: any) => {
+export interface ISaveCallPayload {
+  appointment_id: string | number;
+  call_start_time: string;
+  call_end_time: string;
+  call_duration_seconds: number;
+  accumulated_call_seconds: number;
+  call_end_reason: 'time_up' | 'doctor_ended_early' | 'patient_left' | 'error';
+  max_participants: number;
+  mark_completed: boolean;
+  call_timer_started_at?: string | null;
+  call_elapsed_seconds?: number;
+  call_timer_paused?: boolean;
+  doctor_last_heartbeat?: string | null;
+  patient_last_heartbeat?: string | null;
+}
+
+export const saveCall = async (body: ISaveCallPayload) => {
   const res = await axiosInstance.post(endpoints.appointments.saveCall, body);
   return res.data;
 };
+

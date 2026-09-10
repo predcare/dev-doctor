@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { DeviceEventEmitter, Platform, StyleSheet, View } from 'react-native';
 import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
 import { useMeetingHeartbeat } from '../../../hooks/commons/useMeetingHeartbeat';
 import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
@@ -59,7 +59,19 @@ const MeetingSessionController: React.FC = () => {
   }, [setIsInAppPip]);
 
   const handleEndCall = useCallback(() => {
-    endCall();
+    endCall('doctor_ended_early');
+  }, [endCall]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    const subscription = DeviceEventEmitter.addListener('onPiPClosed', () => {
+      endCall('doctor_ended_early');
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, [endCall]);
 
   useMeetingHeartbeat(handleEndCall);

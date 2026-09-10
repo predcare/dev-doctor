@@ -65,7 +65,15 @@ export const useRescheduleAppointment = () =>
       rescheduleAppointment(params?.id!, params?.body!),
   });
 
+import { ISaveCallPayload } from './appointments.func';
+
+export const useSaveCall = () =>
+  useMutation({
+    mutationFn: (body: ISaveCallPayload) => saveCall(body),
+  });
+
 export const useSaveCalled = () =>
   useMutation({
-    mutationFn: (params?: { body?: any }) => saveCall(params?.body!),
+    mutationFn: (params?: { body?: ISaveCallPayload }) => saveCall(params?.body!),
   });
+
