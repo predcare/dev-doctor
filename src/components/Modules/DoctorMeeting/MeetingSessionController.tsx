@@ -1,6 +1,8 @@
-import { useMeeting } from '@videosdk.live/react-native-sdk';
-import React, { useCallback } from 'react';
-import { NativeModules, Platform, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { NativeModules, StyleSheet, View } from 'react-native';
+import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
+import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
+import { showErrorToast } from '../../../lib/common/toast.utils';
 import { navigationRef } from '../../../navigation/navigationRef';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import { DoctorMeetingContainer } from './DoctorMeetingContainer';
@@ -10,7 +12,6 @@ import { MeetingStageContainer } from './MeetingStageContainer';
 const { PiPModule } = NativeModules;
 
 const MeetingSessionController: React.FC = () => {
-  const { leave } = useMeeting();
   const {
     isInAppPip,
     setIsInAppPip,
@@ -21,6 +22,43 @@ const MeetingSessionController: React.FC = () => {
     resetMeetingStore,
   } = useMeetingStore();
 
+  const { joinCall, endCall } = useVideoCallControls(() => {
+    if (navigationRef.isReady()) {
+      if (navigationRef.canGoBack()) {
+        navigationRef.goBack();
+      } else {
+        (navigationRef as any).navigate('DoctorAppointments');
+      }
+    }
+  });
+
+  const { requestAudioVideoPermissions } = useDevicePermissions();
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      const granted = await requestAudioVideoPermissions();
+      if (!granted) {
+        showErrorToast('Camera and Microphone permissions are required for the consultation.');
+        resetMeetingStore();
+        if (navigationRef.isReady()) {
+          if (navigationRef.canGoBack()) {
+            navigationRef.goBack();
+          } else {
+            (navigationRef as any).navigate('DoctorAppointments');
+          }
+        }
+        return;
+      }
+      if (isMounted) {
+        joinCall();
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [joinCall, requestAudioVideoPermissions, resetMeetingStore]);
+
   const handleExpandFromPip = useCallback(() => {
     setIsInAppPip(false);
     if (navigationRef.isReady()) {
@@ -29,21 +67,8 @@ const MeetingSessionController: React.FC = () => {
   }, [setIsInAppPip]);
 
   const handleEndCall = useCallback(() => {
-    try {
-      if (leave) {
-        leave();
-      }
-    } catch (e) {
-      console.warn('[GlobalMeetingManager]: Error leaving call:', e);
-    }
-    if (Platform.OS === 'android' && PiPModule?.setCallActive) {
-      PiPModule.setCallActive(false).catch?.(() => {});
-    }
-    resetMeetingStore();
-    if (navigationRef.isReady()) {
-      (navigationRef as any).navigate('DoctorAppointments');
-    }
-  }, [leave, resetMeetingStore]);
+    endCall();
+  }, [endCall]);
 
   if (isNativePip) {
     return (

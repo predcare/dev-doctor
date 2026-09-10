@@ -124,7 +124,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     leaveRef.current = leave;
   }, [leave]);
 
-  // Cleanup on component unmount to ensure VideoSDK leaves session only when not in PiP
+  // Cleanup on component unmount to ensure VideoSDK leaves session only when not in active call / PiP
   useEffect(() => {
     isMountedRef.current = true;
     if (localParticipant) {
@@ -132,10 +132,22 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     }
     return () => {
       isMountedRef.current = false;
-      // If we are minimizing to In-App PiP mode, keep the call running
-      if (useMeetingStore.getState().isInAppPip) {
+      const storeState = useMeetingStore.getState();
+
+      // If active call is ongoing (In-App PiP, Native PiP, or active meeting session),
+      // DO NOT call leave(). leave() is only called when endCall() is explicitly triggered.
+      const isCallActive =
+        storeState.isInAppPip ||
+        storeState.isNativePip ||
+        (storeState.token &&
+          storeState.meetingId &&
+          storeState.callState !== 'ENDED' &&
+          storeState.callState !== 'IDLE');
+
+      if (isCallActive) {
         return;
       }
+
       if (hasJoinedRef.current || isJoiningRef.current) {
         hasJoinedRef.current = false;
         isJoiningRef.current = false;

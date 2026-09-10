@@ -1,6 +1,7 @@
 import { MeetingProvider } from '@videosdk.live/react-native-sdk';
 import React, { useEffect } from 'react';
 import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { navigationRef } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import MeetingSessionController from './MeetingSessionController';
@@ -14,6 +15,7 @@ export const GlobalMeetingManager: React.FC = () => {
     meetingId: callmeetingId,
     callState,
     setIsNativePip,
+    setIsInAppPip,
   } = useMeetingStore();
 
   useEffect(() => {
@@ -26,6 +28,13 @@ export const GlobalMeetingManager: React.FC = () => {
 
     const subscription = DeviceEventEmitter.addListener('onPiPModeChanged', (isInPip: boolean) => {
       setIsNativePip(isInPip);
+      if (!isInPip) {
+        // Restoring from OS Native Android PiP -> navigate directly to full-screen DoctorMeeting screen
+        setIsInAppPip(false);
+        if (navigationRef.isReady()) {
+          (navigationRef as any).navigate('DoctorMeeting');
+        }
+      }
     });
 
     return () => {
@@ -34,7 +43,7 @@ export const GlobalMeetingManager: React.FC = () => {
         PiPModule.setCallActive(false).catch?.(() => {});
       }
     };
-  }, [callState, callmeetingId, setIsNativePip]);
+  }, [callState, callmeetingId, setIsNativePip, setIsInAppPip]);
 
   const hasActiveMeeting = Boolean(
     callToken && callmeetingId && callState !== 'ENDED' && callState !== 'IDLE'

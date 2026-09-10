@@ -2,7 +2,9 @@ import { useMeeting } from '@videosdk.live/react-native-sdk';
 import React, { useMemo, useRef } from 'react';
 import {
   Animated,
+  BackHandler,
   Dimensions,
+  NativeModules,
   PanResponder,
   Platform,
   StyleSheet,
@@ -28,6 +30,22 @@ interface InAppPipOverlayProps {
 export const InAppPipOverlay: React.FC<InAppPipOverlayProps> = ({ onExpand, onEndCall }) => {
   const { remoteParticipantId, patientName, isInAppPip } = useMeetingStore();
   const { participants } = useMeeting();
+
+  // Intercept hardware back button when In-App PiP is active -> switch to Native OS PiP mode
+  React.useEffect(() => {
+    if (!isInAppPip) return;
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      const { PiPModule } = NativeModules;
+      if (Platform.OS === 'android' && PiPModule?.enterPiP) {
+        PiPModule.enterPiP().catch?.(() => {});
+        return true;
+      }
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [isInAppPip]);
 
   const effectiveRemoteId = useMemo(() => {
     if (remoteParticipantId) return remoteParticipantId;

@@ -22,6 +22,24 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
     setIsInAppPip(false);
   }, [setIsInAppPip]);
 
+  // Intercept navigation pop (back gesture / header back) to switch active call to In-App PiP mode
+  useEffect(() => {
+    if (!navigation) return;
+
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      const state = useMeetingStore.getState();
+      const isCallActive =
+        (state.callState === 'CONNECTED' || state.callState === 'CONNECTING') &&
+        Boolean(state.token && state.meetingId);
+
+      if (isCallActive && !state.isInAppPip) {
+        state.setIsInAppPip(true);
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const isMissingSession = !callToken || !callmeetingId;
   const isErrorState = callState === 'ERROR';
 

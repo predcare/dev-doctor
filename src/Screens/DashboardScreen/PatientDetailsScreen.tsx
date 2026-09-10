@@ -16,7 +16,7 @@ import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import { useMyPatientInfo } from '../../hooks/react-query/patients/patients.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { getAge } from '../../lib/common/common.utils';
-import type { PatientDetailsScreenProps } from '../../route';
+import { AppRoute, type PatientDetailsScreenProps } from '../../route';
 import { patientDetailsStyles } from '../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 
@@ -59,7 +59,11 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
       <View style={patientDetailsStyles.topBar}>
         <TouchableOpacity
           style={patientDetailsStyles.backCircle}
-          onPress={() => navigation?.goBack()}
+          onPress={() =>
+            navigation?.navigate(AppRoute.MAIN_TABS, {
+              screen: AppRoute.PATIENTS,
+            })
+          }
           activeOpacity={0.8}
         >
           <ChevronLeftIcon size={20} color={theme.colors.textInverted} strokeWidth={2.5} />

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, View } from 'react-native';
-import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
 import { useMeetingTimer } from '../../../hooks/commons/useMeetingTimer';
 import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
 import { SafeAreaWrapper } from '../../../Layout/SafeAreaWrapper';
@@ -97,29 +96,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     }
   }, [callState, errorMessage, navigation, resetMeetingStore]);
 
-  const { requestAudioVideoPermissions } = useDevicePermissions();
 
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      const granted = await requestAudioVideoPermissions();
-      if (!granted) {
-        showErrorToast('Camera and Microphone permissions are required for the consultation.');
-        if (navigation?.canGoBack?.()) {
-          navigation.goBack();
-        } else {
-          navigation?.navigate('DoctorAppointments');
-        }
-        return;
-      }
-      if (isMounted) {
-        joinCall();
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, [joinCall, requestAudioVideoPermissions, navigation]);
 
   // 3-minute warning toast
   useEffect(() => {
