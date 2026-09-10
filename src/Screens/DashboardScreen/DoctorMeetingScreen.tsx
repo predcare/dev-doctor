@@ -11,6 +11,8 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
   const {
     token: callToken,
     meetingId: callmeetingId,
+    callState,
+    errorMessage,
     resetMeetingStore,
     setIsInAppPip,
   } = useMeetingStore(state => state);
@@ -20,12 +22,21 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
     setIsInAppPip(false);
   }, [setIsInAppPip]);
 
-  const isInvalidSession = !callToken || !callmeetingId;
+  const isMissingSession = !callToken || !callmeetingId;
+  const isErrorState = callState === 'ERROR';
+
   useEffect(() => {
-    if (isInvalidSession) {
-      showErrorToast("'token' is empty or invalid or might have expired.");
+    if (isMissingSession && !isErrorState) {
+      // Normal call end or store reset — exit gracefully without error card or toast
+      if (navigation?.canGoBack?.()) {
+        navigation.goBack();
+      } else {
+        navigation?.navigate('DoctorAppointments');
+      }
+    } else if (isErrorState) {
+      showErrorToast(errorMessage || "'token' is empty or invalid or might have expired.");
       const timer = setTimeout(() => {
-        useMeetingStore.getState().resetMeetingStore();
+        resetMeetingStore();
         if (navigation?.canGoBack?.()) {
           navigation.goBack();
         } else {
@@ -34,19 +45,23 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [isInvalidSession, navigation]);
+  }, [isMissingSession, isErrorState, errorMessage, navigation, resetMeetingStore]);
 
-  if (isInvalidSession) {
+  if (isErrorState) {
     return (
       <SafeAreaWrapper>
         <View style={S.container}>
           <View style={[S.stageContainer, { paddingHorizontal: 16 }]}>
             <CommonErrorCard
               title="Invalid Meeting Token"
-              message="'token' is empty or invalid or might have expired."
+              message={errorMessage || "'token' is empty or invalid or might have expired."}
               onRetry={() => {
                 resetMeetingStore();
-                navigation?.navigate('DoctorAppointments');
+                if (navigation?.canGoBack?.()) {
+                  navigation.goBack();
+                } else {
+                  navigation?.navigate('DoctorAppointments');
+                }
               }}
               retryText="Return to Appointments"
             />

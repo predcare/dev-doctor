@@ -1,6 +1,9 @@
 import { useMeeting } from '@videosdk.live/react-native-sdk';
 import { useCallback, useEffect, useRef } from 'react';
+import { NativeModules, Platform } from 'react-native';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
+
+const { PiPModule } = NativeModules;
 
 export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   const hasJoinedRef = useRef(false);
@@ -66,6 +69,9 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
       hasJoinedRef.current = false;
       isJoiningRef.current = false;
       isLeavingRef.current = false;
+      if (Platform.OS === 'android' && PiPModule?.setCallActive) {
+        PiPModule.setCallActive(false).catch?.(() => {});
+      }
       resetMeetingStore();
       if (onLeaveCallback) {
         onLeaveCallback();

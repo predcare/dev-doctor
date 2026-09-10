@@ -16,9 +16,7 @@ import { DashboardTabParamList, RootStackParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
 import ComingSoonScreen from '../Screens/ComingSoonScreen';
 import AddPatientScreen from '../Screens/DashboardScreen/AddPatientScreen';
-import DoctorAppointmentsScreen, {
-  AppointmentsScreen,
-} from '../Screens/DashboardScreen/AppointmentsScreen';
+import { AppointmentsScreen } from '../Screens/DashboardScreen/AppointmentsScreen';
 import AvailabilityScreen from '../Screens/DashboardScreen/AvailabilityScreen';
 import BookAppointmentScreen from '../Screens/DashboardScreen/BookAppointmentScreen';
 import CreateInvoiceScreen from '../Screens/DashboardScreen/CreateInvoiceScreen';
@@ -139,7 +137,7 @@ const DashboardTabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Schedule"
-        component={DoctorAppointmentsScreen}
+        component={AppointmentsScreen}
         options={{
           headerShown: false,
           title: 'Schedule',
