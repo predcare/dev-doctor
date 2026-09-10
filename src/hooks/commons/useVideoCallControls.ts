@@ -1,7 +1,7 @@
 import { useMeeting } from '@videosdk.live/react-native-sdk';
 import { useCallback, useEffect, useRef } from 'react';
-import { NativeModules, Platform } from 'react-native';
-import { showErrorToast } from '../../lib/common/toast.utils';
+import { AppState, AppStateStatus, NativeModules, Platform } from 'react-native';
+import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 import { ISaveCallPayload, saveCall } from '../react-query/appointments/appointments.func';
@@ -15,7 +15,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   const isMountedRef = useRef(true);
   const callStartTimeRef = useRef<string | null>(null);
   const maxParticipantsRef = useRef<number>(1);
-
+  const wasCameraOnBeforeCaptureRef = useRef<boolean>(false);
 
   const {
     setCallState,
@@ -284,6 +284,78 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     }
   }, [changeWebcam, getWebcams, facingMode, setFacingMode]);
 
+  const isCameraPausedForCapture = useMeetingStore(state => state.isCameraPausedForCapture);
+
+  const pauseCameraForCapture = useCallback(() => {
+    const storeState = useMeetingStore.getState();
+    if (storeState.isCameraOn) {
+      wasCameraOnBeforeCaptureRef.current = true;
+      if (disableWebcam) {
+        disableWebcam();
+      }
+      setCameraState(false);
+      storeState.setIsCameraPausedForCapture(true);
+      showInfoToast(
+        'Camera paused while taking document photo...',
+        '📷 Camera Paused'
+      );
+    }
+  }, [disableWebcam, setCameraState]);
+
+  const resumeCameraAfterCapture = useCallback(() => {
+    if (wasCameraOnBeforeCaptureRef.current || useMeetingStore.getState().isCameraPausedForCapture) {
+      setTimeout(() => {
+        if (!isMountedRef.current) return;
+        if (enableWebcam) {
+          enableWebcam();
+        }
+        setCameraState(true);
+        wasCameraOnBeforeCaptureRef.current = false;
+        useMeetingStore.getState().setIsCameraPausedForCapture(false);
+        showInfoToast('Camera stream resumed.', '📷 Camera Resumed');
+      }, 300);
+    }
+  }, [enableWebcam, setCameraState]);
+
+  useEffect(() => {
+    if (isCameraPausedForCapture) {
+      const storeState = useMeetingStore.getState();
+      if (storeState.isCameraOn) {
+        wasCameraOnBeforeCaptureRef.current = true;
+        if (disableWebcam) {
+          disableWebcam();
+        }
+        setCameraState(false);
+        showInfoToast(
+          'Camera paused while taking document photo...',
+          '📷 Camera Paused'
+        );
+      }
+    } else if (wasCameraOnBeforeCaptureRef.current) {
+      setTimeout(() => {
+        if (!isMountedRef.current) return;
+        if (enableWebcam) {
+          enableWebcam();
+        }
+        setCameraState(true);
+        wasCameraOnBeforeCaptureRef.current = false;
+        showInfoToast('Camera stream resumed.', '📷 Camera Resumed');
+      }, 300);
+    }
+  }, [isCameraPausedForCapture, disableWebcam, enableWebcam, setCameraState]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active' && wasCameraOnBeforeCaptureRef.current) {
+        resumeCameraAfterCapture();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [resumeCameraAfterCapture]);
+
   const endCall = useCallback(
     async (
       reason: 'time_up' | 'doctor_ended_early' | 'patient_left' | 'error' = 'doctor_ended_early'
@@ -363,6 +435,8 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
     stopCamera,
     startCamera,
     switchCamera,
+    pauseCameraForCapture,
+    resumeCameraAfterCapture,
     endCall,
     localParticipant,
     participants,

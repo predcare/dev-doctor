@@ -123,7 +123,9 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
   const isInitialLoadRef = useRef<boolean>(true);
 
   const { showLoader, hideLoader } = useLoadingStore(state => state);
-  const { appointmentId } = useMeetingStore(state => state);
+  const { appointmentId, apptIdforInPerson, clearInPersonAppointment } = useMeetingStore(
+    state => state
+  );
   const {
     data: patientInfo,
     isFetching: patientInfoPending,
@@ -219,7 +221,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     const rawPayload: Record<string, any> = {
       doctor_id: userData?.user_id || '',
       patient_id: patientId ?? rx?.patient_id ?? '',
-      appointment_id: appointmentId ? appointmentId : '',
+      appointment_id: apptIdforInPerson || appointmentId || '',
       type: 'doctor',
       patient_name: patientInfo?.name ?? route?.params?.patientName ?? rx?.patient_name,
       patient_age: patientInfo?.date_of_birth ? getAge(patientInfo.date_of_birth) : rx?.patient_age,
@@ -347,6 +349,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             await queryClient.invalidateQueries({
               queryKey: [PatientsQueryKeys.Prescriptions],
             });
+            clearInPersonAppointment();
             showSuccessToast('Prescription updated successfully');
             hideLoader();
             (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
@@ -373,6 +376,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           await queryClient.invalidateQueries({
             queryKey: [PatientsQueryKeys.Prescriptions],
           });
+          clearInPersonAppointment();
           showSuccessToast('Prescription created successfully');
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
@@ -415,6 +419,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           await queryClient.invalidateQueries({
             queryKey: [PatientsQueryKeys.Prescriptions],
           });
+          clearInPersonAppointment();
           showSuccessToast(res?.message || "Prescription completed & sent to patient's email.");
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
@@ -429,6 +434,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           await queryClient.invalidateQueries({
             queryKey: [PatientsQueryKeys.Prescriptions],
           });
+          clearInPersonAppointment();
           const msg =
             e?.response?.data?.message || 'Prescription completed, but failed to send email.';
           showErrorToast(msg, 'Email Error');
@@ -656,6 +662,12 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                 rxId: Number(prescriptionId),
                 patientName: patientInfo?.name,
               });
+            } else if (apptIdforInPerson) {
+              if (navigation && navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS as any);
+              }
             } else {
               navigation?.navigate(AppRoute.PATIENT_DETAILS, {
                 patientId: patientId,

@@ -24,9 +24,16 @@ interface IMeetingStoreState {
   isCameraOn: boolean;
   facingMode: 'front' | 'back';
   remoteParticipantId: string | null;
-  // PiP States
+  // PiP & Camera Interruption States
   isInAppPip: boolean;
   isNativePip: boolean;
+  isCameraPausedForCapture: boolean;
+
+  // in Person consulatation
+  apptIdforInPerson?: string | null;
+  patientIdforInPerson?: string | null;
+  patientNameforInPerson?: string | null;
+  statusforInPerson?: string | null;
 
   // Actions
   setMeetingSession: (params: {
@@ -49,7 +56,15 @@ interface IMeetingStoreState {
   setRemoteParticipantId: (id: string | null) => void;
   setIsInAppPip: (isInAppPip: boolean) => void;
   setIsNativePip: (isNativePip: boolean) => void;
+  setIsCameraPausedForCapture: (paused: boolean) => void;
   resetMeetingStore: () => void;
+  clearInPersonAppointment: () => void;
+  setInPersonAppointment: (params: {
+    apptIdforInPerson?: string | null;
+    patientIdforInPerson?: string | null;
+    patientNameforInPerson?: string | null;
+    statusforInPerson?: string | null;
+  }) => void;
 }
 
 const initialState = {
@@ -71,6 +86,11 @@ const initialState = {
   remoteParticipantId: null,
   isInAppPip: false,
   isNativePip: false,
+  isCameraPausedForCapture: false,
+  apptIdforInPerson: null,
+  patientIdforInPerson: null,
+  patientNameforInPerson: null,
+  statusforInPerson: null,
 };
 
 export const useMeetingStore = create<IMeetingStoreState>(set => ({
@@ -103,6 +123,7 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
       errorMessage: null,
       isInAppPip: false,
       isNativePip: false,
+      isCameraPausedForCapture: false,
     }),
 
   setCallState: callState => set({ callState }),
@@ -136,5 +157,29 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
 
   setIsNativePip: isNativePip => set({ isNativePip }),
 
+  setIsCameraPausedForCapture: isCameraPausedForCapture => set({ isCameraPausedForCapture }),
+
   resetMeetingStore: () => set({ ...initialState }),
+
+  // In Person
+  clearInPersonAppointment: () =>
+    set({
+      apptIdforInPerson: null,
+      patientIdforInPerson: null,
+      patientNameforInPerson: null,
+      statusforInPerson: null,
+    }),
+
+  setInPersonAppointment: ({
+    apptIdforInPerson,
+    patientIdforInPerson,
+    patientNameforInPerson,
+    statusforInPerson,
+  }) =>
+    set({
+      apptIdforInPerson: apptIdforInPerson ?? null,
+      patientIdforInPerson: patientIdforInPerson ?? null,
+      patientNameforInPerson: patientNameforInPerson ?? null,
+      statusforInPerson: statusforInPerson ?? null,
+    }),
 }));

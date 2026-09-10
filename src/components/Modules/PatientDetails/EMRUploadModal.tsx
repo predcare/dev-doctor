@@ -105,6 +105,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
       }
 
       setShowUploadOptions(false);
+      useMeetingStore.getState().setIsCameraPausedForCapture(true);
 
       setTimeout(
         () => {
@@ -116,6 +117,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
               includeBase64: false,
             },
             res => {
+              useMeetingStore.getState().setIsCameraPausedForCapture(false);
               if (res.didCancel) return;
               if (res.errorCode) {
                 console.warn('launchCamera errorCode:', res.errorCode, res.errorMessage);
@@ -141,6 +143,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
         Platform.OS === 'android' ? 200 : 50
       );
     } catch (err: any) {
+      useMeetingStore.getState().setIsCameraPausedForCapture(false);
       console.warn('handleCamera error:', err);
       showInfoToast('Could not open camera', 'Camera Error');
     }

@@ -50,7 +50,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState<TabType>('both');
   const [searchQuery, setSearchQuery] = useState('');
-
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filterStates, setFilterStates] = useState<FilterStates>({
@@ -60,13 +59,12 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
     toDate: null,
     activeTarget: null,
   });
-
   const [selectedDetailsApt, setSelectedDetailsApt] = useState<IAppointmentDoc | null>(null);
   const [confirmCompleteAptId, setConfirmCompleteAptId] = useState<number | string | null>(null);
 
   const { userData } = useAuthStore(state => state);
   const { showLoader, hideLoader } = useLoadingStore(state => state);
-  const { setMeetingSession } = useMeetingStore(state => state);
+  const { setMeetingSession, setInPersonAppointment } = useMeetingStore(state => state);
   const { requestAudioVideoPermissions } = useDevicePermissions();
 
   const {
@@ -338,10 +336,11 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
 
   const handleStartConsulation = useCallback(
     (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
+      console.log(status, 'statusstatusstatus');
       if (status?.toLowerCase() === 'confirmed') {
         showLoader('Loading...');
         changeStatus(
-          { appointmentId, appointment_status: status },
+          { appointmentId, appointment_status: 'in_progress' },
           {
             onSuccess: async () => {
               await queryClient.invalidateQueries({
@@ -349,6 +348,12 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
               });
               hideLoader();
               setConfirmCompleteAptId(null);
+              setInPersonAppointment({
+                apptIdforInPerson: String(appointmentId),
+                patientIdforInPerson: String(patientId),
+                patientNameforInPerson: String(patientName),
+                statusforInPerson: String(status),
+              });
               navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
                 patientId: patientId,
                 patientName: patientName,
@@ -361,6 +366,12 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
           }
         );
       } else {
+        setInPersonAppointment({
+          apptIdforInPerson: String(appointmentId),
+          patientIdforInPerson: String(patientId),
+          patientNameforInPerson: String(patientName),
+          statusforInPerson: String(status),
+        });
         navigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
           patientId: patientId,
           patientName: patientName,
@@ -550,7 +561,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                     item?.id,
                     item?.patient_id,
                     item?.patient_name,
-                    'in_progress'
+                    item?.appointment_status
                   );
                 }}
               />

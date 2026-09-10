@@ -37,7 +37,6 @@ export const useSendHeartBeat = () =>
 
 export const useChangeAppointmentStatus = () => {
   return useMutation({
-    mutationKey: [MyAppointmentsQueryKeys.StatusChange],
     mutationFn: (payload: { appointmentId: number | string; appointment_status: string }) =>
       changeAppointmentStatus(payload),
   });
@@ -76,4 +75,3 @@ export const useSaveCalled = () =>
   useMutation({
     mutationFn: (params?: { body?: ISaveCallPayload }) => saveCall(params?.body!),
   });
-
