@@ -50,8 +50,9 @@ export const endpoints = {
     statusChange: (appointmentId: number | string) =>
       `/doctor/appointments/${appointmentId}/status`,
     bookByDoc: '/doctor/appointments/book',
-    getdetails:(id:string|number)=> `/doctor/appointments/${id}`,
-    reschedule:(id:string|number)=> `/doctor/appointments/${id}/reschedule`,
+    getdetails: (id: string | number) => `/doctor/appointments/${id}`,
+    reschedule: (id: string | number) => `/doctor/appointments/${id}/reschedule`,
+    heartBeat: '/doctor/appointments/heartbeat',
   },
   availablity: {
     get: '/doctor/doctor-availability/doctor/',
