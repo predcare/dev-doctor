@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { capitalize, getInitials } from '../../../lib/common/common.utils';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import { theme } from '../../../styled/theme.styled';
-import { ClockIcon } from '../../ui/icons';
+import { ClockIcon, PlayCircleIcon, VideoIcon } from '../../ui/icons';
 
 export interface AppointmentCardProps {
   id: string;
@@ -14,8 +14,12 @@ export interface AppointmentCardProps {
   isExpired: boolean;
   consultType: 'ONLINE' | 'IN-PERSON' | string;
   chiefComplaint: string;
+  appointmentStatus?: string;
+  isJoinedOnce?: boolean;
+  isCurrentApptInCall?: boolean;
+  onStartConsultation?: () => void;
+  onVideoCall?: () => void;
   onActionPress?: () => void;
-  onSecondaryPress?: () => void;
 }
 
 export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -25,9 +29,43 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
   timeDistance,
   consultType,
   chiefComplaint,
-  onActionPress,
   isExpired,
+  isJoinedOnce,
+  isCurrentApptInCall,
+  onStartConsultation,
+  onVideoCall,
+  onActionPress,
 }) => {
+  const isVideo = useMemo(() => {
+    const type = consultType?.toLowerCase() || '';
+    return type === 'video' || type === 'online';
+  }, [consultType]);
+
+  const buttonText = useMemo(() => {
+    if (isVideo) {
+      if (isCurrentApptInCall) return 'Resume Call';
+      if (isJoinedOnce) return 'Rejoin Video';
+      return 'Join Video';
+    }
+    return 'Start Consultation';
+  }, [isVideo, isCurrentApptInCall, isJoinedOnce]);
+
+  const handlePress = () => {
+    if (isVideo) {
+      if (onVideoCall) {
+        onVideoCall();
+      } else {
+        onActionPress?.();
+      }
+    } else {
+      if (onStartConsultation) {
+        onStartConsultation();
+      } else {
+        onActionPress?.();
+      }
+    }
+  };
+
   return (
     <View style={homeStyles.appointmentCard}>
       {time && (
@@ -65,24 +103,37 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
 
         <TouchableOpacity
           style={[
-            homeStyles.detailsBtn,
+            homeStyles.joinBtn,
             isExpired && {
               backgroundColor: theme.colors.grayDisabled,
             },
           ]}
-          onPress={onActionPress}
+          onPress={handlePress}
           activeOpacity={0.85}
           disabled={isExpired}
         >
+          {isVideo ? (
+            <VideoIcon
+              size={14}
+              color={isExpired ? theme.colors.grayText : '#FFFFFF'}
+              style={{ marginRight: 4 }}
+            />
+          ) : (
+            <PlayCircleIcon
+              size={14}
+              color={isExpired ? theme.colors.grayText : '#FFFFFF'}
+              style={{ marginRight: 4 }}
+            />
+          )}
           <Text
             style={[
-              homeStyles.detailsBtnText,
+              homeStyles.joinBtnText,
               isExpired && {
                 color: theme.colors.grayText,
               },
             ]}
           >
-            Details
+            {buttonText}
           </Text>
         </TouchableOpacity>
       </View>

@@ -13,6 +13,7 @@ import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceB
 import HomeStatsCard from '../../components/Modules/Dashboard/HomeStatsCard';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
 import UpcomingAppointmentCard from '../../components/Modules/Dashboard/UpcomingAppointmentCard';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { AppointmentSkeleton } from '../../components/Skeletons/AppointmentSkeleton';
 import { HomeStatSkeleton } from '../../components/Skeletons/HomeStatSkeleton';
 import {
@@ -28,15 +29,23 @@ import {
   WalletIcon,
 } from '../../components/ui/icons';
 import EmptyIcon from '../../components/ui/icons/EmptyIcon';
+import { useDevicePermissions } from '../../hooks/commons/useDevicePermissions';
+import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
+import { useChangeAppointmentStatus } from '../../hooks/react-query/appointments/appointments.hooks';
 import { useHomeStats, useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
+import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import { Header } from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { _compactNumber, checkIsExpired, getTimeUntilStart } from '../../lib/common/common.utils';
+import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { AppRoute, type HomeScreenProps } from '../../route';
 import { homeStyles } from '../../styled/HomeScreen.styled';
 import { theme } from '../../styled/theme.styled';
+import { IUpcomingApptsDoc } from '../../typescripts/interfaces/homes.interfaces';
 import { formatTime12h } from '../../utils/availabilityUtils';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
+import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type PeriodKey = 'today' | 'week' | 'month';
 
@@ -80,6 +89,143 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const pillRef = useRef<View>(null);
   const [refreshing, setRefreshing] = useState(false);
   const { userData } = useAuthStore(state => state);
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
+  const { setMeetingSession, setInPersonAppointment } = useMeetingStore(state => state);
+  const { requestAudioVideoPermissions } = useDevicePermissions();
+  const { mutate: changeStatus } = useChangeAppointmentStatus();
+
+  const handleJoinVideoCall = useCallback(
+    async (appointment: IUpcomingApptsDoc) => {
+      if (!appointment) return;
+
+      const storeState = useMeetingStore.getState();
+      const isCallActive =
+        (storeState.callState === 'CONNECTED' || storeState.callState === 'CONNECTING') &&
+        Boolean(storeState.token && storeState.meetingId);
+
+      const isCurrentAppt =
+        isCallActive &&
+        (String(storeState.appointmentId) === String(appointment.id) ||
+          (Boolean(appointment.appointment_id) &&
+            storeState.appointmentGeneratedId === appointment.appointment_id));
+
+      if (isCurrentAppt) {
+        storeState.setIsInAppPip(false);
+        navigation?.navigate(AppRoute.DOCTOR_MEETING);
+        return;
+      }
+
+      if (isCallActive) {
+        showInfoToast(
+          'You are currently in an active consultation. Please end that call first.',
+          'Active Call Ongoing'
+        );
+        return;
+      }
+
+      const hasPermissions = await requestAudioVideoPermissions();
+      if (!hasPermissions) {
+        showErrorToast('Camera and Microphone permissions are required to join the consultation.');
+        return;
+      }
+
+      const apptId = appointment.id;
+      let token: string | undefined;
+      let meetingId: string | undefined = appointment.meeting_id;
+      let call_duration_seconds: number | undefined = appointment.call_duration_seconds;
+
+      if (!apptId) {
+        showErrorToast('No valid appointment ID found to fetch token');
+        return;
+      }
+      if (!appointment?.patient_id)
+        return showErrorToast('No valid patient ID found to fetch token');
+
+      try {
+        const tokenResponse = await queryClient.fetchQuery({
+          queryKey: [MyAppointmentsQueryKeys.MyAppointments, 'token', apptId],
+          queryFn: () => getApptToken(apptId),
+        });
+        token = tokenResponse?.token;
+        meetingId = tokenResponse?.meeting_id;
+      } catch (error) {
+        console.error('Failed to fetch fresh appointment token:', error);
+      }
+
+      if (!token && appointment.token) {
+        token = appointment.token;
+        call_duration_seconds = appointment.call_duration_seconds;
+      }
+
+      const cleanedToken = token?.trim().replace(/^["']|["']$/g, '');
+      const cleanedMeetingId = meetingId?.trim().replace(/^["']|["']$/g, '');
+
+      if (!cleanedToken || !cleanedMeetingId) {
+        showErrorToast('Meeting credentials missing or invalid');
+        return;
+      }
+
+      setMeetingSession({
+        token: cleanedToken,
+        meetingId: cleanedMeetingId,
+        appointmentId: apptId,
+        patientName: appointment.patient_name,
+        patientAlphanumericId: appointment.patient_alphanumeric_id,
+        appointmentGeneratedId: appointment.appointment_id,
+        startTime: appointment.start_time,
+        endTime: appointment.end_time,
+        callDurationSeconds: call_duration_seconds ?? 0,
+        patientUserId: String(appointment?.patient_id),
+      });
+
+      navigation?.navigate(AppRoute.DOCTOR_MEETING);
+    },
+    [navigation, setMeetingSession, requestAudioVideoPermissions]
+  );
+
+  const handleStartConsultation = useCallback(
+    (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
+      if (status?.toLowerCase() === 'confirmed') {
+        showLoader('Loading...');
+        changeStatus(
+          { appointmentId, appointment_status: 'in_progress' },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries({
+                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+              });
+              hideLoader();
+              setInPersonAppointment({
+                apptIdforInPerson: String(appointmentId),
+                patientIdforInPerson: String(patientId),
+                patientNameforInPerson: String(patientName),
+                statusforInPerson: String(status),
+              });
+              navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                patientId: patientId,
+                patientName: patientName,
+              });
+            },
+            onError: () => {
+              hideLoader();
+            },
+          }
+        );
+      } else {
+        setInPersonAppointment({
+          apptIdforInPerson: String(appointmentId),
+          patientIdforInPerson: String(patientId),
+          patientNameforInPerson: String(patientName),
+          statusforInPerson: String(status),
+        });
+        navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+          patientId: patientId,
+          patientName: patientName,
+        });
+      }
+    },
+    [changeStatus, showLoader, hideLoader, navigation, setInPersonAppointment]
+  );
 
   const {
     data: boardStats,
@@ -278,6 +424,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => navigation?.navigate(AppRoute.PATIENTS)}
               activeOpacity={0.7}
+              style={{
+                width: 100,
+                height: 25,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                borderRadius: 20,
+              }}
             >
               <Text style={homeStyles.sectionLink}>See All</Text>
             </TouchableOpacity>
@@ -288,9 +441,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           ) : upcomingAppts && upcomingAppts?.length > 0 ? (
             upcomingAppts?.slice(0, 3)?.map(apt => {
               const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
+              const storeState = useMeetingStore.getState();
+              const isCallActive =
+                (storeState.callState === 'CONNECTED' || storeState.callState === 'CONNECTING') &&
+                Boolean(storeState.token && storeState.meetingId);
+              const isCurrentApptInCall =
+                isCallActive &&
+                (String(storeState.appointmentId) === String(apt.id) ||
+                  (Boolean(apt.appointment_id) &&
+                    storeState.appointmentGeneratedId === apt.appointment_id));
+
               return (
                 <UpcomingAppointmentCard
-                  key={apt.appointment_id}
+                  key={apt.appointment_id || apt.id}
                   id={String(apt.id)}
                   patientName={apt.patient_name || 'Patient'}
                   ageGender={apt.patient_gender}
@@ -299,9 +462,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   consultType={apt.consultation_type || 'ONLINE'}
                   chiefComplaint={apt.symptoms || apt.reason || ''}
                   isExpired={isExpired}
-                  onActionPress={() => {
-                    navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
-                  }}
+                  isJoinedOnce={Number(apt?.call_duration_seconds) > 0}
+                  isCurrentApptInCall={isCurrentApptInCall}
+                  appointmentStatus={apt.appointment_status}
+                  onVideoCall={() => handleJoinVideoCall(apt)}
+                  onStartConsultation={() =>
+                    handleStartConsultation(
+                      apt.id,
+                      apt.patient_id,
+                      apt.patient_name,
+                      apt.appointment_status
+                    )
+                  }
                 />
               );
             })
