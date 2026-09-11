@@ -1,3 +1,4 @@
+import notifee, { AndroidImportance } from '@notifee/react-native';
 import {
   AuthorizationStatus,
   FirebaseMessagingTypes,
@@ -60,6 +61,9 @@ export async function requestNotificationPermission(): Promise<{
     }
 
     console.log('[FCM] Permission Auth Status:', authStatus, 'Is Granted:', isGranted);
+    if (isGranted) {
+      await setupNotificationChannel();
+    }
     return { isGranted, status: authStatus, token };
   } catch (error) {
     console.error('[FCM] Error requesting notification permission:', error);
@@ -151,6 +155,13 @@ export function onForegroundNotification(
         visibilityTime: 4000,
       });
 
+      // Display system notification in mobile notification bar
+      await displayLocalSystemNotification(
+        notificationData.title,
+        notificationData.body,
+        notificationData.data
+      );
+
       if (onMessageReceived) {
         onMessageReceived(notificationData);
       }
@@ -158,6 +169,62 @@ export function onForegroundNotification(
   );
 
   return unsubscribe;
+}
+
+/**
+ * Setup High-Importance Android Notification Channel for system status bar notifications
+ */
+export async function setupNotificationChannel(): Promise<string> {
+  const channelId = 'default_channel_id';
+  try {
+    if (Platform.OS === 'android') {
+      await notifee.createChannel({
+        id: channelId,
+        name: 'Default Channel',
+        importance: AndroidImportance.HIGH,
+        sound: 'default',
+        vibration: true,
+      });
+    }
+  } catch (error) {
+    console.error('[FCM] Error creating notification channel:', error);
+  }
+  return channelId;
+}
+
+/**
+ * Display a local system notification in the mobile status bar/notification tray
+ */
+export async function displayLocalSystemNotification(
+  title: string,
+  body: string,
+  data?: any
+): Promise<void> {
+  try {
+    const channelId = await setupNotificationChannel();
+    await notifee.displayNotification({
+      title,
+      body,
+      data,
+      android: {
+        channelId,
+        importance: AndroidImportance.HIGH,
+        pressAction: {
+          id: 'default',
+        },
+      },
+      ios: {
+        foregroundPresentationOptions: {
+          badge: true,
+          sound: true,
+          banner: true,
+          list: true,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('[FCM] Error displaying local system notification:', error);
+  }
 }
 
 /**

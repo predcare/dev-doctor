@@ -6,6 +6,7 @@ import {
   onBackgroundNotificationTap,
   onForegroundNotification,
   requestPermissionAndGetToken,
+  setupNotificationChannel,
 } from '../utils/firebaseMessaging';
 
 export interface UseFirebaseMessagingReturn {
@@ -54,6 +55,9 @@ export function useFirebaseMessaging(): UseFirebaseMessagingReturn {
     const initializeMessaging = async () => {
       try {
         console.log('[FCM Hook] Initializing Firebase Push Messaging listeners...');
+
+        // 0. Ensure Android notification channel is created
+        await setupNotificationChannel();
 
         // 1. Check initial notification (quit state launch)
         await checkInitialNotification();
