@@ -247,7 +247,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
             <TouchableOpacity
               style={styles.markReadButton}
               activeOpacity={0.75}
-              onPress={() => showInfoToast('Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat minus corporis natus perferendis quae, praesentium ratione sed rem perspiciatis nihil, tenetur dolorum quidem, quam saepe nemo. Repellat aspernatur repellendus nam.')}
+              onPress={() => showInfoToast('This Features is Under Development!.')}
             >
               <CheckIcon size={14} color="#0D9488" />
               <Text style={styles.markReadText}>Mark all as read</Text>
