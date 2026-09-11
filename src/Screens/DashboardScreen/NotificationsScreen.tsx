@@ -8,6 +8,7 @@ import NotificationSkeleton from '../../components/Skeletons/NotificationSkeleto
 import {
   BellIcon,
   CalendarIcon,
+  CheckIcon,
   ChevronLeftIcon,
   ClockIcon,
   FileTextIcon,
@@ -20,6 +21,7 @@ import {
   useNotifications,
 } from '../../hooks/react-query/notifications/notifications.hooks';
 import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
+import { showInfoToast } from '../../lib/common/toast.utils';
 import { AppRoute, type NotificationsScreenProps } from '../../route';
 import { notificationsStyles as styles } from '../../styled/NotificationsScreen.styled';
 import { theme } from '../../styled/theme.styled';
@@ -242,7 +244,14 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               </View>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Notifications</Text>
-            <View style={{ width: 44 }} />
+            <TouchableOpacity
+              style={styles.markReadButton}
+              activeOpacity={0.75}
+              onPress={() => showInfoToast('Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat minus corporis natus perferendis quae, praesentium ratione sed rem perspiciatis nihil, tenetur dolorum quidem, quam saepe nemo. Repellat aspernatur repellendus nam.')}
+            >
+              <CheckIcon size={14} color="#0D9488" />
+              <Text style={styles.markReadText}>Mark all as read</Text>
+            </TouchableOpacity>
           </View>
         </SafeAreaView>
 

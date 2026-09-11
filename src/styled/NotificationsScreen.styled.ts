@@ -60,6 +60,23 @@ export const notificationsStyles = StyleSheet.create({
     color: theme.colors.textPrimary,
     marginLeft: 8,
   },
+  markReadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: '#F0FDFA',
+    borderWidth: 1,
+    borderColor: '#CCFBF1',
+    gap: 4,
+  },
+  markReadText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#0D9488',
+    letterSpacing: -0.1,
+  },
 
   // List & Group Header Labels
   listContainer: {
