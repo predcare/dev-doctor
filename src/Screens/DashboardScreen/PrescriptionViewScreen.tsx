@@ -1,12 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
 import PrescriptionViewSkeleton from '../../components/Skeletons/PrescriptionViewSkeleton';
@@ -196,23 +189,46 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
     );
   }, [rxDoc?.id, downloadPdfMutation]);
 
+  const handleBack = useCallback(() => {
+    const fromScreen = route?.params?.fromScreen;
+    const patientId = rxDoc?.patient_id || route?.params?.patientId;
+
+    if (navigation?.canGoBack()) {
+      navigation.goBack();
+    } else if (fromScreen === AppRoute.PATIENT_DETAILS && patientId) {
+      navigation?.navigate(AppRoute.PATIENT_DETAILS, {
+        patientId: patientId,
+        patientName: displayData?.patientName || route?.params?.patientName,
+      });
+    } else if (fromScreen === AppRoute.PRESCRIPTION_LIST) {
+      navigation?.navigate(AppRoute.PRESCRIPTION_LIST);
+    } else if (patientId) {
+      navigation?.navigate(AppRoute.PATIENT_DETAILS, {
+        patientId: patientId,
+        patientName: displayData?.patientName || route?.params?.patientName,
+      });
+    } else {
+      navigation?.navigate(AppRoute.PRESCRIPTION_LIST);
+    }
+  }, [navigation, route?.params, rxDoc?.patient_id, displayData?.patientName]);
+
   const handleEdit = useCallback(() => {
     if (rxDoc) {
       navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
         patientId: rxDoc.patient_id,
         prescriptionId: rxDoc.id,
+        fromScreen: route?.params?.fromScreen,
       });
     } else {
       showInfoToast('Prescription details not available for editing.', 'Edit Prescription');
     }
-  }, [navigation, rxDoc]);
+  }, [navigation, rxDoc, route?.params?.fromScreen]);
 
   if (prescriptionInfoLoading) {
     return (
       <SafeAreaWrapper>
-        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
         <View style={S.header}>
-          <TouchableOpacity onPress={() => navigation?.goBack()} activeOpacity={0.7}>
+          <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
             <ChevronLeftIcon size={24} color="#0F172A" />
           </TouchableOpacity>
           <Text style={S.headerTitle}>Summary</Text>
@@ -227,9 +243,8 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
   if (isError || !displayData) {
     return (
       <SafeAreaWrapper>
-        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
         <View style={S.header}>
-          <TouchableOpacity onPress={() => navigation?.goBack()} activeOpacity={0.7}>
+          <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
             <ChevronLeftIcon size={24} color="#0F172A" />
           </TouchableOpacity>
           <Text style={S.headerTitle}>Summary</Text>
@@ -249,8 +264,8 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
   return (
     <SafeAreaWrapper>
       <View style={S.header}>
-        <TouchableOpacity onPress={() => navigation?.goBack()} activeOpacity={0.7}>
-          <ChevronLeftIcon size={24} color="#0F172A" />
+        <TouchableOpacity style={S.backCircle} onPress={handleBack} activeOpacity={0.7}>
+          <ChevronLeftIcon size={24} strokeWidth={2.5} />
         </TouchableOpacity>
         <Text style={S.headerTitle}>Summary</Text>
         <View style={S.headerRight}>

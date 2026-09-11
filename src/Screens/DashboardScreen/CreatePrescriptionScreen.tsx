@@ -354,7 +354,9 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             hideLoader();
             (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
               rxId: String(activeId),
+              patientId: patientId || prescriptionInfo?.prescription?.patient_id,
               patientName: patientInfo?.name || route?.params?.patientName || '',
+              fromScreen: route?.params?.fromScreen,
             });
           },
           onError: () => {
@@ -381,7 +383,9 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
             rxId: String(createId || currentPrescriptionId.current),
+            patientId: patientId || prescriptionInfo?.prescription?.patient_id,
             patientName: patientInfo?.name || route?.params?.patientName || '',
+            fromScreen: route?.params?.fromScreen,
           });
         },
         onError: () => {
@@ -424,7 +428,9 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
             rxId: String(rxId),
+            patientId: patientId || prescriptionInfo?.prescription?.patient_id,
             patientName: patientInfo?.name || route?.params?.patientName || '',
+            fromScreen: route?.params?.fromScreen,
           });
         },
         onError: async (e: any) => {
@@ -441,7 +447,9 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
             rxId: String(rxId),
+            patientId: patientId || prescriptionInfo?.prescription?.patient_id,
             patientName: patientInfo?.name || route?.params?.patientName || '',
+            fromScreen: route?.params?.fromScreen,
           });
         },
       });
@@ -658,21 +666,32 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           style={S.backButton}
           onPress={() => {
             if (prescriptionId) {
-              navigation?.navigate(AppRoute.PRESCRIPTION_VIEW, {
-                rxId: Number(prescriptionId),
-                patientName: patientInfo?.name,
-              });
+              if (navigation && navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                (navigation as any)?.navigate(AppRoute.PRESCRIPTION_VIEW, {
+                  rxId: Number(prescriptionId),
+                  patientName: patientInfo?.name,
+                  fromScreen: route?.params?.fromScreen,
+                });
+              }
             } else if (apptIdforInPerson) {
               if (navigation && navigation.canGoBack()) {
                 navigation.goBack();
               } else {
-                navigation?.navigate(AppRoute.DOCTOR_APPOINTMENTS as any);
+                (navigation as any)?.navigate(AppRoute.DOCTOR_APPOINTMENTS as any);
               }
-            } else {
-              navigation?.navigate(AppRoute.PATIENT_DETAILS, {
+            } else if (navigation && navigation.canGoBack()) {
+              navigation.goBack();
+            } else if (route?.params?.fromScreen === AppRoute.PRESCRIPTION_LIST) {
+              (navigation as any)?.navigate(AppRoute.PRESCRIPTION_LIST);
+            } else if (patientId) {
+              (navigation as any)?.navigate(AppRoute.PATIENT_DETAILS, {
                 patientId: patientId,
                 patientName: patientInfo?.name,
               });
+            } else {
+              (navigation as any)?.navigate(AppRoute.PRESCRIPTION_LIST);
             }
           }}
           activeOpacity={0.8}

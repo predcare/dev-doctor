@@ -43,11 +43,13 @@ export const PrescriptionsTabPanel: React.FC<PrescriptionsTabPanelProps> = ({ pa
 
   const handleView = useCallback(
     (prescriptionId: string) => {
-      navigation.navigate('PrescriptionView', {
+      (navigation as any).navigate(AppRoute.PRESCRIPTION_VIEW, {
         rxId: prescriptionId,
+        patientId: patientId,
+        fromScreen: AppRoute.PATIENT_DETAILS,
       });
     },
-    [navigation]
+    [navigation, patientId]
   );
 
   return (
@@ -67,7 +69,10 @@ export const PrescriptionsTabPanel: React.FC<PrescriptionsTabPanelProps> = ({ pa
           style={patientDetailsStyles.addDocBtn}
           activeOpacity={0.8}
           onPress={() => {
-            navigation.navigate(AppRoute.CREATE_PRESCRIPTION, { patientId });
+            (navigation as any).navigate(AppRoute.CREATE_PRESCRIPTION, {
+              patientId: patientId,
+              fromScreen: AppRoute.PATIENT_DETAILS,
+            });
           }}
         >
           <Text style={patientDetailsStyles.addDocBtnText}>+</Text>

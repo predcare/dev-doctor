@@ -4,6 +4,7 @@ import useEventEmitter from '../../../hooks/commons/useEventEmitter';
 import useAuthProfile from '../../../hooks/react-query/common/useAuthProfile';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
 import events from '../../../lib/services/events/events';
+import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 
 interface EventListenerProps {
   onLogout?: () => void;
@@ -11,6 +12,7 @@ interface EventListenerProps {
 
 export default function EventListener({ onLogout }: EventListenerProps) {
   useAuthProfile();
+  const { logout } = useAuthStore(state => state);
   const handleLogout = useCallback(
     (data?: { intentional?: boolean }) => {
       if (data?.intentional) {
@@ -19,8 +21,9 @@ export default function EventListener({ onLogout }: EventListenerProps) {
         showErrorToast('Please login again.', 'Session Expired');
       }
       onLogout?.();
+      logout();
     },
-    [onLogout]
+    [onLogout, logout]
   );
 
   const showNotifications = useCallback(

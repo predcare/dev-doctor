@@ -257,6 +257,9 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
               onPress={() =>
                 navigation?.navigate(AppRoute.PRESCRIPTION_VIEW, {
                   rxId: item.id,
+                  patientId: item.patient_id,
+                  patientName: item.patient_name,
+                  fromScreen: AppRoute.PRESCRIPTION_LIST,
                 })
               }
             />
@@ -280,6 +283,7 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
           navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
             patientId: patient.id,
             patientName: patient.name,
+            fromScreen: AppRoute.PRESCRIPTION_LIST,
           });
         }}
       />

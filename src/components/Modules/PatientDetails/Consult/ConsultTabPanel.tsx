@@ -82,6 +82,7 @@ export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
               navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
                 patientId: patientId,
                 patientName: patientName,
+                fromScreen: AppRoute.PATIENT_DETAILS,
               });
             },
             onError: () => {
@@ -99,6 +100,7 @@ export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
         navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
           patientId: patientId,
           patientName: patientName,
+          fromScreen: AppRoute.PATIENT_DETAILS,
         });
       }
     },

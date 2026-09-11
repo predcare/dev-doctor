@@ -49,7 +49,12 @@ export type RootStackParamList = {
   DoctorProfile: { user?: any } | undefined;
   PrescriptionSettings: { user?: any } | undefined;
   PrescriptionView:
-    | { rxId?: string | number; patientId?: string; patientName?: string }
+    | {
+        rxId?: string | number;
+        patientId?: string | number;
+        patientName?: string;
+        fromScreen?: string;
+      }
     | undefined;
   PrescriptionList: { user?: any } | undefined;
   InvoiceSettings: { user?: any } | undefined;
@@ -81,6 +86,7 @@ export type RootStackParamList = {
         appointmentId?: string | number;
         patientName?: string;
         prescriptionId?: string | number;
+        fromScreen?: string;
       }
     | undefined;
   MainTabs: NavigatorScreenParams<DashboardTabParamList> | undefined;
