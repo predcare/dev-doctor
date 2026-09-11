@@ -154,7 +154,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
         {/* Alt & WhatsApp */}
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={[ContactInfoStyles.group, { flex: 1 }]}>
-            <Text style={ContactInfoStyles.lbl}>ALT. NUMBER</Text>
+            <Text style={ContactInfoStyles.lbl}>ALTERNATE NUMBER</Text>
             <Controller
               control={control}
               name="alternate_number"
@@ -163,29 +163,6 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
                   style={[
                     ContactInfoStyles.inp,
                     !!errors.alternate_number && ContactInfoStyles.inpErr,
-                  ]}
-                  placeholder="9876543210"
-                  placeholderTextColor={theme.colors.textMuted}
-                  value={value || ''}
-                  onChangeText={v => onChange(v.replace(/\D/g, '').slice(0, 10))}
-                  onBlur={onBlur}
-                  keyboardType="phone-pad"
-                  maxLength={10}
-                />
-              )}
-            />
-          </View>
-
-          <View style={[ContactInfoStyles.group, { flex: 1 }]}>
-            <Text style={ContactInfoStyles.lbl}>WHATSAPP</Text>
-            <Controller
-              control={control}
-              name="whatsapp_number"
-              render={({ field: { onChange, value, onBlur } }) => (
-                <TextInput
-                  style={[
-                    ContactInfoStyles.inp,
-                    !!errors.whatsapp_number && ContactInfoStyles.inpErr,
                   ]}
                   placeholder="9876543210"
                   placeholderTextColor={theme.colors.textMuted}
@@ -212,7 +189,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
               <TextInput
                 style={[
                   ContactInfoStyles.inp,
-                  { minHeight: 70, textAlignVertical: 'top', paddingTop: 12 },
+                  { height: 'auto', minHeight: 70, textAlignVertical: 'top', paddingTop: 12 },
                   !!errors.address && ContactInfoStyles.inpErr,
                 ]}
                 placeholder="Enter full street address"

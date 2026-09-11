@@ -65,7 +65,7 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
       email: patientInfo?.email,
       phone: patientInfo?.phone_number,
       alternate_number: patientInfo?.alternate_phone,
-      whatsapp_number: patientInfo?.whatsapp_number,
+      // whatsapp_number: patientInfo?.whatsapp_number,
       address: patientInfo?.address,
       date_of_birth: patientInfo?.date_of_birth,
       age: patientInfo?.age_display || '',
@@ -88,7 +88,7 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
         { label: 'Email', value: patient.email },
         { label: 'Phone', value: patient.phone },
         { label: 'Alternate Phone', value: patient.alternate_number },
-        { label: 'WhatsApp', value: patient.whatsapp_number },
+        // { label: 'WhatsApp', value: patient.whatsapp_number },
         { label: 'Address', value: patient.address },
       ].filter(r => r.value),
     [patient]
@@ -100,7 +100,7 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
         { label: 'Date of Birth', value: patient.date_of_birth },
         { label: 'Age', value: patient.age },
         { label: 'Gender', value: patient.gender },
-        { label: 'Blood Group', value: patient.blood_group },
+        { label: 'Blood Group', value: patient.blood_group || '-' },
       ].filter(r => r.value),
     [patient]
   );
@@ -159,24 +159,6 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
             </View>
           </View>
         ))}
-      </View>
-      <View style={patientProfileTabStyles.card}>
-        <Text style={patientProfileTabStyles.cardSectionTitle}>Health Vitals</Text>
-        <View style={patientProfileTabStyles.vitalsGrid}>
-          {vitalsList.map((v, i) => (
-            <View key={i} style={patientProfileTabStyles.vitalBox}>
-              <Text
-                style={[
-                  patientProfileTabStyles.vitalValue,
-                  v.value === '—' && { color: '#CBD5E1' },
-                ]}
-              >
-                {v.value}
-              </Text>
-              <Text style={patientProfileTabStyles.vitalLabel}>{v.label}</Text>
-            </View>
-          ))}
-        </View>
       </View>
       {(patient.drug_allergies || patient.medical_history) && (
         <View style={patientProfileTabStyles.card}>

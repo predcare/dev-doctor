@@ -229,9 +229,23 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={handleCloseModal}>
-      <TouchableWithoutFeedback onPress={handleCloseModal}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (showCategoryDropdown) {
+            setShowCategoryDropdown(false);
+          } else {
+            handleCloseModal();
+          }
+        }}
+      >
         <View style={styles.modalOverlay}>
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              if (showCategoryDropdown) {
+                setShowCategoryDropdown(false);
+              }
+            }}
+          >
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
               style={styles.sheetContainer}
@@ -256,6 +270,11 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.formContainer}
                 keyboardShouldPersistTaps="handled"
+                onTouchStart={() => {
+                  if (showCategoryDropdown) {
+                    setShowCategoryDropdown(false);
+                  }
+                }}
               >
                 {/* Category Field */}
                 <View style={styles.fieldGroup}>
@@ -277,8 +296,13 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
 
                   {/* Inline Dropdown Options */}
                   {showCategoryDropdown && (
-                    <View style={styles.inlineDropdownList}>
-                      <ScrollView nestedScrollEnabled style={{ maxHeight: 180 }}>
+                    <View style={styles.inlineDropdownList} onTouchStart={e => e.stopPropagation()}>
+                      <ScrollView
+                        nestedScrollEnabled
+                        persistentScrollbar={true}
+                        showsVerticalScrollIndicator={true}
+                        style={{ maxHeight: 180 }}
+                      >
                         {EMR_Record_Category.map((cat, index) => {
                           const isSelected = cat === selectedCategory;
                           return (
@@ -287,6 +311,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
                               onPress={() => {
                                 setValue('category', cat, { shouldValidate: true });
                                 setShowCategoryDropdown(false);
+                                setValue('title', cat);
                               }}
                               style={[
                                 styles.inlineDropdownItem,

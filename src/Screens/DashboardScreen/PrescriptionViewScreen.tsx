@@ -270,7 +270,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {' '}
         <View style={S.clinicCard}>
           <View style={{ flex: 1 }}>
             <Text style={S.clinicName}>{displayData.clinicName}</Text>

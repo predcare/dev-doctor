@@ -33,7 +33,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
     const dateOfBirth = watch('date_of_birth') || new Date(2000, 0, 1);
     const bloodGroup = watch('blood_group');
     const genderValue = watch('gender');
-    const statusValue = watch('status');
 
     const handlePickImage = async () => {
       try {
@@ -253,28 +252,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                 </Text>
                 <Text style={{ fontSize: 14, color: theme.colors.textMuted }}>▼</Text>
               </TouchableOpacity>
-            </View>
-
-            {/* Status */}
-            <View style={BasicInfoStyles.group}>
-              <Text style={BasicInfoStyles.lbl}>STATUS</Text>
-              <View style={BasicInfoStyles.pillRow}>
-                {(['active', 'inactive'] as const).map(st => {
-                  const active = statusValue === st;
-                  return (
-                    <TouchableOpacity
-                      key={st}
-                      style={[BasicInfoStyles.pill, active && BasicInfoStyles.pillOn]}
-                      onPress={() => setValue('status', st, { shouldValidate: true })}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={[BasicInfoStyles.pillTxt, active && BasicInfoStyles.pillTxtOn]}>
-                        {st.charAt(0).toUpperCase() + st.slice(1)}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
             </View>
           </>
         )}
