@@ -4,7 +4,7 @@ import { useDevicePermissions } from '../../../hooks/commons/useDevicePermission
 import { useMeetingHeartbeat } from '../../../hooks/commons/useMeetingHeartbeat';
 import { useVideoCallControls } from '../../../hooks/commons/useVideoCallControls';
 import { showErrorToast } from '../../../lib/common/toast.utils';
-import { navigationRef } from '../../../navigation/navigationRef';
+import { navigationRef, replace } from '../../../navigation/navigationRef';
 import { AppRoute } from '../../../route';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import { DoctorMeetingContainer } from './DoctorMeetingContainer';
@@ -24,7 +24,7 @@ const MeetingSessionController: React.FC = () => {
 
   const { joinCall, endCall } = useVideoCallControls(() => {
     if (navigationRef.isReady()) {
-      (navigationRef as any).navigate('DoctorAppointments');
+      replace('DoctorAppointments');
     }
   });
 
@@ -38,7 +38,7 @@ const MeetingSessionController: React.FC = () => {
         showErrorToast('Camera and Microphone permissions are required for the consultation.');
         resetMeetingStore();
         if (navigationRef.isReady()) {
-          (navigationRef as any).navigate('DoctorAppointments');
+          replace('DoctorAppointments');
         }
         return;
       }

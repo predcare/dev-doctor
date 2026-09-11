@@ -46,12 +46,12 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
   useEffect(() => {
     if (isMissingSession && !isErrorState) {
       // Normal call end or store reset — exit gracefully without error card or toast
-      navigation?.navigate('DoctorAppointments');
+      navigation?.replace('DoctorAppointments');
     } else if (isErrorState) {
       showErrorToast(errorMessage || "'token' is empty or invalid or might have expired.");
       const timer = setTimeout(() => {
         resetMeetingStore();
-        navigation?.navigate('DoctorAppointments');
+        navigation?.replace('DoctorAppointments');
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -67,7 +67,7 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
               message={errorMessage || "'token' is empty or invalid or might have expired."}
               onRetry={() => {
                 resetMeetingStore();
-                navigation?.navigate('DoctorAppointments');
+                navigation?.replace('DoctorAppointments');
               }}
               retryText="Return to Appointments"
             />

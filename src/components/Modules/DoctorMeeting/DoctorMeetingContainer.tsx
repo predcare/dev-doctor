@@ -44,7 +44,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
 
   const { toggleAudio, toggleVideo, switchCamera, endCall, localParticipant } =
     useVideoCallControls(() => {
-      navigation?.navigate('DoctorAppointments');
+      navigation?.replace('DoctorAppointments');
     });
 
   const handleEnterPip = React.useCallback(() => {
@@ -53,7 +53,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
       if (navigation?.canGoBack?.()) {
         navigation.goBack();
       } else {
-        navigation?.navigate('DoctorAppointments');
+        navigation?.replace('DoctorAppointments');
       }
     } else {
       endCall();
@@ -117,7 +117,7 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
       showErrorToast(errorMessage || "'token' is empty or invalid or might have expired.");
       const timer = setTimeout(() => {
         resetMeetingStore();
-        navigation?.navigate('DoctorAppointments');
+        navigation?.replace('DoctorAppointments');
       }, 5000);
       return () => clearTimeout(timer);
     }

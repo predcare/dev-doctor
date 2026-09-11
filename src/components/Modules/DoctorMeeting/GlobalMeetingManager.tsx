@@ -1,7 +1,7 @@
 import { MeetingProvider } from '@videosdk.live/react-native-sdk';
 import React, { useEffect } from 'react';
 import { BackHandler, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
-import { navigationRef } from '../../../navigation/navigationRef';
+import { navigationRef, replace } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import MeetingSessionController from './MeetingSessionController';
@@ -51,7 +51,7 @@ export const GlobalMeetingManager: React.FC = () => {
             } else {
               // Fallback if DoctorMeeting is root: navigate to DoctorAppointments in app with In-App PiP
               useMeetingStore.getState().setIsInAppPip(true);
-              (navigationRef as any).navigate('DoctorAppointments');
+              replace('DoctorAppointments');
               return true;
             }
           }
