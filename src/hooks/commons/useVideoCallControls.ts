@@ -1,10 +1,12 @@
 import { useMeeting } from '@videosdk.live/react-native-sdk';
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState, AppStateStatus, NativeModules, Platform } from 'react-native';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 import { ISaveCallPayload, saveCall } from '../react-query/appointments/appointments.func';
+import { MyAppointmentsQueryKeys } from '../react-query/query.keys';
 
 const { PiPModule } = NativeModules;
 
@@ -295,15 +297,15 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
       }
       setCameraState(false);
       storeState.setIsCameraPausedForCapture(true);
-      showInfoToast(
-        'Camera paused while taking document photo...',
-        '📷 Camera Paused'
-      );
+      showInfoToast('Camera paused while taking document photo...', '📷 Camera Paused');
     }
   }, [disableWebcam, setCameraState]);
 
   const resumeCameraAfterCapture = useCallback(() => {
-    if (wasCameraOnBeforeCaptureRef.current || useMeetingStore.getState().isCameraPausedForCapture) {
+    if (
+      wasCameraOnBeforeCaptureRef.current ||
+      useMeetingStore.getState().isCameraPausedForCapture
+    ) {
       setTimeout(() => {
         if (!isMountedRef.current) return;
         if (enableWebcam) {
@@ -326,10 +328,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
           disableWebcam();
         }
         setCameraState(false);
-        showInfoToast(
-          'Camera paused while taking document photo...',
-          '📷 Camera Paused'
-        );
+        showInfoToast('Camera paused while taking document photo...', '📷 Camera Paused');
       }
     } else if (wasCameraOnBeforeCaptureRef.current) {
       setTimeout(() => {
@@ -402,6 +401,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
           };
 
           await saveCall(payload);
+          await queryClient.invalidateQueries({ queryKey: [MyAppointmentsQueryKeys.MyAppointments] });
         }
       } catch (err) {
         console.warn('[saveCall Error]:', err);
