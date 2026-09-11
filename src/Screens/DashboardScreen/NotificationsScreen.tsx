@@ -8,7 +8,6 @@ import NotificationSkeleton from '../../components/Skeletons/NotificationSkeleto
 import {
   BellIcon,
   CalendarIcon,
-  CheckIcon,
   ChevronLeftIcon,
   ClockIcon,
   FileTextIcon,
@@ -222,7 +221,11 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
   const keyExtractor = useCallback((item: FlatListItem) => item.id, []);
 
   if (notificationPending) {
-    return <NotificationSkeleton />;
+    return (
+      <SafeAreaWrapper>
+        <NotificationSkeleton />
+      </SafeAreaWrapper>
+    );
   }
 
   if (isNotifyError) {
@@ -249,8 +252,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               activeOpacity={0.75}
               onPress={() => showInfoToast('This Features is Under Development!.')}
             >
-              <CheckIcon size={14} color="#0D9488" />
-              <Text style={styles.markReadText}>Mark all as read</Text>
+              <Text style={styles.markReadText}>Clear All</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

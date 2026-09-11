@@ -178,7 +178,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 {!!metadata.appointment_date && (
                   <View style={styles.metadataChip}>
                     <Text style={styles.metadataChipText}>
-                      📅 {formatDate(metadata.appointment_date, 'DD MMM YYYY')}
+                      📅 {formatDate(metadata.appointment_date)}
                     </Text>
                   </View>
                 )}
@@ -194,9 +194,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 )}
                 {!!metadata.new_date && (
                   <View style={styles.metadataChip}>
-                    <Text style={styles.metadataChipText}>
-                      📅 {formatDate(metadata.new_date, 'DD MMM YYYY')}
-                    </Text>
+                    <Text style={styles.metadataChipText}>📅 {formatDate(metadata.new_date)}</Text>
                   </View>
                 )}
                 {!!metadata.medications_count && (

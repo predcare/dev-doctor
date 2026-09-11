@@ -30,11 +30,7 @@ import {
 import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import {
-  checkIsExpired,
-  formatDateToYYYYMMDD,
-  formatTodayBannerDate,
-} from '../../lib/common/common.utils';
+import { checkIsExpired, formatDate, formatDateToYYYYMMDD } from '../../lib/common/common.utils';
 import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
@@ -475,7 +471,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
             ? `Filtered · ${filteredAppointments.length} appointment${
                 filteredAppointments.length !== 1 ? 's' : ''
               }`
-            : `Today · ${formatTodayBannerDate(new Date())}`}
+            : `Today · ${formatDate(new Date())}`}
         </Text>
         {isCustomFilterApplied && (
           <TouchableOpacity onPress={handleResetFilters} activeOpacity={0.7}>

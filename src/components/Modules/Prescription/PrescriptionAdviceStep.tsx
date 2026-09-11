@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { formatDate } from '../../../lib/common/common.utils';
 import { TCreatePrescriptionFormValues } from '../../../lib/schemas/createPrescription.schema';
 import { patientDetailsStyles as S } from '../../../styled/PatientDetailsScreen.styled';
@@ -34,7 +34,7 @@ export const PrescriptionAdviceStep: React.FC = () => {
               }}
             >
               {getValues('follow_up_date')
-                ? formatDate(getValues('follow_up_date'), 'DD MMM YYYY')
+                ? formatDate(getValues('follow_up_date'))
                 : 'Tap to select follow-up date'}
             </Text>
             <Text style={{ fontSize: 16 }}>📅</Text>
@@ -158,13 +158,14 @@ export const PrescriptionAdviceStep: React.FC = () => {
       <PredDatePickerModal
         visible={showDatePicker}
         value={
-          getValues('follow_up_date') && !isNaN(new Date(getValues('follow_up_date') || '').getTime())
+          getValues('follow_up_date') &&
+          !isNaN(new Date(getValues('follow_up_date') || '').getTime())
             ? new Date(getValues('follow_up_date') || '')
             : new Date()
         }
         title="Select Follow-up Date"
         onConfirm={selectedDate => {
-          console.log('selectedDate', selectedDate)
+          console.log('selectedDate', selectedDate);
           setValue('follow_up_date', formatDate(selectedDate, 'YYYY-MM-DD'), {
             shouldValidate: true,
             shouldDirty: true,

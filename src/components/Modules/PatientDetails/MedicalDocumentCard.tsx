@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Switch, Text, TouchableOpacity, View } from 'react-native';
-import { dateOnly } from '../../../lib/common/common.utils';
+import { formatDate } from '../../../lib/common/common.utils';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 import { FileDocumentIcon, ImageIcon } from '../../ui/icons';
@@ -58,7 +58,7 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
 
   const displayDate = useMemo(() => {
     if (created_at) {
-      return dateOnly(created_at, 'DD MMM YYYY');
+      return formatDate(created_at);
     }
     return '';
   }, [created_at]);

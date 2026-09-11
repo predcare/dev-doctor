@@ -86,9 +86,7 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
                 <Text style={styles.labelTitle}>INVOICE NUMBER:</Text>
                 {invoiceNumber ? <Text style={styles.paperInvNum}>{invoiceNumber}</Text> : null}
                 {invoice.created_at ? (
-                  <Text style={styles.paperInvDate}>
-                    Date: {formatDate(invoice.created_at, 'DD MMM YYYY')}
-                  </Text>
+                  <Text style={styles.paperInvDate}>Date: {formatDate(invoice.created_at)}</Text>
                 ) : null}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
                   <View style={[styles.statusPill, { backgroundColor: statusBg }]}>

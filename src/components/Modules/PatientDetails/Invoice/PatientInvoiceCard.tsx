@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { dateOnly } from '../../../../lib/common/common.utils';
+import { formatDate } from '../../../../lib/common/common.utils';
 import { patientInvoiceTabStyles as styles } from '../../../../styled/PatientInvoiceTabPanel.styled';
 
 export interface PatientInvoiceCardProps {
@@ -39,7 +39,7 @@ export const PatientInvoiceCard: React.FC<PatientInvoiceCardProps> = ({
         </View>
         <View style={styles.bottomMetaRow}>
           <View style={styles.pillsContainer}>
-            <Text style={styles.recordSub}>{dateOnly(createdAt || '')}</Text>
+            <Text style={styles.recordSub}>{formatDate(createdAt || '')}</Text>
             <View style={[styles.pill, { backgroundColor: pillBg }]}>
               <Text style={[styles.pillText, { color: pillColor }]}>{label}</Text>
             </View>

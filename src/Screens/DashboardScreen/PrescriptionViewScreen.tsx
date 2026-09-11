@@ -33,7 +33,7 @@ import {
   useResendPrescriptionEmail,
 } from '../../hooks/react-query/prescriptions/prescriptions.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { dateOnly } from '../../lib/common/common.utils';
+import { formatDate } from '../../lib/common/common.utils';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../../lib/common/toast.utils';
 import { AppRoute, PrescriptionViewScreenProps } from '../../route';
 import {
@@ -103,7 +103,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
       rxId: rxDoc.prescription_id || route?.params?.rxId || `#${rxDoc.id}`,
       clinicName: rxDoc.resolved_clinic_name || rxDoc.clinic_name || 'PRED Care Medical Center',
       clinicAddress: rxDoc.resolved_clinic_address || rxDoc.clinic_address,
-      date: dateOnly(rxDoc.created_at),
+      date: formatDate(rxDoc.created_at),
       status: rxDoc.status || 'completed',
       isSent: Boolean(rxDoc?.email_sent_at) ? true : false,
 
@@ -133,9 +133,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
       labTests: rxDoc.lab_tests || [],
 
       // Follow Up & Referral
-      followUp:
-        sanitizeText(rxDoc.follow_up) ||
-        (rxDoc.follow_up_date ? new Date(rxDoc.follow_up_date).toLocaleDateString('en-GB') : null),
+      followUp: rxDoc.follow_up_date ? formatDate(rxDoc.follow_up_date, 'DD/MM/YYYY') : null,
       referralSpecialist: sanitizeText(rxDoc.referral_specialist),
       referralDoctorHospital: sanitizeText(rxDoc.referral_doctor_hospital),
       referralReason: sanitizeText(rxDoc.referral_reason),
@@ -148,8 +146,6 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
     route?.params?.patientId,
     sanitizeText,
   ]);
-
-  const isCompleted = displayData?.status === 'completed';
 
   const handleResendToPatient = useCallback(() => {
     if (!rxDoc?.id) {
@@ -213,7 +209,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
 
   if (prescriptionInfoLoading) {
     return (
-      <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
+      <SafeAreaWrapper>
         <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
         <View style={S.header}>
           <TouchableOpacity onPress={() => navigation?.goBack()} activeOpacity={0.7}>
@@ -230,7 +226,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
   // 2. Error State
   if (isError || !displayData) {
     return (
-      <SafeAreaWrapper edges={['top', 'left', 'right', 'bottom']}>
+      <SafeAreaWrapper>
         <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
         <View style={S.header}>
           <TouchableOpacity onPress={() => navigation?.goBack()} activeOpacity={0.7}>

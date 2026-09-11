@@ -129,27 +129,6 @@ export const formatDateToYYYYMMDD = (d: Date): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export const formatTodayBannerDate = (d: Date): string => {
-  const day = d.getDate();
-  const monthNames = [
-    'JAN',
-    'FEB',
-    'MAR',
-    'APR',
-    'MAY',
-    'JUN',
-    'JUL',
-    'AUG',
-    'SEPT',
-    'OCT',
-    'NOV',
-    'DEC',
-  ];
-  const month = monthNames[d.getMonth()];
-  const year = d.getFullYear();
-  return `${day} ${month} ${year}`;
-};
-
 export const checkIsExpired = (
   appointmentDate: string,
   endTime?: string,
