@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, RefreshControl, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
-import CommonConfirmModal from '../../components/commons/CommonConfirmModal/CommonConfirmModal';
 import NotificationCard from '../../components/Modules/Notifications/NotificationCard';
 import NotificationEmptyCard from '../../components/Modules/Notifications/NotificationEmptyCard';
 import NotificationErrorCard from '../../components/Modules/Notifications/NotificationErrorCard';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import NotificationSkeleton from '../../components/Skeletons/NotificationSkeleton';
 import {
   BellIcon,
@@ -17,15 +17,19 @@ import {
 } from '../../components/ui/icons';
 import {
   useDeleteNotification,
+  useMarkNoShowNotifications,
   useNotifications,
 } from '../../hooks/react-query/notifications/notifications.hooks';
+import { NotificationQueryKeys } from '../../hooks/react-query/query.keys';
 import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
-import { showInfoToast } from '../../lib/common/toast.utils';
+import { showErrorToast, showSuccessToast } from '../../lib/common/toast.utils';
 import { AppRoute, type NotificationsScreenProps } from '../../route';
 import { notificationsStyles as styles } from '../../styled/NotificationsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { IMetadata, INotificationDoc } from '../../typescripts/interfaces/notification.interfaces';
+import { useAlertStore } from '../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 type FlatListItem =
   | { kind: 'header'; label: string; id: string }
@@ -33,8 +37,11 @@ type FlatListItem =
 
 export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
+
+  const showLoader = useLoadingStore(state => state.showLoader);
+  const hideLoader = useLoadingStore(state => state.hideLoader);
+  const showConfirm = useAlertStore(state => state.showConfirm);
 
   const { userData } = useAuthStore(state => state);
   const doctorId = userData?.user_id;
@@ -49,6 +56,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
   });
 
   const { mutate: deleteNotificationMutate } = useDeleteNotification();
+  const { mutate: mutateNotificationClear } = useMarkNoShowNotifications();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -59,29 +67,66 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
     }
   }, [notifyRefetch]);
 
-  const handleDeleteNotification = useCallback((notificationId: number) => {
-    setDeleteTargetId(notificationId);
-  }, []);
+  const handleDeleteNotification = useCallback(
+    (notificationId: number) => {
+      showConfirm({
+        title: 'Delete Notification',
+        message: 'Are you sure you want to delete this notification? This action cannot be undone.',
+        buttonText: 'Delete',
+        cancelText: 'Cancel',
+        onConfirm: () => {
+          setDeletedIds(prev => new Set(prev).add(notificationId));
+          showLoader('Deleting notification...');
+          deleteNotificationMutate(notificationId, {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries({
+                queryKey: [NotificationQueryKeys.NotificationCount],
+              });
+              hideLoader();
+              showSuccessToast('Notification deleted successfully');
+              notifyRefetch();
+            },
+            onError: () => {
+              hideLoader();
+              showErrorToast('Failed to delete notification');
+              setDeletedIds(prev => {
+                const next = new Set(prev);
+                next.delete(notificationId);
+                return next;
+              });
+            },
+          });
+        },
+      });
+    },
+    [showConfirm, showLoader, hideLoader, deleteNotificationMutate, notifyRefetch]
+  );
 
-  const handleConfirmDelete = useCallback(() => {
-    if (!deleteTargetId) return;
-    const targetId = deleteTargetId;
-    setDeletedIds(prev => new Set(prev).add(targetId));
-    setDeleteTargetId(null);
-
-    deleteNotificationMutate(targetId, {
-      onSuccess: () => {
-        notifyRefetch();
-      },
-      onError: () => {
-        setDeletedIds(prev => {
-          const next = new Set(prev);
-          next.delete(targetId);
-          return next;
+  const handleClearAll = useCallback(() => {
+    showConfirm({
+      title: 'Clear All Notifications',
+      message: 'Are you sure you want to clear all notifications? This action cannot be undone.',
+      buttonText: 'Clear All',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        if (!doctorId) return;
+        showLoader('Clearing all notifications...');
+        mutateNotificationClear(doctorId, {
+          onSuccess: async () => {
+            await queryClient.invalidateQueries({
+              queryKey: [NotificationQueryKeys.NotificationCount],
+            });
+            hideLoader();
+            showSuccessToast('All notifications cleared');
+            notifyRefetch();
+          },
+          onError: () => {
+            hideLoader();
+          },
         });
       },
     });
-  }, [deleteTargetId, deleteNotificationMutate, notifyRefetch]);
+  }, [showConfirm, doctorId, showLoader, hideLoader, mutateNotificationClear, notifyRefetch]);
 
   const getNotificationIcon = useCallback((category?: string, action?: string): React.ReactNode => {
     const cat = (category || '').toLowerCase();
@@ -247,13 +292,15 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               </View>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Notifications</Text>
-            <TouchableOpacity
-              style={styles.markReadButton}
-              activeOpacity={0.75}
-              onPress={() => showInfoToast('This Features is Under Development!.')}
-            >
-              <Text style={styles.markReadText}>Clear All</Text>
-            </TouchableOpacity>
+            {flatListData.length > 0 && (
+              <TouchableOpacity
+                style={styles.markReadButton}
+                activeOpacity={0.75}
+                onPress={handleClearAll}
+              >
+                <Text style={styles.markReadText}>Clear All</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </SafeAreaView>
 
@@ -289,17 +336,6 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
             }
           />
         )}
-
-        <CommonConfirmModal
-          visible={!!deleteTargetId}
-          title="Delete Notification"
-          message="Are you sure you want to delete this notification? This action cannot be undone."
-          confirmText="Delete"
-          cancelText="Cancel"
-          type="danger"
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setDeleteTargetId(null)}
-        />
       </View>
     </SafeAreaWrapper>
   );

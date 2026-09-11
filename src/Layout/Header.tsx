@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import {
   BellIcon,
   CalendarIcon,
@@ -10,6 +10,7 @@ import {
   PrescriptionIcon,
   SettingsIcon,
 } from '../components/ui/icons';
+import { useNotificationCount } from '../hooks/react-query/notifications/notifications.hooks';
 import { getInitials } from '../lib/common/common.utils';
 import { headerStyles } from '../styled/Header.styled';
 import { theme } from '../styled/theme.styled';
@@ -53,12 +54,19 @@ export const Header: React.FC<HeaderProps> = ({
   subtitle,
   icon,
   onBackPress,
-  unreadCount = 3,
   onNotificationPress,
   onProfilePress,
 }) => {
   const subText = description || subtitle;
   const { userData } = useAuthStore(state => state);
+  const { data: notificationData, isPending: isLoadingNotificationCount } = useNotificationCount({
+    doctorId: userData?.user_id || '',
+  });
+
+  const isNotificationAvailable = useMemo(() => {
+    return notificationData && notificationData?.count > 0 ? true : false;
+  }, [notificationData?.count]);
+
   return (
     <View style={headerStyles.container}>
       <View style={headerStyles.topRow}>
@@ -95,7 +103,6 @@ export const Header: React.FC<HeaderProps> = ({
             </View>
 
             <View style={headerStyles.greetingContainer}>
-              {/* <Text style={headerStyles.welcomeText}>Good morning 👋</Text> */}
               <Text style={headerStyles.doctorName}>{userData?.name || 'Unknown'}</Text>
               <Text style={headerStyles.specialtyText}>
                 {userData?.specialization || 'Unknown'}
@@ -110,8 +117,14 @@ export const Header: React.FC<HeaderProps> = ({
             onPress={onNotificationPress}
             activeOpacity={0.7}
           >
-            <BellIcon size={20} color={theme.colors.textPrimary} />
-            {unreadCount > 0 && <View style={headerStyles.notificationDot} />}
+            {isLoadingNotificationCount ? (
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            ) : (
+              <>
+                <BellIcon size={20} color={theme.colors.textPrimary} />
+                {isNotificationAvailable && <View style={headerStyles.notificationDot} />}
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </View>

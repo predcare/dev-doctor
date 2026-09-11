@@ -74,11 +74,10 @@ export const notificationsStyles = StyleSheet.create({
   markReadText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0D9488',
+    color: theme.colors.primaryDark,
     letterSpacing: -0.1,
   },
 
-  // List & Group Header Labels
   listContainer: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -87,11 +86,11 @@ export const notificationsStyles = StyleSheet.create({
   groupLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: theme.colors.textMuted,
+    color: theme.colors.primaryDark,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
     marginBottom: 10,
-    marginTop: 6,
+    marginTop: 0,
   },
 });
 

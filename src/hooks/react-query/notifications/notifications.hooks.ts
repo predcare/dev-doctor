@@ -1,6 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { NotificationQueryKeys } from '../query.keys';
-import { deleteNotification, getNotifications } from './notifications.func';
+import {
+  deleteNotification,
+  getNotificationCount,
+  getNotifications,
+  markNoShowNotifications,
+} from './notifications.func';
 
 export const useNotifications = (params?: { doctorId?: number | string }) =>
   useQuery({
@@ -17,5 +22,20 @@ export const useNotifications = (params?: { doctorId?: number | string }) =>
 export const useDeleteNotification = () => {
   return useMutation({
     mutationFn: (notificationId: number | string) => deleteNotification(notificationId),
+  });
+};
+
+export const useNotificationCount = (params?: { doctorId?: number | string } | number | string) => {
+  const doctorId = typeof params === 'object' ? params?.doctorId : params;
+  return useQuery({
+    queryKey: [NotificationQueryKeys.NotificationCount, doctorId],
+    queryFn: () => getNotificationCount(doctorId!),
+    enabled: !!doctorId,
+  });
+};
+
+export const useMarkNoShowNotifications = () => {
+  return useMutation({
+    mutationFn: (userId: number | string) => markNoShowNotifications(userId),
   });
 };

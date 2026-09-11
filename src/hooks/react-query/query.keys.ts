@@ -12,6 +12,7 @@ export enum ProfileQueryKeys {
 
 export enum NotificationQueryKeys {
   Notifications = 'Notifications',
+  NotificationCount = 'NotificationCount',
 }
 
 export enum PatientsQueryKeys {

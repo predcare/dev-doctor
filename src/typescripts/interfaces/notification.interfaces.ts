@@ -47,3 +47,15 @@ export interface INotificationRoot {
   count: number;
   notifications: INotificationDoc[];
 }
+
+export interface INotificationCountResponse {
+  success: boolean;
+  user_id: number;
+  count: number;
+}
+
+export interface INotificationClearResponse {
+  success: boolean;
+  message: string;
+  affected_rows: number;
+}

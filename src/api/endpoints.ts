@@ -89,6 +89,8 @@ export const endpoints = {
   notifications: {
     getAll: '/doctor/notifications/',
     delete: '/doctor/notifications/',
+    counts: (uid: number | string) => `/doctor/notifications/count/${uid}`,
+    clearNotify: (uid: number | string) => `/doctor/notifications/mark-no-show/${uid}`,
   },
   homes: {
     stats: (doctorId: string | number) => `/doctor/appointments/doctor/${doctorId}/stats`,
