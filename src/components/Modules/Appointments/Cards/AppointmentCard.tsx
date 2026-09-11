@@ -320,12 +320,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           </View>
         )}
 
-        {isCurrentApptInCall && (
-          <Text style={S.activeCallNotice}>
-            Reschedule & Cancel unavailable while call is active.
-          </Text>
-        )}
-
         {isCancelled && (
           <View style={S.cancelledBox}>
             <View style={S.cancelledIconCircle}>
@@ -374,6 +368,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
               </TouchableOpacity>
             )}
           </View>
+        )}
+        {isCurrentApptInCall && (
+          <Text style={S.activeCallNotice}>
+            Reschedule & Cancel unavailable while call is active.
+          </Text>
         )}
       </View>
     );

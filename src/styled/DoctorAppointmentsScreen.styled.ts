@@ -624,8 +624,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
-    marginTop: 8,
-    marginHorizontal: 14,
+    paddingBottom: 10,
   },
 });
 
