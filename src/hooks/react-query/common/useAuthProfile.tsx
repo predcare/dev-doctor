@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { getItem, STORAGE_KEYS } from '../../../lib/common/asyncStorage';
+import { navigationRef, replace } from '../../../navigation/navigationRef';
+import { AppRoute } from '../../../route';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { getProfile } from '../profile/profile.funcs';
 import { ProfileQueryKeys } from '../query.keys';
@@ -17,13 +19,24 @@ const useAuthProfile = () => {
   });
   useEffect(() => {
     if (profileDetails.isSuccess && profileDetails?.data?.success) {
-      setUserData(profileDetails?.data?.doctor);
+      const doctor = profileDetails?.data?.doctor;
+      setUserData(doctor);
+
+      if (doctor && doctor.has_accepted_policies === false && navigationRef.isReady()) {
+        const currentRoute = navigationRef.getCurrentRoute()?.name;
+        const bypassRoutes: string[] = [
+          AppRoute.LOGIN,
+          AppRoute.SPLASH,
+          AppRoute.POLICY_ACCEPTANCE,
+        ];
+        if (currentRoute && !bypassRoutes.includes(currentRoute)) {
+          replace(AppRoute.POLICY_ACCEPTANCE);
+        }
+      }
     }
   }, [
     profileDetails.isSuccess,
-    profileDetails.isError,
     profileDetails?.data,
-    profileDetails.error,
     setUserData,
   ]);
 

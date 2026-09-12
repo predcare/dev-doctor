@@ -46,6 +46,7 @@ export interface IMyProfileDoc {
   clinic_reg_number: string;
   clinic_location: IClinicLocation;
   location: ILocation;
+  has_accepted_policies?: boolean;
 }
 
 export interface IPatientEMRDoc {

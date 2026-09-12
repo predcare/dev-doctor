@@ -14,6 +14,7 @@ import {
 import useNotificationListeners from '../hooks/commons/useNotificationListeners';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
+import PolicyAcceptanceScreen from '../Screens/Auth/PolicyAcceptanceScreen';
 import ComingSoonScreen from '../Screens/ComingSoonScreen';
 import AddPatientScreen from '../Screens/DashboardScreen/AddPatientScreen';
 import { AppointmentsScreen } from '../Screens/DashboardScreen/AppointmentsScreen';
@@ -245,6 +246,7 @@ export const AppNavigator: React.FC = () => {
       >
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="PolicyAcceptance" component={PolicyAcceptanceScreen} />
         <Stack.Screen name="MainTabs" component={DashboardTabNavigator} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} />
         <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} />

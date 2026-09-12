@@ -32,6 +32,7 @@ export enum CommonQueryKeys {
   States = 'States',
   Cities = 'Cities',
   GET_ALL_USERS = 'GET_ALL_USERS',
+  POLICIES = 'POLICIES',
 }
 
 export enum PrescriptionQueryKeys {

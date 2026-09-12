@@ -12,6 +12,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export const AppRoute = {
   SPLASH: 'Splash',
   LOGIN: 'Login',
+  POLICY_ACCEPTANCE: 'PolicyAcceptance',
   NOTIFICATIONS: 'Notifications',
   DOCTOR_PROFILE: 'DoctorProfile',
   PRESCRIPTION_SETTINGS: 'PrescriptionSettings',
@@ -44,7 +45,8 @@ export type RouteNames = (typeof AppRoute)[keyof typeof AppRoute];
  */
 export type RootStackParamList = {
   Splash: undefined;
-  Login: undefined;
+  Login: { refetchOnMount?: boolean } | undefined;
+  PolicyAcceptance: undefined;
   Notifications: { user?: any } | undefined;
   DoctorProfile: { user?: any } | undefined;
   PrescriptionSettings: { user?: any } | undefined;
@@ -125,6 +127,16 @@ export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
 export interface LoginScreenProps {
   navigation?: LoginScreenNavigationProp;
   route?: LoginScreenRouteProp;
+}
+
+export type PolicyAcceptanceScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'PolicyAcceptance'
+>;
+export type PolicyAcceptanceScreenRouteProp = RouteProp<RootStackParamList, 'PolicyAcceptance'>;
+export interface PolicyAcceptanceScreenProps {
+  navigation?: PolicyAcceptanceScreenNavigationProp;
+  route?: PolicyAcceptanceScreenRouteProp;
 }
 
 export type NotificationsScreenNavigationProp = NativeStackNavigationProp<

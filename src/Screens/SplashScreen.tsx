@@ -5,8 +5,12 @@ import { getProfile } from '../hooks/react-query/profile/profile.funcs';
 import { ProfileQueryKeys } from '../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../Layout/SafeAreaWrapper';
 import { getItem, STORAGE_KEYS } from '../lib/common/asyncStorage';
-import { resetToLogin, resetToMainTabs } from '../lib/common/navigation.utils';
-import type { SplashScreenNavigationProp, SplashScreenRouteProp } from '../route';
+import { resetAndNavigate, resetToLogin, resetToMainTabs } from '../lib/common/navigation.utils';
+import {
+  AppRoute,
+  type SplashScreenNavigationProp,
+  type SplashScreenRouteProp,
+} from '../route';
 import { Splashstyles } from '../styled/SplashScreen.styled';
 import { theme } from '../styled/theme.styled';
 import { useAuthStore } from '../zustand/stores/useAuthStore';
@@ -59,7 +63,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
 
     pulseLoop.start();
 
-    let isAuthenticated = false;
     let isMounted = true;
 
     const authenticateAndLoad = async () => {
@@ -68,7 +71,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
 
         if (!token) {
           logout();
-          return;
+          return null;
         }
 
         const res = await queryClient.fetchQuery({
@@ -78,27 +81,33 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
 
         if (res?.doctor) {
           setUserData(res.doctor);
-          isAuthenticated = true;
+          return res.doctor;
         } else {
           logout();
+          return null;
         }
       } catch (error) {
         console.error('[SplashScreen] Profile auto-login error:', error);
         logout();
+        return null;
       }
     };
 
     const startAuthentication = async () => {
-      await authenticateAndLoad();
+      const doctorData = await authenticateAndLoad();
 
       if (!isMounted) return;
 
       // Move immediately after authentication/API completes
       if (onFinish) {
-        onFinish(isAuthenticated);
+        onFinish(Boolean(doctorData));
       } else if (navigation) {
-        if (isAuthenticated) {
-          resetToMainTabs(navigation);
+        if (doctorData) {
+          if (doctorData.has_accepted_policies) {
+            resetToMainTabs(navigation);
+          } else {
+            resetAndNavigate(navigation, AppRoute.POLICY_ACCEPTANCE);
+          }
         } else {
           resetToLogin(navigation);
         }

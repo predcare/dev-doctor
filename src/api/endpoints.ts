@@ -68,6 +68,8 @@ export const endpoints = {
     states: '/doctor/patients/locations/states/',
     cities: '/doctor/patients/locations/cities/',
     users: '/doctor/auth/users',
+    policies: '/policies',
+    policyAccept: '/policies/accept',
   },
   invoices: {
     getAll: (uid: string | number) => `/doctor/invoices/doctor/${uid}`,

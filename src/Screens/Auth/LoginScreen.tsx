@@ -24,11 +24,10 @@ import { useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hook
 import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
 import { ProfileQueryKeys } from '../../hooks/react-query/query.keys';
 import { setItem, STORAGE_KEYS } from '../../lib/common/asyncStorage';
-import { resetToMainTabs } from '../../lib/common/navigation.utils';
 import { showErrorToast } from '../../lib/common/toast.utils';
 import { LoginFormSchema, TLoginFormSchemaType } from '../../lib/schemas/auth.schema';
 import { Assets } from '../../resources/assets';
-import type { LoginScreenNavigationProp, LoginScreenRouteProp } from '../../route';
+import { AppRoute, type LoginScreenNavigationProp, type LoginScreenRouteProp } from '../../route';
 import { loginStyles } from '../../styled/LoginScreen.styled';
 import theme from '../../styled/theme.styled';
 import { LoginMode } from '../../typescripts/types/common.types';
@@ -59,12 +58,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
     setValue,
     watch,
     clearErrors,
-    formState: { errors },
     getValues,
+    formState: { errors },
   } = useForm<TLoginFormSchemaType>({
     resolver: yupResolver(LoginFormSchema),
     defaultValues: {
-      mode: 'mobile',
       identifier: '',
       otp: '',
     },
@@ -143,23 +141,32 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
           if (token) {
             showLoader('Please wait...');
             await setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+            let doctorData: any = null;
             try {
               const profileRes = await getProfile();
               if (profileRes?.doctor) {
+                doctorData = profileRes.doctor;
                 setUserData(profileRes.doctor);
-              } else {
-                setUserData(res.user || res.data);
               }
             } catch (err) {
               console.error('Failed to fetch doctor profile after login:', err);
-              setUserData(res.user || res.data);
             }
             await queryClient.invalidateQueries({
               queryKey: [ProfileQueryKeys.Profile],
             });
+            hideLoader();
+            if (doctorData?.has_accepted_policies) {
+              if (navigation && navigation.replace) {
+                navigation.replace(AppRoute.MAIN_TABS);
+              }
+            } else {
+              if (navigation && navigation.replace) {
+                navigation.replace(AppRoute.POLICY_ACCEPTANCE);
+              }
+            }
+          } else {
+            hideLoader();
           }
-          hideLoader();
-          resetToMainTabs(navigation);
         }
       },
     });
