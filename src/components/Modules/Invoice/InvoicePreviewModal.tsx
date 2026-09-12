@@ -21,7 +21,6 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
   patientGeneratedId,
 }) => {
   const { mutate: downloadPdf, isPending: isDownloading } = useDownloadInvoicePdf();
-  console.log('selectedInvoiceForPreview', invoice);
   if (!invoice) return null;
 
   const invoiceNumber = invoice.invoice_number || '';

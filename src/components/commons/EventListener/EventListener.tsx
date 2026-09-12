@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react';
-import Toast from 'react-native-toast-message';
+import { useCallback } from 'react';
 import useEventEmitter from '../../../hooks/commons/useEventEmitter';
 import useAuthProfile from '../../../hooks/react-query/common/useAuthProfile';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
@@ -43,5 +42,5 @@ export default function EventListener({ onLogout }: EventListenerProps) {
   useEventEmitter(events.showToast, showNotifications);
   useEventEmitter(events.logoutCurrentUser, handleLogout);
 
-  return <Toast position="bottom" />;
+  return null;
 }

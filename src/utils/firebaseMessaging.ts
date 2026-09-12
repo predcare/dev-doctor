@@ -11,7 +11,7 @@ import {
   requestPermission,
 } from '@react-native-firebase/messaging';
 import { PermissionsAndroid, Platform } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { showInfoToast } from '../lib/common/toast.utils';
 import { getItem, setItem, STORAGE_KEYS } from '../lib/common/asyncStorage';
 
 export interface DeviceSessionFields {
@@ -147,13 +147,7 @@ export function onForegroundNotification(
         data: remoteMessage.data,
       };
 
-      Toast.show({
-        type: 'info',
-        text1: notificationData.title,
-        text2: notificationData.body,
-        position: 'top',
-        visibilityTime: 4000,
-      });
+      showInfoToast(notificationData.body, notificationData.title);
 
       // Display system notification in mobile notification bar
       await displayLocalSystemNotification(

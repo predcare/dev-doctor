@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-toast-message';
+import { showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
 import { theme } from '../../../styled/theme.styled';
 import { Invoice } from '../../../typescripts/types/invoice.types';
 
@@ -26,7 +26,11 @@ export const InvoiceCard: React.FC<InvoiceCardProps> = ({
       case 'Overdue':
         return { bg: theme.colors.dangerSoft, text: theme.colors.danger, label: 'OVERDUE' };
       default:
-        return { bg: theme.colors.background, text: theme.colors.textMuted, label: status.toUpperCase() };
+        return {
+          bg: theme.colors.background,
+          text: theme.colors.textMuted,
+          label: status.toUpperCase(),
+        };
     }
   };
 
@@ -44,12 +48,7 @@ export const InvoiceCard: React.FC<InvoiceCardProps> = ({
     if (onPressDownload) {
       onPressDownload(invoice);
     } else {
-      Toast.show({
-        type: 'success',
-        text1: 'PDF Saved!',
-        text2: `${invoice.invoiceNumber}.pdf downloaded to device.`,
-        position: 'bottom',
-      });
+      showSuccessToast('PDF Saved!', `${invoice.invoiceNumber}.pdf downloaded to device.`);
     }
   };
 
@@ -57,12 +56,7 @@ export const InvoiceCard: React.FC<InvoiceCardProps> = ({
     if (onPressShare) {
       onPressShare(invoice);
     } else {
-      Toast.show({
-        type: 'info',
-        text1: 'Receipt Sent',
-        text2: `Receipt shared to ${invoice.patientName}`,
-        position: 'bottom',
-      });
+      showInfoToast('Receipt Sent', `Receipt shared to ${invoice.patientName}`);
     }
   };
 
@@ -75,9 +69,7 @@ export const InvoiceCard: React.FC<InvoiceCardProps> = ({
           <Text style={styles.invNumber}>{invoice.invoiceNumber}</Text>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
-          <Text style={[styles.statusText, { color: statusStyle.text }]}>
-            {statusStyle.label}
-          </Text>
+          <Text style={[styles.statusText, { color: statusStyle.text }]}>{statusStyle.label}</Text>
         </View>
       </View>
 

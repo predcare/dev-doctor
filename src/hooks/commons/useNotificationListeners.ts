@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import Toast from 'react-native-toast-message';
+import { showInfoToast } from '../../lib/common/toast.utils';
 import {
   checkInitialNotification,
   onBackgroundNotificationTap,
@@ -27,13 +27,7 @@ export function useNotificationListeners(navigationRef: any) {
     const unsubForeground = onForegroundNotification(
       (notification: { title: string; body: string; data?: any }) => {
         console.log('[useNotificationListeners] Foreground Notification received:', notification);
-        Toast.show({
-          type: 'info',
-          text1: notification.title,
-          text2: notification.body,
-          position: 'top',
-          visibilityTime: 4000,
-        });
+        showInfoToast(notification.body, notification.title);
       }
     );
 
