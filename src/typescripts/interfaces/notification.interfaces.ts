@@ -40,18 +40,12 @@ export interface INotificationDoc {
   associate_patient_id?: number;
   created_at: string;
   is_read?: boolean;
-}
-
-export interface INotificationRoot {
-  success: boolean;
-  count: number;
-  notifications: INotificationDoc[];
-}
-
-export interface INotificationCountResponse {
-  success: boolean;
-  user_id: number;
-  count: number;
+  clinic_id: string;
+  associate_staff_id: any;
+  created_by: string;
+  created_by_type: string;
+  show: boolean;
+  updated_at: string;
 }
 
 export interface INotificationClearResponse {

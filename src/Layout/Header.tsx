@@ -59,13 +59,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const subText = description || subtitle;
   const { userData } = useAuthStore(state => state);
-  const { data: notificationData, isPending: isLoadingNotificationCount } = useNotificationCount({
-    doctorId: userData?.user_id || '',
-  });
-
+  const { data: notificationData, isPending: isLoadingNotificationCount } = useNotificationCount();
   const isNotificationAvailable = useMemo(() => {
-    return notificationData && notificationData?.count > 0 ? true : false;
-  }, [notificationData?.count]);
+    return notificationData && notificationData?.data?.unread_count > 0 ? true : false;
+  }, [notificationData?.data?.unread_count]);
 
   return (
     <View style={headerStyles.container}>
@@ -84,8 +81,18 @@ export const Header: React.FC<HeaderProps> = ({
             <View style={headerStyles.titleRow}>
               <View style={headerStyles.titleIconBadge}>{icon || getDefaultHeaderIcon(title)}</View>
               <View style={headerStyles.titleTextGroup}>
-                <Text style={headerStyles.headerTitle}>{title}</Text>
-                {subText ? <Text style={headerStyles.headerDescription}>{subText}</Text> : null}
+                <Text style={headerStyles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
+                  {title}
+                </Text>
+                {subText ? (
+                  <Text
+                    style={headerStyles.headerDescription}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {subText}
+                  </Text>
+                ) : null}
               </View>
             </View>
           </View>
@@ -103,8 +110,10 @@ export const Header: React.FC<HeaderProps> = ({
             </View>
 
             <View style={headerStyles.greetingContainer}>
-              <Text style={headerStyles.doctorName}>{userData?.name || 'Unknown'}</Text>
-              <Text style={headerStyles.specialtyText}>
+              <Text style={headerStyles.doctorName} numberOfLines={1} ellipsizeMode="tail">
+                {userData?.name || 'Unknown'}
+              </Text>
+              <Text style={headerStyles.specialtyText} numberOfLines={1} ellipsizeMode="tail">
                 {userData?.specialization || 'Unknown'}
               </Text>
             </View>

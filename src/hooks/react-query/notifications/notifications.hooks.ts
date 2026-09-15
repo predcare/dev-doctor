@@ -7,16 +7,10 @@ import {
   markNoShowNotifications,
 } from './notifications.func';
 
-export const useNotifications = (params?: { doctorId?: number | string }) =>
+export const useNotifications = (params?: { page: number; limit: number }) =>
   useQuery({
     queryKey: [NotificationQueryKeys.Notifications, params],
-    queryFn: () => getNotifications(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: v => {
-      if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.notifications)) return v.notifications;
-      return [];
-    },
+    queryFn: () => getNotifications(params),
   });
 
 export const useDeleteNotification = () => {
@@ -25,17 +19,15 @@ export const useDeleteNotification = () => {
   });
 };
 
-export const useNotificationCount = (params?: { doctorId?: number | string } | number | string) => {
-  const doctorId = typeof params === 'object' ? params?.doctorId : params;
+export const useNotificationCount = () => {
   return useQuery({
-    queryKey: [NotificationQueryKeys.NotificationCount, doctorId],
-    queryFn: () => getNotificationCount(doctorId!),
-    enabled: !!doctorId,
+    queryKey: [NotificationQueryKeys.NotificationCount],
+    queryFn: () => getNotificationCount(),
   });
 };
 
 export const useMarkNoShowNotifications = () => {
   return useMutation({
-    mutationFn: (userId: number | string) => markNoShowNotifications(userId),
+    mutationFn: () => markNoShowNotifications(),
   });
 };

@@ -47,6 +47,35 @@ export interface IMyProfileDoc {
   clinic_location: IClinicLocation;
   location: ILocation;
   has_accepted_policies?: boolean;
+  parent_user_id: any;
+  relation: any;
+  is_dependent: boolean;
+  can_login: boolean;
+  salutation: string;
+  country_code: number;
+  date_of_birth: string;
+  email_verified_at: any;
+  phone_verified_at: string;
+  user_type: string;
+  max_active_devices: number;
+  is_superadmin: boolean;
+  last_login_at: string;
+  created_at: string;
+  updated_at: string;
+  doctor_status: string;
+  doctor_gender: any;
+  license_state: any;
+  verification_status: string;
+  doctor_verified_at: string;
+  doctor_verified_by: string;
+  rating: any;
+  reviews_count: number;
+  accepts_new_patients: boolean;
+  approval_required: boolean;
+  booking_type: string;
+  current_clinic: any;
+  doctor_profile_image: any;
+  certificates: any;
 }
 
 export interface IPatientEMRDoc {

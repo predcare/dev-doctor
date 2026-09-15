@@ -170,6 +170,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                     </Text>
                   </View>
                 )}
+                {!!metadata.clinic_name && (
+                  <View style={styles.metadataChip}>
+                    <Text style={styles.metadataChipText}>🏥 {metadata.clinic_name}</Text>
+                  </View>
+                )}
                 {!!metadata.appointment_id && (
                   <View style={styles.metadataChip}>
                     <Text style={styles.metadataChipText}>🔖 {metadata.appointment_id}</Text>

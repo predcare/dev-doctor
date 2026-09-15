@@ -7,7 +7,7 @@ export const usePolicies = () =>
   useQuery({
     queryKey: [CommonQueryKeys.POLICIES],
     queryFn: () => getPolicies({ role: 'doctor' }),
-    select: (v: any) => v.policies,
+    // select: (v: any) => v.policies,
   });
 
 export const usePostPolicyAcceptance = () => {

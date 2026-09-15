@@ -6,5 +6,5 @@ export const useProfile = () =>
   useQuery({
     queryKey: [ProfileQueryKeys.Profile],
     queryFn: () => getProfile(),
-    select: v => v.doctor,
+    select: v => v.data,
   });

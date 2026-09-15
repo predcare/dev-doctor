@@ -1,11 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AuthQueryKey } from '../query.keys';
-import { fetchAllUsers, sendOtp, verifyOtp } from './auth.funcs';
+import { fetchAllUsers, reSendOtp, sendOtp, verifyOtp } from './auth.funcs';
 
 export const useSendOtp = () =>
   useMutation({
     mutationFn: sendOtp,
     mutationKey: [AuthQueryKey.SEND_OTP],
+  });
+export const useReSendOtp = () =>
+  useMutation({
+    mutationFn: reSendOtp,
+    mutationKey: [AuthQueryKey.RESEND_OTP],
   });
 export const useVerifyOTP = () =>
   useMutation({

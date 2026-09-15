@@ -42,6 +42,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
   const cardMaxHeight = Math.min(height - 100, 640);
 
   const { data: allPolicies, isPending: isLoadingPolicies } = usePolicies();
+  console.log('allPolicies', allPolicies);
   const { logout, userData, setUserData } = useAuthStore(state => state);
   const [selectedPolicyItem, setSelectedPolicyItem] = useState<PolicyItemType | null>(null);
   const [formStates, setFormStates] = useState<IPolicyAcceptancePayload>({
@@ -53,7 +54,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
     usePostPolicyAcceptance();
 
   const termsData = allPolicies?.terms;
-  const privacyData = allPolicies?.privacy;
+  const privacyData = allPolicies?.privacy_policy;
   const consentData = allPolicies?.informed_consent;
 
   const isAgreedTermsAndPrivacy =
@@ -81,14 +82,14 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
         if (termsData) {
           newDocs.push({
             document_kind: 'terms',
-            document_id: termsData.id,
+            document_id: Number(termsData?.id),
             document_version: termsData.version,
           });
         }
         if (privacyData) {
           newDocs.push({
             document_kind: 'privacy',
-            document_id: privacyData.id,
+            document_id: Number(privacyData?.id),
             document_version: privacyData.version,
           });
         }
@@ -113,7 +114,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
         if (consentData) {
           newDocs.push({
             document_kind: 'informed_consent',
-            document_id: consentData.id,
+            document_id: Number(consentData?.id),
             document_version: consentData.version,
           });
         }
@@ -134,8 +135,8 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
         if (res?.success) {
           await queryClient.invalidateQueries({ queryKey: [ProfileQueryKeys.Profile] });
           const profileRes = await getProfile();
-          if (profileRes?.doctor) {
-            setUserData(profileRes.doctor);
+          if (profileRes?.data) {
+            setUserData(profileRes.data);
           }
           resetToMainTabs(navigation);
         }

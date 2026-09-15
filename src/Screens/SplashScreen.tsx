@@ -6,11 +6,7 @@ import { ProfileQueryKeys } from '../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../Layout/SafeAreaWrapper';
 import { getItem, STORAGE_KEYS } from '../lib/common/asyncStorage';
 import { resetAndNavigate, resetToLogin, resetToMainTabs } from '../lib/common/navigation.utils';
-import {
-  AppRoute,
-  type SplashScreenNavigationProp,
-  type SplashScreenRouteProp,
-} from '../route';
+import { AppRoute, type SplashScreenNavigationProp, type SplashScreenRouteProp } from '../route';
 import { Splashstyles } from '../styled/SplashScreen.styled';
 import { theme } from '../styled/theme.styled';
 import { useAuthStore } from '../zustand/stores/useAuthStore';
@@ -79,9 +75,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
           queryFn: getProfile,
         });
 
-        if (res?.doctor) {
-          setUserData(res.doctor);
-          return res.doctor;
+        if (res?.data) {
+          setUserData(res.data);
+          return res.data;
         } else {
           logout();
           return null;

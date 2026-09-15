@@ -20,7 +20,8 @@ import OtpInput from '../../components/commons/OtpInput';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { MailIcon, PhoneIcon } from '../../components/ui/icons';
 import useFcmToken from '../../hooks/commons/useFcmToken';
-import { useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
+import { useReSendOtp, useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
+import { ILoginVerifyOtpPayload } from '../../hooks/react-query/auth/payload.interfaces';
 import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
 import { ProfileQueryKeys } from '../../hooks/react-query/query.keys';
 import { setItem, STORAGE_KEYS } from '../../lib/common/asyncStorage';
@@ -51,6 +52,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
   const { setUserData } = useAuthStore(state => state);
   const { hideLoader, showLoader } = useLoadingStore(state => state);
   const { mutate: sendOtpMutation, isPending: sendOtpPending } = useSendOtp();
+  const { mutate: resendOtpMutation, isPending: resendOtpPending } = useReSendOtp();
   const { mutate: verifyOtpMutation, isPending: verifyOtpPending } = useVerifyOTP();
   const {
     control,
@@ -92,15 +94,28 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
     setOtpSent(false);
   };
 
-  const getOtpPayload = (identifier: string, mode: string) => ({
-    identifier: mode === 'mobile' ? identifier.trim() : identifier.trim().toLowerCase(),
-    ...(mode === 'mobile' && { method: 'both' }),
-  });
+  const getOtpPayload = (identifier: string, mode: string) => {
+    const cleanIdentifier = identifier.trim();
+    if (mode === 'mobile') {
+      return {
+        phone_number: cleanIdentifier,
+        user_type: 'doctor',
+      };
+    }
+    return {
+      email: cleanIdentifier.toLowerCase(),
+      user_type: 'doctor',
+    };
+  };
 
   const handleSendOtp = (_data: TLoginFormSchemaType, type: 'send' | 'resend' = 'send') => {
-    if (type === 'resend' && sendOtpPending) return;
+    if (type === 'resend' && resendOtpPending) return;
+    if (type === 'send' && sendOtpPending) return;
+
     const payload = getOtpPayload(_data.identifier || '', _data.mode);
-    sendOtpMutation(payload, {
+    const mutateFn = type === 'resend' ? resendOtpMutation : sendOtpMutation;
+
+    mutateFn(payload, {
       onSuccess: res => {
         if (res?.success) {
           if (type === 'send') setOtpSent(true);
@@ -126,12 +141,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
     }
     if (!identifier) return;
 
-    const payload = {
-      identifier: identifier,
+    const cleanIdentifier = identifier.trim();
+    const payload: ILoginVerifyOtpPayload = {
+      ...(loginMode === 'email'
+        ? { email: cleanIdentifier.toLowerCase() }
+        : { phone_number: cleanIdentifier }),
       otp: _data.otp,
-      platform: Platform.OS,
-      fcm_token: fcmToken || '',
-      device_name: deviceInfo?.device_name || '',
+      user_type: 'doctor',
+      device_id: deviceInfo?.device_id || `device_${Platform.OS}_123`,
+      device_name:
+        deviceInfo?.device_name || (Platform.OS === 'android' ? 'Android Device' : 'iOS Device'),
+      platform: Platform.OS as 'android' | 'ios',
+      fcm_token: fcmToken || deviceInfo?.fcm_token || '',
+      os_version: '14',
+      app_version: '1.0.0',
     };
 
     verifyOtpMutation(payload, {
@@ -142,11 +165,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
             showLoader('Please wait...');
             await setItem(STORAGE_KEYS.AUTH_TOKEN, token);
             let doctorData: any = null;
+            console.log('doctorData', doctorData);
             try {
               const profileRes = await getProfile();
-              if (profileRes?.doctor) {
-                doctorData = profileRes.doctor;
-                setUserData(profileRes.doctor);
+              if (profileRes?.data) {
+                doctorData = profileRes.data;
+                setUserData(profileRes.data);
               }
             } catch (err) {
               console.error('Failed to fetch doctor profile after login:', err);
@@ -154,6 +178,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
             await queryClient.invalidateQueries({
               queryKey: [ProfileQueryKeys.Profile],
             });
+            console.log('doctorData', doctorData);
             hideLoader();
             if (doctorData?.has_accepted_policies) {
               if (navigation && navigation.replace) {

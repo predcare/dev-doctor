@@ -1,5 +1,6 @@
 export const baseUrl = 'https://api-stage.predcare.in';
-export const baseUrlApi = `${baseUrl}/api/v1`;
+export const localBaseUrl = 'http://192.168.0.104:3000';
+export const baseUrlApi = `${localBaseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
   if (!fileName) return '';
@@ -18,12 +19,13 @@ export const mediaPaths = (fileName?: string) => {
 
 export const endpoints = {
   auth: {
-    sendOtp: '/doctor/auth/send-otp',
-    verifyOtp: '/doctor/auth/verify-otp',
+    sendOtp: '/auth/request-login-otp',
+    verifyOtp: '/auth/verify-login-otp',
+    resendOtp: '/auth/resend-otp',
     users: '/doctor/auth/users',
   },
   profile: {
-    get: '/doctor/own-profile',
+    get: '/users/profile',
     update: '/doctors/user/',
   },
   patients: {
@@ -68,8 +70,8 @@ export const endpoints = {
     states: '/doctor/patients/locations/states/',
     cities: '/doctor/patients/locations/cities/',
     users: '/doctor/auth/users',
-    policies: '/policies',
-    policyAccept: '/policies/accept',
+    policies: '/cms/policies',
+    policyAccept: '/users/user-policy-acceptances',
   },
   invoices: {
     getAll: (uid: string | number) => `/doctor/invoices/doctor/${uid}`,
@@ -89,10 +91,10 @@ export const endpoints = {
     downloadPrescription: (id: string | number) => `/doctor/prescriptions/${id}/pdf`,
   },
   notifications: {
-    getAll: '/doctor/notifications/',
-    delete: '/doctor/notifications/',
-    counts: (uid: number | string) => `/doctor/notifications/count/${uid}`,
-    clearNotify: (uid: number | string) => `/doctor/notifications/mark-no-show/${uid}`,
+    getAll: '/notifications',
+    delete: '/notifications/',
+    counts: `/notifications/count`,
+    clearNotify: `/notifications/clear-all`,
   },
   homes: {
     stats: (doctorId: string | number) => `/doctor/appointments/doctor/${doctorId}/stats`,

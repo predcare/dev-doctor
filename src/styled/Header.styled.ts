@@ -62,8 +62,10 @@ export const headerStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.regular,
   },
   profileGroup: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    marginRight: theme.spacing.sm,
   },
   avatarWrapper: {
     position: 'relative',
@@ -96,6 +98,7 @@ export const headerStyles = StyleSheet.create({
     borderColor: theme.colors.surface,
   },
   greetingContainer: {
+    flex: 1,
     justifyContent: 'center',
   },
   welcomeText: {

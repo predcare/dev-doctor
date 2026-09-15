@@ -2,19 +2,18 @@ import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
 import { IMyProfileDoc } from '../../../typescripts/interfaces/profile.interfaces';
+import { ILoginVerifyOtpPayload } from './payload.interfaces';
 
-export const sendOtp = async (body: { identifier: string; method?: string }) => {
+export const sendOtp = async (body: { email?: string; phone?: string; user_type?: string }) => {
   const res = await axiosInstance.post<ICommonRoot>(endpoints.auth.sendOtp, body);
   return res.data;
 };
 
-export const verifyOtp = async (body: {
-  identifier: string;
-  platform: string;
-  otp: string;
-  fcm_token?: string;
-  device_name?: string;
-}) => {
+export const reSendOtp = async (body: { email?: string; phone?: string; user_type?: string }) => {
+  const res = await axiosInstance.post<ICommonRoot>(endpoints.auth.resendOtp, body);
+  return res.data;
+};
+export const verifyOtp = async (body: ILoginVerifyOtpPayload) => {
   const res = await axiosInstance.post<IRootResponse<IMyProfileDoc>>(
     endpoints.auth.verifyOtp,
     body

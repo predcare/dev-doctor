@@ -2,22 +2,17 @@ export interface IGetPoliciesRoot {
   status: number;
   success: boolean;
   message: string;
-  data: IPolicyDoc;
-}
-
-export interface IPolicyDoc {
-  audience: string;
-  policies: IPolicies;
+  data: IPolicies;
 }
 
 export interface IPolicies {
   terms: ITerms;
-  privacy: IPrivacy;
+  privacy_policy: IPrivacyPolicy;
   informed_consent: IInformedConsent;
 }
 
 export interface ITerms {
-  id: number;
+  id: string;
   type: string;
   title: string;
   version: number;
@@ -26,12 +21,10 @@ export interface ITerms {
   published_at: string;
   created_at: string;
   updated_at: string;
-  document_kind: string;
-  is_accepted: boolean;
 }
 
-export interface IPrivacy {
-  id: number;
+export interface IPrivacyPolicy {
+  id: string;
   type: string;
   title: string;
   version: number;
@@ -40,12 +33,12 @@ export interface IPrivacy {
   published_at: string;
   created_at: string;
   updated_at: string;
-  document_kind: string;
-  is_accepted: boolean;
 }
+
+export type IPrivacy = IPrivacyPolicy;
 
 export interface IInformedConsent {
-  id: number;
+  id: string;
   type: string;
   title: string;
   version: number;
@@ -54,8 +47,6 @@ export interface IInformedConsent {
   published_at: string;
   created_at: string;
   updated_at: string;
-  document_kind: string;
-  is_accepted: boolean;
 }
 
 export interface IPolicyAcceptanceDocumentItem {
@@ -69,4 +60,3 @@ export interface IPolicyAcceptancePayload {
   source?: 'signup' | 'forced_reaccept' | 'mobile_app' | 'web_portal';
   documents?: IPolicyAcceptanceDocumentItem[];
 }
-

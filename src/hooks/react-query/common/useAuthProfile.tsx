@@ -19,7 +19,7 @@ const useAuthProfile = () => {
   });
   useEffect(() => {
     if (profileDetails.isSuccess && profileDetails?.data?.success) {
-      const doctor = profileDetails?.data?.doctor;
+      const doctor = profileDetails?.data?.data;
       setUserData(doctor);
 
       if (doctor && doctor.has_accepted_policies === false && navigationRef.isReady()) {
@@ -34,11 +34,7 @@ const useAuthProfile = () => {
         }
       }
     }
-  }, [
-    profileDetails.isSuccess,
-    profileDetails?.data,
-    setUserData,
-  ]);
+  }, [profileDetails.isSuccess, profileDetails?.data, setUserData]);
 
   useEffect(() => {
     const fetchToken = async () => {

@@ -31,28 +31,25 @@ import { useAlertStore } from '../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
-type FlatListItem =
-  | { kind: 'header'; label: string; id: string }
-  | { kind: 'item'; notif: INotificationDoc; id: string };
-
 export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
-  const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
 
   const showLoader = useLoadingStore(state => state.showLoader);
   const hideLoader = useLoadingStore(state => state.hideLoader);
   const showConfirm = useAlertStore(state => state.showConfirm);
 
   const { userData } = useAuthStore(state => state);
-  const doctorId = userData?.user_id;
+  const doctorId = userData?.id;
 
   const {
-    data: allNotifications,
-    isPending: notificationPending,
+    data: notificationResponse,
+    isFetching: notificationPending,
     isError: isNotifyError,
     refetch: notifyRefetch,
   } = useNotifications({
-    doctorId,
+    page: 1,
+    limit: 10,
   });
 
   const { mutate: deleteNotificationMutate } = useDeleteNotification();
@@ -68,30 +65,33 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
   }, [notifyRefetch]);
 
   const handleDeleteNotification = useCallback(
-    (notificationId: number) => {
+    (notificationId: string | number) => {
       showConfirm({
         title: 'Delete Notification',
         message: 'Are you sure you want to delete this notification? This action cannot be undone.',
         buttonText: 'Delete',
         cancelText: 'Cancel',
         onConfirm: () => {
-          setDeletedIds(prev => new Set(prev).add(notificationId));
+          const idStr = String(notificationId);
+          setDeletedIds(prev => new Set(prev).add(idStr));
           showLoader('Deleting notification...');
           deleteNotificationMutate(notificationId, {
-            onSuccess: async () => {
-              await queryClient.invalidateQueries({
-                queryKey: [NotificationQueryKeys.NotificationCount],
-              });
-              hideLoader();
-              showSuccessToast('Notification deleted successfully');
-              notifyRefetch();
+            onSuccess: async res => {
+              if (res?.success) {
+                await queryClient.invalidateQueries({
+                  queryKey: [NotificationQueryKeys.NotificationCount],
+                });
+                hideLoader();
+                showSuccessToast('Notification deleted successfully');
+                notifyRefetch();
+              }
             },
             onError: () => {
               hideLoader();
               showErrorToast('Failed to delete notification');
               setDeletedIds(prev => {
                 const next = new Set(prev);
-                next.delete(notificationId);
+                next.delete(idStr);
                 return next;
               });
             },
@@ -109,16 +109,19 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
       buttonText: 'Clear All',
       cancelText: 'Cancel',
       onConfirm: () => {
-        if (!doctorId) return;
         showLoader('Clearing all notifications...');
-        mutateNotificationClear(doctorId, {
-          onSuccess: async () => {
-            await queryClient.invalidateQueries({
-              queryKey: [NotificationQueryKeys.NotificationCount],
-            });
-            hideLoader();
-            showSuccessToast('All notifications cleared');
-            notifyRefetch();
+        mutateNotificationClear(undefined, {
+          onSuccess: async res => {
+            if (res?.success) {
+              await queryClient.invalidateQueries({
+                queryKey: [NotificationQueryKeys.NotificationCount],
+              });
+              hideLoader();
+              showSuccessToast('All notifications cleared');
+              notifyRefetch();
+            } else {
+              hideLoader();
+            }
           },
           onError: () => {
             hideLoader();
@@ -161,55 +164,17 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
     return <BellIcon size={20} color={theme.colors.primary} />;
   }, []);
 
-  const flatListData = useMemo(() => {
-    if (!allNotifications || !Array.isArray(allNotifications)) return [];
+  const activeNotifications = useMemo(() => {
+    const rawList: INotificationDoc[] = Array.isArray(notificationResponse?.data)
+      ? notificationResponse.data
+      : [];
 
-    const activeNotifications = allNotifications.filter(
-      n => !deletedIds.has(n.id) && !deletedIds.has(n.notification_id)
+    return rawList.filter(
+      n =>
+        !deletedIds.has(String(n.id)) &&
+        (!n.notification_id || !deletedIds.has(String(n.notification_id)))
     );
-    if (activeNotifications.length === 0) return [];
-
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const yesterdayStart = todayStart - 24 * 60 * 60 * 1000;
-
-    const today: INotificationDoc[] = [];
-    const yesterday: INotificationDoc[] = [];
-    const older: INotificationDoc[] = [];
-
-    activeNotifications.forEach(n => {
-      const time = n.created_at ? new Date(n.created_at).getTime() : 0;
-      if (time >= todayStart) {
-        today.push(n);
-      } else if (time >= yesterdayStart) {
-        yesterday.push(n);
-      } else {
-        older.push(n);
-      }
-    });
-
-    const list: FlatListItem[] = [];
-    if (today.length) {
-      list.push({ kind: 'header', label: 'TODAY', id: 'header-today' });
-      today.forEach(n =>
-        list.push({ kind: 'item', notif: n, id: `item-${n.id || n.notification_id}` })
-      );
-    }
-    if (yesterday.length) {
-      list.push({ kind: 'header', label: 'YESTERDAY', id: 'header-yesterday' });
-      yesterday.forEach(n =>
-        list.push({ kind: 'item', notif: n, id: `item-${n.id || n.notification_id}` })
-      );
-    }
-    if (older.length) {
-      list.push({ kind: 'header', label: 'EARLIER', id: 'header-earlier' });
-      older.forEach(n =>
-        list.push({ kind: 'item', notif: n, id: `item-${n.id || n.notification_id}` })
-      );
-    }
-
-    return list;
-  }, [allNotifications, deletedIds]);
+  }, [notificationResponse?.data, deletedIds]);
 
   const handleNotificationPress = useCallback(
     (notif: INotificationDoc) => {
@@ -242,20 +207,16 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
     [navigation]
   );
 
-  const renderFlatListItem = useCallback(
-    ({ item }: { item: FlatListItem }) => {
-      if (item.kind === 'header') {
-        return <Text style={styles.groupLabel}>{item.label}</Text>;
-      }
-
-      const notifId = item.notif.id || item.notif.notification_id;
+  const renderNotificationItem = useCallback(
+    ({ item }: { item: INotificationDoc }) => {
+      const notifId = item.id || item.notification_id || '';
       return (
         <View style={{ marginBottom: 10 }}>
           <NotificationCard
-            item={item.notif}
+            item={item}
             onDelete={() => handleDeleteNotification(notifId)}
-            onPress={() => handleNotificationPress(item.notif)}
-            icon={getNotificationIcon(item.notif.event_category, item.notif.event_action)}
+            onPress={() => handleNotificationPress(item)}
+            icon={getNotificationIcon(item.event_category, item.event_action)}
           />
         </View>
       );
@@ -263,7 +224,10 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
     [handleDeleteNotification, handleNotificationPress, getNotificationIcon]
   );
 
-  const keyExtractor = useCallback((item: FlatListItem) => item.id, []);
+  const keyExtractor = useCallback(
+    (item: INotificationDoc) => String(item.id || item.notification_id),
+    []
+  );
 
   if (notificationPending) {
     return (
@@ -292,7 +256,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
               </View>
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Notifications</Text>
-            {flatListData.length > 0 && (
+            {activeNotifications.length > 0 && (
               <TouchableOpacity
                 style={styles.markReadButton}
                 activeOpacity={0.75}
@@ -304,7 +268,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
           </View>
         </SafeAreaView>
 
-        {flatListData.length === 0 ? (
+        {activeNotifications.length === 0 ? (
           <NotificationEmptyCard
             title="No Notifications"
             message="You're all caught up! New notifications will appear here."
@@ -313,9 +277,9 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
           />
         ) : (
           <FlatList
-            data={flatListData}
+            data={activeNotifications}
             keyExtractor={keyExtractor}
-            renderItem={renderFlatListItem}
+            renderItem={renderNotificationItem}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={

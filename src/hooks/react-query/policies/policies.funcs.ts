@@ -8,9 +8,9 @@ import {
 
 export const getPolicies = async (params: { role: string }) => {
   const res = await axiosInstance.get<IGetPoliciesRoot>(
-    `${endpoints.commons.policies}/${params?.role}`
+    `${endpoints.commons.policies}?role=${params?.role}`
   );
-  return res.data.data;
+  return res.data?.data;
 };
 
 export const postPolicyAcceptance = async (payload: IPolicyAcceptancePayload) => {

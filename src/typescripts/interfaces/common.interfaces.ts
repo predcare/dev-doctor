@@ -72,4 +72,6 @@ export interface IPaginateMeta {
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
+  total_pages: number;
+  limit: number;
 }
