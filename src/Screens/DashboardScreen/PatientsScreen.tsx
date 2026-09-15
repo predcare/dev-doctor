@@ -14,6 +14,7 @@ import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErro
 import PatientCard from '../../components/Modules/Patients/PatientCard';
 import PatientSkeleton from '../../components/Skeletons/PatientSkeleton';
 import { PlusIcon, SearchIcon } from '../../components/ui/icons';
+import { useDebounce } from '../../hooks/commons/useDebounce';
 import { useMyPatientList } from '../../hooks/react-query/patients/patients.hooks';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
@@ -25,7 +26,6 @@ import {
 } from '../../route';
 import { MyPatientsStyles as S } from '../../styled/PatientsScreen.styled';
 import { theme } from '../../styled/theme.styled';
-import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
 export interface PatientsScreenProps {
   navigation?: PatientsScreenNavigationProp;
@@ -36,28 +36,26 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
   const appNavigation = useNavigation();
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const { userData } = useAuthStore(state => state);
+  const debounceSearch = useDebounce(search, 500);
   const {
     data: myPatients,
-    isPending: myPatientPending,
+    isFetching: myPatientPending,
     refetch: fetchPatientList,
     isError: isPatientError,
     error: patientError,
   } = useMyPatientList({
-    doctorId: userData?.user_id,
+    page: 1,
+    limit: 10,
+    search: debounceSearch,
   });
 
-  const displayPatients = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return myPatients;
-    return myPatients?.filter(
-      p =>
-        p.name?.toLowerCase().includes(q) ||
-        p.patient_id?.toLowerCase().includes(q) ||
-        p.phone_number?.includes(q) ||
-        p.condition?.toLowerCase().includes(q)
-    );
-  }, [search, myPatients]);
+  const { patientsList, totalCount } = useMemo(() => {
+    const totalCount = myPatients?.meta?.total ?? myPatients?.data?.length;
+    return {
+      patientsList: Array.isArray(myPatients?.data) ? myPatients.data : [],
+      totalCount,
+    };
+  }, [myPatients?.data]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -120,7 +118,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
           <Text style={S.txCount}>
             {myPatientPending
               ? 'Loading Records...'
-              : `${displayPatients?.length ?? 0} OF ${myPatients?.length ?? 0} RECORDS`}
+              : `${patientsList.length} OF ${totalCount} RECORDS`}
           </Text>
         </View>
         {myPatientPending ? (
@@ -148,20 +146,20 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
           </ScrollView>
         ) : (
           <FlatList
-            data={displayPatients}
-            keyExtractor={item => item.id}
+            data={patientsList}
+            keyExtractor={item => String(item.id || item.patient_id || item.user_id)}
             renderItem={({ item }) => (
               <PatientCard
                 age={getAge(item?.date_of_birth)}
                 gender={item?.gender}
                 name={item?.name}
                 patientId={item?.patient_id}
-                condition={item?.condition}
+                condition={item?.medical_history}
                 phoneNumber={item?.phone_number}
                 onPress={() =>
                   handlePatientDetails({
                     name: item?.name,
-                    patientId: item?.user_id,
+                    patientId: item?.user_id || item?.id,
                   })
                 }
               />

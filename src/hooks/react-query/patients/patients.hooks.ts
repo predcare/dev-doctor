@@ -9,6 +9,7 @@ import {
   getMyPatientsList,
   getMyPatientsPrescriptions,
   getPatientsFamilyMembers,
+  IGetMyPatientsParams,
   linkExistingPatient,
   sendPatientCredentials,
   shareEmrDocument,
@@ -23,16 +24,10 @@ import {
   IUpdatePatientInfo,
 } from './payload.interfaces';
 
-export const useMyPatientList = (params?: { doctorId?: number | string }) =>
+export const useMyPatientList = (params?: IGetMyPatientsParams) =>
   useQuery({
     queryKey: [PatientsQueryKeys.PatientsList, params],
-    queryFn: () => getMyPatientsList(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: v => {
-      if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.patients)) return v.patients;
-      return [];
-    },
+    queryFn: () => getMyPatientsList(params),
   });
 
 export const useDeletePatient = () => {

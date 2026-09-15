@@ -37,8 +37,11 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
   });
 
   const normalizedPatients = useMemo(() => {
-    const sourceList =
-      myPatients && myPatients.length > 0 ? myPatients : myPatientPending ? [] : [];
+    const sourceList: any[] = Array.isArray(myPatients?.data)
+      ? myPatients.data
+      : Array.isArray(myPatients)
+      ? myPatients
+      : [];
     return sourceList.map(item => {
       const rawId = item.user_id;
       const name = item.name || 'Unknown Patient';
@@ -55,7 +58,7 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
         phone,
       };
     });
-  }, [myPatients, myPatientPending]);
+  }, [myPatients]);
 
   const filteredPatients = useMemo(() => {
     const q = patientSearch.toLowerCase().trim();
@@ -63,13 +66,13 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
     return normalizedPatients.filter(
       p =>
         p.name.toLowerCase().includes(q) ||
-        p.patientGenId.toLowerCase().includes(q) ||
+        p.patientGenId?.toLowerCase().includes(q) ||
         p.phone.includes(q)
     );
   }, [normalizedPatients, patientSearch]);
 
   const renderEmptyState = () => {
-    if (isPatientError && (!myPatients || myPatients.length === 0)) {
+    if (isPatientError && normalizedPatients.length === 0) {
       return (
         <CommonErrorCard
           title="Failed to Load Patients"

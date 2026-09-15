@@ -1,11 +1,11 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import { IMyAppointmentsRoot } from '../../../typescripts/interfaces/appointments.interfaces';
-import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
+import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
 import {
   ICreatePatientResponse,
   ILinkExistingPatientResponse,
-  IMyPatientListRoot,
+  IMyPatientDoc,
   IPatientFamilyMemberRoot,
   IPatientInfoRoot,
 } from '../../../typescripts/interfaces/patients.interfaces';
@@ -18,8 +18,22 @@ import {
   IUpdatePatientInfo,
 } from './payload.interfaces';
 
-export const getMyPatientsList = async (doctorId: number | string) => {
-  const res = await axiosInstance.get<IMyPatientListRoot>(`${endpoints.patients.get}${doctorId}`);
+export interface IGetMyPatientsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  doctorId?: number | string;
+}
+
+export const getMyPatientsList = async (params?: IGetMyPatientsParams) => {
+  const queryParams = {
+    page: params?.page ?? 1,
+    limit: params?.limit ?? 10,
+    search: params?.search,
+  };
+  const res = await axiosInstance.get<IRootResponse<IMyPatientDoc[]>>(`${endpoints.patients.get}`, {
+    params: queryParams,
+  });
   return res.data;
 };
 

@@ -44,8 +44,9 @@ export const SelectPatientModal: React.FC<SelectPatientModalProps> = ({
   });
 
   const patients = useMemo(() => {
-    if (!Array.isArray(patientsList)) return [];
-    return patientsList as IMyPatientDoc[];
+    if (Array.isArray(patientsList?.data)) return patientsList.data as IMyPatientDoc[];
+    if (Array.isArray(patientsList)) return patientsList as IMyPatientDoc[];
+    return [];
   }, [patientsList]);
 
   const filteredPatients = useMemo(() => {

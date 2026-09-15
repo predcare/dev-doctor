@@ -28,14 +28,14 @@ export interface IPatientFamilyMemberRoot {
 }
 
 export interface IMyPatientDoc {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   patient_id: string;
   name: string;
   email: string;
   phone_number: string;
-  alternate_phone?: string;
-  whatsapp_number: any;
+  alternate_phone: string;
+  whatsapp_number: string;
   gender: string;
   date_of_birth: string;
   status: string;
@@ -44,30 +44,22 @@ export interface IMyPatientDoc {
   state: string;
   postal_code: string;
   country: string;
-  profile_image?: string;
-  medical_history?: string;
-  created_at: string;
+  profile_image: any;
+  medical_history: string;
+  created_at: any;
   blood_pressure: any;
   pulse: any;
   temperature: any;
-  blood_type: any;
   spo2: any;
   weight: any;
   height: any;
   bmi: any;
-  total_appointments: number;
-  last_appointment_date?: string;
-  created_from: string;
-  created_by: number;
   drug_allergies: any;
-  verified_at: any;
-  verified_by: any;
-  updated_at: string;
-  deleted_at: any;
-  age_display: string;
-  age_years: number;
-  gender_display: string;
-  appointments: any[];
+  total_appointments: number;
+  last_appointment_date: any;
+  age_display?: string;
+  gender_display?: string;
+  blood_type?: any;
 }
 
 export interface IPatientBasicInfo {
