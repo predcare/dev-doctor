@@ -39,58 +39,34 @@ export interface DoctorProfileScreenProps {
 }
 
 export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [tab, setTab] = useState<'pro' | 'clinic'>('pro');
   const [isRefetching, setIsRefetching] = useState(false);
 
   const { data: doctorProfile, isPending: profilePending, refetch: profileRefetch } = useProfile();
 
-  const isActive = useMemo(() => {
-    return doctorProfile?.status.toLowerCase() === 'active';
-  }, [doctorProfile?.status]);
+  const { isActive, clinic } = useMemo(() => {
+    const res = (doctorProfile?.doctor_status || doctorProfile?.status)?.toLowerCase() === 'active';
+    return { isActive: res, clinic: doctorProfile?.clinic };
+  }, [doctorProfile?.doctor_status, doctorProfile?.status, doctorProfile?.clinic]);
+
+  const clinicAddress = useMemo(() => {
+    if (!clinic) return doctorProfile?.clinic_address;
+    return [clinic?.line1, clinic?.city, clinic?.state, clinic?.country, clinic?.pincode]
+      .filter(Boolean)
+      .join(', ');
+  }, [clinic, doctorProfile?.clinic_address]);
 
   const subSpecializations = useMemo(() => {
     const raw = doctorProfile?.sub_specializations;
     if (!raw) return [];
-    let parsed = raw;
-    if (typeof parsed === 'string') {
-      try {
-        parsed = JSON.parse(parsed);
-      } catch {
-        const items = parsed
-          .split(',')
-          .map((s: string) => s.trim())
-          .filter(Boolean);
-        const parent = doctorProfile?.specialization;
-        return items.map((item: string) => (parent ? `${parent}: ${item}` : item));
-      }
+    if (typeof raw === 'object') {
+      return Object.entries(raw).flatMap(([cat, items]) =>
+        Array.isArray(items) ? items.map(item => `${cat}: ${item}`) : `${cat}: ${items}`
+      );
     }
-    if (Array.isArray(parsed)) {
-      const parent = doctorProfile?.specialization;
-      return parsed
-        .map((item: any) => String(item).trim())
-        .filter(Boolean)
-        .map((item: string) => (parent ? `${parent}: ${item}` : item));
-    }
-    if (typeof parsed === 'object' && parsed !== null) {
-      const list: string[] = [];
-      Object.entries(parsed).forEach(([category, val]: [string, any]) => {
-        const catName = category.trim();
-        if (Array.isArray(val)) {
-          val.forEach((item: any) => {
-            const itemStr = String(item).trim();
-            if (itemStr) {
-              list.push(catName ? `${catName}: ${itemStr}` : itemStr);
-            }
-          });
-        } else if (typeof val === 'string' && val.trim()) {
-          list.push(catName ? `${catName}: ${val.trim()}` : val.trim());
-        }
-      });
-      return list.filter(Boolean);
-    }
-    return [];
-  }, [doctorProfile?.sub_specializations, doctorProfile?.specialization]);
+    return Array.isArray(raw) ? raw : [String(raw)];
+  }, [doctorProfile?.sub_specializations]);
 
   const onRefresh = useCallback(async () => {
     setIsRefetching(true);
@@ -99,18 +75,17 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
   }, [profileRefetch]);
 
   const navigateToAccountTab = () => {
-    navigation.navigate(AppRoute.MAIN_TABS, {
-      screen: AppRoute.ACCOUNT,
-    });
+    navigation.navigate(AppRoute.MAIN_TABS, { screen: AppRoute.ACCOUNT });
   };
 
   const handleOpenMap = useCallback(() => {
+    const loc = clinic?.location || doctorProfile?.clinic_location || doctorProfile?.location;
     openLocationOnMap({
-      lat: doctorProfile?.clinic_location?.lat ?? doctorProfile?.location?.lat,
-      long: doctorProfile?.clinic_location?.lng ?? doctorProfile?.location?.lng,
-      address: doctorProfile?.clinic_address,
+      lat: loc?.lat,
+      long: loc?.lng,
+      address: clinicAddress,
     });
-  }, [doctorProfile]);
+  }, [clinic?.location, doctorProfile?.clinic_location, doctorProfile?.location, clinicAddress]);
 
   if (profilePending || !doctorProfile) {
     return <DoctorProfileSkeleton />;
@@ -121,11 +96,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
       <View style={doctorProfileStyles.header}>
         <TouchableOpacity
           style={doctorProfileStyles.backBtn}
-          onPress={() => {
-            if (navigation && navigation.canGoBack()) {
-              navigation.goBack();
-            }
-          }}
+          onPress={() => navigation?.canGoBack?.() && navigation.goBack()}
           activeOpacity={0.8}
         >
           <ChevronLeftIcon size={18} color={theme.colors.textSecondary} />
@@ -160,7 +131,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
               <View style={doctorProfileStyles.avatarRing}>
                 <View style={doctorProfileStyles.avatarCircle}>
                   <Text style={doctorProfileStyles.avatarTxt}>
-                    {getInitials(doctorProfile?.name || '')}
+                    {getInitials(doctorProfile.name || '')}
                   </Text>
                 </View>
               </View>
@@ -170,10 +141,10 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
             </View>
             <View style={doctorProfileStyles.heroInfo}>
               <Text style={doctorProfileStyles.drName}>
-                DR. {doctorProfile?.name.toUpperCase()}
+                {`${doctorProfile.salutation || 'DR.'} ${doctorProfile.name}`.toUpperCase()}
               </Text>
               <View style={doctorProfileStyles.idRow}>
-                <Text style={doctorProfileStyles.drId}>ID: {doctorProfile?.doctor_id}</Text>
+                <Text style={doctorProfileStyles.drId}>ID: {doctorProfile.doctor_id}</Text>
                 <View style={doctorProfileStyles.dot} />
                 <View
                   style={[
@@ -196,9 +167,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
                   <Text
                     style={[
                       doctorProfileStyles.activeTxt,
-                      {
-                        color: isActive ? theme.colors.success : theme.colors.danger,
-                      },
+                      { color: isActive ? theme.colors.success : theme.colors.danger },
                     ]}
                   >
                     {isActive ? 'ACTIVE' : 'INACTIVE'}
@@ -234,13 +203,16 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
           activeTab={tab}
           onTabChange={setTab}
         />
+
         {tab === 'pro' && (
           <View style={doctorProfileStyles.card}>
-            <ProfileInfoCard
-              label="SPECIALIZATION"
-              value={doctorProfile?.specialization}
-              iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
-            />
+            {doctorProfile.specialization && (
+              <ProfileInfoCard
+                label="SPECIALIZATION"
+                value={doctorProfile.specialization}
+                iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
             {subSpecializations.length > 0 && (
               <ProfileInfoCard
                 label="SUB SPECIALIZATION"
@@ -249,104 +221,123 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
                 iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
               />
             )}
-            <ProfileInfoCard
-              label="QUALIFICATIONS"
-              value={doctorProfile?.qualifications}
-              iconPath={<QualificationsIcon size={18} color={theme.colors.primary} />}
-            />
-            <ProfileInfoCard
-              label="EXPERIENCE"
-              value={`${doctorProfile?.experience_years} Years`}
-              iconPath={<ExperienceIcon size={18} color={theme.colors.primary} />}
-            />
-            <ProfileInfoCard
-              label="EMAIL"
-              value={doctorProfile?.email}
-              iconPath={<MailIcon size={18} color={theme.colors.primary} />}
-            />
-            <ProfileInfoCard
-              label="PHONE"
-              value={doctorProfile?.phone_number}
-              iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
-            />
-            {doctorProfile?.alternate_number && (
+            {doctorProfile.qualifications && (
+              <ProfileInfoCard
+                label="QUALIFICATIONS"
+                value={doctorProfile.qualifications}
+                iconPath={<QualificationsIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.experience_years != null && (
+              <ProfileInfoCard
+                label="EXPERIENCE"
+                value={`${doctorProfile.experience_years} Years`}
+                iconPath={<ExperienceIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.languages_spoken && doctorProfile.languages_spoken.length > 0 && (
+              <ProfileInfoCard
+                label="LANGUAGES SPOKEN"
+                multiTag={true}
+                tags={doctorProfile.languages_spoken}
+                iconPath={<ProfileIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.gender && (
+              <ProfileInfoCard
+                label="GENDER"
+                value={capitalize(doctorProfile.gender)}
+                iconPath={<ProfileIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.email && (
+              <ProfileInfoCard
+                label="EMAIL"
+                value={doctorProfile.email}
+                iconPath={<MailIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.phone_number && (
+              <ProfileInfoCard
+                label="PHONE"
+                value={doctorProfile.phone_number}
+                iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.alternate_number && (
               <ProfileInfoCard
                 label="ALTERNATE NUMBER"
-                value={doctorProfile?.alternate_number}
+                value={doctorProfile.alternate_number}
                 iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
               />
             )}
-            {doctorProfile?.whatsapp_number && (
+            {doctorProfile.whatsapp_number && (
               <ProfileInfoCard
                 label="WHATSAPP NUMBER"
-                value={doctorProfile?.whatsapp_number}
+                value={doctorProfile.whatsapp_number}
                 iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
               />
             )}
-            <ProfileInfoCard
-              label="MEDICAL LICENSE"
-              value={doctorProfile?.license_number}
-              iconPath={<LicenseIcon size={18} color={theme.colors.primary} />}
-            />
-            <ProfileInfoCard
-              label="PROFESSIONAL BIO"
-              value={doctorProfile?.bio}
-              iconPath={<BioIcon size={18} color={theme.colors.primary} />}
-            />
-            <ProfileInfoCard
-              label="GOOGLE CALENDAR"
-              value="Not Connected"
-              iconPath={<ScheduleIcon size={18} color={theme.colors.primary} />}
-            />
+            {doctorProfile.license_number && (
+              <ProfileInfoCard
+                label="MEDICAL LICENSE"
+                value={doctorProfile.license_number}
+                iconPath={<LicenseIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.verification_status && (
+              <ProfileInfoCard
+                label="VERIFICATION STATUS"
+                value={capitalize(doctorProfile.verification_status)}
+                iconPath={<CheckBadgeIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.bio && (
+              <ProfileInfoCard
+                label="PROFESSIONAL BIO"
+                value={doctorProfile.bio}
+                iconPath={<BioIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
           </View>
         )}
 
         {tab === 'clinic' && (
           <View style={doctorProfileStyles.card}>
-            {doctorProfile?.clinic_name ? (
+            {clinic ? (
               <>
-                <ProfileInfoCard
-                  label="CLINIC NAME"
-                  value={doctorProfile?.clinic_name}
-                  iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
-                />
-                <ProfileInfoCard
-                  label="CLINIC ID"
-                  value={`Id:- ${doctorProfile?.clinic_id}`}
-                  iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
-                />
-                {doctorProfile?.clinic_reg_number && (
+                {clinic.name && (
                   <ProfileInfoCard
-                    label="CLINIC REGISTRATION NUMBER"
-                    value={doctorProfile?.clinic_reg_number}
+                    label="CLINIC NAME"
+                    value={clinic.name}
                     iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                   />
                 )}
-                {doctorProfile?.clinic_gstin && (
+                {clinic.id && (
                   <ProfileInfoCard
-                    label="CLINIC GST NUMBER"
-                    value={`${doctorProfile?.clinic_gstin}`}
-                    iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
+                    label="CLINIC ID"
+                    value={`Id:- ${clinic.id}`}
+                    iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                   />
                 )}
-                {doctorProfile?.clinic_phone && (
+                {clinic.clinic_reg_number && (
+                  <ProfileInfoCard
+                    label="CLINIC REGISTRATION NUMBER"
+                    value={clinic.clinic_reg_number}
+                    iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
+                  />
+                )}
+                {clinic.contact_numbers && clinic.contact_numbers.length > 0 && (
                   <ProfileInfoCard
                     label="CLINIC PHONE"
-                    value={`${doctorProfile?.clinic_phone}`}
+                    value={clinic.contact_numbers.join(', ')}
                     iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
                   />
                 )}
-                {doctorProfile?.clinic_email && (
-                  <ProfileInfoCard
-                    label="CLINIC EMAIL"
-                    value={`${doctorProfile?.clinic_email}`}
-                    iconPath={<MailIcon size={18} color={theme.colors.primary} />}
-                  />
-                )}
-                {doctorProfile?.clinic_address && (
+                {clinicAddress && (
                   <ProfileInfoCard
                     label="CLINIC ADDRESS"
-                    value={`${doctorProfile?.clinic_address}`}
+                    value={clinicAddress}
                     iconPath={<LocationIcon size={18} color={theme.colors.primary} />}
                     rightAction={
                       <TouchableOpacity
@@ -359,11 +350,28 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
                     }
                   />
                 )}
-                <ProfileInfoCard
-                  label="ASSOCIATION STATUS"
-                  value={capitalize(doctorProfile?.clinic_association_status)}
-                  iconPath={<AssociationIcon size={18} color={theme.colors.primary} />}
-                />
+                {clinic.about && (
+                  <ProfileInfoCard
+                    label="ABOUT CLINIC"
+                    value={clinic.about}
+                    iconPath={<BioIcon size={18} color={theme.colors.primary} />}
+                  />
+                )}
+                {clinic.specialities && clinic.specialities.length > 0 && (
+                  <ProfileInfoCard
+                    label="CLINIC SPECIALITIES"
+                    multiTag={true}
+                    tags={clinic.specialities}
+                    iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
+                  />
+                )}
+                {clinic.status && (
+                  <ProfileInfoCard
+                    label="ASSOCIATION STATUS"
+                    value={capitalize(clinic.status)}
+                    iconPath={<AssociationIcon size={18} color={theme.colors.primary} />}
+                  />
+                )}
               </>
             ) : (
               <View style={doctorProfileStyles.emptyTab}>
@@ -383,6 +391,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
             )}
           </View>
         )}
+
         <View style={doctorProfileStyles.actions}>
           <TouchableOpacity
             style={doctorProfileStyles.primaryBtn}

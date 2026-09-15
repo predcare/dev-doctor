@@ -76,6 +76,7 @@ export interface IMyProfileDoc {
   current_clinic: any;
   doctor_profile_image: any;
   certificates: any;
+  clinic: IMyClinic;
 }
 
 export interface IPatientEMRDoc {
@@ -109,4 +110,24 @@ export interface ILocation {
 export interface IClinicLocation {
   lat: number;
   lng: number;
+}
+
+export interface IMyClinic {
+  id: string | number;
+  name: string;
+  clinic_reg_number: string;
+  owner_id?: number | string;
+  about?: string;
+  line1?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  pincode?: string;
+  location?: IClinicLocation;
+  specialities?: string[];
+  contact_numbers?: string[];
+  status?: string;
+  qr_code?: string;
+  created_at?: string;
+  updated_at?: string;
 }
