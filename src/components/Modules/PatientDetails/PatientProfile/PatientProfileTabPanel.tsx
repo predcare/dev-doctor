@@ -33,8 +33,6 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
     patientId: patientInfo?.user_id,
   });
 
-  console.log('familyMemberList', familyMemberList);
-
   const patient = useMemo(
     () => ({
       patientId: patientInfo?.patient_id || '-',

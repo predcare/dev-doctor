@@ -83,7 +83,7 @@ export const useMyPatientPrescriptions = (params?: { patientId?: number | string
     enabled: !!params?.patientId,
     select: v => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.prescriptions)) return v.prescriptions;
+      if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });

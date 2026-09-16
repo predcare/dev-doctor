@@ -133,7 +133,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     error: patientInfoError,
     refetch: refetchPatientInfo,
   } = useMyPatientInfo({
-    patientId: patientId,
+    patientId: Number(patientId),
   });
 
   const {
@@ -211,7 +211,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     _data: TCreatePrescriptionFormValues,
     status: 'draft' | 'completed' = 'draft'
   ): ICreatePrescriptionPayload => {
-    const rx = prescriptionInfo?.prescription;
+    const rx = prescriptionInfo?.data;
     const validMedications = _data?.medications?.filter(m => m?.name && m.name.trim() !== '');
     const validCustomVitals = _data?.custom_vitals?.filter(
       v => (v?.name && v.name.trim() !== '') || (v?.value && v.value.trim() !== '')
@@ -221,18 +221,16 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     const rawPayload: Record<string, any> = {
       doctor_id: userData?.user_id || '',
       patient_id: patientId ?? rx?.patient_id ?? '',
+      clinic_id: userData?.clinic?.id ?? rx?.clinic_id ?? '',
       appointment_id: apptIdforInPerson || appointmentId || '',
       type: 'doctor',
-      patient_name: patientInfo?.name ?? route?.params?.patientName ?? rx?.patient_name,
-      patient_age: patientInfo?.date_of_birth ? getAge(patientInfo.date_of_birth) : rx?.patient_age,
-      patient_gender: patientInfo?.gender ?? rx?.patient_gender,
       chief_complaints: _data?.chief_complaints,
       diagnosis: _data?.diagnosis,
       symptoms: _data?.chief_complaints,
       examination_notes: _data?.examination_notes,
       treatment_plan: _data?.treatment_plan,
-      drug_allergies: _data?.drug_allergies || patientInfo?.drug_allergies,
-      chronic_conditions: _data?.chronic_conditions || patientInfo?.medical_history,
+      drug_allergies: _data?.drug_allergies || '',
+      chronic_conditions: _data?.chronic_conditions || '',
       blood_pressure: _data?.blood_pressure,
       pulse: _data?.pulse,
       temperature: _data?.temperature,
@@ -252,8 +250,6 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       referral_reason: _data?.referral_reason,
       notes: _data?.notes,
       status: status,
-      clinic_name: userData?.clinic_name,
-      clinic_address: userData?.clinic_address,
     };
 
     return Object.fromEntries(
@@ -297,7 +293,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     } else {
       createPrescription(payload, {
         onSuccess: response => {
-          const createId = response?.id;
+          const createId = response?.data?.id;
           if (createId) {
             currentPrescriptionId.current = Number(createId);
           }
@@ -354,7 +350,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             hideLoader();
             (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
               rxId: String(activeId),
-              patientId: patientId || prescriptionInfo?.prescription?.patient_id,
+              patientId: patientId || prescriptionInfo?.data?.patient_id,
               patientName: patientInfo?.name || route?.params?.patientName || '',
               fromScreen: route?.params?.fromScreen,
             });
@@ -368,7 +364,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       showLoader('Creating new prescription...');
       createPrescription(payload, {
         onSuccess: async response => {
-          const createId = response?.id;
+          const createId = response?.data?.id;
           if (createId) {
             currentPrescriptionId.current = Number(createId);
           }
@@ -383,7 +379,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
             rxId: String(createId || currentPrescriptionId.current),
-            patientId: patientId || prescriptionInfo?.prescription?.patient_id,
+            patientId: patientId || prescriptionInfo?.data?.patient_id,
             patientName: patientInfo?.name || route?.params?.patientName || '',
             fromScreen: route?.params?.fromScreen,
           });
@@ -428,7 +424,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
             rxId: String(rxId),
-            patientId: patientId || prescriptionInfo?.prescription?.patient_id,
+            patientId: patientId || prescriptionInfo?.data?.patient_id,
             patientName: patientInfo?.name || route?.params?.patientName || '',
             fromScreen: route?.params?.fromScreen,
           });
@@ -447,7 +443,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           hideLoader();
           (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
             rxId: String(rxId),
-            patientId: patientId || prescriptionInfo?.prescription?.patient_id,
+            patientId: patientId || prescriptionInfo?.data?.patient_id,
             patientName: patientInfo?.name || route?.params?.patientName || '',
             fromScreen: route?.params?.fromScreen,
           });
@@ -473,7 +469,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     } else {
       createPrescription(payload, {
         onSuccess: response => {
-          const createId = response?.id;
+          const createId = response?.data?.id;
           if (createId) {
             currentPrescriptionId.current = Number(createId);
           }
@@ -514,10 +510,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     (Boolean(prescriptionId) && isPrescriptionInfoError);
 
   const displayPatientName =
-    patientInfo?.name ||
-    route?.params?.patientName ||
-    prescriptionInfo?.prescription?.patient_name ||
-    '';
+    patientInfo?.name || route?.params?.patientName || prescriptionInfo?.data?.patient_name || '';
 
   const subtitle = isLoadingData
     ? 'Loading details...'
@@ -561,8 +554,8 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
 
   useEffect(() => {
     setActiveStep('clinical');
-    if (prescriptionId && prescriptionInfo?.prescription) {
-      const rx = prescriptionInfo.prescription;
+    if (prescriptionId && prescriptionInfo?.data) {
+      const rx = prescriptionInfo.data;
       currentPrescriptionId.current = Number(prescriptionId);
       methods.reset({
         chief_complaints: rx.chief_complaints || rx.symptoms || '',
@@ -622,7 +615,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       setLastSavedAt(null);
       methods.reset(defaultFormValues);
     }
-  }, [prescriptionId, prescriptionInfo?.prescription, methods]);
+  }, [prescriptionId, prescriptionInfo?.data, methods]);
 
   useEffect(() => {
     if (isLoadingData) {

@@ -7,6 +7,8 @@ import PatientTabBar, {
   MainTabKey,
   TabItem,
 } from '../../components/Modules/PatientDetails/PatientTabBar';
+import PrescriptionsTabPanel from '../../components/Modules/PatientDetails/PrescriptionsTabPanel';
+import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 import PatientDetailsSkeleton from '../../components/Skeletons/PatientDetailsSkeleton';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import { useMyPatientInfo } from '../../hooks/react-query/patients/patients.hooks';
@@ -15,7 +17,6 @@ import { capitalize, getAge } from '../../lib/common/common.utils';
 import { AppRoute, type PatientDetailsScreenProps } from '../../route';
 import { patientDetailsStyles } from '../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../styled/theme.styled';
-import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 
 const PatientMainTabs: TabItem[] = [
   { key: 'records', label: 'Records' },
@@ -121,7 +122,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
           <View style={{ flex: 1 }}>
             {activeMainTab === 'records' && <RecordsTabPanel patientId={patientId} />}
 
-            {/* {activeMainTab === 'prescriptions' && <PrescriptionsTabPanel patientId={patientId} />} */}
+            {activeMainTab === 'prescriptions' && <PrescriptionsTabPanel patientId={patientId} />}
             {/* {activeMainTab === 'invoice' && (
               <PatientInvoiceTabPanel
                 patientId={patientId}

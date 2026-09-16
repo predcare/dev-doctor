@@ -50,7 +50,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
     id: Number(rxId),
   });
 
-  const rxDoc: IPatientPrescriptionDoc | undefined = prescriptionInfo?.prescription;
+  const rxDoc: IPatientPrescriptionDoc | undefined = prescriptionInfo?.data;
 
   const [downloadProgress, setDownloadProgress] = useState(0);
 
@@ -147,11 +147,13 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
     }
     resendEmailMutation(rxDoc.id, {
       onSuccess: res => {
-        showSuccessToast(res?.message || "Prescription sent to patient's email.", '📧 Email Sent');
-      },
-      onError: (e: any) => {
-        const msg = e?.response?.data?.message || 'Failed to send email';
-        showErrorToast(msg, 'Email Failed');
+        if (res?.success) {
+          showSuccessToast(
+            res?.message || "Prescription sent to patient's email.",
+            '📧 Email Sent'
+          );
+          refetch();
+        }
       },
     });
   }, [rxDoc?.id, resendEmailMutation]);

@@ -2,27 +2,16 @@ import RNFS from 'react-native-fs';
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import { arrayBufferToBase64 } from '../../../lib/common/file.utils';
-import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
+import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
 import {
-  IPatientPrescriptionInfoRoot,
+  IPatientPrescriptionDoc,
   IPatientPrescriptionListRoot,
 } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import { ICreatePrescriptionPayload, IUpdatePrescriptionPayload } from './payload.interfaces';
 
 export const createPrescription = async (payload: ICreatePrescriptionPayload) => {
-  const res = await axiosInstance.post<ICommonRoot>(endpoints.prescritions.create, payload);
-  return res.data;
-};
-
-export const upsertDraftPrescription = async ({
-  id,
-  payload,
-}: {
-  id?: number | string;
-  payload: IUpdatePrescriptionPayload;
-}) => {
-  const res = await axiosInstance.post<ICommonRoot>(
-    endpoints.prescritions.upsertDraft(id),
+  const res = await axiosInstance.post<IRootResponse<{ id: number }>>(
+    endpoints.prescritions.create,
     payload
   );
   return res.data;
@@ -40,7 +29,9 @@ export const updatePrescription = async ({
 };
 
 export const getPrescriptionDetails = async (id: string | number) => {
-  const res = await axiosInstance.get<IPatientPrescriptionInfoRoot>(endpoints.prescritions.get(id));
+  const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc>>(
+    endpoints.prescritions.get(id)
+  );
   return res.data;
 };
 

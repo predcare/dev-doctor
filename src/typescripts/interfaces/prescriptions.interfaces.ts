@@ -64,7 +64,6 @@ export interface IPatientPrescriptionDoc {
   doctor_phone: string;
   resolved_clinic_name: any;
   resolved_clinic_address: any;
-  //
   clinic_phone: any;
   clinic_email?: string;
   clinic_gstin?: string;

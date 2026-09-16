@@ -8,7 +8,7 @@ import {
   IMyPatientDoc,
   IPatientFamilyMember,
 } from '../../../typescripts/interfaces/patients.interfaces';
-import { IPatientPrescriptionListRoot } from '../../../typescripts/interfaces/prescriptions.interfaces';
+import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
 import {
   ICreatePatientPayload,
@@ -77,7 +77,7 @@ export const getMyPatientsEmrs = async (patientId: number | string) => {
 };
 
 export const getMyPatientsPrescriptions = async (patientId: number | string) => {
-  const res = await axiosInstance.get<IPatientPrescriptionListRoot>(
+  const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc[]>>(
     `${endpoints.patients.prescriptions(patientId)}`
   );
   return res.data;

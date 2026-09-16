@@ -1,10 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PrescriptionQueryKeys } from '../query.keys';
-import {
-  ICreatePrescriptionPayload,
-  IUpdatePrescriptionPayload,
-  IUpsertDraftPrescriptionPayload,
-} from './payload.interfaces';
+import { ICreatePrescriptionPayload, IUpdatePrescriptionPayload } from './payload.interfaces';
 import {
   createPrescription,
   downloadPrescriptionPdf,
@@ -12,26 +8,12 @@ import {
   getPrescriptionDetails,
   resendPrescriptionEmail,
   updatePrescription,
-  upsertDraftPrescription,
 } from './prescriptions.funcs';
 
 export const useCreatePrescription = () => {
   return useMutation({
     mutationKey: [PrescriptionQueryKeys.Create],
     mutationFn: (payload: ICreatePrescriptionPayload) => createPrescription(payload),
-  });
-};
-
-export const useUpsertDraftPrescription = () => {
-  return useMutation({
-    mutationKey: [PrescriptionQueryKeys.UpsertDraft],
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id?: number | string;
-      payload: IUpsertDraftPrescriptionPayload;
-    }) => upsertDraftPrescription({ id, payload }),
   });
 };
 

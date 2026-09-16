@@ -1,5 +1,5 @@
 export const baseUrl = 'https://api-stage.predcare.in';
-export const localBaseUrl = ' https://chant-abrasion-sustainer.ngrok-free.dev';
+export const localBaseUrl = 'https://chant-abrasion-sustainer.ngrok-free.dev';
 export const baseUrlApi = `${localBaseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
@@ -38,7 +38,7 @@ export const endpoints = {
     sendCred: '/doctor/patients/send-credentials',
     emrRecords: (uid: string | number) => `/emr/doc-patient/${uid}`,
     emrShare: (emrId: string | number) => `/emr/visibility/${emrId}`,
-    prescriptions: (uid: string | number) => `/doctor/prescriptions/patient/${uid}?role=doctor`,
+    prescriptions: (uid: string | number) => `/prescriptions/patient/${uid}`,
     prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
     emrUpload: '/emr/upload',
     consults: (uid: string | number) => `/doctor/appointments/doctor/patient-consult/${uid}`,
@@ -82,14 +82,14 @@ export const endpoints = {
     create: '/doctor/invoices',
   },
   prescritions: {
-    create: '/doctor/prescriptions',
+    create: '/prescriptions',
     getAll: (doctorId: string | number) => `/doctor/prescriptions/doctor/${doctorId}`,
-    update: (id: string | number) => `/doctor/prescriptions/${id}`,
+    update: (id: string | number) => `/prescriptions/${id}`,
     upsertDraft: (id?: string | number) =>
       id ? `/doctor/prescriptions/upsert-draft/${id}` : '/doctor/prescriptions/upsert-draft',
-    get: (id: string | number) => `/doctor/prescriptions/${id}`,
-    sendAgain: (id: string | number) => `/doctor/prescriptions/${id}/send-email`,
-    downloadPrescription: (id: string | number) => `/doctor/prescriptions/${id}/pdf`,
+    get: (id: string | number) => `/prescriptions/${id}`,
+    sendAgain: (id: string | number) => `/prescriptions/${id}/send-prescription`,
+    downloadPrescription: (id: string | number) => `/prescriptions/${id}/pdf`,
   },
   notifications: {
     getAll: '/notifications',
