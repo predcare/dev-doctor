@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -39,7 +39,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
   const debounceSearch = useDebounce(search, 500);
   const {
     data: myPatients,
-    isFetching: myPatientPending,
+    isPending: myPatientPending,
     refetch: fetchPatientList,
     isError: isPatientError,
     error: patientError,
@@ -79,6 +79,12 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
       });
     },
     [appNavigation]
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPatientList();
+    }, [fetchPatientList])
   );
 
   return (

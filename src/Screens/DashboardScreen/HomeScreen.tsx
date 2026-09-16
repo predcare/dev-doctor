@@ -237,6 +237,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     doctorId: userData?.user_id || '',
   });
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     refetchAppointments();
+  //   }, [refetchAppointments])
+  // );
+
   const togglePeriodMenu = useCallback(() => {
     if (showPeriodMenu) {
       setShowPeriodMenu(false);

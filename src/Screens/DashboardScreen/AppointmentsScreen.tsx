@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -72,6 +72,12 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   } = useMyAppointments({
     doctorId: userData?.user_id,
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchMyAppointments();
+    }, [fetchMyAppointments])
+  );
 
   const { mutate: changeStatus } = useChangeAppointmentStatus();
 
