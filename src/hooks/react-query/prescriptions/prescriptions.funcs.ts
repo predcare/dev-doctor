@@ -3,11 +3,12 @@ import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import { arrayBufferToBase64 } from '../../../lib/common/file.utils';
 import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
+import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import {
-  IPatientPrescriptionDoc,
-  IPatientPrescriptionListRoot,
-} from '../../../typescripts/interfaces/prescriptions.interfaces';
-import { ICreatePrescriptionPayload, IUpdatePrescriptionPayload } from './payload.interfaces';
+  ICreatePrescriptionPayload,
+  IGetDoctorPrescriptionsParams,
+  IUpdatePrescriptionPayload,
+} from './payload.interfaces';
 
 export const createPrescription = async (payload: ICreatePrescriptionPayload) => {
   const res = await axiosInstance.post<IRootResponse<{ id: number }>>(
@@ -67,9 +68,16 @@ export const downloadPrescriptionPdf = async ({
   return destPath;
 };
 
-export const getAllPrescriptionsForDoctor = async (doctorId: string | number) => {
-  const res = await axiosInstance.get<IPatientPrescriptionListRoot>(
-    endpoints.prescritions.getAll(doctorId)
+export const getAllPrescriptionsForDoctor = async (params?: IGetDoctorPrescriptionsParams) => {
+  const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc[]>>(
+    endpoints.prescritions.getAll,
+    {
+      params: {
+        page: 1,
+        limit: 100,
+        ...params,
+      },
+    }
   );
   return res.data;
 };

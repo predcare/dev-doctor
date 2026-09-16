@@ -69,3 +69,15 @@ export interface IUpsertDraftPrescriptionPayload extends Omit<ICreatePrescriptio
 export interface IUpdatePrescriptionPayload extends Partial<ICreatePrescriptionPayload> {
   status?: 'draft' | 'completed' | string;
 }
+
+export interface IGetDoctorPrescriptionsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: 'draft' | 'completed' | string;
+  clinic_id?: string | number;
+  date_filter?: 'today' | 'this_week' | 'current_month' | 'current_year' | 'custom' | string;
+  from_date?: string;
+  to_date?: string;
+}
+

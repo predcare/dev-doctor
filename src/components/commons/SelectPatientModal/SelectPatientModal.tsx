@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useDebounce } from '../../../hooks/commons/useDebounce';
 import { useMyPatientList } from '../../../hooks/react-query/patients/patients.hooks';
+import { getInitials } from '../../../lib/common/common.utils';
 import { theme } from '../../../styled/theme.styled';
-import type { IMyPatientDoc } from '../../../typescripts/interfaces/patients.interfaces';
-import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import PatientSkeleton from '../../Skeletons/PatientSkeleton';
 import { SearchIcon } from '../../ui/icons';
 import CommonErrorCard from '../CommonErrorCard/CommonErrorCard';
@@ -32,34 +32,17 @@ export const SelectPatientModal: React.FC<SelectPatientModalProps> = ({
   onSelectPatient,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { userData } = useAuthStore(state => state);
-
+  const debounceSearch = useDebounce(searchQuery?.trim(), 500);
   const {
     data: patientsList,
     isFetching: isPendingPatientsList,
     isError: isErrorPatientsList,
     refetch: refetchPatientsList,
   } = useMyPatientList({
-    doctorId: visible && userData?.user_id ? userData?.user_id : undefined,
+    limit: 100,
+    page: 1,
+    search: debounceSearch,
   });
-
-  const patients = useMemo(() => {
-    if (Array.isArray(patientsList?.data)) return patientsList.data as IMyPatientDoc[];
-    if (Array.isArray(patientsList)) return patientsList as IMyPatientDoc[];
-    return [];
-  }, [patientsList]);
-
-  const filteredPatients = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return patients;
-    return patients.filter(
-      p =>
-        (p.name && p.name.toLowerCase().includes(q)) ||
-        (p.email && p.email.toLowerCase().includes(q)) ||
-        (p.phone_number && p.phone_number.includes(q)) ||
-        (p.patient_id && p.patient_id.toLowerCase().includes(q))
-    );
-  }, [patients, searchQuery]);
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
@@ -95,7 +78,7 @@ export const SelectPatientModal: React.FC<SelectPatientModalProps> = ({
                 onRetry={refetchPatientsList}
               />
             </View>
-          ) : filteredPatients.length === 0 ? (
+          ) : patientsList?.meta?.total === 0 ? (
             <View style={styles.centerContainer}>
               <Text style={styles.emptyTitle}>No patients found</Text>
               <Text style={styles.emptySub}>
@@ -104,24 +87,29 @@ export const SelectPatientModal: React.FC<SelectPatientModalProps> = ({
             </View>
           ) : (
             <FlatList
-              data={filteredPatients}
+              data={patientsList?.data || []}
               keyExtractor={item => String(item.id)}
               showsVerticalScrollIndicator={false}
               renderItem={({ item }) => {
-                const initials = (item.name || 'P').substring(0, 2).toUpperCase();
                 return (
                   <View style={styles.patientRow}>
                     <View style={styles.avatar}>
-                      <Text style={styles.avatarTxt}>{initials}</Text>
+                      <Text style={styles.avatarTxt}>{getInitials(item?.name)}</Text>
                     </View>
 
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.patientName}>{item.name}</Text>
-                      <Text style={styles.patientSub}>
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text style={styles.patientName} numberOfLines={1} ellipsizeMode="tail">
+                        {item.name}
+                      </Text>
+                      <Text style={styles.patientSub} numberOfLines={1} ellipsizeMode="tail">
                         {item.patient_id || `ID: ${item.id}`}
                         {item.phone_number ? ` • ${item.phone_number}` : ''}
-                        {item.email ? ` • ${item.email}` : ''}
                       </Text>
+                      {item.email ? (
+                        <Text style={styles.patientSub} numberOfLines={1} ellipsizeMode="tail">
+                          {item.email}
+                        </Text>
+                      ) : null}
                     </View>
 
                     <TouchableOpacity

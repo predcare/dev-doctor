@@ -1,6 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { PrescriptionQueryKeys } from '../query.keys';
-import { ICreatePrescriptionPayload, IUpdatePrescriptionPayload } from './payload.interfaces';
+import {
+  ICreatePrescriptionPayload,
+  IGetDoctorPrescriptionsParams,
+  IUpdatePrescriptionPayload,
+} from './payload.interfaces';
 import {
   createPrescription,
   downloadPrescriptionPdf,
@@ -52,10 +56,9 @@ export const useDownloadPrescriptionPdf = () => {
     }) => downloadPrescriptionPdf({ id, onProgress }),
   });
 };
-export const useGetAllPrescriptions = (doctorId: string | number) => {
+export const useGetAllPrescriptions = (params?: IGetDoctorPrescriptionsParams) => {
   return useQuery({
-    queryKey: [PrescriptionQueryKeys.GetAllPrescriptions, doctorId],
-    queryFn: () => getAllPrescriptionsForDoctor(doctorId),
-    enabled: !!doctorId,
+    queryKey: [PrescriptionQueryKeys.GetAllPrescriptions, params],
+    queryFn: () => getAllPrescriptionsForDoctor(params),
   });
 };

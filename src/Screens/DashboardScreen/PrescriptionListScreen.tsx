@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -13,12 +13,12 @@ import SelectPatientModal from '../../components/commons/SelectPatientModal/Sele
 import PrescriptionFilterModal from '../../components/Modules/Prescription/PrescriptionFilterModal';
 import PrescriptionItemCard from '../../components/Modules/Prescription/PrescriptionItemCard';
 import { ChevronLeftIcon, FilterIcon, PlusIcon, SearchIcon } from '../../components/ui/icons';
+import { useDebounce } from '../../hooks/commons/useDebounce';
 import { useGetAllPrescriptions } from '../../hooks/react-query/prescriptions/prescriptions.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { AppRoute } from '../../route';
 import { prescriptionListStyles as S } from '../../styled/PrescriptionListScreen.styled';
 import { theme } from '../../styled/theme.styled';
-import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
 export interface PrescriptionListScreenProps {
   navigation?: any;
@@ -28,145 +28,64 @@ export interface PrescriptionListScreenProps {
 export type PrescriptionStatus = 'All' | 'Draft' | 'Sent' | 'Active';
 export type DateRangeOption = 'Today' | 'This Week' | 'Current Month' | 'Current Year' | 'Custom';
 
-const isDateInRange = (
-  dateStr?: string,
-  range?: DateRangeOption,
-  customFrom?: string,
-  customTo?: string
-): boolean => {
-  if (!range) return true;
-  if (!dateStr) return false;
+export interface IPrescriptionFilterState {
+  activeChip: string;
+  status: string;
+  date_filter: string;
+  from_date: string;
+  to_date: string;
+}
 
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return true;
-
-  const now = new Date();
-
-  if (range === 'Today') {
-    return (
-      d.getDate() === now.getDate() &&
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear()
-    );
-  }
-
-  if (range === 'This Week') {
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    return d >= startOfWeek && d <= endOfWeek;
-  }
-
-  if (range === 'Current Month') {
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  }
-
-  if (range === 'Current Year') {
-    return d.getFullYear() === now.getFullYear();
-  }
-
-  if (range === 'Custom') {
-    if (customFrom) {
-      const fromDate = new Date(customFrom + 'T00:00:00');
-      if (d < fromDate) return false;
-    }
-    if (customTo) {
-      const toDate = new Date(customTo + 'T23:59:59');
-      if (d > toDate) return false;
-    }
-    return true;
-  }
-
-  return true;
+const initialFilterState: IPrescriptionFilterState = {
+  activeChip: 'all',
+  status: 'all',
+  date_filter: 'today',
+  from_date: '',
+  to_date: '',
 };
 
 export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ navigation }) => {
   const [search, setSearch] = useState('');
-  const [activeFilter, setActiveFilter] = useState<PrescriptionStatus>('All');
+  const [filterState, setFilterState] = useState<IPrescriptionFilterState>(initialFilterState);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSelectPatientModal, setShowSelectPatientModal] = useState(false);
 
-  // Filter Modal state
-  const [dateRange, setDateRange] = useState<DateRangeOption>('Today');
-  const [customFrom, setCustomFrom] = useState('');
-  const [customTo, setCustomTo] = useState('');
-  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['All']));
+  const debounceSearch = useDebounce(search?.trim(), 600);
 
-  // Get Auth State User Data
-  const { userData } = useAuthStore(state => state);
+  const updateFilterState = <K extends keyof IPrescriptionFilterState>(
+    key: K,
+    value: IPrescriptionFilterState[K]
+  ) => {
+    setFilterState(prev => ({ ...prev, [key]: value }));
+  };
 
-  // API Call using user_id
+  const resetFilters = () => {
+    setFilterState(initialFilterState);
+  };
+
   const {
     data: prescriptionListData,
     isPending: prescriptionsLoading,
     isError,
     refetch,
-  } = useGetAllPrescriptions(userData?.user_id || '');
-
-  const prescriptions = useMemo(() => {
-    return prescriptionListData?.prescriptions || [];
-  }, [prescriptionListData]);
-
-  console.log('prescriptions', prescriptions);
-  // Filtering Logic
-  const filteredPrescriptions = useMemo(() => {
-    return prescriptions.filter(item => {
-      // 1. Search Match
-      const searchLower = search.toLowerCase().trim();
-      const matchSearch =
-        !searchLower ||
-        (item.patient_name && item.patient_name.toLowerCase().includes(searchLower)) ||
-        (item.prescription_id && item.prescription_id.toLowerCase().includes(searchLower));
-
-      // 2. Chip Match
-      const statusLower = (item.status || 'draft').toLowerCase();
-      const matchChip =
-        activeFilter === 'All' ||
-        (activeFilter === 'Draft' && statusLower === 'draft') ||
-        (activeFilter === 'Sent' && (statusLower === 'sent' || Boolean(item.email_sent_at))) ||
-        (activeFilter === 'Active' && statusLower === 'active');
-
-      // 3. Modal Status Match
-      const matchModalStatus =
-        statusFilter.has('All') ||
-        (statusFilter.has('Draft') && statusLower === 'draft') ||
-        (statusFilter.has('Sent') && (statusLower === 'sent' || Boolean(item.email_sent_at))) ||
-        (statusFilter.has('Active') && statusLower === 'active');
-
-      // 4. Date Range Match
-      const itemDate = item.created_at || item.consultation_date || item.appointment_date;
-      const matchDate = isDateInRange(itemDate, dateRange, customFrom, customTo);
-
-      return matchSearch && matchChip && matchModalStatus && matchDate;
-    });
-  }, [prescriptions, search, activeFilter, statusFilter, dateRange, customFrom, customTo]);
-
-  const toggleStatusFilter = (s: string) => {
-    setStatusFilter(prev => {
-      const next = new Set(prev);
-      if (s === 'All') return new Set(['All']);
-      next.delete('All');
-      if (next.has(s)) {
-        next.delete(s);
-        if (next.size === 0) next.add('All');
-      } else {
-        next.add(s);
-      }
-      return next;
-    });
-  };
-
-  const resetFilters = () => {
-    setDateRange('Today');
-    setCustomFrom('');
-    setCustomTo('');
-    setStatusFilter(new Set(['All']));
-  };
+  } = useGetAllPrescriptions({
+    page: 1,
+    limit: 100,
+    search: debounceSearch.trim() || undefined,
+    status:
+      filterState.activeChip !== 'all'
+        ? filterState.activeChip
+        : filterState.status !== 'all'
+        ? filterState.status
+        : undefined,
+    date_filter: filterState.date_filter,
+    from_date:
+      filterState.date_filter === 'custom' && filterState.from_date
+        ? filterState.from_date
+        : undefined,
+    to_date:
+      filterState.date_filter === 'custom' && filterState.to_date ? filterState.to_date : undefined,
+  });
 
   return (
     <SafeAreaWrapper>
@@ -202,19 +121,25 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
 
       {/* Filter Chips */}
       <View style={S.chipRow}>
-        {(['All', 'Draft', 'Sent', 'Active'] as const).map(f => (
+        {[
+          { label: 'All', value: 'all' },
+          { label: 'Draft', value: 'draft' },
+          { label: 'Sent', value: 'sent' },
+          { label: 'Completed', value: 'completed' },
+        ].map(f => (
           <TouchableOpacity
-            key={f}
-            style={[S.chip, activeFilter === f && S.chipActive]}
-            onPress={() => setActiveFilter(f)}
+            key={f.value}
+            style={[S.chip, filterState.activeChip === f.value && S.chipActive]}
+            onPress={() => updateFilterState('activeChip', f.value)}
             activeOpacity={0.7}
           >
-            <Text style={[S.chipTxt, activeFilter === f && S.chipTxtActive]}>{f}</Text>
+            <Text style={[S.chipTxt, filterState.activeChip === f.value && S.chipTxtActive]}>
+              {f.label}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Main Content Area */}
       {prescriptionsLoading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -233,14 +158,14 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
       ) : (
         <FlatList
           style={S.scroll}
-          data={filteredPrescriptions}
+          data={prescriptionListData?.data || []}
           keyExtractor={item => String(item.id)}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
           ListHeaderComponent={
             <View style={S.txHeader}>
               <Text style={S.txLabel}>PRESCRIPTION RECORDS</Text>
-              <Text style={S.txCount}>TOTAL {filteredPrescriptions.length} PRESCRIPTIONS</Text>
+              <Text style={S.txCount}>TOTAL {prescriptionListData?.meta?.total} PRESCRIPTIONS</Text>
             </View>
           }
           ListEmptyComponent={
@@ -290,14 +215,8 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
       <PrescriptionFilterModal
         visible={showFilterModal}
         onClose={() => setShowFilterModal(false)}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-        customFrom={customFrom}
-        setCustomFrom={setCustomFrom}
-        customTo={customTo}
-        setCustomTo={setCustomTo}
-        statusFilter={statusFilter}
-        toggleStatusFilter={toggleStatusFilter}
+        filterState={filterState}
+        updateFilterState={updateFilterState}
         onReset={resetFilters}
         onApply={() => setShowFilterModal(false)}
       />

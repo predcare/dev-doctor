@@ -83,7 +83,7 @@ export const endpoints = {
   },
   prescritions: {
     create: '/prescriptions',
-    getAll: (doctorId: string | number) => `/doctor/prescriptions/doctor/${doctorId}`,
+    getAll: `/prescriptions/doc-my-prescriptions`,
     update: (id: string | number) => `/prescriptions/${id}`,
     upsertDraft: (id?: string | number) =>
       id ? `/doctor/prescriptions/upsert-draft/${id}` : '/doctor/prescriptions/upsert-draft',

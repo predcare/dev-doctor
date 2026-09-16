@@ -32,11 +32,11 @@ import EmptyIcon from '../../components/ui/icons/EmptyIcon';
 import { useDevicePermissions } from '../../hooks/commons/useDevicePermissions';
 import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
 import { useChangeAppointmentStatus } from '../../hooks/react-query/appointments/appointments.hooks';
-import { useHomeStats, useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
+import { useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
 import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import { Header } from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { _compactNumber, checkIsExpired, getTimeUntilStart } from '../../lib/common/common.utils';
+import { checkIsExpired, getTimeUntilStart } from '../../lib/common/common.utils';
 import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { AppRoute, type HomeScreenProps } from '../../route';
 import { homeStyles } from '../../styled/HomeScreen.styled';
@@ -227,14 +227,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     [changeStatus, showLoader, hideLoader, navigation, setInPersonAppointment]
   );
 
-  const {
-    data: boardStats,
-    isPending: statsPending,
-    refetch: refetchHomeStats,
-  } = useHomeStats({
-    doctorId: userData?.user_id || '',
-    period: period,
-  });
+  const statsPending = false;
 
   const {
     data: upcomingAppts,
@@ -261,16 +254,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([refetchHomeStats(), refetchAppointments()]);
+    await Promise.all([refetchAppointments()]);
     setRefreshing(false);
-  }, [refetchHomeStats, refetchAppointments]);
+  }, [refetchAppointments]);
 
   const homeStats = useMemo(() => {
     return [
       {
         id: '1',
         label: 'Upcoming Appts',
-        value: String(boardStats?.upcomingAppointments ?? 0),
+        value: 0,
         icon: <ClockIcon size={20} color="#8B5CF6" />,
         iconBg: '#F3E8FF',
       },
@@ -278,26 +271,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         id: '2',
         label:
           period === 'today' ? 'Today Appts' : period === 'week' ? 'Week Appts' : 'Month Appts',
-        value: String(boardStats?.todayAppointments ?? 0),
+        value: 0,
         icon: <CalendarIcon size={20} color="#0EA5E9" />,
         iconBg: '#E0F2FE',
       },
       {
         id: '3',
         label: 'Earnings',
-        value: `₹${_compactNumber(Number(boardStats?.todayRevenue ?? 0))}`,
+        value: 0,
         icon: <WalletIcon size={20} color="#10B981" />,
         iconBg: '#D1FAE5',
       },
       {
         id: '4',
         label: 'Total Patients',
-        value: String(boardStats?.totalPatients ?? 0),
+        value: 0,
         icon: <PatientsIcon size={20} color="#F59E0B" />,
         iconBg: '#FEF3C7',
       },
     ];
-  }, [boardStats, period]);
+  }, [period]);
 
   useEffect(() => {
     const unsubscribe = navigation?.addListener('blur', () => {
@@ -410,7 +403,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   <HomeStatsCard
                     key={stat.id}
                     label={stat.label}
-                    value={stat.value}
+                    value={String(stat.value)}
                     icon={stat.icon}
                     iconBg={stat.iconBg}
                   />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import InlineCalendar from '../../../components/commons/InlineCalendar/InlineCalendar';
+import type { IPrescriptionFilterState } from '../../../Screens/DashboardScreen/PrescriptionListScreen';
 import { prescriptionListStyles } from '../../../styled/PrescriptionListScreen.styled';
 import { CalendarIcon } from '../../ui/icons';
 
@@ -10,16 +11,11 @@ const TEAL = '#00897B';
 export interface PrescriptionFilterModalProps {
   visible: boolean;
   onClose: () => void;
-  dateRange: 'Today' | 'This Week' | 'Current Month' | 'Current Year' | 'Custom';
-  setDateRange: (
-    range: 'Today' | 'This Week' | 'Current Month' | 'Current Year' | 'Custom'
+  filterState: IPrescriptionFilterState;
+  updateFilterState: <K extends keyof IPrescriptionFilterState>(
+    key: K,
+    value: IPrescriptionFilterState[K]
   ) => void;
-  customFrom: string;
-  setCustomFrom: (dateIso: string) => void;
-  customTo: string;
-  setCustomTo: (dateIso: string) => void;
-  statusFilter: Set<string>;
-  toggleStatusFilter: (status: string) => void;
   onReset: () => void;
   onApply: () => void;
 }
@@ -38,27 +34,38 @@ const fmtIsoString = (d: Date) => {
   return `${year}-${month}-${day}`;
 };
 
+const dateRangeOptions = [
+  { label: 'Today', value: 'today' },
+  { label: 'This Week', value: 'this_week' },
+  { label: 'Current Month', value: 'current_month' },
+  { label: 'Current Year', value: 'current_year' },
+  { label: 'Custom', value: 'custom' },
+];
+
+const statusOptions = [
+  { label: 'All', value: 'all' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Sent', value: 'sent' },
+  { label: 'Completed', value: 'completed' },
+];
+
 export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = ({
   visible,
   onClose,
-  dateRange,
-  setDateRange,
-  customFrom,
-  setCustomFrom,
-  customTo,
-  setCustomTo,
-  statusFilter,
-  toggleStatusFilter,
+  filterState,
+  updateFilterState,
   onReset,
   onApply,
 }) => {
   const [activeTarget, setActiveTarget] = useState<'from' | 'to' | null>(null);
 
+  const customFrom = filterState.from_date;
+  const customTo = filterState.to_date;
+
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={prescriptionListStyles.filterOverlay}>
         <View style={prescriptionListStyles.filterSheet}>
-          {/* Header */}
           <View style={prescriptionListStyles.filterHeader}>
             <TouchableOpacity
               onPress={onClose}
@@ -83,43 +90,43 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                 <Text style={prescriptionListStyles.filterSectionTitle}>Date Range</Text>
                 <Text style={prescriptionListStyles.filterSectionBadge}>SELECT ONE</Text>
               </View>
-              {(['Today', 'This Week', 'Current Month', 'Current Year', 'Custom'] as const).map(
-                d => (
-                  <TouchableOpacity
-                    key={d}
+              {dateRangeOptions.map(d => (
+                <TouchableOpacity
+                  key={d.value}
+                  style={[
+                    prescriptionListStyles.radioRow,
+                    filterState.date_filter === d.value && prescriptionListStyles.radioRowActive,
+                  ]}
+                  onPress={() => {
+                    updateFilterState('date_filter', d.value);
+                    if (d.value !== 'custom') setActiveTarget(null);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text
                     style={[
-                      prescriptionListStyles.radioRow,
-                      dateRange === d && prescriptionListStyles.radioRowActive,
+                      prescriptionListStyles.radioTxt,
+                      filterState.date_filter === d.value && prescriptionListStyles.radioTxtActive,
                     ]}
-                    onPress={() => {
-                      setDateRange(d);
-                      if (d !== 'Custom') setActiveTarget(null);
-                    }}
-                    activeOpacity={0.7}
                   >
-                    <Text
-                      style={[
-                        prescriptionListStyles.radioTxt,
-                        dateRange === d && prescriptionListStyles.radioTxtActive,
-                      ]}
-                    >
-                      {d}
-                    </Text>
-                    <View
-                      style={[
-                        prescriptionListStyles.radio,
-                        dateRange === d && prescriptionListStyles.radioSelected,
-                      ]}
-                    >
-                      {dateRange === d && <View style={prescriptionListStyles.radioDot} />}
-                    </View>
-                  </TouchableOpacity>
-                )
-              )}
+                    {d.label}
+                  </Text>
+                  <View
+                    style={[
+                      prescriptionListStyles.radio,
+                      filterState.date_filter === d.value && prescriptionListStyles.radioSelected,
+                    ]}
+                  >
+                    {filterState.date_filter === d.value && (
+                      <View style={prescriptionListStyles.radioDot} />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
 
             {/* Custom Date Pickers with InlineCalendar */}
-            {dateRange === 'Custom' && (
+            {filterState.date_filter === 'custom' && (
               <View style={prescriptionListStyles.filterSection}>
                 <View style={prescriptionListStyles.customHead}>
                   <View>
@@ -164,7 +171,7 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                   </Text>
                   {customFrom ? (
                     <TouchableOpacity
-                      onPress={() => setCustomFrom('')}
+                      onPress={() => updateFilterState('from_date', '')}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
                       <Text style={{ fontSize: 13, color: '#9CA3AF', fontWeight: '700' }}>✕</Text>
@@ -178,7 +185,7 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                     <InlineCalendar
                       selectedDate={customFrom ? new Date(customFrom + 'T00:00:00') : null}
                       onSelectDate={d => {
-                        setCustomFrom(fmtIsoString(d));
+                        updateFilterState('from_date', fmtIsoString(d));
                         setActiveTarget('to');
                       }}
                       initialMonth={customFrom ? new Date(customFrom + 'T00:00:00') : new Date()}
@@ -216,7 +223,7 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                   </Text>
                   {customTo ? (
                     <TouchableOpacity
-                      onPress={() => setCustomTo('')}
+                      onPress={() => updateFilterState('to_date', '')}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
                       <Text style={{ fontSize: 13, color: '#9CA3AF', fontWeight: '700' }}>✕</Text>
@@ -230,7 +237,7 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                     <InlineCalendar
                       selectedDate={customTo ? new Date(customTo + 'T00:00:00') : null}
                       onSelectDate={d => {
-                        setCustomTo(fmtIsoString(d));
+                        updateFilterState('to_date', fmtIsoString(d));
                         setActiveTarget(null);
                       }}
                       initialMonth={customTo ? new Date(customTo + 'T00:00:00') : new Date()}
@@ -244,26 +251,26 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
             <View style={prescriptionListStyles.filterSection}>
               <View style={prescriptionListStyles.filterSectionHead}>
                 <Text style={prescriptionListStyles.filterSectionTitle}>Prescription Status</Text>
-                <Text style={prescriptionListStyles.filterSectionBadge}>MULTI-SELECT</Text>
+                <Text style={prescriptionListStyles.filterSectionBadge}>SELECT ONE</Text>
               </View>
               <View style={prescriptionListStyles.statusGrid}>
-                {(['All', 'Draft', 'Sent', 'Active'] as const).map(s => (
+                {statusOptions.map(s => (
                   <TouchableOpacity
-                    key={s}
+                    key={s.value}
                     style={[
                       prescriptionListStyles.statusBtn,
-                      statusFilter.has(s) && prescriptionListStyles.statusBtnActive,
+                      filterState.status === s.value && prescriptionListStyles.statusBtnActive,
                     ]}
-                    onPress={() => toggleStatusFilter(s)}
+                    onPress={() => updateFilterState('status', s.value)}
                     activeOpacity={0.7}
                   >
                     <Text
                       style={[
                         prescriptionListStyles.statusBtnTxt,
-                        statusFilter.has(s) && prescriptionListStyles.statusBtnTxtActive,
+                        filterState.status === s.value && prescriptionListStyles.statusBtnTxtActive,
                       ]}
                     >
-                      {s}
+                      {s.label}
                     </Text>
                   </TouchableOpacity>
                 ))}

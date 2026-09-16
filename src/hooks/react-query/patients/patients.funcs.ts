@@ -21,7 +21,6 @@ export interface IGetMyPatientsParams {
   page?: number;
   limit?: number;
   search?: string;
-  doctorId?: number | string;
 }
 
 export const getMyPatientsList = async (params?: IGetMyPatientsParams) => {
