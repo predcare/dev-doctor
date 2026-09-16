@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
 import useEventEmitter from '../../../hooks/commons/useEventEmitter';
 import useAuthProfile from '../../../hooks/react-query/common/useAuthProfile';
+import { resetToLogin } from '../../../lib/common/navigation.utils';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
 import events from '../../../lib/services/events/events';
+import { navigationRef } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import { queryClient } from '../../providers/ReactQueryProvider';
 
 interface EventListenerProps {
   onLogout?: () => void;
@@ -13,14 +16,16 @@ export default function EventListener({ onLogout }: EventListenerProps) {
   useAuthProfile();
   const { logout } = useAuthStore(state => state);
   const handleLogout = useCallback(
-    (data?: { intentional?: boolean }) => {
+    async (data?: { intentional?: boolean }) => {
       if (data?.intentional) {
         showSuccessToast('Logged out successfully');
       } else {
         showErrorToast('Please login again.', 'Session Expired');
       }
       onLogout?.();
-      logout();
+      await queryClient.clear();
+      await logout();
+      resetToLogin(navigationRef);
     },
     [onLogout, logout]
   );

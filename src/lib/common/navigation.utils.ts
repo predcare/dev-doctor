@@ -16,6 +16,10 @@ export const resetAndNavigate = <K extends keyof RootStackParamList>(
 ): void => {
   if (!navigation) return;
 
+  if (typeof navigation.isReady === 'function' && !navigation.isReady()) {
+    return;
+  }
+
   if (typeof navigation.reset === 'function') {
     navigation.reset({
       index: 0,
