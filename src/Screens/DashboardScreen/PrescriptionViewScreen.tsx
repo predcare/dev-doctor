@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import PrescriptionViewSkeleton from '../../components/Skeletons/PrescriptionViewSkeleton';
 import {
   CalendarIcon,
@@ -25,6 +26,7 @@ import {
   useGetPrescriptionDetails,
   useResendPrescriptionEmail,
 } from '../../hooks/react-query/prescriptions/prescriptions.hooks';
+import { PatientsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { formatDate } from '../../lib/common/common.utils';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../../lib/common/toast.utils';
@@ -35,12 +37,14 @@ import {
   TEAL_DARK,
 } from '../../styled/PrescriptionViewScreen.styled';
 import type { IPatientPrescriptionDoc } from '../../typescripts/interfaces/prescriptions.interfaces';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
   navigation,
   route,
 }) => {
   const { rxId } = route?.params || {};
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
   const {
     data: prescriptionInfo,
     isFetching: prescriptionInfoLoading,
@@ -145,18 +149,30 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
       showErrorToast('Prescription ID is missing', 'Email Failed');
       return;
     }
+    showLoader("Sending prescription to patient's email...");
     resendEmailMutation(rxDoc.id, {
-      onSuccess: res => {
-        if (res?.success) {
-          showSuccessToast(
-            res?.message || "Prescription sent to patient's email.",
-            '📧 Email Sent'
-          );
-          refetch();
+      onSuccess: async res => {
+        try {
+          if (res?.success) {
+            showSuccessToast(
+              res?.message || "Prescription sent to patient's email.",
+              '📧 Email Sent'
+            );
+            await refetch();
+            await queryClient.invalidateQueries({ queryKey: [PatientsQueryKeys.Prescriptions] });
+          } else {
+            showErrorToast(res?.message || 'Failed to send prescription email.', 'Email Failed');
+          }
+        } finally {
+          hideLoader();
         }
       },
+      onError: (err: any) => {
+        hideLoader();
+        showErrorToast(err?.message || 'Failed to resend prescription email.', 'Email Failed');
+      },
     });
-  }, [rxDoc?.id, resendEmailMutation]);
+  }, [rxDoc?.id, resendEmailMutation, showLoader, hideLoader, refetch]);
 
   const handleDownloadPDF = useCallback(() => {
     if (!rxDoc?.id) {
