@@ -1,12 +1,8 @@
-export interface ICountryRoot {
-  success: boolean;
-  countries: ICountryDoc[];
-}
-
-export interface ICountryDoc {
+export interface ILocationDoc {
   id: number;
   name: string;
   code: string;
+  status: boolean;
 }
 
 export interface IStatesRoot {

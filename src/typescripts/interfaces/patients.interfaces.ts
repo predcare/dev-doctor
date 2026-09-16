@@ -80,11 +80,11 @@ export interface IPatientFamilyMember {
   email: string;
   patient_record_id: number;
   patient_id: string;
-  profile_image: any;
-  address: any;
-  city: any;
-  state: any;
-  postal_code: any;
-  country: any;
-  profile_picture: any;
+  profile_image: string;
+  address: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  profile_picture: string;
 }

@@ -100,6 +100,14 @@ export interface IPatientEMRDoc {
   patient_user_id: number;
   notes: string;
   shared_doctor_ids: number[];
+  uuid: string;
+  clinic_id: any;
+  file_size: string;
+  owner_type: string;
+  owner_id: string;
+  meeting_id: any;
+  created_from: string;
+  created_by: string;
 }
 
 export interface ILocation {

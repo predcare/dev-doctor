@@ -1,8 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
@@ -24,7 +25,7 @@ import {
 } from '../../hooks/react-query/patients/patients.hooks';
 import { PatientsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { showErrorToast, showSuccessToast } from '../../lib/common/toast.utils';
+import { showErrorToast } from '../../lib/common/toast.utils';
 import { EditPatientSchema, TEditPatientSchemaType } from '../../lib/schemas/editPatient.schema';
 import type { EditPatientScreenProps } from '../../route';
 import { editPatientStyles } from '../../styled/EditPatientScreen.styled';
@@ -53,11 +54,16 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
   const [showBloodGroupModal, setShowBloodGroupModal] = useState(false);
   const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>();
   const [selectedStateId, setSelectedStateId] = useState<number | undefined>();
+  const [refreshing, setRefreshing] = useState(false);
 
   const { hideLoader, showLoader } = useLoadingStore(state => state);
 
-  const { data: patientInfo, isPending: fetchingPatientInfo } = useMyPatientInfo({
-    patientId: paramPatientId,
+  const {
+    data: patientInfo,
+    isPending: fetchingPatientInfo,
+    refetch: refetchPatientInfo,
+  } = useMyPatientInfo({
+    patientId: Number(paramPatientId),
   });
 
   const { data: rawCountries, isPending: loadingCountries } = useCountries();
@@ -68,7 +74,6 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     selectedStateId ? { sId: selectedStateId } : undefined
   );
   const { mutate: updatePatient, isPending: patientUpdatePending } = useUpdatePatientInfo();
-
   const {
     control,
     handleSubmit,
@@ -101,7 +106,6 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
   const stateName = useWatch({ control, name: 'state' });
   const cityName = useWatch({ control, name: 'city' });
   const bloodGroupVal = useWatch({ control, name: 'blood_type' });
-
   const roName = patientInfo?.name || paramPatientName || 'N/A';
   const roEmail = patientInfo?.email || 'N/A';
   const roPhone = patientInfo?.phone_number || 'N/A';
@@ -146,6 +150,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     if (!paramPatientId) return showErrorToast('No patient ID found');
     const trim = (v: string | null | undefined) => (v?.trim() ? v.trim() : null);
     const payload = {
+      patient_id: paramPatientId,
       address: trim(data.address) || '',
       city: trim(data.city) || '',
       state: trim(data.state) || '',
@@ -161,24 +166,20 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
       medical_history: trim(data.medical_history) || '',
       blood_type: trim(data.blood_type) || '',
     };
-    updatePatient(
-      {
-        body: payload,
-        patientId: paramPatientId,
-      },
-      {
-        onSuccess: async () => {
-          showSuccessToast('Patient information updated successfully!');
-          showLoader('Please Wait...');
+    updatePatient(payload, {
+      onSuccess: async res => {
+        if (res?.success) {
           await queryClient.invalidateQueries({ queryKey: [PatientsQueryKeys.PatientInfo] });
           hideLoader();
           navigation?.goBack();
-        },
-        onError: () => {
+        } else {
           hideLoader();
-        },
-      }
-    );
+        }
+      },
+      onError: () => {
+        hideLoader();
+      },
+    });
   };
 
   useEffect(() => {
@@ -220,7 +221,13 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     }
   }, [stateName, states]);
 
-  if (fetchingPatientInfo) {
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetchPatientInfo();
+    setRefreshing(false);
+  }, [refetchPatientInfo]);
+
+  if (fetchingPatientInfo && !refreshing) {
     return <EditPatientSkeleton />;
   }
 
@@ -246,6 +253,14 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
         contentContainerStyle={{ paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
+        }
       >
         <View style={editPatientStyles.sectionRow}>
           <View style={[editPatientStyles.sectionBar, { backgroundColor: '#6366F1' }]} />

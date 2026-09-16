@@ -1,5 +1,5 @@
 export const baseUrl = 'https://api-stage.predcare.in';
-export const localBaseUrl = 'http://192.168.0.104:3000';
+export const localBaseUrl = ' https://chant-abrasion-sustainer.ngrok-free.dev';
 export const baseUrlApi = `${localBaseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
@@ -23,6 +23,7 @@ export const endpoints = {
     verifyOtp: '/auth/verify-login-otp',
     resendOtp: '/auth/resend-otp',
     users: '/doctor/auth/users',
+    logout: '/auth/logout',
   },
   profile: {
     get: '/users/profile',
@@ -31,18 +32,18 @@ export const endpoints = {
   patients: {
     get: '/doctors/my-patients',
     delete: '/doctor/patients/',
-    details: '/doctor/patients/',
+    details: (id: number) => `/doctors/my-patients/${id}`,
     linkExisting: '/users/link-existing-patient',
     newCreate: '/users/add-patient',
     sendCred: '/doctor/patients/send-credentials',
-    emrRecords: '/doctor/emr/patient/',
+    emrRecords: (uid: string | number) => `/emr/doc-patient/${uid}`,
+    emrShare: (emrId: string | number) => `/emr/visibility/${emrId}`,
     prescriptions: (uid: string | number) => `/doctor/prescriptions/patient/${uid}?role=doctor`,
-    emrShare: (docId: string | number) => `/doctor/emr/document/${docId}/share`,
     prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
-    emrUpload: '/doctor/emr/upload',
+    emrUpload: '/emr/upload',
     consults: (uid: string | number) => `/doctor/appointments/doctor/patient-consult/${uid}`,
-    familyMembers: (uid: string | number) => `/doctor/patients/family-members/${uid}`,
-    patientUpdate: (uid: number | string) => `/doctor/patients/${uid}`,
+    familyMembers: (uid: string | number) => `/doctors/patient-family-members/${uid}`,
+    patientUpdate: `/doctors/my-patients-update`,
   },
   appointments: {
     get: '/doctor/appointments/doctor',
@@ -58,17 +59,17 @@ export const endpoints = {
     saveCall: '/doctor/appointments/save-call',
   },
   availablity: {
-    get: '/doctor/doctor-availability/doctor/',
-    delete: '/doctor/doctor-availability/',
-    create: '/doctor/doctor-availability',
-    update: '/doctor/doctor-availability/',
+    get: '/doctor-availabilities',
+    delete: '/doctor-availabilities/',
+    create: '/doctor-availabilities',
+    update: '/doctor-availabilities',
     docAvailabilities: '/doctor/doctor-availability/doctor/',
     fullAvailability: '/doctor/availability/full-overview',
   },
   commons: {
-    country: '/doctor/patients/locations/countries',
-    states: '/doctor/patients/locations/states/',
-    cities: '/doctor/patients/locations/cities/',
+    country: '/common/countries',
+    states: (countryId: string | number) => `/common/countries/${countryId}/states`,
+    cities: (stateId: string | number) => `/common/states/${stateId}/cities`,
     users: '/doctor/auth/users',
     policies: '/cms/policies',
     policyAccept: '/users/user-policy-acceptances',
@@ -102,6 +103,11 @@ export const endpoints = {
   },
 };
 
-export const successEndpoints = [endpoints.auth.sendOtp, endpoints.auth.verifyOtp];
+export const successEndpoints = [
+  endpoints.auth.sendOtp,
+  endpoints.auth.verifyOtp,
+  endpoints?.patients?.emrUpload,
+  endpoints?.patients?.patientUpdate,
+];
 
 export const exclude401Routes = [endpoints.auth.verifyOtp, endpoints.auth.sendOtp];

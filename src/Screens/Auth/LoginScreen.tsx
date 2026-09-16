@@ -20,6 +20,7 @@ import OtpInput from '../../components/commons/OtpInput';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { MailIcon, PhoneIcon } from '../../components/ui/icons';
 import useFcmToken from '../../hooks/commons/useFcmToken';
+import { getDeviceName, getOrCreateDeviceId } from '../../utils/firebaseMessaging';
 import { useReSendOtp, useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
 import { ILoginVerifyOtpPayload } from '../../hooks/react-query/auth/payload.interfaces';
 import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
@@ -133,7 +134,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
     handleSendOtp(_data, 'resend');
   };
 
-  const onSubmitVerifyOtp = (_data: TLoginFormSchemaType) => {
+  const onSubmitVerifyOtp = async (_data: TLoginFormSchemaType) => {
     if (verifyOtpPending) return;
     if (!_data.otp || _data.otp.length < 6) {
       showErrorToast('Please enter a valid 6-digit OTP code.');
@@ -142,19 +143,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
     if (!identifier) return;
 
     const cleanIdentifier = identifier.trim();
+    const activeDeviceId = deviceInfo?.device_id || (await getOrCreateDeviceId());
+    const activeDeviceName = deviceInfo?.device_name || getDeviceName();
+
     const payload: ILoginVerifyOtpPayload = {
       ...(loginMode === 'email'
         ? { email: cleanIdentifier.toLowerCase() }
         : { phone_number: cleanIdentifier }),
       otp: _data.otp,
       user_type: 'doctor',
-      device_id: deviceInfo?.device_id || `device_${Platform.OS}_123`,
-      device_name:
-        deviceInfo?.device_name || (Platform.OS === 'android' ? 'Android Device' : 'iOS Device'),
+      device_id: activeDeviceId,
+      device_name: activeDeviceName,
       platform: Platform.OS as 'android' | 'ios',
       fcm_token: fcmToken || deviceInfo?.fcm_token || '',
-      os_version: '14',
-      app_version: '1.0.0',
+      os_version: deviceInfo?.os_version || String(Platform.Version),
+      app_version: deviceInfo?.app_version || '1.0.0',
     };
 
     verifyOtpMutation(payload, {

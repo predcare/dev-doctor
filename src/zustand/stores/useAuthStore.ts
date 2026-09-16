@@ -40,7 +40,7 @@ export const useAuthStore = create<TAuthState>()(
           isLoggedIn: false,
           isDoctor: false,
         });
-        await clearStorageExcept([STORAGE_KEYS.FCM_TOKEN]);
+        await clearStorageExcept([STORAGE_KEYS.FCM_TOKEN, STORAGE_KEYS.DEVICE_ID]);
       },
     }),
     {

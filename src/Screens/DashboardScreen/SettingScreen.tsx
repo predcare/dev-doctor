@@ -7,7 +7,10 @@ import AppSettingsSection from '../../components/Modules/AccountSettings/AppSett
 import SettingsProfileCard from '../../components/Modules/AccountSettings/SettingsProfileCard';
 import SupportSection from '../../components/Modules/AccountSettings/SupportSection';
 import WalletSection from '../../components/Modules/AccountSettings/WalletSection';
+import LogoutOptionsModal from '../../components/commons/LogoutOptionsModal/LogoutOptionsModal';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
+import useFcmToken from '../../hooks/commons/useFcmToken';
+import { useUserLogout } from '../../hooks/react-query/auth/auth.hooks';
 import { resetToLogin } from '../../lib/common/navigation.utils';
 import {
   AppRoute,
@@ -26,25 +29,32 @@ export interface ProfileScreenProps {
 
 export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [subExpanded, setSubExpanded] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   const showComingSoon = useAlertStore(state => state.showComingSoon);
-  const showConfirm = useAlertStore(state => state.showConfirm);
   const logout = useAuthStore(state => state.logout);
   const { hideLoader, showLoader } = useLoadingStore(state => state);
+  const { deviceInfo } = useFcmToken();
+  const { mutate: userLogout, isPending: isLogoutLoading } = useUserLogout();
 
   const handleLogout = () => {
-    showConfirm({
-      title: 'Sign Out',
-      message: 'Are you sure you want to log out of the Practice Portal?',
-      buttonText: 'Sign Out',
-      onConfirm: async () => {
-        showLoader('Signing out...');
-        await queryClient.clear();
-        await logout();
-        hideLoader();
-        resetToLogin(navigation);
-      },
-    });
+    setLogoutModalVisible(true);
+  };
+
+  const handleConfirmLogout = async (allDevices: boolean) => {
+    showLoader(allDevices ? 'Signing out of all devices...' : 'Signing out...');
+    userLogout(
+      { all_devices: allDevices, device_id: deviceInfo?.device_id },
+      {
+        onSettled: async () => {
+          setLogoutModalVisible(false);
+          await queryClient.clear();
+          await logout();
+          hideLoader();
+          resetToLogin(navigation);
+        },
+      }
+    );
   };
 
   return (
@@ -90,6 +100,13 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           onLogout={handleLogout}
         />
       </ScrollView>
+
+      <LogoutOptionsModal
+        visible={logoutModalVisible}
+        onClose={() => setLogoutModalVisible(false)}
+        onConfirmLogout={handleConfirmLogout}
+        isLoading={isLogoutLoading}
+      />
     </SafeAreaWrapper>
   );
 };

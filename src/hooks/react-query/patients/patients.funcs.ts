@@ -6,11 +6,10 @@ import {
   ICreatePatientResponse,
   ILinkExistingPatientResponse,
   IMyPatientDoc,
-  IPatientFamilyMemberRoot,
-  IPatientInfoRoot,
+  IPatientFamilyMember,
 } from '../../../typescripts/interfaces/patients.interfaces';
 import { IPatientPrescriptionListRoot } from '../../../typescripts/interfaces/prescriptions.interfaces';
-import { IPatientEMRRoot } from '../../../typescripts/interfaces/profile.interfaces';
+import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
 import {
   ICreatePatientPayload,
   ILinkExistingPatientPayload,
@@ -63,16 +62,16 @@ export const sendPatientCredentials = async (payload: ISendPatientCredentialsPay
   return res.data;
 };
 
-export const getMyPatientsInfo = async (patientId: number | string) => {
-  const res = await axiosInstance.get<IPatientInfoRoot>(
-    `${endpoints.patients.details}${patientId}`
+export const getMyPatientsInfo = async (patientId: number) => {
+  const res = await axiosInstance.get<IRootResponse<IMyPatientDoc>>(
+    `${endpoints.patients.details(patientId)}`
   );
   return res.data;
 };
 
 export const getMyPatientsEmrs = async (patientId: number | string) => {
-  const res = await axiosInstance.get<IPatientEMRRoot>(
-    `${endpoints.patients.emrRecords}${patientId}`
+  const res = await axiosInstance.get<IRootResponse<IPatientEMRDoc[]>>(
+    `${endpoints.patients.emrRecords(patientId)}`
   );
   return res.data;
 };
@@ -86,7 +85,7 @@ export const getMyPatientsPrescriptions = async (patientId: number | string) => 
 
 export const shareEmrDocument = async (
   docId: string | number,
-  body: { visible_to_patient: number }
+  body: { visible_to_patient: boolean }
 ) => {
   const res = await axiosInstance.patch<ICommonRoot>(endpoints.patients.emrShare(docId), body);
   return res.data;
@@ -116,16 +115,13 @@ export const getMyPatientsConsults = async (patientId: number | string) => {
 };
 
 export const getPatientsFamilyMembers = async (patientId: number | string) => {
-  const res = await axiosInstance.get<IPatientFamilyMemberRoot>(
+  const res = await axiosInstance.get<IRootResponse<IPatientFamilyMember[]>>(
     `${endpoints.patients.familyMembers(patientId)}`
   );
   return res.data;
 };
 
-export const updatePatient = async (patientId: string | number, body: IUpdatePatientInfo) => {
-  const res = await axiosInstance.put<ICommonRoot>(
-    endpoints.patients.patientUpdate(patientId),
-    body
-  );
+export const updatePatient = async (body: IUpdatePatientInfo) => {
+  const res = await axiosInstance.put<ICommonRoot>(endpoints.patients.patientUpdate, body);
   return res.data;
 };

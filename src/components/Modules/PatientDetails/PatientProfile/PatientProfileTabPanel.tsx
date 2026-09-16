@@ -14,37 +14,12 @@ import { showErrorToast } from '../../../../lib/common/toast.utils';
 import { AppRoute } from '../../../../route';
 import { patientProfileTabStyles } from '../../../../styled/PatientProfileTabPanel.styled';
 import { theme } from '../../../../styled/theme.styled';
-import {
-  IMyPatientDoc,
-  IPatientFamilyMember,
-} from '../../../../typescripts/interfaces/patients.interfaces';
+import { IMyPatientDoc } from '../../../../typescripts/interfaces/patients.interfaces';
 import FamilyMemberCard from './FamilyMemberCard';
 
 interface ProfileTabProps {
   patientInfo?: IMyPatientDoc | null;
 }
-
-// Static mock family members as per response format
-const STATIC_FAMILY_MEMBERS: IPatientFamilyMember[] = [
-  {
-    user_id: 5,
-    name: 'Samir',
-    relation: 'parent',
-    gender: 'male',
-    date_of_birth: '1994-12-31',
-    phone: '8918030206',
-    email: 'iamsahilmallick@gmail.com',
-    patient_record_id: 3,
-    patient_id: 'PT0003',
-    profile_image: null,
-    address: null,
-    city: null,
-    state: null,
-    postal_code: null,
-    country: null,
-    profile_picture: null,
-  },
-];
 
 export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo }) => {
   const navigation = useNavigation();
@@ -58,6 +33,8 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
     patientId: patientInfo?.user_id,
   });
 
+  console.log('familyMemberList', familyMemberList);
+
   const patient = useMemo(
     () => ({
       patientId: patientInfo?.patient_id || '-',
@@ -65,7 +42,6 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
       email: patientInfo?.email,
       phone: patientInfo?.phone_number,
       alternate_number: patientInfo?.alternate_phone,
-      // whatsapp_number: patientInfo?.whatsapp_number,
       address: patientInfo?.address,
       date_of_birth: patientInfo?.date_of_birth,
       age: patientInfo?.age_display || '',
@@ -105,16 +81,6 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
     [patient]
   );
 
-  const vitalsList = useMemo(
-    () => [
-      { label: 'BP', value: patient.blood_pressure || '—' },
-      { label: 'Pulse', value: patient.pulse ? `${patient.pulse} bpm` : '—' },
-      { label: 'Temp', value: patient.temperature ? `${patient.temperature}°C` : '—' },
-      { label: 'SpO₂', value: patient.spo2 ? `${patient.spo2}%` : '—' },
-      { label: 'BMI', value: patient.bmi || '—' },
-    ],
-    [patient]
-  );
   const handleEditProfile = () => {
     if (!patientInfo?.user_id) return showErrorToast('Invalid patient details');
     if (navigation?.navigate) {

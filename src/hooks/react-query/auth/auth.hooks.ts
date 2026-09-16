@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AuthQueryKey } from '../query.keys';
-import { fetchAllUsers, reSendOtp, sendOtp, verifyOtp } from './auth.funcs';
+import { fetchAllUsers, reSendOtp, sendOtp, userLogout, verifyOtp } from './auth.funcs';
 
 export const useSendOtp = () =>
   useMutation({
@@ -24,4 +24,11 @@ export const useGetAllUsers = (doctorId?: string | number, enabled: boolean = tr
     queryFn: () => fetchAllUsers(doctorId),
     enabled,
     select: v => v.users,
+  });
+
+// User Logout
+export const useUserLogout = () =>
+  useMutation({
+    mutationFn: userLogout,
+    mutationKey: [AuthQueryKey.USER_LOGOUT],
   });

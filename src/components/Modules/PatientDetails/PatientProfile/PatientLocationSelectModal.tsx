@@ -38,7 +38,7 @@ const PatientLocationSelectModal = ({
                   key={item.id}
                   style={[
                     editPatientStyles.modalOpt,
-                    selected && editPatientStyles.modalOptSelected,
+                    isSelected && editPatientStyles.modalOptSelected,
                   ]}
                   onPress={() => {
                     onPick(item);
@@ -49,12 +49,12 @@ const PatientLocationSelectModal = ({
                   <Text
                     style={[
                       editPatientStyles.modalOptTxt,
-                      selected && editPatientStyles.modalOptTxtSelected,
+                      isSelected && editPatientStyles.modalOptTxtSelected,
                     ]}
                   >
                     {item.name}
                   </Text>
-                  {selected && <Text style={editPatientStyles.checkmark}>✓</Text>}
+                  {isSelected && <Text style={editPatientStyles.checkmark}>✓</Text>}
                 </TouchableOpacity>
               );
             })}

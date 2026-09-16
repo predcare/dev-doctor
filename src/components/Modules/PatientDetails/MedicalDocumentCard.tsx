@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { formatDate } from '../../../lib/common/common.utils';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../styled/theme.styled';
@@ -10,10 +10,9 @@ export interface MedicalDocument {
   title: string;
   document_type: string;
   document_url?: string;
-  visible_to_patient: boolean | number;
+  visible_to_patient: boolean;
   appointment_date?: string | null;
   created_at?: string;
-  doctor_name?: string;
   doctor_id?: number;
   isDoctorUploaded?: boolean;
 }
@@ -23,38 +22,32 @@ export interface MedicalDocumentCardProps {
   title: string;
   document_type: string;
   document_url?: string;
-  visible_to_patient: boolean | number;
+  visible_to_patient: boolean;
   appointment_date?: string | null;
   created_at?: string;
   doctor_name?: string;
   doctor_id?: number;
   isDoctorUploaded?: boolean;
+  isUpdatingShare?: boolean;
   onPress?: () => void;
   onToggleShare?: (newVisible: boolean) => void;
 }
 
 export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
-  id,
   title,
   document_type,
   document_url,
   visible_to_patient,
-  appointment_date,
   created_at,
-  doctor_name,
   doctor_id,
   isDoctorUploaded,
+  isUpdatingShare,
   onPress,
   onToggleShare,
 }) => {
   const cleanPath = (document_url || '').split('?')[0] || '';
   const ext = (cleanPath.split('.').pop() || '').toLowerCase();
   const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
-
-  const isDoctor = isDoctorUploaded ?? (doctor_id !== undefined || !!doctor_name);
-
-  const isShared =
-    typeof visible_to_patient === 'number' ? visible_to_patient === 1 : Boolean(visible_to_patient);
 
   const displayDate = useMemo(() => {
     if (created_at) {
@@ -83,16 +76,16 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
             <View
               style={[
                 patientDetailsStyles.pill,
-                { backgroundColor: isDoctor ? '#EEF4FF' : theme.colors.primarySoft },
+                { backgroundColor: isDoctorUploaded ? '#EEF4FF' : theme.colors.primarySoft },
               ]}
             >
               <Text
                 style={[
                   patientDetailsStyles.pillText,
-                  { color: isDoctor ? '#3B6FD4' : theme.colors.primary },
+                  { color: isDoctorUploaded ? '#3B6FD4' : theme.colors.primary },
                 ]}
               >
-                {isDoctor ? 'Doctor' : 'Patient'}
+                {isDoctorUploaded ? 'Doctor' : 'Patient'}
               </Text>
             </View>
             {!!displayDate && <Text style={patientDetailsStyles.recordMeta}>{displayDate}</Text>}
@@ -101,31 +94,42 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
 
         <Text style={patientDetailsStyles.chevronText}>›</Text>
       </TouchableOpacity>
-      {isDoctor && (
+      {isDoctorUploaded && (
         <View
           style={[
             patientDetailsStyles.shareRow,
-            { backgroundColor: isShared ? theme.colors.primarySoft : theme.colors.background },
+            {
+              backgroundColor: visible_to_patient
+                ? theme.colors.primarySoft
+                : theme.colors.background,
+            },
           ]}
         >
-          <View>
+          <View style={{ flex: 1, marginRight: 8 }}>
             <Text
               style={[
                 patientDetailsStyles.shareLabel,
-                { color: isShared ? theme.colors.primary : theme.colors.textMuted },
+                { color: visible_to_patient ? theme.colors.primary : theme.colors.textMuted },
               ]}
             >
-              {isShared ? 'Visible to patient' : 'Hidden from patient'}
+              {visible_to_patient ? 'Visible to patient' : 'Hidden from patient'}
             </Text>
-            <Text style={patientDetailsStyles.shareSub}>Tap to {isShared ? 'hide' : 'share'}</Text>
+            <Text style={patientDetailsStyles.shareSub}>
+              {visible_to_patient ? 'Tap to hide from patient' : 'Tap to share with patient'}
+            </Text>
           </View>
 
-          <Switch
-            value={isShared}
-            onValueChange={val => onToggleShare?.(val)}
-            trackColor={{ false: '#E2E8F0', true: theme.colors.mintBdr }}
-            thumbColor={isShared ? theme.colors.primary : '#CBD5E1'}
-          />
+          {isUpdatingShare ? (
+            <ActivityIndicator size="small" color={theme.colors.primary} />
+          ) : (
+            <Switch
+              value={visible_to_patient || false}
+              onValueChange={val => onToggleShare?.(val)}
+              disabled={isUpdatingShare}
+              trackColor={{ false: '#E2E8F0', true: theme.colors.mintBdr }}
+              thumbColor={visible_to_patient ? theme.colors.primary : '#CBD5E1'}
+            />
+          )}
         </View>
       )}
     </View>

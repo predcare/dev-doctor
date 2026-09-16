@@ -54,14 +54,6 @@ const formatTimeValueToHHMM = (tv: TimeValue): string => {
   return `${hh}:${mm}`;
 };
 
-const consultationOverlaps = (a: string, b: string): boolean => {
-  if (a === b) return true;
-  if (a === 'both' || b === 'both') return true;
-  return false;
-};
-
-const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-
 export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
   ({ slotIndex, editingSlot, existingSlots = [], onSave, onCancel, isSaving = false }) => {
     const {
@@ -145,7 +137,7 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
     };
 
     const handleFormSave = (data: TAvailabilityFormValues) => {
-      if (!userData?.user_id) {
+      if (!userData?.id) {
         return showErrorToast('Doctor information not found. Please log in again.');
       }
 
@@ -163,68 +155,8 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
         calcInPersonFee = parseFloat(data.inPersonFee) || 0;
         calcVideoFee = parseFloat(data.videoFee) || 0;
       }
-
       const fromTimeHHMM = formatTimeValueToHHMM(data.fromTime);
       const toTimeHHMM = formatTimeValueToHHMM(data.toTime);
-
-      // 2. Duplicate Check against existingSlots
-      if (existingSlots && existingSlots.length > 0) {
-        const fromHHMM = fromTimeHHMM.substring(0, 5);
-        const toHHMM = toTimeHHMM.substring(0, 5);
-
-        for (const existing of existingSlots) {
-          if (editingSlot?.id && existing.id === editingSlot.id) continue;
-
-          const existingFrom = (existing.from_time || '').substring(0, 5);
-          const existingTo = (existing.to_time || '').substring(0, 5);
-
-          const sameTime = existingFrom === fromHHMM && existingTo === toHHMM;
-          const sameDuration = Number(existing.slot_duration) === Number(data.slotDuration);
-          const sameConsult = consultationOverlaps(
-            existing.consultation_type,
-            data.consultationType
-          );
-
-          if (sameTime && sameDuration && sameConsult) {
-            const currentMode =
-              data.editorTab === 'leave'
-                ? (editingSlot?.date_selection_mode as string) ||
-                  (data.recurringDays && data.recurringDays.length > 0 ? 'recurring' : 'specific')
-                : data.editorTab;
-
-            if (currentMode === 'specific' && existing.date_selection_mode === 'specific') {
-              const existingDates = existing.selected_dates || [];
-              const overlap = data.selectedDates.filter(d => existingDates.includes(d));
-              if (overlap.length > 0) {
-                showErrorToast(
-                  `You already have a ${existing.consultation_type} slot on ${overlap.join(
-                    ', '
-                  )} from ${fromHHMM} to ${toHHMM}.`,
-                  'Duplicate Availability'
-                );
-                return;
-              }
-            } else if (
-              currentMode === 'recurring' &&
-              existing.date_selection_mode === 'recurring'
-            ) {
-              const existingDays = existing.recurring_days || [];
-              const overlapDays = data.recurringDays.filter(d => existingDays.includes(d));
-              if (overlapDays.length > 0) {
-                showErrorToast(
-                  `You already have a recurring ${
-                    existing.consultation_type
-                  } slot on ${overlapDays.join(', ')} from ${fromHHMM} to ${toHHMM}.`,
-                  'Duplicate Availability'
-                );
-                return;
-              }
-            }
-          }
-        }
-      }
-
-      console.log('userData.user_id', userData.user_id);
 
       const targetMode =
         data.editorTab === 'leave'
@@ -233,22 +165,23 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
           : data.editorTab;
 
       const slotPayload: Record<string, any> = {
+        clinic_id: userData?.clinic?.id || '',
         date_selection_mode: targetMode,
         selected_dates: data.selectedDates || [],
         recurring_days: data.recurringDays || [],
         recurring_start_date:
           data.startDate && data.startDate.trim() !== '' ? data.startDate : null,
-        recurring_end_date:
-          data.endDate && data.endDate.trim() !== '' ? data.endDate : null,
+        recurring_end_date: data.endDate && data.endDate.trim() !== '' ? data.endDate : null,
         leave_dates: data.leaveDates || [],
+        slot_duration: Number(data.slotDuration),
         from_time: fromTimeHHMM,
         to_time: toTimeHHMM,
         consultation_type: data.consultationType,
-        slot_duration: Number(data.slotDuration),
         in_person_fee: calcInPersonFee,
         video_fee: calcVideoFee,
-        hide_fee: data.hideFee ? 1 : 0,
-        require_payment: data.requirePayment ? 1 : 0,
+        hide_fee: Boolean(data.hideFee),
+        require_payment: Boolean(data.requirePayment),
+        status: true,
       };
 
       if (editingSlot?.id) {
@@ -259,56 +192,45 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
             body: slotPayload,
           },
           {
-            onSuccess: async () => {
-              showSuccessToast('Doctor availability updated successfully');
-              await queryClient.invalidateQueries({
-                queryKey: [AvailbilityQueryKeys.GetAvailablity],
-              });
-              hideLoader();
-              if (onSave) onSave(data);
-              onCancel();
+            onSuccess: async res => {
+              if (res?.success) {
+                showSuccessToast(res?.message);
+                await queryClient.invalidateQueries({
+                  queryKey: [AvailbilityQueryKeys.GetAvailablity],
+                });
+                hideLoader();
+                if (onSave) onSave(data);
+                onCancel();
+              } else {
+                hideLoader();
+              }
             },
-            onError: (err: any) => {
-              console.log('Update availability error response:', err?.response?.data);
-              const msg =
-                err?.response?.data?.message ||
-                err?.response?.data?.error ||
-                'Failed to update availability';
-              showErrorToast(msg);
+            onError: () => {
               hideLoader();
             },
           }
         );
       } else {
-        const createPayload = {
-          doctor_id: Number(userData.user_id),
-          clinic_id: userData.clinic_id ? Number(userData.clinic_id) : 1,
-          slots: [slotPayload],
-        };
-
         showLoader('Adding...');
         createAvailbility(
           {
-            doctorId: Number(userData.user_id),
-            body: createPayload,
+            body: slotPayload,
           },
           {
-            onSuccess: async () => {
-              showSuccessToast('Doctor availability created successfully');
-              await queryClient.invalidateQueries({
-                queryKey: [AvailbilityQueryKeys.GetAvailablity],
-              });
-              hideLoader();
-              if (onSave) onSave(data);
-              onCancel();
+            onSuccess: async res => {
+              if (res?.success) {
+                showSuccessToast(res?.message);
+                await queryClient.invalidateQueries({
+                  queryKey: [AvailbilityQueryKeys.GetAvailablity],
+                });
+                hideLoader();
+                if (onSave) onSave(data);
+                onCancel();
+              } else {
+                hideLoader();
+              }
             },
-            onError: (err: any) => {
-              console.log('Create availability error response:', err?.response?.data);
-              const msg =
-                err?.response?.data?.message ||
-                err?.response?.data?.error ||
-                'Failed to create availability';
-              showErrorToast(msg);
+            onError: () => {
               hideLoader();
             },
           }
@@ -366,7 +288,6 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
 
     return (
       <View style={SlotEditCardStyles.card}>
-        {/* Editor Card Header */}
         <View style={SlotEditCardStyles.cardHeader}>
           <Text style={SlotEditCardStyles.slotTitle}>
             {editingSlot ? `Edit Slot #${editingSlot.id}` : `Slot Configuration #${slotIndex + 1}`}

@@ -39,13 +39,13 @@ export const PatientHeaderCard: React.FC<PatientHeaderCardProps> = ({
           </View>
         )}
         <View style={patientDetailsStyles.profileInfoGroup}>
-          <Text style={patientDetailsStyles.profileName}>{name?.toUpperCase()}</Text>
+          <Text style={patientDetailsStyles.profileName}>{name}</Text>
           <Text style={patientDetailsStyles.profileIdText}>ID: {patientId}</Text>
 
           <View style={patientDetailsStyles.profileChips}>
             {!!gender && (
               <View style={patientDetailsStyles.profileChip}>
-                <Text style={patientDetailsStyles.profileChipText}>{gender?.toUpperCase()}</Text>
+                <Text style={patientDetailsStyles.profileChipText}>{gender}</Text>
               </View>
             )}
             {!!age && (

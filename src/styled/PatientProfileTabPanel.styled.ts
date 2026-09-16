@@ -237,10 +237,10 @@ export const patientProfileTabStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 200,
+    height: 100,
   },
   emptyFamilyText: {
-    fontSize: theme.fontSize.xs || 12,
+    fontSize: theme.fontSize.md || 12,
     color: theme.colors.textMuted || '#94A3B8',
     fontWeight: '500',
   },

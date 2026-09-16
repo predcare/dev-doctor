@@ -8,7 +8,7 @@ export const useCountries = () =>
     queryFn: () => getCountries(),
     select: (v: any) => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.countries)) return v.countries;
+      if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });
@@ -20,7 +20,7 @@ export const useStatesByCId = (params?: { cId?: number }) =>
     enabled: !!params?.cId,
     select: (v: any) => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.states)) return v.states;
+      if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });
@@ -32,7 +32,7 @@ export const useCitiesBySId = (params?: { sId?: number }) =>
     enabled: !!params?.sId,
     select: (v: any) => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.cities)) return v.cities;
+      if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });

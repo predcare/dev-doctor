@@ -5,16 +5,15 @@ import {
   deleteAvailability,
   getAvailablity,
   getDocBookingAvails,
-  getMyAvailablities,
   updateAvailability,
 } from './availablity.funcs';
 
-export const useAvailablityList = (params?: { doctorId?: number | string }) =>
+export const useAvailablityList = () =>
   useQuery({
-    queryKey: [AvailbilityQueryKeys.GetAvailablity, params],
-    queryFn: () => getAvailablity(params?.doctorId!),
-    enabled: !!params?.doctorId,
+    queryKey: [AvailbilityQueryKeys.GetAvailablity],
+    queryFn: () => getAvailablity(),
     select: v => {
+      console.log('vvvvv', v);
       if (Array.isArray(v)) return v;
       if (Array.isArray(v?.data)) return v.data;
       return [];
@@ -30,26 +29,13 @@ export const useDeleteAvailability = () =>
 // create
 export const useCreateAvailability = () =>
   useMutation({
-    mutationFn: ({ doctorId, body }: { doctorId: number | string; body: any }) =>
-      createAvailability(doctorId, body),
+    mutationFn: ({ body }: { body: any }) => createAvailability(body),
   });
 
 // update
 export const useUpdateAvailability = () =>
   useMutation({
     mutationFn: ({ id, body }: { id: number | string; body: any }) => updateAvailability(id, body),
-  });
-
-export const useMyAvailablities = (params?: { doctorId?: number | string }) =>
-  useQuery({
-    queryKey: [AvailbilityQueryKeys.GetMyAvailablity, params],
-    queryFn: () => getMyAvailablities(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: v => {
-      if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.data)) return v.data;
-      return [];
-    },
   });
 
 export const useBookingAvailablities = (params: { doctorId: number; clinicId: number }) =>

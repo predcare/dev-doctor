@@ -159,7 +159,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
                 onPress={() =>
                   handlePatientDetails({
                     name: item?.name,
-                    patientId: item?.user_id || item?.id,
+                    patientId: item?.user_id,
                   })
                 }
               />

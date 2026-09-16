@@ -305,17 +305,68 @@ export async function checkInitialNotification(
 }
 
 /**
+ * Helper to generate a unique UUID v4 string
+ */
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    try {
+      return crypto.randomUUID();
+    } catch (e) {
+      // fallback
+    }
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/**
+ * Retrieves an existing persistent device ID from AsyncStorage,
+ * or generates a new unique UUID and persists it if one doesn't exist.
+ */
+export async function getOrCreateDeviceId(): Promise<string> {
+  try {
+    let deviceId = await getItem(STORAGE_KEYS.DEVICE_ID);
+    if (!deviceId) {
+      deviceId = generateUUID();
+      await setItem(STORAGE_KEYS.DEVICE_ID, deviceId);
+    }
+    return deviceId;
+  } catch (error) {
+    console.error('[FCM] Error retrieving or generating device ID:', error);
+    return `device_${Platform.OS}_${Date.now()}`;
+  }
+}
+
+/**
+ * Gets a human-readable device name based on platform and model info
+ */
+export function getDeviceName(): string {
+  if (Platform.OS === 'android') {
+    const constants = Platform.constants as { Model?: string; Manufacturer?: string };
+    const brand = constants.Manufacturer ? constants.Manufacturer.toUpperCase() : '';
+    const model = constants.Model || 'Android Device';
+    return brand ? `${brand} ${model}` : model;
+  }
+  return 'iOS Device';
+}
+
+/**
  * 8. getDeviceSessionFields
  * Helper to get device session information along with FCM token
  */
 export async function getDeviceSessionFields(): Promise<DeviceSessionFields> {
   const token = (await getFirebaseToken()) || '';
+  const deviceId = await getOrCreateDeviceId();
   return {
     platform: Platform.OS,
-    device_name: Platform.OS === 'android' ? 'Android Device' : 'iOS Device',
-    device_id: Platform.OS + '-' + String(Platform.Version),
+    device_name: getDeviceName(),
+    device_id: deviceId,
     os_version: String(Platform.Version),
     app_version: '1.0.0',
     fcm_token: token,
   };
 }
+

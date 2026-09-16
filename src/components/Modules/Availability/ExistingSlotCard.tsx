@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { capitalizeFirstLetter } from '../../../lib/common/common.utils';
+import { ExitingSlotsStyled } from '../../../styled/DoctorAvailabilityScreen.styled';
 import { theme } from '../../../styled/theme.styled';
 import CalendarIcon from '../../ui/icons/CalendarIcon';
 import EditIcon from '../../ui/icons/EditIcon';
@@ -76,7 +77,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     const formattedRecurringDays = useMemo(() => {
       return safeRecurringDays.map(day => capitalizeFirstLetter(day)).join(', ');
     }, [safeRecurringDays]);
-
+    console.log('from_time', from_time, to_time);
     const formattedFromTime = useMemo(() => {
       return formatDisplayTime(from_time);
     }, [from_time]);
@@ -86,29 +87,33 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     }, [to_time]);
 
     return (
-      <View style={s.existingSlotCard}>
-        <View style={s.slotCardHeader}>
+      <View style={ExitingSlotsStyled.existingSlotCard}>
+        <View style={ExitingSlotsStyled.slotCardHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-            <View style={s.slotTypeIconBox}>
+            <View style={ExitingSlotsStyled.slotTypeIconBox}>
               <CalendarIcon size={20} color={theme.colors.primary} />
             </View>
             <View style={{ marginLeft: 10 }}>
-              <Text style={s.slotTypeLabel}>TYPE</Text>
-              <Text style={s.slotCardMode}>
+              <Text style={ExitingSlotsStyled.slotTypeLabel}>TYPE</Text>
+              <Text style={ExitingSlotsStyled.slotCardMode}>
                 {isSpecific ? 'Specific Dates' : 'Recurring Schedule'}
               </Text>
             </View>
           </View>
 
-          <View style={s.slotCardActions}>
+          <View style={ExitingSlotsStyled.slotCardActions}>
             {onEdit && (
-              <TouchableOpacity style={s.editButton} onPress={() => onEdit(id)} activeOpacity={0.7}>
+              <TouchableOpacity
+                style={ExitingSlotsStyled.editButton}
+                onPress={() => onEdit(id)}
+                activeOpacity={0.7}
+              >
                 <EditIcon size={16} color={theme.colors.primary} />
               </TouchableOpacity>
             )}
             {onDelete && (
               <TouchableOpacity
-                style={s.deleteButton}
+                style={ExitingSlotsStyled.deleteButton}
                 onPress={() => onDelete(id)}
                 activeOpacity={0.7}
               >
@@ -117,61 +122,63 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
             )}
           </View>
         </View>
-        <View style={s.consultationChipRow}>
+        <View style={ExitingSlotsStyled.consultationChipRow}>
           <View
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
-            <Text style={s.slotTypeLabel}>CONSULTATIONS</Text>
+            <Text style={ExitingSlotsStyled.slotTypeLabel}>CONSULTATIONS</Text>
             <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>📋</Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 6 }}>
-            {(consultation_type === 'in-person' || consultation_type === 'both') && (
+            {(consultation_type === 'in-person' ||
+              consultation_type === 'in_person' ||
+              consultation_type === 'both') && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                 <Text style={{ fontSize: 13 }}>👤</Text>
-                <Text style={s.consultationChip}>In-Person</Text>
+                <Text style={ExitingSlotsStyled.consultationChip}>In-Person</Text>
               </View>
             )}
             {(consultation_type === 'video' || consultation_type === 'both') && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                 <Text style={{ fontSize: 13 }}>📹</Text>
-                <Text style={s.consultationChip}>Video</Text>
+                <Text style={ExitingSlotsStyled.consultationChip}>Video</Text>
               </View>
             )}
           </View>
         </View>
-        <View style={s.slotCardGrid}>
-          <View style={s.slotCardGridCell}>
-            <View style={s.slotCardGridRow}>
+        <View style={ExitingSlotsStyled.slotCardGrid}>
+          <View style={ExitingSlotsStyled.slotCardGridCell}>
+            <View style={ExitingSlotsStyled.slotCardGridRow}>
               <Text style={{ fontSize: 12, marginRight: 4 }}>⏰</Text>
-              <Text style={s.slotCardGridLabel}>TIME</Text>
+              <Text style={ExitingSlotsStyled.slotCardGridLabel}>TIME</Text>
             </View>
-            <Text style={s.slotCardGridValue}>
+            <Text style={ExitingSlotsStyled.slotCardGridValue}>
               {formattedFromTime} - {formattedToTime}
             </Text>
           </View>
 
           {isSpecific ? (
-            <View style={s.slotCardGridCell}>
-              <View style={s.slotCardGridRow}>
+            <View style={ExitingSlotsStyled.slotCardGridCell}>
+              <View style={ExitingSlotsStyled.slotCardGridRow}>
                 <Text style={{ fontSize: 12, marginRight: 4 }}>⏳</Text>
-                <Text style={s.slotCardGridLabel}>DURATION</Text>
+                <Text style={ExitingSlotsStyled.slotCardGridLabel}>DURATION</Text>
               </View>
-              <Text style={s.slotCardGridValue}>{slot_duration} min</Text>
+              <Text style={ExitingSlotsStyled.slotCardGridValue}>{slot_duration} min</Text>
             </View>
           ) : (
-            <View style={s.slotCardGridCell}>
-              <View style={s.slotCardGridRow}>
+            <View style={ExitingSlotsStyled.slotCardGridCell}>
+              <View style={ExitingSlotsStyled.slotCardGridRow}>
                 <Text style={{ fontSize: 12, marginRight: 4 }}>📅</Text>
-                <Text style={s.slotCardGridLabel}>DAYS</Text>
+                <Text style={ExitingSlotsStyled.slotCardGridLabel}>DAYS</Text>
               </View>
-              <Text style={s.slotCardGridValue} numberOfLines={2}>
+              <Text style={ExitingSlotsStyled.slotCardGridValue} numberOfLines={2}>
                 {formattedRecurringDays || 'N/A'}
               </Text>
             </View>
           )}
         </View>
 
-        <View style={s.slotFeesRow}>
+        <View style={ExitingSlotsStyled.slotFeesRow}>
           <View
             style={{
               flexDirection: 'row',
@@ -180,28 +187,30 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
               marginBottom: 8,
             }}
           >
-            <Text style={s.slotFeeLabel}>CONSULTATION FEES</Text>
+            <Text style={ExitingSlotsStyled.slotFeeLabel}>CONSULTATION FEES</Text>
             <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>💳</Text>
           </View>
           <View style={{ flexDirection: 'row', gap: 10 }}>
-            {(consultation_type === 'in-person' || consultation_type === 'both') && (
-              <View style={s.slotFeeCell}>
-                <Text style={s.slotFeeTypeLabel}>IN-PERSON</Text>
-                <Text style={s.slotFeeValue}>₹{in_person_fee}</Text>
+            {(consultation_type === 'in-person' ||
+              consultation_type === 'in_person' ||
+              consultation_type === 'both') && (
+              <View style={ExitingSlotsStyled.slotFeeCell}>
+                <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>IN-PERSON</Text>
+                <Text style={ExitingSlotsStyled.slotFeeValue}>₹{in_person_fee}</Text>
               </View>
             )}
             {(consultation_type === 'video' || consultation_type === 'both') && (
-              <View style={s.slotFeeCell}>
-                <Text style={s.slotFeeTypeLabel}>VIDEO</Text>
-                <Text style={s.slotFeeValue}>₹{video_fee}</Text>
+              <View style={ExitingSlotsStyled.slotFeeCell}>
+                <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>VIDEO</Text>
+                <Text style={ExitingSlotsStyled.slotFeeValue}>₹{video_fee}</Text>
               </View>
             )}
           </View>
         </View>
         {isSpecific && safeSelectedDates.length > 0 && (
-          <View style={s.slotDatesRow}>
-            <Text style={s.slotDatesLabel}>AVAILABLE DATES</Text>
-            <Text style={s.slotDatesValue}>
+          <View style={ExitingSlotsStyled.slotDatesRow}>
+            <Text style={ExitingSlotsStyled.slotDatesLabel}>AVAILABLE DATES</Text>
+            <Text style={ExitingSlotsStyled.slotDatesValue}>
               {expandedDates
                 ? safeSelectedDates.map(d => formatDisplayDate(d)).join(', ')
                 : safeSelectedDates
@@ -209,7 +218,10 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                     .map(d => formatDisplayDate(d))
                     .join(', ')}
               {safeSelectedDates.length > 3 && (
-                <Text style={s.moreDatesLink} onPress={() => setExpandedDates(!expandedDates)}>
+                <Text
+                  style={ExitingSlotsStyled.moreDatesLink}
+                  onPress={() => setExpandedDates(!expandedDates)}
+                >
                   {expandedDates ? '  show less' : `  +${safeSelectedDates.length - 3} more`}
                 </Text>
               )}
@@ -217,9 +229,11 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
           </View>
         )}
         {!isSpecific && safeRecurringDates.length > 0 && (
-          <View style={s.slotDatesRow}>
-            <Text style={s.slotDatesLabel}>RECURRING DATES ({safeRecurringDates.length})</Text>
-            <Text style={s.slotDatesValue}>
+          <View style={ExitingSlotsStyled.slotDatesRow}>
+            <Text style={ExitingSlotsStyled.slotDatesLabel}>
+              RECURRING DATES ({safeRecurringDates.length})
+            </Text>
+            <Text style={ExitingSlotsStyled.slotDatesValue}>
               {expandedRecurringDates
                 ? safeRecurringDates.map(d => formatDisplayDate(d)).join(', ')
                 : safeRecurringDates
@@ -228,20 +242,22 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                     .join(', ')}
               {safeRecurringDates.length > 4 && (
                 <Text
-                  style={s.moreDatesLink}
+                  style={ExitingSlotsStyled.moreDatesLink}
                   onPress={() => setExpandedRecurringDates(!expandedRecurringDates)}
                 >
-                  {expandedRecurringDates ? '  show less' : `  +${safeRecurringDates.length - 4} more`}
+                  {expandedRecurringDates
+                    ? '  show less'
+                    : `  +${safeRecurringDates.length - 4} more`}
                 </Text>
               )}
             </Text>
           </View>
         )}
         {safeLeaveDates.length > 0 && (
-          <View style={s.slotLeaveRow}>
+          <View style={ExitingSlotsStyled.slotLeaveRow}>
             <View style={{ flex: 1 }}>
-              <Text style={s.slotLeaveLabel}>LEAVES</Text>
-              <Text style={s.slotLeaveValue}>
+              <Text style={ExitingSlotsStyled.slotLeaveLabel}>LEAVES</Text>
+              <Text style={ExitingSlotsStyled.slotLeaveValue}>
                 {expandedLeaves
                   ? safeLeaveDates.map(d => formatDisplayDate(d)).join(', ')
                   : safeLeaveDates
@@ -249,7 +265,10 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                       .map(d => formatDisplayDate(d))
                       .join(', ')}
                 {safeLeaveDates.length > 2 && (
-                  <Text style={s.moreLeavesLink} onPress={() => setExpandedLeaves(!expandedLeaves)}>
+                  <Text
+                    style={ExitingSlotsStyled.moreLeavesLink}
+                    onPress={() => setExpandedLeaves(!expandedLeaves)}
+                  >
                     {expandedLeaves ? '  show less' : `  +${safeLeaveDates.length - 2} more`}
                   </Text>
                 )}
@@ -261,187 +280,5 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     );
   }
 );
-
-const s = StyleSheet.create({
-  existingSlotCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-  },
-  slotCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  slotTypeIconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: theme.colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  slotTypeLabel: {
-    fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textMuted,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  slotCardMode: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-    marginTop: 1,
-  },
-  slotCardActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  editButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: theme.colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#FEF2F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  consultationChipRow: {
-    backgroundColor: theme.colors.primarySoft,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    marginBottom: 10,
-  },
-  consultationChip: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.primary,
-  },
-  slotCardGrid: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 10,
-  },
-  slotCardGridCell: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: theme.colors.bg,
-  },
-  slotCardGridRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  slotCardGridLabel: {
-    fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textMuted,
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-  },
-  slotCardGridValue: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-  },
-  slotFeesRow: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-  },
-  slotFeeCell: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    borderRadius: 10,
-    padding: 8,
-  },
-  slotFeeLabel: {
-    fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textMuted,
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-  },
-  slotFeeTypeLabel: {
-    fontSize: 9,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.textMuted,
-    marginBottom: 2,
-  },
-  slotFeeValue: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.dark,
-  },
-  slotDatesRow: {
-    backgroundColor: theme.colors.background,
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-  },
-  slotDatesLabel: {
-    fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.textMuted,
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-    marginBottom: 4,
-  },
-  slotDatesValue: {
-    fontSize: 12,
-    color: theme.colors.dark,
-  },
-  moreDatesLink: {
-    color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
-  },
-  slotLeaveRow: {
-    backgroundColor: '#FEF2F2',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-  },
-  slotLeaveLabel: {
-    fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.danger,
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
-  slotLeaveValue: {
-    fontSize: 12,
-    color: theme.colors.danger,
-  },
-  moreLeavesLink: {
-    color: theme.colors.danger,
-    fontWeight: theme.fontWeight.bold,
-  },
-});
 
 export default ExistingSlotCard;

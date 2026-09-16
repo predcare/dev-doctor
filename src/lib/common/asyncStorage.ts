@@ -4,9 +4,11 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: '@auth_token',
   USER_DATA: '@auth_storage',
   FCM_TOKEN: '@fcm_token',
+  DEVICE_ID: '@device_id',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS] | string;
+
 
 export async function setItem(key: StorageKey, value: string): Promise<boolean> {
   try {
@@ -80,7 +82,7 @@ export async function clearStorage(): Promise<boolean> {
 }
 
 export async function clearStorageExcept(
-  excludeKeys: (StorageKey | string)[] = [STORAGE_KEYS.FCM_TOKEN]
+  excludeKeys: (StorageKey | string)[] = [STORAGE_KEYS.FCM_TOKEN, STORAGE_KEYS.DEVICE_ID]
 ): Promise<boolean> {
   try {
     const allKeys = await AsyncStorage.getAllKeys();

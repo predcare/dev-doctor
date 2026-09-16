@@ -211,18 +211,19 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
     }
     formData.append('title', data.title.trim());
     formData.append('document_type', data.category);
-    formData.append('notes', (data.notes || '').trim());
-    if (appointmentId) formData.append('appointment_id', String(appointmentId));
+    formData.append('description', (data.notes || '').trim());
     if (patientId) formData.append('patient_id', String(patientId));
     if (doctorId) formData.append('doctor_id', String(doctorId));
-    formData.append('uploader_role', 'doctor');
-    formData.append('visible_to_patient', data.shareWithPatient ? '1' : '0');
-
+    if (appointmentId) formData.append('appointment_id', String(appointmentId));
+    formData.append('visible_to_patient', data.shareWithPatient ? 'true' : 'false');
+    formData.append('created_from', 'app');
     mutate(formData, {
-      onSuccess: () => {
-        reset();
-        onUploadSuccess?.();
-        onClose();
+      onSuccess: res => {
+        if (res?.success) {
+          reset();
+          onUploadSuccess?.();
+          onClose();
+        }
       },
     });
   };

@@ -27,3 +27,8 @@ export const fetchAllUsers = async (doctorId?: string | number) => {
   });
   return res.data;
 };
+
+export const userLogout = async (body: { all_devices: boolean; device_id?: string }) => {
+  const res = await axiosInstance.post<ICommonRoot>(endpoints.auth.logout, body);
+  return res.data;
+};

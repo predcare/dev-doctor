@@ -1,24 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
-import ConsultTabPanel from '../../components/Modules/PatientDetails/Consult/ConsultTabPanel';
-import PatientInvoiceTabPanel from '../../components/Modules/PatientDetails/Invoice/PatientInvoiceTabPanel';
 import PatientHeaderCard from '../../components/Modules/PatientDetails/PatientHeaderCard';
 import PatientProfileTabPanel from '../../components/Modules/PatientDetails/PatientProfile/PatientProfileTabPanel';
 import PatientTabBar, {
   MainTabKey,
   TabItem,
 } from '../../components/Modules/PatientDetails/PatientTabBar';
-import PrescriptionsTabPanel from '../../components/Modules/PatientDetails/PrescriptionsTabPanel';
-import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 import PatientDetailsSkeleton from '../../components/Skeletons/PatientDetailsSkeleton';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import { useMyPatientInfo } from '../../hooks/react-query/patients/patients.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { getAge } from '../../lib/common/common.utils';
+import { capitalize, getAge } from '../../lib/common/common.utils';
 import { AppRoute, type PatientDetailsScreenProps } from '../../route';
 import { patientDetailsStyles } from '../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../styled/theme.styled';
+import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 
 const PatientMainTabs: TabItem[] = [
   { key: 'records', label: 'Records' },
@@ -41,12 +38,6 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
   const { patientId, patientName, openUploadModal } = (route?.params as PageProps) || {};
   const [activeMainTab, setActiveMainTab] = useState<MainTabKey>('records');
 
-  useEffect(() => {
-    if (openUploadModal) {
-      setActiveMainTab('records');
-    }
-  }, [openUploadModal]);
-
   const {
     data: patientInfo,
     isFetching: patientInfoPending,
@@ -54,12 +45,18 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
     error: patientInfoError,
     refetch: refetchPatientInfo,
   } = useMyPatientInfo({
-    patientId: patientId,
+    patientId: Number(patientId),
   });
 
   const displayName = useMemo(() => {
     return patientInfo?.name || patientName;
   }, [patientInfo?.name, patientName]);
+
+  useEffect(() => {
+    if (openUploadModal) {
+      setActiveMainTab('records');
+    }
+  }, [openUploadModal]);
 
   return (
     <SafeAreaWrapper>
@@ -107,8 +104,12 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
           <PatientHeaderCard
             name={patientInfo?.name || 'UnKnown'}
             patientId={patientInfo?.patient_id || ''}
-            gender={patientInfo?.gender || ''}
-            age={getAge(patientInfo?.date_of_birth || '') || ''}
+            gender={capitalize(patientInfo?.gender || '')}
+            age={
+              getAge(patientInfo?.date_of_birth || '', {
+                large: true,
+              }) || ''
+            }
             bloodGroup={patientInfo?.blood_type || ''}
             profileImg={patientInfo?.profile_image}
           />
@@ -120,15 +121,15 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
           <View style={{ flex: 1 }}>
             {activeMainTab === 'records' && <RecordsTabPanel patientId={patientId} />}
 
-            {activeMainTab === 'prescriptions' && <PrescriptionsTabPanel patientId={patientId} />}
-            {activeMainTab === 'invoice' && (
+            {/* {activeMainTab === 'prescriptions' && <PrescriptionsTabPanel patientId={patientId} />} */}
+            {/* {activeMainTab === 'invoice' && (
               <PatientInvoiceTabPanel
                 patientId={patientId}
                 patientGeneratedId={patientInfo?.patient_id || ''}
               />
-            )}
+            )} */}
 
-            {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />}
+            {/* {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />} */}
             {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
           </View>
         </>

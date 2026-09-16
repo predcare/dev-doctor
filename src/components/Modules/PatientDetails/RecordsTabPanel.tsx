@@ -1,7 +1,10 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Linking, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
-import { useMyPatientEmrs } from '../../../hooks/react-query/patients/patients.hooks';
+import {
+  useMyPatientEmrs,
+  useShareEmrDocument,
+} from '../../../hooks/react-query/patients/patients.hooks';
 import { showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
 import { RootStackParamList } from '../../../route';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
@@ -33,15 +36,17 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
   } = useMyPatientEmrs({
     patientId: patientId,
   });
+  const {
+    mutate: shareEmrDocumentMutate,
+    isPending: isShareEmrDocumentPending,
+    variables: shareEmrVariables,
+  } = useShareEmrDocument();
 
   const [refreshing, setRefreshing] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const [selectedDocForAction, setSelectedDocForAction] = useState<MedicalDocument | null>(null);
   const [showActionsModal, setShowActionsModal] = useState(false);
-  const [localShareOverrides, setLocalShareOverrides] = useState<Record<string | number, boolean>>(
-    {}
-  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -55,7 +60,20 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
   };
 
   const handleToggleShare = (docId: string | number, newShareState: boolean) => {
-    setLocalShareOverrides(prev => ({ ...prev, [docId]: newShareState }));
+    shareEmrDocumentMutate(
+      {
+        docId,
+        body: { visible_to_patient: newShareState },
+      },
+      {
+        onSuccess: res => {
+          if (res?.success) {
+            showSuccessToast(res?.message);
+            refetchEmr();
+          }
+        },
+      }
+    );
   };
 
   const handleOpenDocument = (doc: MedicalDocument) => {
@@ -129,22 +147,29 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
         <FlatList
           data={emrData || []}
           keyExtractor={item => String(item.id)}
-          renderItem={({ item }) => (
-            <MedicalDocumentCard
-              document_type={item.document_type}
-              id={item.id}
-              title={item.title}
-              visible_to_patient={item?.visible_to_patient}
-              appointment_date={item?.appointment_date}
-              created_at={item?.created_at}
-              doctor_name={item?.doctor_name}
-              doctor_id={item?.doctor_id}
-              isDoctorUploaded={item?.doctor_id === userData?.user_id}
-              document_url={item?.document_url}
-              onPress={() => handleDocumentClick(item)}
-              onToggleShare={newVal => handleToggleShare(item.id, newVal)}
-            />
-          )}
+          renderItem={({ item }) => {
+            const isUpdatingShare =
+              isShareEmrDocumentPending && String(shareEmrVariables?.docId) === String(item.id);
+            const isDoctorUploaded =
+              String(item?.owner_id) === String(userData?.id) ||
+              String(item?.created_by) === String(userData?.id);
+
+            return (
+              <MedicalDocumentCard
+                document_type={item.document_type}
+                id={item.id}
+                title={item.title}
+                visible_to_patient={!!item.visible_to_patient}
+                created_at={item?.created_at}
+                doctor_id={item?.doctor_id}
+                isDoctorUploaded={isDoctorUploaded}
+                isUpdatingShare={isUpdatingShare}
+                document_url={item?.document_url}
+                onPress={() => handleDocumentClick(item)}
+                onToggleShare={newVal => handleToggleShare(item.id, newVal)}
+              />
+            );
+          }}
           ListEmptyComponent={
             <CommonEmptyCard
               title="No Medical Documents"

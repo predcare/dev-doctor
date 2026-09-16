@@ -34,10 +34,8 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
   const {
     data: availablityList,
     isFetching: isLoadingAvailablityList,
-    refetch,
-  } = useAvailablityList({
-    doctorId: userData?.user_id,
-  });
+    refetch: avialRefetch,
+  } = useAvailablityList();
 
   const { mutate: deleteAvailabilityMutation } = useDeleteAvailability();
 
@@ -51,7 +49,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
         deleteAvailabilityMutation(id, {
           onSuccess: async () => {
             showSuccessToast('Availability slot has been removed.');
-            await refetch();
+            await avialRefetch();
           },
         });
       },
@@ -83,7 +81,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
           refreshControl={
             <RefreshControl
               refreshing={isLoadingAvailablityList}
-              onRefresh={refetch}
+              onRefresh={avialRefetch}
               colors={[theme.colors.primary]}
               tintColor={theme.colors.primary}
             />

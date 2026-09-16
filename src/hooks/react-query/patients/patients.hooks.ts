@@ -21,7 +21,6 @@ import {
   ICreatePatientPayload,
   ILinkExistingPatientPayload,
   ISendPatientCredentialsPayload,
-  IUpdatePatientInfo,
 } from './payload.interfaces';
 
 export const useMyPatientList = (params?: IGetMyPatientsParams) =>
@@ -57,12 +56,12 @@ export const useSendPatientCredentials = () => {
   });
 };
 
-export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
+export const useMyPatientInfo = (params?: { patientId?: number }) =>
   useQuery({
     queryKey: [PatientsQueryKeys.PatientInfo, params],
     queryFn: () => getMyPatientsInfo(params?.patientId!),
     enabled: !!params?.patientId,
-    select: v => (!v?.patient ? null : v.patient),
+    select: v => (!v?.data ? null : v.data),
   });
 
 export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
@@ -72,7 +71,7 @@ export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
     enabled: !!params?.patientId,
     select: v => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.documents)) return v.documents;
+      if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });
@@ -96,7 +95,7 @@ export const useShareEmrDocument = () => {
       body,
     }: {
       docId: string | number;
-      body: { visible_to_patient: number };
+      body: { visible_to_patient: boolean };
     }) => shareEmrDocument(docId, body),
   });
 };
@@ -137,14 +136,13 @@ export const useMyPatientFamilyMembers = (params?: { patientId?: number | string
     enabled: !!params?.patientId,
     select: v => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.members)) return v.members;
+      if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });
 
 export const useUpdatePatientInfo = () => {
   return useMutation({
-    mutationFn: ({ patientId, body }: { patientId: string | number; body: IUpdatePatientInfo }) =>
-      updatePatient(patientId, body),
+    mutationFn: updatePatient,
   });
 };
