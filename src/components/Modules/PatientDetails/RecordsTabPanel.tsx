@@ -205,7 +205,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
       <EMRUploadModal
         visible={showUploadModal}
         patientId={patientId}
-        doctorId={userData?.user_id}
+        doctorId={userData?.id}
         onClose={() => setShowUploadModal(false)}
         onUploadSuccess={() => {
           refetchEmr();

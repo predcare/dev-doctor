@@ -44,7 +44,7 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const handleConfirmLogout = async (allDevices: boolean) => {
     showLoader(allDevices ? 'Signing out of all devices...' : 'Signing out...');
     userLogout(
-      { all_devices: allDevices, device_id: deviceInfo?.device_id },
+      { all_devices: allDevices },
       {
         onSettled: async () => {
           setLogoutModalVisible(false);

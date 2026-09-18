@@ -33,12 +33,13 @@ export interface IMyProfileDoc {
   clinic_phone: string;
   clinic_email: string;
   clinic_gstin: string;
+  blood_type?: string;
   sub_specializations: any;
-  address: any;
-  city: any;
-  state: any;
-  country: any;
-  postal_code: any;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
   profile_image: any;
   languages_spoken: string[];
   license_valid_until: any;

@@ -8,6 +8,7 @@ import CustomTabs from '../../components/ui/CustomTabs/CustomTabs';
 import {
   AssociationIcon,
   BioIcon,
+  CalendarIcon,
   CheckBadgeIcon,
   ChevronLeftIcon,
   ClinicIcon,
@@ -19,12 +20,18 @@ import {
   PhoneIcon,
   ProfileIcon,
   QualificationsIcon,
+  RxIcon,
   ScheduleIcon,
   SpecializationIcon,
 } from '../../components/ui/icons';
 import LocationIcon from '../../components/ui/icons/LocaltionIcon';
 import { useProfile } from '../../hooks/react-query/profile/profile.hooks';
-import { capitalize, getInitials, openLocationOnMap } from '../../lib/common/common.utils';
+import {
+  capitalize,
+  formatDate,
+  getInitials,
+  openLocationOnMap,
+} from '../../lib/common/common.utils';
 import {
   AppRoute,
   type ProfileScreenNavigationProp,
@@ -44,7 +51,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
   const [isRefetching, setIsRefetching] = useState(false);
 
   const { data: doctorProfile, isPending: profilePending, refetch: profileRefetch } = useProfile();
-
+  console.log('doctorProfile', doctorProfile);
   const { isActive, clinic } = useMemo(() => {
     const res = (doctorProfile?.doctor_status || doctorProfile?.status)?.toLowerCase() === 'active';
     return { isActive: res, clinic: doctorProfile?.clinic };
@@ -264,6 +271,27 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
                 iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
               />
             )}
+            {doctorProfile.date_of_birth && (
+              <ProfileInfoCard
+                label="DATE OF BIRTH"
+                value={formatDate(doctorProfile.date_of_birth)}
+                iconPath={<CalendarIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.blood_type && (
+              <ProfileInfoCard
+                label="BLOOD TYPE"
+                value={doctorProfile.blood_type}
+                iconPath={<RxIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
+            {doctorProfile.address && (
+              <ProfileInfoCard
+                label="ADDRESS"
+                value={doctorProfile.address}
+                iconPath={<LocationIcon size={18} color={theme.colors.primary} />}
+              />
+            )}
             {doctorProfile.alternate_number && (
               <ProfileInfoCard
                 label="ALTERNATE NUMBER"
@@ -313,13 +341,13 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
                     iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                   />
                 )}
-                {clinic.id && (
+                {/* {clinic.id && (
                   <ProfileInfoCard
                     label="CLINIC ID"
                     value={`Id:- ${clinic.id}`}
                     iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                   />
-                )}
+                )} */}
                 {clinic.clinic_reg_number && (
                   <ProfileInfoCard
                     label="CLINIC REGISTRATION NUMBER"

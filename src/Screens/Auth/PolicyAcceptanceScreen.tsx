@@ -42,7 +42,6 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
   const cardMaxHeight = Math.min(height - 100, 640);
 
   const { data: allPolicies, isPending: isLoadingPolicies } = usePolicies();
-  console.log('allPolicies', allPolicies);
   const { logout, userData, setUserData } = useAuthStore(state => state);
   const [selectedPolicyItem, setSelectedPolicyItem] = useState<PolicyItemType | null>(null);
   const [formStates, setFormStates] = useState<IPolicyAcceptancePayload>({
@@ -145,7 +144,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
   };
 
   const handleSignOut = () => {
-    if (userData?.user_id) {
+    if (userData?.id) {
       logout();
       if (navigation && navigation.navigate) {
         navigation.navigate(AppRoute.LOGIN, { refetchOnMount: true });
@@ -185,7 +184,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
               <>
                 <View style={policyStyles.policyBox}>
                   <Text style={policyStyles.policyItem}>
-                    <Text style={policyStyles.policyBoldLabel}>Terms: </Text>
+                    <Text style={policyStyles.policyBoldLabel}>Terms of Use </Text>
                     <Text
                       style={policyStyles.policyLinkText}
                       onPress={() => openPolicyModal(termsData)}
