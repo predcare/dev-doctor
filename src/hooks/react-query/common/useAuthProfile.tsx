@@ -38,6 +38,11 @@ const useAuthProfile = () => {
 
   useEffect(() => {
     const fetchToken = async () => {
+      if (!isLoggedIn) {
+        setToken(null);
+        setIsTokenLoading(false);
+        return;
+      }
       setIsTokenLoading(true);
       try {
         const storedToken = await getItem(STORAGE_KEYS.AUTH_TOKEN);

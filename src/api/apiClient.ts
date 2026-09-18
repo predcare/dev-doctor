@@ -8,6 +8,11 @@ import { IBaseApiRoot } from '../typescripts/interfaces/axios.interfaces';
 import { baseUrlApi, exclude401Routes, successEndpoints } from './endpoints';
 let isAlreadyHandlingUnauthorized = false;
 let isAlreadyHandlingNetworkError = false;
+let isIntentionalLogoutInProgress = false;
+
+export const setIntentionalLogoutMode = (status: boolean) => {
+  isIntentionalLogoutInProgress = status;
+};
 
 const axiosInstance = axios.create({
   baseURL: baseUrlApi,
@@ -25,7 +30,6 @@ axiosInstance.interceptors.request.use(async config => {
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse<IBaseApiRoot>) => {
     const requestUrl = res.config?.url || '';
-    console.log('requestUrl', res);
     console.log('requestUrl', requestUrl);
     const method = res.config?.method?.toLowerCase() || '';
     const successMethods = ['post', 'put', 'patch', 'delete'];
@@ -50,8 +54,8 @@ axiosInstance.interceptors.response.use(
     const invalidTokenStatuses = [401];
     const isExcludedRoute = exclude401Routes.some(route => requestUrl.includes(route));
 
-    if (status && invalidTokenStatuses.includes(status) && !isExcludedRoute) {
-      if (!isAlreadyHandlingUnauthorized) {
+    if (status && invalidTokenStatuses.includes(status)) {
+      if (!isExcludedRoute && !isIntentionalLogoutInProgress && !isAlreadyHandlingUnauthorized) {
         isAlreadyHandlingUnauthorized = true;
         eventEmitter.emit(events.logoutCurrentUser);
         setTimeout(() => {
@@ -70,7 +74,9 @@ axiosInstance.interceptors.response.use(
       }
       return Promise.reject(error);
     }
-    globalError(error);
+    if (!isIntentionalLogoutInProgress) {
+      globalError(error);
+    }
     return Promise.reject(error);
   }
 );

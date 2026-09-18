@@ -110,4 +110,8 @@ export const successEndpoints = [
   endpoints?.patients?.patientUpdate,
 ];
 
-export const exclude401Routes = [endpoints.auth.verifyOtp, endpoints.auth.sendOtp];
+export const exclude401Routes = [
+  endpoints.auth.verifyOtp,
+  endpoints.auth.sendOtp,
+  endpoints.auth.logout,
+];

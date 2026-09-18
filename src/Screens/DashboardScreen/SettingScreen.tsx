@@ -22,6 +22,8 @@ import { useAlertStore } from '../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
+import { setIntentionalLogoutMode } from '../../api/apiClient';
+
 export interface ProfileScreenProps {
   navigation?: ProfileScreenNavigationProp;
   route?: ProfileScreenRouteProp;
@@ -43,15 +45,20 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const handleConfirmLogout = async (allDevices: boolean) => {
     showLoader(allDevices ? 'Signing out of all devices...' : 'Signing out...');
+    setIntentionalLogoutMode(true);
     userLogout(
       { all_devices: allDevices },
       {
         onSettled: async () => {
           setLogoutModalVisible(false);
+          await queryClient.cancelQueries();
           await queryClient.clear();
           await logout();
           hideLoader();
           resetToLogin(navigation);
+          setTimeout(() => {
+            setIntentionalLogoutMode(false);
+          }, 1000);
         },
       }
     );

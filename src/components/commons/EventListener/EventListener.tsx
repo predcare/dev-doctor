@@ -8,6 +8,8 @@ import { navigationRef } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { queryClient } from '../../providers/ReactQueryProvider';
 
+import { setIntentionalLogoutMode } from '../../../api/apiClient';
+
 interface EventListenerProps {
   onLogout?: () => void;
 }
@@ -18,14 +20,19 @@ export default function EventListener({ onLogout }: EventListenerProps) {
   const handleLogout = useCallback(
     async (data?: { intentional?: boolean }) => {
       if (data?.intentional) {
+        setIntentionalLogoutMode(true);
         showSuccessToast('Logged out successfully');
       } else {
         showErrorToast('Please login again.', 'Session Expired');
       }
       onLogout?.();
+      await queryClient.cancelQueries();
       await queryClient.clear();
       await logout();
       resetToLogin(navigationRef);
+      setTimeout(() => {
+        setIntentionalLogoutMode(false);
+      }, 1000);
     },
     [onLogout, logout]
   );
