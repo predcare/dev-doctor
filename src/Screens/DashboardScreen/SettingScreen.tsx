@@ -9,7 +9,6 @@ import SupportSection from '../../components/Modules/AccountSettings/SupportSect
 import WalletSection from '../../components/Modules/AccountSettings/WalletSection';
 import LogoutOptionsModal from '../../components/commons/LogoutOptionsModal/LogoutOptionsModal';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
-import useFcmToken from '../../hooks/commons/useFcmToken';
 import { useUserLogout } from '../../hooks/react-query/auth/auth.hooks';
 import { resetToLogin } from '../../lib/common/navigation.utils';
 import {
@@ -36,7 +35,6 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const showComingSoon = useAlertStore(state => state.showComingSoon);
   const logout = useAuthStore(state => state.logout);
   const { hideLoader, showLoader } = useLoadingStore(state => state);
-  const { deviceInfo } = useFcmToken();
   const { mutate: userLogout, isPending: isLogoutLoading } = useUserLogout();
 
   const handleLogout = () => {

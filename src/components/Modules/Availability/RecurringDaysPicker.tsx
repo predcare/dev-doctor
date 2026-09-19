@@ -101,9 +101,7 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
               onPress={() => setModalState({ visible: true, type: 'start' })}
               activeOpacity={0.7}
             >
-              <Text style={startDate ? s.dateTxt : s.phTxt}>
-                {startDate || 'Select Start Date'}
-              </Text>
+              <Text style={startDate ? s.dateTxt : s.phTxt}>{startDate || 'Start Date'}</Text>
               <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>📅</Text>
             </TouchableOpacity>
             {Boolean(startDateError) && <Text style={s.cellErrorTxt}>{startDateError}</Text>}
@@ -116,7 +114,7 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
               onPress={() => setModalState({ visible: true, type: 'end' })}
               activeOpacity={0.7}
             >
-              <Text style={endDate ? s.dateTxt : s.phTxt}>{endDate || 'Select End Date'}</Text>
+              <Text style={endDate ? s.dateTxt : s.phTxt}>{endDate || 'End Date'}</Text>
               <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>📅</Text>
             </TouchableOpacity>
             {Boolean(endDateError) && <Text style={s.cellErrorTxt}>{endDateError}</Text>}

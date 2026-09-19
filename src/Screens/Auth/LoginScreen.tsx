@@ -20,7 +20,6 @@ import OtpInput from '../../components/commons/OtpInput';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { MailIcon, PhoneIcon } from '../../components/ui/icons';
 import useFcmToken from '../../hooks/commons/useFcmToken';
-import { getDeviceName, getOrCreateDeviceId } from '../../utils/firebaseMessaging';
 import { useReSendOtp, useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
 import { ILoginVerifyOtpPayload } from '../../hooks/react-query/auth/payload.interfaces';
 import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
@@ -32,7 +31,9 @@ import { Assets } from '../../resources/assets';
 import { AppRoute, type LoginScreenNavigationProp, type LoginScreenRouteProp } from '../../route';
 import { loginStyles } from '../../styled/LoginScreen.styled';
 import theme from '../../styled/theme.styled';
+import { UserRoles } from '../../typescripts/enums';
 import { LoginMode } from '../../typescripts/types/common.types';
+import { getDeviceName, getOrCreateDeviceId } from '../../utils/firebaseMessaging';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
@@ -69,7 +70,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
       identifier: '',
       otp: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const identifier = watch('identifier') || '';
@@ -108,6 +109,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
       user_type: 'doctor',
     };
   };
+  const isVerifyDisabled = otpSent && (otpValue.length !== 6 || verifyOtpPending);
 
   const handleSendOtp = (_data: TLoginFormSchemaType, type: 'send' | 'resend' = 'send') => {
     if (type === 'resend' && resendOtpPending) return;
@@ -151,7 +153,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
         ? { email: cleanIdentifier.toLowerCase() }
         : { phone_number: cleanIdentifier }),
       otp: _data.otp,
-      user_type: 'doctor',
+      user_type: UserRoles.DOCTOR,
       device_id: activeDeviceId,
       device_name: activeDeviceName,
       platform: Platform.OS as 'android' | 'ios',
@@ -168,12 +170,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
             showLoader('Please wait...');
             await setItem(STORAGE_KEYS.AUTH_TOKEN, token);
             let doctorData: any = null;
-            console.log('doctorData', doctorData);
             try {
               const profileRes = await getProfile();
               if (profileRes?.data) {
-                doctorData = profileRes.data;
-                setUserData(profileRes.data);
+                doctorData = profileRes?.data;
+                setUserData(profileRes?.data);
               }
             } catch (err) {
               console.error('Failed to fetch doctor profile after login:', err);
@@ -181,7 +182,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
             await queryClient.invalidateQueries({
               queryKey: [ProfileQueryKeys.Profile],
             });
-            console.log('doctorData', doctorData);
             hideLoader();
             if (doctorData?.has_accepted_policies) {
               if (navigation && navigation.replace) {
@@ -207,8 +207,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
       handleSubmit(onSubmitVerifyOtp)();
     }
   };
-
-  const isVerifyDisabled = otpSent && (otpValue.length !== 6 || verifyOtpPending);
 
   return (
     <SafeAreaView style={loginStyles.safeArea}>
@@ -316,6 +314,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
                           keyboardType={loginMode === 'mobile' ? 'phone-pad' : 'email-address'}
                           maxLength={loginMode === 'mobile' ? 10 : undefined}
                           autoCapitalize="none"
+                          autoFocus
                           value={value}
                           onChangeText={text => {
                             if (loginMode === 'mobile') {

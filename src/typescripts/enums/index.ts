@@ -27,3 +27,8 @@ export enum ConsultStatus {
   RESCHEDULED = 'rescheduled',
   NOT_RESCHEDULED = 'not_rescheduled',
 }
+
+export enum UserRoles {
+  DOCTOR = 'doctor',
+  PATIENT = 'patient',
+}

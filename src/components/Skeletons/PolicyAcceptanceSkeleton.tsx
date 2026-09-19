@@ -25,23 +25,21 @@ export const PolicyAcceptanceSkeleton: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Inset Box Skeleton */}
-      <Animated.View style={[styles.boxSkeleton, { opacity: pulseAnim }]}>
-        <View style={styles.lineRow}>
-          <View style={styles.labelSkeleton} />
-          <View style={[styles.valueSkeleton, { width: '65%' }]} />
-        </View>
-        <View style={styles.lineRow}>
-          <View style={styles.labelSkeleton} />
-          <View style={[styles.valueSkeleton, { width: '60%' }]} />
-        </View>
-        <View style={styles.lineRow}>
-          <View style={[styles.labelSkeleton, { width: 90 }]} />
-          <View style={[styles.valueSkeleton, { width: '50%' }]} />
-        </View>
-      </Animated.View>
+      {/* Policy Card Tile Skeletons */}
+      <View style={styles.listGap}>
+        {[1, 2, 3].map(key => (
+          <Animated.View key={key} style={[styles.tileSkeleton, { opacity: pulseAnim }]}>
+            <View style={styles.iconSkeleton} />
+            <View style={styles.metaSkeleton}>
+              <View style={styles.titleSkeleton} />
+              <View style={styles.subtextSkeleton} />
+            </View>
+            <View style={styles.buttonSkeleton} />
+          </Animated.View>
+        ))}
+      </View>
 
-      {/* Notice Text Skeleton */}
+      {/* Notice Box Skeleton */}
       <Animated.View style={[styles.noticeSkeleton, { opacity: pulseAnim }]}>
         <View style={styles.textLineFull} />
         <View style={styles.textLineHalf} />
@@ -54,47 +52,68 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
-  boxSkeleton: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 16,
-    padding: 16,
+  listGap: {
+    gap: 10,
     marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-    gap: 12,
   },
-  lineRow: {
+  tileSkeleton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
-  labelSkeleton: {
-    width: 50,
+  iconSkeleton: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: '#E2E8F0',
+    marginRight: 10,
+  },
+  metaSkeleton: {
+    flex: 1,
+    gap: 6,
+  },
+  titleSkeleton: {
+    width: '70%',
     height: 14,
     borderRadius: 4,
     backgroundColor: '#CBD5E1',
   },
-  valueSkeleton: {
-    height: 14,
+  subtextSkeleton: {
+    width: '45%',
+    height: 12,
     borderRadius: 4,
+    backgroundColor: '#E2E8F0',
+  },
+  buttonSkeleton: {
+    width: 60,
+    height: 28,
+    borderRadius: 8,
     backgroundColor: '#E2E8F0',
   },
   noticeSkeleton: {
     gap: 6,
     marginBottom: 8,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#FFFBEB',
   },
   textLineFull: {
     width: '100%',
     height: 12,
     borderRadius: 4,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#FDE68A',
   },
   textLineHalf: {
     width: '60%',
     height: 12,
     borderRadius: 4,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#FDE68A',
   },
 });
 
 export default PolicyAcceptanceSkeleton;
+

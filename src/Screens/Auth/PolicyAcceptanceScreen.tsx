@@ -15,6 +15,14 @@ import PolicyViewerModal, {
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import PolicyAcceptanceSkeleton from '../../components/Skeletons/PolicyAcceptanceSkeleton';
 import {
+  CheckBadgeIcon,
+  ChevronRightIcon,
+  FileDocumentIcon,
+  InfoCircleIcon,
+  LogoutIcon,
+  ShieldIcon,
+} from '../../components/ui/icons';
+import {
   usePolicies,
   usePostPolicyAcceptance,
 } from '../../hooks/react-query/policies/policies.hooks';
@@ -29,17 +37,18 @@ import {
   type PolicyAcceptanceScreenProps,
 } from '../../route';
 import { policyStyles } from '../../styled/PolicyAcceptanceScreen.styled';
+import theme from '../../styled/theme.styled';
 import { IPolicyAcceptancePayload } from '../../typescripts/interfaces/policies.interfaces';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
   navigation: propNavigation,
 }) => {
   const defaultNavigation = useNavigation<PolicyAcceptanceScreenNavigationProp>();
   const navigation = propNavigation || defaultNavigation;
-  const { width, height } = useWindowDimensions();
-  const cardWidth = Math.min(width - 32, 480);
-  const cardMaxHeight = Math.min(height - 100, 640);
+  const { width } = useWindowDimensions();
+  const cardWidth = Math.min(width - 24, 500);
 
   const { data: allPolicies, isPending: isLoadingPolicies } = usePolicies();
   const { logout, userData, setUserData } = useAuthStore(state => state);
@@ -51,6 +60,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
   });
   const { mutate: postPolicyAcceptanceMutation, isPending: isPostPolicyAcceptancePending } =
     usePostPolicyAcceptance();
+  const { hideLoader, showLoader } = useLoadingStore(state => state);
 
   const termsData = allPolicies?.terms;
   const privacyData = allPolicies?.privacy_policy;
@@ -63,6 +73,7 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
   const isAgreedConsent = Boolean(
     formStates.documents?.some(d => d.document_kind === 'informed_consent')
   );
+  const isFormValid = isAgreedTermsAndPrivacy && isAgreedConsent;
 
   const toggleTermsAndPrivacy = () => {
     setFormStates(prev => {
@@ -125,10 +136,9 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
     });
   };
 
-  const isFormValid = isAgreedTermsAndPrivacy && isAgreedConsent;
-
   const handleAccept = () => {
     if (!isFormValid) return;
+    showLoader('Submitting your response...');
     postPolicyAcceptanceMutation(formStates, {
       onSuccess: async res => {
         if (res?.success) {
@@ -137,8 +147,14 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
           if (profileRes?.data) {
             setUserData(profileRes.data);
           }
+          hideLoader();
           resetToMainTabs(navigation);
+        } else {
+          hideLoader();
         }
+      },
+      onError: () => {
+        hideLoader();
       },
     });
   };
@@ -160,11 +176,16 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
 
   return (
     <SafeAreaWrapper>
-      <View style={policyStyles.screenContainer}>
+      <ScrollView
+        style={policyStyles.scrollContainer}
+        contentContainerStyle={policyStyles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={policyStyles.logoContainer}>
           <Image source={Assets.logo2} style={policyStyles.logo} resizeMode="contain" />
         </View>
-        <View style={[policyStyles.card, { width: cardWidth, maxHeight: cardMaxHeight }]}>
+        <View style={[policyStyles.card, { width: cardWidth }]}>
           <View style={policyStyles.titleContainer}>
             <Text style={policyStyles.title}>Review & Accept Policies</Text>
             <Text style={policyStyles.subtitle}>
@@ -172,154 +193,227 @@ export const PolicyAcceptanceScreen: React.FC<PolicyAcceptanceScreenProps> = ({
             </Text>
           </View>
 
-          <ScrollView
-            style={policyStyles.scrollableContent}
-            contentContainerStyle={policyStyles.scrollableContentInner}
-            showsVerticalScrollIndicator={true}
-            keyboardShouldPersistTaps="handled"
-          >
-            {isLoadingPolicies ? (
-              <PolicyAcceptanceSkeleton />
-            ) : (
-              <>
-                <View style={policyStyles.policyBox}>
-                  <Text style={policyStyles.policyItem}>
-                    <Text style={policyStyles.policyBoldLabel}>Terms of Use </Text>
-                    <Text
-                      style={policyStyles.policyLinkText}
-                      onPress={() => openPolicyModal(termsData)}
-                    >
-                      {termsData?.title || 'Terms of Use – Doctor'} (v{termsData?.version || 1})
-                    </Text>
-                  </Text>
-                  <Text style={policyStyles.policyItem}>
-                    <Text style={policyStyles.policyBoldLabel}>Privacy: </Text>
-                    <Text
-                      style={policyStyles.policyLinkText}
-                      onPress={() => openPolicyModal(privacyData)}
-                    >
-                      {privacyData?.title || 'Privacy Policy – Doctor'} (v
-                      {privacyData?.version || 1})
-                    </Text>
-                  </Text>
-                  <Text style={policyStyles.policyItem}>
-                    <Text style={policyStyles.policyBoldLabel}>Informed Consent: </Text>
-                    <Text
-                      style={policyStyles.policyLinkText}
-                      onPress={() => openPolicyModal(consentData)}
-                    >
-                      {consentData?.title || 'PRED Care Informed Consent Policy – Doctor'} (v
-                      {consentData?.version || 1})
-                    </Text>
-                  </Text>
-                </View>
+          {isLoadingPolicies ? (
+            <PolicyAcceptanceSkeleton />
+          ) : (
+            <>
+              <View style={policyStyles.docListContainer}>
+                <Pressable
+                  style={({ pressed }) => [
+                    policyStyles.docTileCard,
+                    pressed && policyStyles.docTileCardActive,
+                  ]}
+                  onPress={() => openPolicyModal(termsData)}
+                >
+                  <View style={policyStyles.docTileLeft}>
+                    <View style={policyStyles.docIconBox}>
+                      <FileDocumentIcon size={20} color={theme.colors.primary} />
+                    </View>
+                    <View style={policyStyles.docMeta}>
+                      <View style={policyStyles.docTitleRow}>
+                        <Text style={policyStyles.docTitle} numberOfLines={1}>
+                          {termsData?.title || 'Terms of Use'}
+                        </Text>
+                        <View style={policyStyles.docVersionBadge}>
+                          <Text style={policyStyles.docVersionText}>
+                            v{termsData?.version || 1}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={policyStyles.docSubtext}>Doctor Terms & Service Guidelines</Text>
+                    </View>
+                  </View>
+                  <View style={policyStyles.docActionPill}>
+                    <Text style={policyStyles.docActionText}>View</Text>
+                    <ChevronRightIcon size={14} color={theme.colors.primary} />
+                  </View>
+                </Pressable>
 
+                {/* Privacy Policy Tile */}
+                <Pressable
+                  style={({ pressed }) => [
+                    policyStyles.docTileCard,
+                    pressed && policyStyles.docTileCardActive,
+                  ]}
+                  onPress={() => openPolicyModal(privacyData)}
+                >
+                  <View style={policyStyles.docTileLeft}>
+                    <View style={policyStyles.docIconBox}>
+                      <ShieldIcon size={20} color={theme.colors.primary} />
+                    </View>
+                    <View style={policyStyles.docMeta}>
+                      <View style={policyStyles.docTitleRow}>
+                        <Text style={policyStyles.docTitle} numberOfLines={1}>
+                          {privacyData?.title || 'Privacy Policy'}
+                        </Text>
+                        <View style={policyStyles.docVersionBadge}>
+                          <Text style={policyStyles.docVersionText}>
+                            v{privacyData?.version || 1}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={policyStyles.docSubtext}>Data Protection & Privacy Policy</Text>
+                    </View>
+                  </View>
+                  <View style={policyStyles.docActionPill}>
+                    <Text style={policyStyles.docActionText}>View</Text>
+                    <ChevronRightIcon size={14} color={theme.colors.primary} />
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    policyStyles.docTileCard,
+                    pressed && policyStyles.docTileCardActive,
+                  ]}
+                  onPress={() => openPolicyModal(consentData)}
+                >
+                  <View style={policyStyles.docTileLeft}>
+                    <View style={policyStyles.docIconBox}>
+                      <CheckBadgeIcon size={20} color={theme.colors.primary} />
+                    </View>
+                    <View style={policyStyles.docMeta}>
+                      <View style={policyStyles.docTitleRow}>
+                        <Text style={policyStyles.docTitle} numberOfLines={1}>
+                          {consentData?.title || 'Informed Consent'}
+                        </Text>
+                        <View style={policyStyles.docVersionBadge}>
+                          <Text style={policyStyles.docVersionText}>
+                            v{consentData?.version || 1}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text style={policyStyles.docSubtext}>Doctor Informed Consent Policy</Text>
+                    </View>
+                  </View>
+                  <View style={policyStyles.docActionPill}>
+                    <Text style={policyStyles.docActionText}>View</Text>
+                    <ChevronRightIcon size={14} color={theme.colors.primary} />
+                  </View>
+                </Pressable>
+              </View>
+              <View style={policyStyles.noticeBox}>
+                <InfoCircleIcon size={16} color="#B45309" style={policyStyles.noticeIcon} />
                 <Text style={policyStyles.noticeText}>
-                  These are the current published versions for doctors. If policies are updated
-                  later, you will be asked to accept again before using the portal.
+                  These are the current published versions for doctors. If policies are updated, you
+                  will be notified to accept before accessing portal features.
                 </Text>
-              </>
-            )}
-          </ScrollView>
+              </View>
+            </>
+          )}
 
-          <View style={policyStyles.fixedBottomSection}>
-            <View style={policyStyles.checkboxContainer}>
-              <Pressable
-                style={policyStyles.checkboxRow}
-                onPress={toggleTermsAndPrivacy}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: isAgreedTermsAndPrivacy }}
-              >
-                <View
-                  style={[
-                    policyStyles.checkboxSquare,
-                    isAgreedTermsAndPrivacy && policyStyles.checkboxSquareChecked,
-                  ]}
-                >
-                  {isAgreedTermsAndPrivacy && <Text style={policyStyles.checkmarkIcon}>✓</Text>}
-                </View>
-                <Text style={policyStyles.checkboxLabel}>
-                  I have read and agree to the{' '}
-                  <Text
-                    style={policyStyles.policyLinkBold}
-                    onPress={() => openPolicyModal(termsData)}
-                  >
-                    Terms of Use
-                  </Text>{' '}
-                  and{' '}
-                  <Text
-                    style={policyStyles.policyLinkBold}
-                    onPress={() => openPolicyModal(privacyData)}
-                  >
-                    Privacy Policy.
-                  </Text>
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={policyStyles.checkboxRow}
-                onPress={toggleConsent}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: isAgreedConsent }}
-              >
-                <View
-                  style={[
-                    policyStyles.checkboxSquare,
-                    isAgreedConsent && policyStyles.checkboxSquareChecked,
-                  ]}
-                >
-                  {isAgreedConsent && <Text style={policyStyles.checkmarkIcon}>✓</Text>}
-                </View>
-                <Text style={policyStyles.checkboxLabel}>
-                  I have read and agree to the{' '}
-                  <Text
-                    style={policyStyles.policyLinkBold}
-                    onPress={() => openPolicyModal(consentData)}
-                  >
-                    Informed Consent Policy.
-                  </Text>
-                </Text>
-              </Pressable>
-            </View>
-
-            <View style={policyStyles.buttonGroup}>
-              <Pressable
-                disabled={!isFormValid}
-                style={({ pressed }) => [
-                  policyStyles.primaryButton,
-                  !isFormValid && policyStyles.primaryButtonDisabled,
-                  pressed && isFormValid && { opacity: 0.85 },
+          <View style={policyStyles.divider} />
+          <View style={policyStyles.checkboxContainer}>
+            <Pressable
+              style={[
+                policyStyles.checkboxCard,
+                isAgreedTermsAndPrivacy && policyStyles.checkboxCardChecked,
+              ]}
+              onPress={toggleTermsAndPrivacy}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isAgreedTermsAndPrivacy }}
+            >
+              <View
+                style={[
+                  policyStyles.checkboxSquare,
+                  isAgreedTermsAndPrivacy && policyStyles.checkboxSquareChecked,
                 ]}
-                onPress={handleAccept}
               >
-                {isPostPolicyAcceptancePending ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <Text style={policyStyles.primaryButtonText}>Accept & Continue</Text>
-                )}
-              </Pressable>
-
-              <Pressable
-                style={({ pressed }) => [
-                  policyStyles.secondaryButton,
-                  pressed && { opacity: 0.75 },
+                {isAgreedTermsAndPrivacy && <Text style={policyStyles.checkmarkText}>✓</Text>}
+              </View>
+              <Text style={policyStyles.checkboxLabel}>
+                I have read and agree to the{' '}
+                <Text
+                  style={policyStyles.linkText}
+                  onPress={e => {
+                    e.stopPropagation();
+                    openPolicyModal(termsData);
+                  }}
+                >
+                  Terms of Use
+                </Text>{' '}
+                and{' '}
+                <Text
+                  style={policyStyles.linkText}
+                  onPress={e => {
+                    e.stopPropagation();
+                    openPolicyModal(privacyData);
+                  }}
+                >
+                  Privacy Policy
+                </Text>
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                policyStyles.checkboxCard,
+                isAgreedConsent && policyStyles.checkboxCardChecked,
+              ]}
+              onPress={toggleConsent}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isAgreedConsent }}
+            >
+              <View
+                style={[
+                  policyStyles.checkboxSquare,
+                  isAgreedConsent && policyStyles.checkboxSquareChecked,
                 ]}
-                onPress={handleSignOut}
               >
-                <Text style={policyStyles.secondaryButtonText}>Sign out</Text>
-              </Pressable>
-            </View>
+                {isAgreedConsent && <Text style={policyStyles.checkmarkText}>✓</Text>}
+              </View>
+              <Text style={policyStyles.checkboxLabel}>
+                I have read and agree to the{' '}
+                <Text
+                  style={policyStyles.linkText}
+                  onPress={e => {
+                    e.stopPropagation();
+                    openPolicyModal(consentData);
+                  }}
+                >
+                  Informed Consent Policy
+                </Text>
+              </Text>
+            </Pressable>
+          </View>
+          <View style={policyStyles.buttonGroup}>
+            <Pressable
+              disabled={!isFormValid || isPostPolicyAcceptancePending}
+              style={({ pressed }) => [
+                policyStyles.primaryButton,
+                (!isFormValid || isPostPolicyAcceptancePending) &&
+                  policyStyles.primaryButtonDisabled,
+                pressed && isFormValid && { opacity: 0.85 },
+              ]}
+              onPress={handleAccept}
+            >
+              {isPostPolicyAcceptancePending ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Text style={policyStyles.primaryButtonText}>Accept & Continue</Text>
+              )}
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [policyStyles.secondaryButton, pressed && { opacity: 0.75 }]}
+              onPress={handleSignOut}
+            >
+              <LogoutIcon size={16} color={theme.colors.textSecondary} />
+              <Text style={policyStyles.secondaryButtonText}>Sign out</Text>
+            </Pressable>
           </View>
         </View>
-
         <View style={policyStyles.footerContainer}>
+          <View style={policyStyles.footerSecurityNote}>
+            <ShieldIcon size={12} color="rgba(255, 255, 255, 0.75)" />
+            <Text style={policyStyles.footerSecurityText}>256-bit Encrypted Medical Portal</Text>
+          </View>
           <Text style={policyStyles.copyrightText}>
             © {new Date().getFullYear()} PRED Care. All rights reserved.
           </Text>
         </View>
-      </View>
+      </ScrollView>
+
       <PolicyViewerModal
-        visible={!!selectedPolicyItem}
+        visible={Boolean(selectedPolicyItem)}
         policy={selectedPolicyItem}
         onClose={() => setSelectedPolicyItem(null)}
       />

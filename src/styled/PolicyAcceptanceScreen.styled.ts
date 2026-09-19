@@ -2,132 +2,198 @@ import { StyleSheet } from 'react-native';
 import { theme } from './theme.styled';
 
 export const policyStyles = StyleSheet.create({
-  screenContainer: {
+  safeArea: {
     flex: 1,
+    backgroundColor: theme.colors.brandBlue,
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.brandBlue,
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: theme.colors.brandBlue,
+    paddingVertical: 20,
   },
 
   // Logo Header
   logoContainer: {
     alignItems: 'center',
-    paddingVertical: 12,
+    marginBottom: 16,
     width: '100%',
   },
   logo: {
     width: 170,
-    height: 60,
+    height: 56,
     tintColor: theme.colors.surface,
   },
 
-  // Card Container
+  // Main Card Container
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 28,
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
     paddingBottom: 20,
     shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
     elevation: 8,
     width: '100%',
-    maxWidth: 480,
-    flexShrink: 1,
-    flexDirection: 'column',
+    maxWidth: 500,
   },
 
-  // Fixed Card Title Section
+  // Title Section
   titleContainer: {
     marginBottom: 16,
     alignItems: 'center',
   },
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '700',
     color: theme.colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: theme.colors.textMuted,
-    textAlign: 'center',
-    fontWeight: '500',
-    lineHeight: 20,
-  },
-
-  // Scrollable Middle Content
-  scrollableContent: {
-    flexShrink: 1,
-    marginBottom: 12,
-  },
-  scrollableContentInner: {
-    paddingBottom: 4,
-  },
-
-  // Policy Inset Box
-  policyBox: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-  },
-  policyItem: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    lineHeight: 22,
     marginBottom: 4,
   },
-  policyBoldLabel: {
-    fontWeight: '700',
+  subtitle: {
+    fontSize: 13.5,
+    color: theme.colors.textSlate,
+    textAlign: 'center',
+    fontWeight: '400',
+    lineHeight: 19,
+  },
+
+  // Policy Items List Container
+  docListContainer: {
+    gap: 10,
+    marginBottom: 14,
+  },
+  docTileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  docTileCardActive: {
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.mintBdr,
+  },
+  docTileLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+    marginRight: 8,
+  },
+  docIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: 'rgba(15, 118, 110, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  docMeta: {
+    flex: 1,
+  },
+  docTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+    marginBottom: 2,
+  },
+  docTitle: {
+    fontSize: 13.5,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
-  policyValueText: {
-    fontWeight: '400',
+  docVersionBadge: {
+    backgroundColor: '#E2E8F0',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  docVersionText: {
+    fontSize: 10.5,
+    fontWeight: '600',
     color: theme.colors.textSlate,
   },
-  policyLinkText: {
-    color: theme.colors.primary,
-    textDecorationLine: 'underline',
-    fontWeight: '500',
+  docSubtext: {
+    fontSize: 11.5,
+    color: theme.colors.textMuted,
   },
-  policyLinkBold: {
-    color: theme.colors.primary,
-    textDecorationLine: 'underline',
-    fontWeight: '700',
+  docActionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.mintBdr,
   },
-
-  // Notice Text
-  noticeText: {
+  docActionText: {
     fontSize: 12,
-    color: theme.colors.textSlate,
-    lineHeight: 18,
-    marginBottom: 8,
+    fontWeight: '600',
+    color: theme.colors.primary,
   },
 
-  // Fixed Bottom Section (Sticky Checkboxes & Buttons)
-  fixedBottomSection: {
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
-    paddingTop: 16,
-    marginTop: 4,
+  // Notice Banner
+  noticeBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: '#FFFBEB',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  noticeIcon: {
+    marginTop: 1,
+  },
+  noticeText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#92400E',
+    lineHeight: 17,
+    fontWeight: '400',
+  },
+
+  // Divider
+  divider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginBottom: 16,
   },
 
   // Checkbox Group
   checkboxContainer: {
-    marginBottom: 16,
-    gap: 12,
+    gap: 10,
+    marginBottom: 18,
   },
-  checkboxRow: {
+  checkboxCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    backgroundColor: '#F8FAFC',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  checkboxCardChecked: {
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.mintBdr,
   },
   checkboxSquare: {
     width: 22,
@@ -138,29 +204,28 @@ export const policyStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 10,
     marginTop: 1,
   },
   checkboxSquareChecked: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
   },
-  checkmarkIcon: {
+  checkmarkText: {
     color: theme.colors.surface,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
-    lineHeight: 16,
   },
   checkboxLabel: {
     flex: 1,
-    fontSize: 13.5,
+    fontSize: 13,
     color: theme.colors.textPrimary,
-    lineHeight: 19,
-    fontWeight: '400',
+    lineHeight: 18,
   },
-  boldText: {
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
+  linkText: {
+    color: theme.colors.primary,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 
   // Action Buttons
@@ -168,16 +233,19 @@ export const policyStyles = StyleSheet.create({
     gap: 10,
   },
   primaryButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 14,
-    paddingVertical: 15,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 3,
   },
   primaryButtonDisabled: {
     backgroundColor: '#94A3B8',
@@ -186,32 +254,46 @@ export const policyStyles = StyleSheet.create({
   },
   primaryButtonText: {
     color: theme.colors.surface,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
 
   secondaryButton: {
-    backgroundColor: 'transparent',
-    borderRadius: 14,
-    paddingVertical: 13,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderWidth: 1.5,
-    borderColor: theme.colors.primary,
+    borderColor: '#CBD5E1',
   },
   secondaryButtonText: {
-    color: theme.colors.primary,
-    fontSize: 16,
-    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
   },
 
-  // Footer Copyright
+  // Footer Copyright & Security Note
   footerContainer: {
-    paddingTop: 12,
+    marginTop: 16,
     alignItems: 'center',
+    gap: 4,
+  },
+  footerSecurityNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  footerSecurityText: {
+    fontSize: 11.5,
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontWeight: '500',
   },
   copyrightText: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: 'rgba(255, 255, 255, 0.85)',
     fontWeight: '500',
   },

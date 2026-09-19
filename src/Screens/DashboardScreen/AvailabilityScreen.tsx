@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import ExistingSlotCard from '../../components/Modules/Availability/ExistingSlotCard';
 import SlotEditorCard from '../../components/Modules/Availability/SlotEditorCard';
 import AvailabilitySkeleton from '../../components/Skeletons/AvailabilitySkeleton';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
+import PlusIcon from '../../components/ui/icons/PlusIcon';
 import {
   useAvailablityList,
   useDeleteAvailability,
@@ -16,7 +17,7 @@ import { availabilityStyles as S } from '../../styled/DoctorAvailabilityScreen.s
 import { theme } from '../../styled/theme.styled';
 import { IMyAvailabilityDoc } from '../../typescripts/interfaces/availability.interfaces';
 import { useAlertStore } from '../../zustand/stores/useAlertStore';
-import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 export interface AvailabilityScreenProps {
   navigation?: ProfileScreenNavigationProp;
@@ -28,8 +29,9 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
   const [showNewSlotForm, setShowNewSlotForm] = useState(false);
   const [editingSlot, setEditingSlot] = useState<IMyAvailabilityDoc | null>(null);
 
-  const { userData } = useAuthStore(state => state);
   const { showConfirm } = useAlertStore(state => state);
+  const { hideLoader, showLoader } = useLoadingStore(state => state);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {
     data: availablityList,
@@ -39,6 +41,12 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
 
   const { mutate: deleteAvailabilityMutation } = useDeleteAvailability();
 
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await avialRefetch();
+    setIsRefreshing(false);
+  }, []);
+
   const handleDeleteSlot = (id: number) => {
     showConfirm({
       title: 'Delete Availability Slot',
@@ -46,17 +54,25 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
       buttonText: 'Delete',
       cancelText: 'Cancel',
       onConfirm: () => {
+        showLoader('Deleting availability slot...');
         deleteAvailabilityMutation(id, {
-          onSuccess: async () => {
-            showSuccessToast('Availability slot has been removed.');
-            await avialRefetch();
+          onSuccess: async res => {
+            hideLoader();
+            if (res?.success) {
+              showSuccessToast(res?.message || 'Availability slot has been deleted successfully.');
+              await avialRefetch();
+              hideLoader();
+            } else {
+              hideLoader();
+            }
+          },
+          onError: () => {
+            hideLoader();
           },
         });
       },
     });
   };
-
-  const totalSlotsCount = availablityList?.length || 0;
 
   return (
     <SafeAreaWrapper>
@@ -78,10 +94,11 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
           style={S.scroll}
           contentContainerStyle={S.scrollContent}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl
-              refreshing={isLoadingAvailablityList}
-              onRefresh={avialRefetch}
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
               colors={[theme.colors.primary]}
               tintColor={theme.colors.primary}
             />
@@ -89,17 +106,21 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
         >
           <TouchableOpacity
             style={S.sectionHeader}
-            onPress={() => setShowExistingSlots(!showExistingSlots)}
+            onPress={() => {
+              if ((availablityList?.length || 0) > 0) setShowExistingSlots(!showExistingSlots);
+            }}
             activeOpacity={0.75}
           >
-            <Text style={S.sectionHeaderText}>Your Current Availability ({totalSlotsCount})</Text>
+            <Text style={S.sectionHeaderText}>
+              Your Current Availability ({availablityList?.length || 0})
+            </Text>
             <Text style={S.sectionHeaderIcon}>{showExistingSlots ? '▲' : '▼'}</Text>
           </TouchableOpacity>
           {showExistingSlots && (
             <View>
               {isLoadingAvailablityList ? (
                 <AvailabilitySkeleton />
-              ) : totalSlotsCount === 0 ? (
+              ) : availablityList?.length === 0 ? (
                 <CommonEmptyCard
                   title="No Availability Slots"
                   message="You haven't added any clinical sessions yet. Tap '+ Add New Slot' to start accepting patient appointments."
@@ -107,7 +128,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
               ) : (
                 availablityList?.map((slot: IMyAvailabilityDoc) => (
                   <ExistingSlotCard
-                    key={slot.id}
+                    key={`${slot.id}-${slot?.id}`}
                     id={slot.id}
                     date_selection_mode={slot.date_selection_mode}
                     selected_dates={slot.selected_dates}
@@ -149,7 +170,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
 
           {showNewSlotForm && (
             <SlotEditorCard
-              slotIndex={totalSlotsCount}
+              slotIndex={availablityList?.length || 0}
               editingSlot={editingSlot}
               existingSlots={availablityList}
               onSave={_data => {
@@ -165,6 +186,21 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
             />
           )}
         </ScrollView>
+
+        {!showNewSlotForm && (
+          <TouchableOpacity
+            style={S.fabBtn}
+            onPress={() => {
+              setEditingSlot(null);
+              setShowNewSlotForm(true);
+              setShowExistingSlots(false);
+            }}
+            activeOpacity={0.8}
+            accessibilityLabel="Add New Availability Slot"
+          >
+            <PlusIcon size={24} color={theme.colors.surface} />
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaWrapper>
   );
