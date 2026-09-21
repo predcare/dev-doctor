@@ -2,7 +2,12 @@ import { useCallback } from 'react';
 import useEventEmitter from '../../../hooks/commons/useEventEmitter';
 import useAuthProfile from '../../../hooks/react-query/common/useAuthProfile';
 import { resetToLogin } from '../../../lib/common/navigation.utils';
-import { showErrorToast, showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils';
+import {
+  showErrorToast,
+  showInfoToast,
+  showSuccessToast,
+  showWarningToast,
+} from '../../../lib/common/toast.utils';
 import events from '../../../lib/services/events/events';
 import { navigationRef } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
@@ -23,7 +28,7 @@ export default function EventListener({ onLogout }: EventListenerProps) {
         setIntentionalLogoutMode(true);
         showSuccessToast('Logged out successfully');
       } else {
-        showErrorToast('Please login again.', 'Session Expired');
+        showWarningToast('Please login again.', 'Session Expired');
       }
       onLogout?.();
       await queryClient.cancelQueries();
