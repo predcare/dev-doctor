@@ -125,7 +125,6 @@ export const useMyPatientConsults = (params?: { patientId?: number | string }) =
     enabled: !!params?.patientId,
     select: v => {
       if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.appointments)) return v.appointments;
       return [];
     },
   });

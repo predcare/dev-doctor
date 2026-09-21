@@ -21,24 +21,22 @@ import AppointmentInfoModal from '../../components/Modules/Appointments/Modals/A
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import AppointmentSkeleton from '../../components/Skeletons/AppointmentSkeleton';
 import { CircleXIcon, FilterIcon, SearchIcon } from '../../components/ui/icons';
-import { useDevicePermissions } from '../../hooks/commons/useDevicePermissions';
-import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
+import { useDebounce } from '../../hooks/commons/useDebounce';
 import {
   useChangeAppointmentStatus,
   useMyAppointments,
+  useMyAppointmentStats,
 } from '../../hooks/react-query/appointments/appointments.hooks';
+import { IMyApptQueryParams } from '../../hooks/react-query/appointments/payload.interafce';
 import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import { checkIsExpired, formatDate, formatDateToYYYYMMDD } from '../../lib/common/common.utils';
-import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
+import { formatDate, formatDateToYYYYMMDD } from '../../lib/common/common.utils';
 import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
-import { IAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
-import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { IMyAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
-import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type TabType = 'both' | 'inperson' | 'video';
 
@@ -50,18 +48,57 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const [refreshing, setRefreshing] = useState(false);
   const [filterStates, setFilterStates] = useState<FilterStates>({
     dateRange: 'today',
-    statuses: ['upcoming'],
+    statuses: ['pending'],
     fromDate: null,
     toDate: null,
     activeTarget: null,
+    bookingMode: null,
   });
-  const [selectedDetailsApt, setSelectedDetailsApt] = useState<IAppointmentDoc | null>(null);
+  const debounceSearch = useDebounce(searchQuery?.trim(), 500);
+  const [selectedDetailsApt, setSelectedDetailsApt] = useState<IMyAppointmentDoc | null>(null);
   const [confirmCompleteAptId, setConfirmCompleteAptId] = useState<number | string | null>(null);
 
-  const { userData } = useAuthStore(state => state);
   const { showLoader, hideLoader } = useLoadingStore(state => state);
-  const { setMeetingSession, setInPersonAppointment } = useMeetingStore(state => state);
-  const { requestAudioVideoPermissions } = useDevicePermissions();
+
+  const queryParams: IMyApptQueryParams = useMemo(() => {
+    const params: IMyApptQueryParams = {
+      limit: 10,
+      page: 1,
+    };
+
+    if (debounceSearch) {
+      params.search = debounceSearch;
+    }
+
+    if (activeTab === 'inperson') {
+      params.consultation_type = 'in-person';
+    } else if (activeTab === 'video') {
+      params.consultation_type = 'video';
+    }
+
+    if (filterStates.statuses && filterStates.statuses.length > 0) {
+      params.status = filterStates.statuses.join(',');
+    }
+
+    if (filterStates.dateRange) {
+      if (filterStates.dateRange === 'today') {
+        params.date_range = 'today';
+      } else if (filterStates.dateRange === 'tomorrow') {
+        params.date_range = 'tomorrow';
+      } else if (filterStates.dateRange === 'thisweek') {
+        params.date_range = 'this_week';
+      } else if (filterStates.dateRange === 'all') {
+        if (filterStates.fromDate) {
+          params.start_date = formatDateToYYYYMMDD(filterStates.fromDate);
+        }
+        if (filterStates.toDate) {
+          params.end_date = formatDateToYYYYMMDD(filterStates.toDate);
+        }
+      }
+    }
+
+    return params;
+  }, [debounceSearch, activeTab, filterStates]);
 
   const {
     data: myAppointments,
@@ -69,9 +106,9 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
     isError: isMyAppointmentError,
     error: myAppointmentError,
     refetch: fetchMyAppointments,
-  } = useMyAppointments({
-    doctorId: userData?.user_id,
-  });
+  } = useMyAppointments(queryParams);
+
+  const { data: apptStats, isFetching: apptStatsPending } = useMyAppointmentStats();
 
   useFocusEffect(
     useCallback(() => {
@@ -92,128 +129,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
     return !(isDefaultDate && isDefaultStatus && noCustomDates && noSearch && noTab);
   }, [filterStates, searchQuery, activeTab]);
 
-  const { stats, filteredAppointments } = useMemo(() => {
-    const appointmentsList: IAppointmentDoc[] = myAppointments || [];
-    const now = new Date();
-    const todayStr = formatDateToYYYYMMDD(now);
-
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
-    const tomorrowStr = formatDateToYYYYMMDD(tomorrow);
-
-    const weekEnd = new Date(now);
-    weekEnd.setDate(now.getDate() + 7);
-    const weekEndStr = formatDateToYYYYMMDD(weekEnd);
-
-    // 1. Calculate Stats
-    let todayCount = 0;
-    let upcoming3hCount = 0;
-
-    const currentMs = now.getTime();
-    const threeHoursLaterMs = currentMs + 3 * 60 * 60 * 1000;
-
-    appointmentsList.forEach(apt => {
-      if (apt.appointment_date === todayStr) {
-        if (apt.appointment_status?.toLowerCase() !== 'cancelled') {
-          todayCount++;
-        }
-
-        if (
-          apt.start_time &&
-          apt.appointment_status?.toLowerCase() !== 'cancelled' &&
-          apt.appointment_status?.toLowerCase() !== 'completed'
-        ) {
-          const [h, m, s] = apt.start_time.split(':').map(Number);
-          const aptStartTime = new Date(now);
-          aptStartTime.setHours(h || 0, m || 0, s || 0, 0);
-          const aptStartMs = aptStartTime.getTime();
-
-          if (aptStartMs >= currentMs && aptStartMs <= threeHoursLaterMs) {
-            upcoming3hCount++;
-          }
-        }
-      }
-    });
-
-    // 2. Filter Appointments
-    const query = searchQuery.trim().toLowerCase();
-    const filtered = appointmentsList.filter(apt => {
-      // Consultation Type Tab Filter
-      if (activeTab === 'inperson' && apt.consultation_type?.toLowerCase() !== 'in-person') {
-        return false;
-      }
-      if (activeTab === 'video' && apt.consultation_type?.toLowerCase() !== 'video') {
-        return false;
-      }
-
-      // Search Query Filter
-      if (query) {
-        const matchName = apt.patient_name?.toLowerCase().includes(query);
-        const matchPtId = apt.patient_alphanumeric_id?.toLowerCase().includes(query);
-        const matchAptId = apt.appointment_id?.toLowerCase().includes(query);
-        const matchPhone = apt.patient_phone?.toLowerCase().includes(query);
-        if (!matchName && !matchPtId && !matchAptId && !matchPhone) {
-          return false;
-        }
-      }
-
-      // Date Range Filter
-      if (filterStates.dateRange === 'today') {
-        if (apt.appointment_date !== todayStr) return false;
-      } else if (filterStates.dateRange === 'tomorrow') {
-        if (apt.appointment_date !== tomorrowStr) return false;
-      } else if (filterStates.dateRange === 'thisweek') {
-        if (apt.appointment_date < todayStr || apt.appointment_date > weekEndStr) return false;
-      } else if (filterStates.dateRange === 'all') {
-        if (filterStates.fromDate) {
-          const fromStr = formatDateToYYYYMMDD(filterStates.fromDate);
-          if (apt.appointment_date < fromStr) return false;
-        }
-        if (filterStates.toDate) {
-          const toStr = formatDateToYYYYMMDD(filterStates.toDate);
-          if (apt.appointment_date > toStr) return false;
-        }
-      }
-
-      // Status Filter
-      if (filterStates.statuses.length > 0) {
-        const statusMatch = filterStates.statuses.some(st => {
-          const isExpired = checkIsExpired(apt.appointment_date, apt.end_time, apt.start_time);
-          const rawAptStatus = apt.appointment_status?.toLowerCase();
-          const isInProgress =
-            rawAptStatus === 'in_progress' ||
-            rawAptStatus === 'in-progress' ||
-            rawAptStatus === 'inprogress';
-          const effectiveAptStatus =
-            isExpired && rawAptStatus !== 'cancelled' && !isInProgress ? 'completed' : rawAptStatus;
-          const payStatus = apt.payment_status?.toLowerCase();
-
-          if (st === 'upcoming')
-            return (
-              (!isExpired || isInProgress) &&
-              (effectiveAptStatus === 'confirmed' ||
-                effectiveAptStatus === 'upcoming' ||
-                isInProgress)
-            );
-          if (st === 'completed') return effectiveAptStatus === 'completed';
-          if (st === 'cancelled') return rawAptStatus === 'cancelled';
-          if (st === 'pending')
-            return payStatus === 'pending' || isInProgress || effectiveAptStatus === 'pending';
-          if (st === 'noshow')
-            return effectiveAptStatus === 'noshow' || effectiveAptStatus === 'no_show';
-          return false;
-        });
-        if (!statusMatch) return false;
-      }
-
-      return true;
-    });
-
-    return {
-      stats: { todayCount, upcoming3hCount },
-      filteredAppointments: filtered,
-    };
-  }, [myAppointments, activeTab, searchQuery, filterStates]);
   const updateFilterState = useCallback((updates: Partial<FilterStates>) => {
     setFilterStates(prev => ({
       ...prev,
@@ -234,6 +149,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
       fromDate: null,
       toDate: null,
       activeTarget: null,
+      bookingMode: null,
     });
     setSearchQuery('');
     setActiveTab('both');
@@ -247,141 +163,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const handleCloseDetailsModal = useCallback(() => {
     setSelectedDetailsApt(null);
   }, []);
-
-  const handleJoinVideoCall = useCallback(
-    async (appointment: IAppointmentDoc) => {
-      if (!appointment) return;
-
-      const storeState = useMeetingStore.getState();
-      const isCallActive =
-        (storeState.callState === 'CONNECTED' || storeState.callState === 'CONNECTING') &&
-        Boolean(storeState.token && storeState.meetingId);
-
-      const isCurrentAppt =
-        isCallActive &&
-        (String(storeState.appointmentId) === String(appointment.id) ||
-          (Boolean(appointment.appointment_id) &&
-            storeState.appointmentGeneratedId === appointment.appointment_id));
-
-      if (isCurrentAppt) {
-        storeState.setIsInAppPip(false);
-        navigation.navigate(AppRoute.DOCTOR_MEETING);
-        return;
-      }
-
-      if (isCallActive) {
-        showInfoToast(
-          'You are currently in an active consultation. Please end that call first.',
-          'Active Call Ongoing'
-        );
-        return;
-      }
-
-      const hasPermissions = await requestAudioVideoPermissions();
-      if (!hasPermissions) {
-        showErrorToast('Camera and Microphone permissions are required to join the consultation.');
-        return;
-      }
-
-      const apptId = appointment.id;
-      let token: string | undefined;
-      let meetingId: string | undefined = appointment.meeting_id;
-      let call_duration_seconds: number | undefined = appointment.call_duration_seconds;
-      if (!apptId) {
-        showErrorToast('No valid appointment ID found to fetch token');
-        return;
-      }
-      if (!appointment?.patient_id)
-        return showErrorToast('No valid patient ID found to fetch token');
-
-      try {
-        const tokenResponse = await queryClient.fetchQuery({
-          queryKey: [MyAppointmentsQueryKeys.MyAppointments, 'token', apptId],
-          queryFn: () => getApptToken(apptId),
-        });
-        token = tokenResponse?.token;
-        meetingId = tokenResponse?.meeting_id;
-      } catch (error) {
-        console.error('Failed to fetch fresh appointment token:', error);
-      }
-
-      if (!token && appointment.token) {
-        token = appointment.token;
-        call_duration_seconds = appointment.call_duration_seconds;
-      }
-
-      const cleanedToken = token?.trim().replace(/^["']|["']$/g, '');
-      const cleanedMeetingId = meetingId?.trim().replace(/^["']|["']$/g, '');
-
-      if (!cleanedToken || !cleanedMeetingId) {
-        showErrorToast('Meeting credentials missing or invalid');
-        return;
-      }
-
-      setMeetingSession({
-        token: cleanedToken,
-        meetingId: cleanedMeetingId,
-        appointmentId: apptId,
-        patientName: appointment.patient_name,
-        patientAlphanumericId: appointment.patient_alphanumeric_id,
-        appointmentGeneratedId: appointment.appointment_id,
-        startTime: appointment.start_time,
-        endTime: appointment.end_time,
-        callDurationSeconds: call_duration_seconds ?? 0,
-        patientUserId: String(appointment?.patient_id),
-      });
-
-      navigation.navigate(AppRoute.DOCTOR_MEETING);
-    },
-    [navigation, queryClient, setMeetingSession, requestAudioVideoPermissions]
-  );
-
-  const handleStartConsulation = useCallback(
-    (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
-      console.log(status, 'statusstatusstatus');
-      if (status?.toLowerCase() === 'confirmed') {
-        showLoader('Loading...');
-        changeStatus(
-          { appointmentId, appointment_status: 'in_progress' },
-          {
-            onSuccess: async () => {
-              await queryClient.invalidateQueries({
-                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
-              });
-              hideLoader();
-              setConfirmCompleteAptId(null);
-              setInPersonAppointment({
-                apptIdforInPerson: String(appointmentId),
-                patientIdforInPerson: String(patientId),
-                patientNameforInPerson: String(patientName),
-                statusforInPerson: String(status),
-              });
-              navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
-                patientId: patientId,
-                patientName: patientName,
-              });
-            },
-            onError: () => {
-              hideLoader();
-              setConfirmCompleteAptId(null);
-            },
-          }
-        );
-      } else {
-        setInPersonAppointment({
-          apptIdforInPerson: String(appointmentId),
-          patientIdforInPerson: String(patientId),
-          patientNameforInPerson: String(patientName),
-          statusforInPerson: String(status),
-        });
-        navigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
-          patientId: patientId,
-          patientName: patientName,
-        });
-      }
-    },
-    [changeStatus, queryClient, showLoader, hideLoader]
-  );
 
   const handleMarkCompleted = useCallback(
     (appointmentId: number | string) => {
@@ -414,14 +195,18 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
         onNotificationPress={() => navigation.navigate(AppRoute.NOTIFICATIONS)}
       />
 
-      <AppointmentStatsCard todayCount={stats.todayCount} upcoming3hCount={stats.upcoming3hCount} />
+      <AppointmentStatsCard
+        todayCount={apptStats?.today_count || 0}
+        upcoming3hCount={apptStats?.upcoming_3h_count || 0}
+        loading={apptStatsPending}
+      />
 
       <View style={S.searchRow}>
         <View style={S.searchBox}>
           <SearchIcon size={18} color="#94A3B8" />
           <TextInput
             style={S.searchInput}
-            placeholder="Search patient name, ID or phone..."
+            placeholder="Search by Appointment Id"
             placeholderTextColor="#94A3B8"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -474,8 +259,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
       <View style={S.filterBanner}>
         <Text style={S.filterBannerTxt}>
           {isCustomFilterApplied
-            ? `Filtered · ${filteredAppointments.length} appointment${
-                filteredAppointments.length !== 1 ? 's' : ''
+            ? `Filtered · ${myAppointments?.meta?.total} appointment${
+                myAppointments?.meta?.total !== 1 ? 's' : ''
               }`
             : `Today · ${formatDate(new Date())}`}
         </Text>
@@ -506,13 +291,13 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
               (myAppointmentError as any)?.message ||
               'Something went wrong while fetching Appointments.'
             }
-            onRetry={handleOpenFilterModal}
+            onRetry={() => fetchMyAppointments()}
           />
         </ScrollView>
       ) : (
         <FlatList
           style={{ flex: 1 }}
-          data={filteredAppointments}
+          data={myAppointments?.data || []}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={S.listContent}
           showsVerticalScrollIndicator={false}
@@ -533,39 +318,25 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
             />
           }
           renderItem={({ item }) => {
-            const isExpired = checkIsExpired(item.appointment_date, item.end_time, item.start_time);
             return (
               <AppointmentCard
                 appointmentGeneratedId={item.appointment_id}
-                appointmentId={item.id}
-                patientName={item.patient_name}
-                patientGender={item.patient_gender}
-                patientDateOfBirth={item.patient_date_of_birth}
+                appointmentId={Number(item.id)}
+                patientName={item?.patientInfo?.name || ''}
+                patientGender={item.patientInfo?.gender || ''}
+                patientDateOfBirth={item?.patientInfo?.dateOfBirth || ''}
                 appointmentStatus={item.appointment_status}
                 appointment_date={item.appointment_date}
                 consultation_type={item.consultation_type}
                 startTime={item.start_time}
                 endTime={item.end_time}
-                isExpired={isExpired}
-                isJoinedOnce={Number(item?.call_duration_seconds) > 0}
-                callDurationSeconds={Number(item?.call_duration_seconds) || 0}
+                isJoinedOnce={false}
+                callDurationSeconds={0}
                 onViewDetails={() => setSelectedDetailsApt(item)}
-                onVideoCall={() => handleJoinVideoCall(item)}
+                onVideoCall={() => {}}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
-                onReschedule={() => {
-                  navigation?.navigate(AppRoute.RESCHEDULE_APPOINTMENT, {
-                    appointmentId: item.id,
-                    patientId: Number(item.patient_id),
-                  });
-                }}
-                onStartConsultation={() => {
-                  handleStartConsulation(
-                    item?.id,
-                    item?.patient_id,
-                    item?.patient_name,
-                    item?.appointment_status
-                  );
-                }}
+                onReschedule={() => {}}
+                onStartConsultation={() => {}}
               />
             );
           }}

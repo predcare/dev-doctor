@@ -154,43 +154,6 @@ export const checkIsExpired = (
   return false;
 };
 
-export const getTimeUntilStart = (startTime?: string): string => {
-  if (!startTime || typeof startTime !== 'string') {
-    console.warn('Invalid startTime provided to getTimeUntilStart:', startTime);
-    return '';
-  }
-
-  const now = new Date();
-
-  const [hours, minutes, seconds] = startTime.split(':').map(Number);
-
-  const start = new Date();
-  start.setHours(hours, minutes, seconds || 0, 0);
-
-  const diffMs = start.getTime() - now.getTime();
-
-  if (diffMs <= 0) {
-    return 'Started';
-  }
-
-  const totalMinutes = Math.ceil(diffMs / (1000 * 60));
-
-  const hoursLeft = Math.floor(totalMinutes / 60);
-  const minutesLeft = totalMinutes % 60;
-
-  if (hoursLeft > 0 && minutesLeft > 0) {
-    return `${hoursLeft} hour${hoursLeft > 1 ? 's' : ''} ${minutesLeft} minute${
-      minutesLeft > 1 ? 's' : ''
-    }`;
-  }
-
-  if (hoursLeft > 0) {
-    return `${hoursLeft} hour${hoursLeft > 1 ? 's' : ''}`;
-  }
-
-  return `${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}`;
-};
-
 export const capitalize = (value: string): string => {
   if (!value) return '';
   return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();

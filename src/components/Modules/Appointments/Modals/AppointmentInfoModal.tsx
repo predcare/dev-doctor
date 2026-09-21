@@ -12,14 +12,14 @@ import { useChangeAppointmentStatus } from '../../../../hooks/react-query/appoin
 import { MyAppointmentsQueryKeys } from '../../../../hooks/react-query/query.keys';
 import { formatDate, formatStatus, formatTimeSlot } from '../../../../lib/common/common.utils';
 import theme from '../../../../styled/theme.styled';
-import { IAppointmentDoc } from '../../../../typescripts/interfaces/appointments.interfaces';
+import { IMyAppointmentDoc } from '../../../../typescripts/interfaces/appointments.interfaces';
 import { useLoadingStore } from '../../../../zustand/stores/useLoadingStore';
 import { queryClient } from '../../../providers/ReactQueryProvider';
 import { ChevronDownIcon, ChevronUpIcon, CircleXIcon, EditIcon } from '../../../ui/icons';
 
 interface AppointmentInfoModalProps {
   visible: boolean;
-  appointment?: IAppointmentDoc | null;
+  appointment?: IMyAppointmentDoc | null;
   onClose: () => void;
 }
 
@@ -129,8 +129,8 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
     ]);
 
     const patientIdDisplay = useMemo(() => {
-      if (appointment?.patient_alphanumeric_id) return appointment.patient_alphanumeric_id;
-      if (appointment?.patient_id) return `PT${String(appointment.patient_id).padStart(4, '0')}`;
+      if (appointment?.patientInfo?.displayPatientId)
+        return appointment.patientInfo.displayPatientId;
       return '';
     }, [appointment]);
 
@@ -203,7 +203,7 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
 
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Name</Text>
-                  <Text style={styles.infoValue}>{appointment?.patient_name || '-'}</Text>
+                  <Text style={styles.infoValue}>{appointment?.patientInfo?.name || '-'}</Text>
                 </View>
 
                 <View style={styles.infoRow}>
@@ -219,7 +219,9 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
                 <View style={[styles.infoRow, styles.infoRowLast]}>
                   <Text style={styles.infoLabel}>Phone</Text>
                   <Text style={styles.infoValue}>
-                    {appointment?.patient_phone ? `+91-${appointment.patient_phone}` : '-'}
+                    {appointment?.patientInfo?.phoneNumber
+                      ? `+91-${appointment?.patientInfo?.phoneNumber}`
+                      : '-'}
                   </Text>
                 </View>
               </View>
@@ -241,11 +243,7 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
 
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Duration</Text>
-                  <Text style={styles.infoValue}>
-                    {appointment?.call_duration_seconds
-                      ? `⏱ ${Math.ceil(appointment.call_duration_seconds / 60)} min`
-                      : '-'}
-                  </Text>
+                  <Text style={styles.infoValue}>⏱ 0 min</Text>
                 </View>
 
                 <View style={[styles.infoRow, styles.infoRowLast]}>
@@ -260,15 +258,11 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
                 <Text style={styles.sectionTitle}>CALL DETAILS</Text>
                 <View style={[styles.infoRow, styles.infoRowLast]}>
                   <Text style={styles.infoLabel}>Ended At</Text>
-                  <Text style={styles.infoValue}>
-                    {formatDate(appointment?.call_end_time) || '-'}
-                  </Text>
+                  <Text style={styles.infoValue}>23-Aug, 2026</Text>
                 </View>
                 <View style={[styles.infoRow, styles.infoRowLast]}>
                   <Text style={styles.infoLabel}>Reason</Text>
-                  <Text style={styles.infoValue}>
-                    {appointment?.reason || appointment?.symptoms || 'N/A'}
-                  </Text>
+                  <Text style={styles.infoValue}>{appointment?.reason || 'N/A'}</Text>
                 </View>
               </View>
 

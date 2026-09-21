@@ -2,14 +2,23 @@ import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import {
   IAppointmentInfoRoot,
-  IMyAppointmentsRoot,
+  TMyAppointmentRoot,
+  TMyAppointmentStats,
 } from '../../../typescripts/interfaces/appointments.interfaces';
 import { ICreateAppointmentPayload } from '../auth/payload.interfaces';
+import { IMyApptQueryParams } from './payload.interafce';
 
-export const getMyAppointments = async (doctorId: number | string) => {
-  const res = await axiosInstance.get<IMyAppointmentsRoot>(
-    `${endpoints.appointments.get}/${doctorId}`
-  );
+export const getMyAppointments = async (params: IMyApptQueryParams) => {
+  const res = await axiosInstance.get<TMyAppointmentRoot>(`${endpoints.appointments.get}`, {
+    params: params,
+  });
+  return res.data;
+};
+
+export const getMyAppointmentStats = async (params?: { date?: string }) => {
+  const res = await axiosInstance.get<TMyAppointmentStats>(`${endpoints.appointments.apptStats}`, {
+    params: params,
+  });
   return res.data;
 };
 
@@ -100,4 +109,3 @@ export const saveCall = async (body: ISaveCallPayload) => {
   const res = await axiosInstance.post(endpoints.appointments.saveCall, body);
   return res.data;
 };
-

@@ -73,6 +73,7 @@ export enum AppointmentsQueryKeys {
 
 export enum MyAppointmentsQueryKeys {
   MyAppointments = 'MyAppointments',
+  MyAppointmentsStats = 'MyAppointmentsStats',
   MyAppointmentsInfo = 'MyAppointmentsInfo',
   Token = 'Token',
   StatusChange = 'StatusChange',
@@ -94,4 +95,5 @@ export enum MyInvoices {
 
 export enum HomeApiQuery {
   STATS = 'STATS',
+  UPCOMING_APPOITMENTS = 'UPCOMING_APPOITMENTS',
 }

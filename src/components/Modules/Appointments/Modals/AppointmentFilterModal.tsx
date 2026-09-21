@@ -13,6 +13,7 @@ export interface FilterStates {
   fromDate: Date | null;
   toDate: Date | null;
   activeTarget: 'from' | 'to' | null;
+  bookingMode: string | null;
 }
 
 interface AppointmentFilterModalProps {

@@ -94,7 +94,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     appointmentGeneratedId,
     startTime,
     endTime,
-    isExpired,
     patientDateOfBirth,
     patientGender,
     isJoinedOnce,
@@ -107,16 +106,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     onViewDetails,
     onVideoCall,
   }) => {
-    const effectiveStatus = useMemo(() => {
-      const rawStatus = appointmentStatus?.toLowerCase() || '';
-      const isInProgress =
-        rawStatus === 'in-progress' || rawStatus === 'in_progress' || rawStatus === 'inprogress';
-      if (isExpired && rawStatus !== 'cancelled' && !isInProgress) {
-        return 'completed';
-      }
-      return rawStatus;
-    }, [appointmentStatus, isExpired]);
-
     const activeApptId = useMeetingStore(state => state.appointmentId);
     const activeApptGeneratedId = useMeetingStore(state => state.appointmentGeneratedId);
     const activeCallState = useMeetingStore(state => state.callState);
@@ -147,24 +136,24 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       formattedTime,
     } = useMemo(() => {
       const inProgress =
-        effectiveStatus === 'in-progress' ||
-        effectiveStatus === 'in_progress' ||
-        effectiveStatus === 'inprogress';
+        appointmentStatus === 'in-progress' ||
+        appointmentStatus === 'in_progress' ||
+        appointmentStatus === 'inprogress';
 
       return {
         isVideo: consultation_type?.toLowerCase() === 'video',
-        isCompleted: effectiveStatus === 'completed',
-        isCancelled: effectiveStatus === 'cancelled',
-        isConfirmed: effectiveStatus === 'confirmed',
+        isCompleted: appointmentStatus === 'completed',
+        isCancelled: appointmentStatus === 'cancelled',
+        isConfirmed: appointmentStatus === 'confirmed',
         isInProgress: inProgress,
-        statusColor: getStatusColor(effectiveStatus),
-        statusBg: getStatusBackground(effectiveStatus),
+        statusColor: getStatusColor(appointmentStatus),
+        statusBg: getStatusBackground(appointmentStatus),
         formattedTime: formatTimeSlot(startTime, endTime),
       };
-    }, [consultation_type, effectiveStatus, startTime, endTime]);
+    }, [consultation_type, appointmentStatus, startTime, endTime]);
 
     const menuItems = useMemo(() => {
-      if (effectiveStatus === 'completed') {
+      if (appointmentStatus === 'completed') {
         return [
           {
             id: 'details',
@@ -183,7 +172,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         ];
       }
 
-      if (effectiveStatus === 'cancelled') {
+      if (appointmentStatus === 'cancelled') {
         return [
           {
             id: 'details',
@@ -238,7 +227,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         },
       ];
     }, [
-      effectiveStatus,
+      appointmentStatus,
       isInProgress,
       onViewDetails,
       onCreatePrescription,
@@ -270,7 +259,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             <View style={[S.statusBadge, { backgroundColor: statusBg }]}>
               <View style={[S.statusDot, { backgroundColor: statusColor }]} />
               <Text style={[S.statusText, { color: statusColor }]}>
-                {effectiveStatus?.replace(/[-_]/g, ' ').toUpperCase()}
+                {appointmentStatus?.replace(/[-_]/g, ' ').toUpperCase()}
               </Text>
             </View>
             {menuItems.length > 0 && (

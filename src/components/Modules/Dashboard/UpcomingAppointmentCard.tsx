@@ -1,19 +1,20 @@
 import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { capitalize, getInitials } from '../../../lib/common/common.utils';
+import { capitalize, getAge, getInitials } from '../../../lib/common/common.utils';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import { theme } from '../../../styled/theme.styled';
-import { ClockIcon, PlayCircleIcon, VideoIcon } from '../../ui/icons';
+import { ClinicIcon, ClockIcon, PlayCircleIcon, VideoIcon } from '../../ui/icons';
 
 export interface AppointmentCardProps {
-  id: string;
+  id?: string;
+  appointmentGeneratedId?: string;
   patientName: string;
-  ageGender: string;
-  time: string;
-  timeDistance: string;
-  isExpired: boolean;
-  consultType: 'ONLINE' | 'IN-PERSON' | string;
-  chiefComplaint: string;
+  ageGender?: string;
+  dateOfBirth?: string;
+  time?: string;
+  isExpired?: boolean;
+  consultType?: 'ONLINE' | 'IN-PERSON' | string;
+  chiefComplaint?: string;
   appointmentStatus?: string;
   isJoinedOnce?: boolean;
   isCurrentApptInCall?: boolean;
@@ -23,19 +24,24 @@ export interface AppointmentCardProps {
 }
 
 export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
+  id,
+  appointmentGeneratedId,
   patientName,
   ageGender,
   time,
-  timeDistance,
-  consultType,
+  consultType = 'ONLINE',
   chiefComplaint,
+  appointmentStatus,
   isExpired,
   isJoinedOnce,
   isCurrentApptInCall,
+  dateOfBirth,
   onStartConsultation,
   onVideoCall,
   onActionPress,
 }) => {
+  const displayApptId = appointmentGeneratedId || id;
+
   const isVideo = useMemo(() => {
     const type = consultType?.toLowerCase() || '';
     return type === 'video' || type === 'online';
@@ -68,16 +74,38 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
 
   return (
     <View style={homeStyles.appointmentCard}>
-      {time && (
-        <View style={homeStyles.apptTimeRow}>
-          <View style={homeStyles.timeGroup}>
-            <ClockIcon size={14} color={theme.colors.primary} style={{ marginRight: 4 }} />
-            <Text style={homeStyles.apptTime}>{time}</Text>
-          </View>
-          <Text style={homeStyles.apptDistance}>{timeDistance}</Text>
+      <View style={homeStyles.apptHeaderRow}>
+        <View style={homeStyles.timeGroup}>
+          <ClockIcon size={14} color={theme.colors.primary} />
+          {time ? <Text style={homeStyles.apptTime}>{time}</Text> : null}
+          {appointmentStatus === 'in-progress' ? (
+            <View style={homeStyles.apptDistanceBadge}>
+              <Text style={homeStyles.apptDistance}>Started</Text>
+            </View>
+          ) : null}
         </View>
-      )}
 
+        <View
+          style={[
+            homeStyles.consultBadge,
+            isVideo ? homeStyles.consultBadgeVideo : homeStyles.consultBadgeClinic,
+          ]}
+        >
+          {isVideo ? (
+            <VideoIcon size={11} color={theme.colors.primary} />
+          ) : (
+            <ClinicIcon size={11} color="#EA580C" />
+          )}
+          <Text
+            style={[
+              homeStyles.consultBadgeText,
+              { color: isVideo ? theme.colors.primary : '#EA580C' },
+            ]}
+          >
+            {isVideo ? 'Video Call' : 'In-Clinic'}
+          </Text>
+        </View>
+      </View>
       <View style={homeStyles.apptPatientRow}>
         <View style={[homeStyles.apptAvatar, { backgroundColor: theme.colors.primary }]}>
           <Text style={homeStyles.apptAvatarText}>{getInitials(patientName)}</Text>
@@ -85,22 +113,31 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
 
         <View style={homeStyles.patientInfoGroup}>
           <View style={homeStyles.nameRow}>
-            <Text style={homeStyles.apptPatientName}>{patientName}</Text>
-          </View>
-          <Text style={homeStyles.patientMetaText}>{ageGender?.toUpperCase()}</Text>
-          <View style={[homeStyles.consultChip, { backgroundColor: theme.colors.primarySoft }]}>
-            <Text style={[homeStyles.consultChipText, { color: theme.colors.primary }]}>
-              {capitalize(consultType)}
+            <Text style={homeStyles.apptPatientName} numberOfLines={1} ellipsizeMode="tail">
+              {patientName}
             </Text>
           </View>
-          {chiefComplaint && (
-            <Text style={homeStyles.symptomsText} numberOfLines={2}>
-              <Text style={homeStyles.symptomsLabel}>Symptoms: </Text>
-              {chiefComplaint}
+          <Text style={homeStyles.patientMetaText} numberOfLines={1}>
+            {capitalize(ageGender || '')} | {getAge(dateOfBirth || '', { large: true })}
+          </Text>
+          {displayApptId ? (
+            <Text style={homeStyles.aptIdText} numberOfLines={1}>
+              APT ID: {displayApptId}
             </Text>
-          )}
+          ) : null}
         </View>
+      </View>
 
+      {chiefComplaint ? (
+        <View style={homeStyles.symptomsContainer}>
+          <Text style={homeStyles.symptomsText} numberOfLines={2} ellipsizeMode="tail">
+            <Text style={homeStyles.symptomsLabel}>Symptoms: </Text>
+            {chiefComplaint}
+          </Text>
+        </View>
+      ) : null}
+
+      <View style={homeStyles.apptFooterRow}>
         <TouchableOpacity
           style={[
             homeStyles.joinBtn,
@@ -111,19 +148,12 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
           onPress={handlePress}
           activeOpacity={0.85}
           disabled={isExpired}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           {isVideo ? (
-            <VideoIcon
-              size={14}
-              color={isExpired ? theme.colors.grayText : '#FFFFFF'}
-              style={{ marginRight: 4 }}
-            />
+            <VideoIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
           ) : (
-            <PlayCircleIcon
-              size={14}
-              color={isExpired ? theme.colors.grayText : '#FFFFFF'}
-              style={{ marginRight: 4 }}
-            />
+            <PlayCircleIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
           )}
           <Text
             style={[

@@ -6,21 +6,24 @@ import {
   getApptToken,
   getMyAppointmentInfo,
   getMyAppointments,
+  getMyAppointmentStats,
   rescheduleAppointment,
   saveCall,
   sendHeartBeat,
 } from './appointments.func';
+import { IMyApptQueryParams } from './payload.interafce';
 
-export const useMyAppointments = (params?: { doctorId?: number | string }) =>
+export const useMyAppointments = (params: IMyApptQueryParams) =>
   useQuery({
     queryKey: [MyAppointmentsQueryKeys.MyAppointments, params],
-    queryFn: () => getMyAppointments(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: v => {
-      if (Array.isArray(v)) return v;
-      if (Array.isArray(v?.appointments)) return v.appointments;
-      return [];
-    },
+    queryFn: () => getMyAppointments(params),
+  });
+
+export const useMyAppointmentStats = (params?: { date?: string }) =>
+  useQuery({
+    queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats, params],
+    queryFn: () => getMyAppointmentStats(params),
+    select: v => v.data,
   });
 
 export const useApptToken = (params?: { appointmentId?: number | string }) =>

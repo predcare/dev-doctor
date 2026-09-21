@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { HomeApiQuery } from '../query.keys';
 import { getHomeStats, getHomeUpcomingAppts } from './home.funcs';
+import { IMyApptQueryParams } from '../appointments/payload.interafce';
 
 export const useHomeStats = (params: { doctorId: number | string; period: string }) =>
   useQuery({
@@ -14,13 +15,8 @@ export const useHomeStats = (params: { doctorId: number | string; period: string
     select: v => v?.stats || null,
   });
 
-export const useHomeUpcomingAppts = (params: { doctorId: number | string }) =>
+export const useHomeUpcomingAppts = (params: IMyApptQueryParams) =>
   useQuery({
-    queryKey: [HomeApiQuery.STATS, params],
-    queryFn: () =>
-      getHomeUpcomingAppts({
-        userId: params?.doctorId,
-      }),
-    enabled: !!params?.doctorId,
-    select: v => v?.appointments || null,
+    queryKey: [HomeApiQuery.UPCOMING_APPOITMENTS,params],
+    queryFn: () => getHomeUpcomingAppts(params),
   });
