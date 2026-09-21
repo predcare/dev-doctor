@@ -81,7 +81,13 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
           <TouchableOpacity
             style={S.backBtn}
             onPress={() => {
-              if (navigation && navigation.canGoBack()) navigation.goBack();
+              if (showNewSlotForm) {
+                setShowNewSlotForm(false);
+                setShowExistingSlots(true);
+                setEditingSlot(null);
+              } else if (navigation && navigation.canGoBack()) {
+                navigation.goBack();
+              }
             }}
             activeOpacity={0.7}
           >
@@ -143,6 +149,8 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
                     consultation_type={slot.consultation_type}
                     in_person_fee={slot.in_person_fee}
                     video_fee={slot.video_fee}
+                    hide_fee={Boolean(slot.hide_fee)}
+                    require_payment={Boolean(slot.require_payment)}
                     onEdit={() => {
                       setEditingSlot(slot);
                       setShowNewSlotForm(true);
@@ -154,20 +162,6 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
               )}
             </View>
           )}
-          {!showNewSlotForm && (
-            <TouchableOpacity
-              style={S.addSlotBtn}
-              onPress={() => {
-                setEditingSlot(null);
-                setShowNewSlotForm(true);
-                setShowExistingSlots(false);
-              }}
-              activeOpacity={0.8}
-            >
-              <Text style={S.addSlotBtnTxt}>+ Add New Slot</Text>
-            </TouchableOpacity>
-          )}
-
           {showNewSlotForm && (
             <SlotEditorCard
               slotIndex={availablityList?.length || 0}

@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
@@ -249,8 +250,8 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
               : 'specific',
           selectedDates: editingSlot.selected_dates || [],
           recurringDays: editingSlot.recurring_days || [],
-          startDate: editingSlot.recurring_start_date || null,
-          endDate: editingSlot.recurring_end_date || null,
+          startDate: editingSlot.recurring_start_date ? dayjs(editingSlot.recurring_start_date).format('YYYY-MM-DD') : null,
+          endDate: editingSlot.recurring_end_date ? dayjs(editingSlot.recurring_end_date).format('YYYY-MM-DD') : null,
           leaveDates: editingSlot.leave_dates || [],
           fromTime: parseTimeStringToTimeValue(editingSlot.from_time),
           toTime: parseTimeStringToTimeValue(editingSlot.to_time),

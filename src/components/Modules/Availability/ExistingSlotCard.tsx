@@ -4,9 +4,19 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { capitalizeFirstLetter } from '../../../lib/common/common.utils';
 import { ExitingSlotsStyled } from '../../../styled/DoctorAvailabilityScreen.styled';
 import { theme } from '../../../styled/theme.styled';
-import CalendarIcon from '../../ui/icons/CalendarIcon';
-import EditIcon from '../../ui/icons/EditIcon';
-import TrashIcon from '../../ui/icons/TrashIcon';
+import {
+  CalendarIcon,
+  CircleXIcon,
+  ClockIcon,
+  CreditCardIcon,
+  EditIcon,
+  FileTextIcon,
+  InfoCircleIcon,
+  PatientAvatarIcon,
+  ScheduleIcon,
+  TrashIcon,
+  VideoIcon,
+} from '../../ui/icons';
 
 export interface ExistingSlotCardProps {
   id: number;
@@ -23,6 +33,8 @@ export interface ExistingSlotCardProps {
   consultation_type: 'in-person' | 'video' | 'both' | string;
   in_person_fee: number | string;
   video_fee?: number | string;
+  hide_fee?: boolean;
+  require_payment?: boolean;
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
 }
@@ -50,6 +62,8 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     date_selection_mode,
     selected_dates = [],
     recurring_days = [],
+    recurring_start_date,
+    recurring_end_date,
     recurring_dates = [],
     leave_dates = [],
     slot_duration,
@@ -58,12 +72,14 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     consultation_type,
     in_person_fee,
     video_fee,
+    hide_fee = false,
+    require_payment = false,
     onEdit,
     onDelete,
   }) => {
     const [expandedDates, setExpandedDates] = useState(false);
-    const [expandedLeaves, setExpandedLeaves] = useState(false);
-    const [expandedRecurringDates, setExpandedRecurringDates] = useState(false);
+    const [expandedLeaves, setExpandedLeaves] = useState(true);
+    const [expandedRecurringDates, setExpandedRecurringDates] = useState(true);
 
     const safeSelectedDates = useMemo(() => selected_dates || [], [selected_dates]);
     const safeRecurringDays = useMemo(() => recurring_days || [], [recurring_days]);
@@ -75,9 +91,9 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     }, [date_selection_mode]);
 
     const formattedRecurringDays = useMemo(() => {
-      return safeRecurringDays.map(day => capitalizeFirstLetter(day)).join(', ');
+      return safeRecurringDays.map(day => capitalizeFirstLetter(day).slice(0, 3)).join(', ');
     }, [safeRecurringDays]);
-    console.log('from_time', from_time, to_time);
+
     const formattedFromTime = useMemo(() => {
       return formatDisplayTime(from_time);
     }, [from_time]);
@@ -91,9 +107,9 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
         <View style={ExitingSlotsStyled.slotCardHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
             <View style={ExitingSlotsStyled.slotTypeIconBox}>
-              <CalendarIcon size={20} color={theme.colors.primary} />
+              <CalendarIcon size={18} color={theme.colors.primary} />
             </View>
-            <View style={{ marginLeft: 10 }}>
+            <View style={{ marginLeft: 8 }}>
               <Text style={ExitingSlotsStyled.slotTypeLabel}>TYPE</Text>
               <Text style={ExitingSlotsStyled.slotCardMode}>
                 {isSpecific ? 'Specific Dates' : 'Recurring Schedule'}
@@ -108,7 +124,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                 onPress={() => onEdit(id)}
                 activeOpacity={0.7}
               >
-                <EditIcon size={16} color={theme.colors.primary} />
+                <EditIcon size={14} color={theme.colors.primary} />
               </TouchableOpacity>
             )}
             {onDelete && (
@@ -117,39 +133,41 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                 onPress={() => onDelete(id)}
                 activeOpacity={0.7}
               >
-                <TrashIcon size={16} color={theme.colors.danger} />
+                <TrashIcon size={14} color={theme.colors.danger} />
               </TouchableOpacity>
             )}
           </View>
         </View>
+
         <View style={ExitingSlotsStyled.consultationChipRow}>
           <View
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
             <Text style={ExitingSlotsStyled.slotTypeLabel}>CONSULTATIONS</Text>
-            <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>📋</Text>
+            <FileTextIcon size={12} color={theme.colors.primary} />
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 4 }}>
             {(consultation_type === 'in-person' ||
               consultation_type === 'in_person' ||
               consultation_type === 'both') && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                <Text style={{ fontSize: 13 }}>👤</Text>
+                <PatientAvatarIcon size={13} color={theme.colors.primary} />
                 <Text style={ExitingSlotsStyled.consultationChip}>In-Person</Text>
               </View>
             )}
             {(consultation_type === 'video' || consultation_type === 'both') && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                <Text style={{ fontSize: 13 }}>📹</Text>
+                <VideoIcon size={13} color={theme.colors.primary} />
                 <Text style={ExitingSlotsStyled.consultationChip}>Video</Text>
               </View>
             )}
           </View>
         </View>
+
         <View style={ExitingSlotsStyled.slotCardGrid}>
           <View style={ExitingSlotsStyled.slotCardGridCell}>
             <View style={ExitingSlotsStyled.slotCardGridRow}>
-              <Text style={{ fontSize: 12, marginRight: 4 }}>⏰</Text>
+              <ClockIcon size={12} color={theme.colors.textMuted} />
               <Text style={ExitingSlotsStyled.slotCardGridLabel}>TIME</Text>
             </View>
             <Text style={ExitingSlotsStyled.slotCardGridValue}>
@@ -157,25 +175,13 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
             </Text>
           </View>
 
-          {isSpecific ? (
-            <View style={ExitingSlotsStyled.slotCardGridCell}>
-              <View style={ExitingSlotsStyled.slotCardGridRow}>
-                <Text style={{ fontSize: 12, marginRight: 4 }}>⏳</Text>
-                <Text style={ExitingSlotsStyled.slotCardGridLabel}>DURATION</Text>
-              </View>
-              <Text style={ExitingSlotsStyled.slotCardGridValue}>{slot_duration} min</Text>
+          <View style={ExitingSlotsStyled.slotCardGridCell}>
+            <View style={ExitingSlotsStyled.slotCardGridRow}>
+              <ScheduleIcon size={12} color={theme.colors.textMuted} />
+              <Text style={ExitingSlotsStyled.slotCardGridLabel}>DURATION</Text>
             </View>
-          ) : (
-            <View style={ExitingSlotsStyled.slotCardGridCell}>
-              <View style={ExitingSlotsStyled.slotCardGridRow}>
-                <Text style={{ fontSize: 12, marginRight: 4 }}>📅</Text>
-                <Text style={ExitingSlotsStyled.slotCardGridLabel}>DAYS</Text>
-              </View>
-              <Text style={ExitingSlotsStyled.slotCardGridValue} numberOfLines={2}>
-                {formattedRecurringDays || 'N/A'}
-              </Text>
-            </View>
-          )}
+            <Text style={ExitingSlotsStyled.slotCardGridValue}>{slot_duration} min</Text>
+          </View>
         </View>
 
         <View style={ExitingSlotsStyled.slotFeesRow}>
@@ -184,32 +190,46 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: 8,
+              marginBottom: 6,
             }}
           >
             <Text style={ExitingSlotsStyled.slotFeeLabel}>CONSULTATION FEES</Text>
-            <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>💳</Text>
+            <CreditCardIcon size={12} color={theme.colors.textMuted} />
           </View>
-          <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
             {(consultation_type === 'in-person' ||
               consultation_type === 'in_person' ||
               consultation_type === 'both') && (
               <View style={ExitingSlotsStyled.slotFeeCell}>
-                <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>IN-PERSON</Text>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}
+                >
+                  <PatientAvatarIcon size={10} color={theme.colors.textMuted} />
+                  <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>IN-PERSON</Text>
+                </View>
                 <Text style={ExitingSlotsStyled.slotFeeValue}>₹{in_person_fee}</Text>
               </View>
             )}
             {(consultation_type === 'video' || consultation_type === 'both') && (
               <View style={ExitingSlotsStyled.slotFeeCell}>
-                <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>VIDEO</Text>
+                <View
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}
+                >
+                  <VideoIcon size={10} color={theme.colors.textMuted} />
+                  <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>VIDEO</Text>
+                </View>
                 <Text style={ExitingSlotsStyled.slotFeeValue}>₹{video_fee}</Text>
               </View>
             )}
           </View>
         </View>
+
         {isSpecific && safeSelectedDates.length > 0 && (
           <View style={ExitingSlotsStyled.slotDatesRow}>
-            <Text style={ExitingSlotsStyled.slotDatesLabel}>AVAILABLE DATES</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+              <CalendarIcon size={11} color={theme.colors.textMuted} />
+              <Text style={ExitingSlotsStyled.slotDatesLabel}>AVAILABLE DATES</Text>
+            </View>
             <Text style={ExitingSlotsStyled.slotDatesValue}>
               {expandedDates
                 ? safeSelectedDates.map(d => formatDisplayDate(d)).join(', ')
@@ -228,11 +248,49 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
             </Text>
           </View>
         )}
+
+        {!isSpecific && safeRecurringDays.length > 0 && (
+          <View style={ExitingSlotsStyled.slotDatesRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+              <CalendarIcon size={11} color={theme.colors.textMuted} />
+              <Text style={ExitingSlotsStyled.slotDatesLabel}>RECURRING DAYS</Text>
+            </View>
+            <Text style={ExitingSlotsStyled.slotDatesValue}>{formattedRecurringDays}</Text>
+          </View>
+        )}
+
+        {!isSpecific && (
+          <View style={ExitingSlotsStyled.slotDatesRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+              <ScheduleIcon size={11} color={theme.colors.textMuted} />
+              <Text style={ExitingSlotsStyled.slotDatesLabel}>RECURRING RANGE</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={ExitingSlotsStyled.slotFeeCell}>
+                <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>FROM</Text>
+                <Text style={ExitingSlotsStyled.slotCardGridValue}>
+                  {formatDisplayDate(recurring_start_date) || 'Not set'}
+                </Text>
+              </View>
+              <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>→</Text>
+              <View style={ExitingSlotsStyled.slotFeeCell}>
+                <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>TO</Text>
+                <Text style={ExitingSlotsStyled.slotCardGridValue}>
+                  {formatDisplayDate(recurring_end_date) || 'Not set'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         {!isSpecific && safeRecurringDates.length > 0 && (
           <View style={ExitingSlotsStyled.slotDatesRow}>
-            <Text style={ExitingSlotsStyled.slotDatesLabel}>
-              RECURRING DATES ({safeRecurringDates.length})
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+              <CalendarIcon size={11} color={theme.colors.textMuted} />
+              <Text style={ExitingSlotsStyled.slotDatesLabel}>
+                RECURRING DATES ({safeRecurringDates.length})
+              </Text>
+            </View>
             <Text style={ExitingSlotsStyled.slotDatesValue}>
               {expandedRecurringDates
                 ? safeRecurringDates.map(d => formatDisplayDate(d)).join(', ')
@@ -253,10 +311,61 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
             </Text>
           </View>
         )}
+
+        <View style={ExitingSlotsStyled.slotCardGrid}>
+          <View
+            style={[
+              ExitingSlotsStyled.slotCardGridCell,
+              { flexDirection: 'row', alignItems: 'center', gap: 6 },
+            ]}
+          >
+            <InfoCircleIcon
+              size={13}
+              color={hide_fee ? theme.colors.warning : theme.colors.success}
+            />
+            <View>
+              <Text style={ExitingSlotsStyled.slotCardGridLabel}>HIDE FEE</Text>
+              <Text
+                style={[
+                  ExitingSlotsStyled.slotCardGridValue,
+                  { color: hide_fee ? theme.colors.warning : theme.colors.success },
+                ]}
+              >
+                {hide_fee ? 'Yes' : 'No'}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={[
+              ExitingSlotsStyled.slotCardGridCell,
+              { flexDirection: 'row', alignItems: 'center', gap: 6 },
+            ]}
+          >
+            <CreditCardIcon
+              size={13}
+              color={require_payment ? theme.colors.success : theme.colors.textMuted}
+            />
+            <View>
+              <Text style={ExitingSlotsStyled.slotCardGridLabel}>ONLINE PAYMENT</Text>
+              <Text
+                style={[
+                  ExitingSlotsStyled.slotCardGridValue,
+                  { color: require_payment ? theme.colors.success : theme.colors.textMuted },
+                ]}
+              >
+                {require_payment ? 'Required' : 'Not Required'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
         {safeLeaveDates.length > 0 && (
           <View style={ExitingSlotsStyled.slotLeaveRow}>
             <View style={{ flex: 1 }}>
-              <Text style={ExitingSlotsStyled.slotLeaveLabel}>LEAVES</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}>
+                <CircleXIcon size={11} color={theme.colors.danger} />
+                <Text style={ExitingSlotsStyled.slotLeaveLabel}>LEAVES</Text>
+              </View>
               <Text style={ExitingSlotsStyled.slotLeaveValue}>
                 {expandedLeaves
                   ? safeLeaveDates.map(d => formatDisplayDate(d)).join(', ')

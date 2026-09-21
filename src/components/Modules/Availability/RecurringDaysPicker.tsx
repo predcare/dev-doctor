@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { theme } from '../../../styled/theme.styled';
@@ -98,7 +99,10 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
             <Text style={s.label}>START DATE</Text>
             <TouchableOpacity
               style={[s.dateBtn, Boolean(startDateError) && { borderColor: theme.colors.danger }]}
-              onPress={() => setModalState({ visible: true, type: 'start' })}
+              onPress={() => {
+                if (startDate) setCalendarMonth(dayjs(startDate).toDate());
+                setModalState({ visible: true, type: 'start' });
+              }}
               activeOpacity={0.7}
             >
               <Text style={startDate ? s.dateTxt : s.phTxt}>{startDate || 'Start Date'}</Text>
@@ -111,7 +115,10 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
             <Text style={s.label}>END DATE</Text>
             <TouchableOpacity
               style={[s.dateBtn, Boolean(endDateError) && { borderColor: theme.colors.danger }]}
-              onPress={() => setModalState({ visible: true, type: 'end' })}
+              onPress={() => {
+                if (endDate) setCalendarMonth(dayjs(endDate).toDate());
+                setModalState({ visible: true, type: 'end' });
+              }}
               activeOpacity={0.7}
             >
               <Text style={endDate ? s.dateTxt : s.phTxt}>{endDate || 'End Date'}</Text>
