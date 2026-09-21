@@ -118,15 +118,16 @@ export const useUploadEmr = () => {
   });
 };
 
-export const useMyPatientConsults = (params?: { patientId?: number | string }) =>
+export const useMyPatientConsults = (params: {
+  page: number;
+  limit: number;
+  patientId: string | number;
+  status?: string;
+}) =>
   useQuery({
     queryKey: [PatientsQueryKeys.MyConsults, params],
-    queryFn: () => getMyPatientsConsults(params?.patientId!),
+    queryFn: () => getMyPatientsConsults(params),
     enabled: !!params?.patientId,
-    select: v => {
-      if (Array.isArray(v)) return v;
-      return [];
-    },
   });
 export const useMyPatientFamilyMembers = (params?: { patientId?: number | string }) =>
   useQuery({

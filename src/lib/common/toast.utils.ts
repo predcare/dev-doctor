@@ -36,3 +36,13 @@ export const showWarningToast = (message: string, title = 'Warning') => {
   });
 };
 
+export const showUnderDevelopmentToast = (
+  message: string = 'This feature is under development'
+) => {
+  useToastStore.getState().showToast({
+    type: 'error',
+    title: 'Indevlopment',
+    message,
+    duration: 3500,
+  });
+};

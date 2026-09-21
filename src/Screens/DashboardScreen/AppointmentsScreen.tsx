@@ -32,6 +32,7 @@ import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { formatDate, formatDateToYYYYMMDD } from '../../lib/common/common.utils';
+import { showUnderDevelopmentToast } from '../../lib/common/toast.utils';
 import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
@@ -333,10 +334,16 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                 isJoinedOnce={false}
                 callDurationSeconds={0}
                 onViewDetails={() => setSelectedDetailsApt(item)}
-                onVideoCall={() => {}}
+                onVideoCall={() => {
+                  showUnderDevelopmentToast();
+                }}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
-                onReschedule={() => {}}
-                onStartConsultation={() => {}}
+                onReschedule={() => {
+                  showUnderDevelopmentToast();
+                }}
+                onStartConsultation={() => {
+                  showUnderDevelopmentToast();
+                }}
               />
             );
           }}

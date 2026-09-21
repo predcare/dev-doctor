@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
+import ConsultTabPanel from '../../components/Modules/PatientDetails/Consult/ConsultTabPanel';
 import PatientHeaderCard from '../../components/Modules/PatientDetails/PatientHeaderCard';
 import PatientProfileTabPanel from '../../components/Modules/PatientDetails/PatientProfile/PatientProfileTabPanel';
 import PatientTabBar, {
@@ -130,7 +131,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
               />
             )} */}
 
-            {/* {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />} */}
+            {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />}
             {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
           </View>
         </>

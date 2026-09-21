@@ -1,6 +1,6 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
-import { IMyAppointmentsRoot } from '../../../typescripts/interfaces/appointments.interfaces';
+import { IPatientConsultApptRoot } from '../../../typescripts/interfaces/appointments.interfaces';
 import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
 import {
   ICreatePatientResponse,
@@ -106,9 +106,15 @@ export const uploadEmr = async (body: FormData) => {
   return res.data;
 };
 
-export const getMyPatientsConsults = async (patientId: number | string) => {
-  const res = await axiosInstance.get<IMyAppointmentsRoot>(
-    `${endpoints.patients.consults(patientId)}`
+export const getMyPatientsConsults = async (params: {
+  page: number;
+  limit: number;
+  patientId: string | number;
+  status?: string;
+}) => {
+  const res = await axiosInstance.get<IPatientConsultApptRoot>(
+    `${endpoints.patients.consults(params?.patientId)}`,
+    { params }
   );
   return res.data;
 };

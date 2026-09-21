@@ -41,7 +41,7 @@ export const endpoints = {
     prescriptions: (uid: string | number) => `/prescriptions/patient/${uid}`,
     prescriptionsShare: (presId: string | number) => `/doctor/prescriptions/${presId}/share`,
     emrUpload: '/emr/upload',
-    consults: (uid: string | number) => `/doctor/appointments/doctor/patient-consult/${uid}`,
+    consults: (uid: string | number) => `/doctors/my-patients/${uid}/appointments`,
     familyMembers: (uid: string | number) => `/doctors/patient-family-members/${uid}`,
     patientUpdate: `/doctors/my-patients-update`,
   },

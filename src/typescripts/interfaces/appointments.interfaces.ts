@@ -1,7 +1,7 @@
 import { IRootResponse } from './common.interfaces';
 
 export type TMyAppointmentRoot = IRootResponse<IMyAppointmentDoc[]>;
-export type IMyAppointmentsRoot = TMyAppointmentRoot;
+export type IPatientConsultApptRoot = IRootResponse<IMyAppointmentDoc[]>;
 export type TMyAppointmentStats = IRootResponse<IMyApptStatus>;
 
 export interface IAppointmentInfoRoot {
