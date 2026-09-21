@@ -63,7 +63,7 @@ export const SettingScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar={true} activeBottomTab="Account">
       <Header
         title="Settings"
         description="Manage your App Settings"

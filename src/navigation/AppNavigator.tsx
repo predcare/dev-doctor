@@ -1,16 +1,6 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  HomeIcon,
-  PatientsIcon,
-  ReportsIcon,
-  ScheduleIcon,
-  SettingsIcon,
-} from '../components/ui/icons';
 import useNotificationListeners from '../hooks/commons/useNotificationListeners';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
@@ -37,201 +27,20 @@ import PrescriptionViewScreen from '../Screens/DashboardScreen/PrescriptionViewS
 import RescheduleAppointmentScreen from '../Screens/DashboardScreen/RescheduleAppointmentScreen';
 import SettingScreen from '../Screens/DashboardScreen/SettingScreen';
 import SplashScreen from '../Screens/SplashScreen';
-import { navigationStyles } from '../styled/Navigation.styled';
-import { theme } from '../styled/theme.styled';
 import { navigationRef } from './navigationRef';
 
 export type { DashboardTabParamList, RootStackParamList };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<DashboardTabParamList>();
 
 const ReportsTabScreen = () => (
   <ComingSoonScreen
     title="Analytics & Reports"
     description="View clinical insights, diagnostic trends, and patient health analytics."
+    showBottomBar={true}
+    activeBottomTab="Reports"
   />
 );
-
-const DashboardTabNavigator: React.FC = () => {
-  const insets = useSafeAreaInsets();
-  const tabBarHeight = 62 + insets.bottom;
-  const tabBarPaddingBottom = Math.max(insets.bottom, 6);
-
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarStyle: [
-          navigationStyles.tabBar,
-          {
-            height: tabBarHeight,
-            paddingBottom: tabBarPaddingBottom,
-          },
-        ],
-        tabBarItemStyle: navigationStyles.tabItem,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.textSlate,
-        tabBarLabelStyle: navigationStyles.tabLabel,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          headerShown: false,
-          title: 'Home',
-          tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIndicatorDot
-                    : navigationStyles.inactiveIndicatorDot
-                }
-              />
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIconContainer
-                    : navigationStyles.inactiveIconContainer
-                }
-              >
-                <HomeIcon
-                  size={20}
-                  color={focused ? theme.colors.primary : theme.colors.textSlate}
-                />
-              </View>
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Patients"
-        component={PatientsScreen}
-        options={{
-          headerShown: false,
-          title: 'Patients',
-          tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIndicatorDot
-                    : navigationStyles.inactiveIndicatorDot
-                }
-              />
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIconContainer
-                    : navigationStyles.inactiveIconContainer
-                }
-              >
-                <PatientsIcon
-                  size={20}
-                  color={focused ? theme.colors.primary : theme.colors.textSlate}
-                />
-              </View>
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Schedule"
-        component={AppointmentsScreen}
-        options={{
-          headerShown: false,
-          title: 'Schedule',
-          tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIndicatorDot
-                    : navigationStyles.inactiveIndicatorDot
-                }
-              />
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIconContainer
-                    : navigationStyles.inactiveIconContainer
-                }
-              >
-                <ScheduleIcon
-                  size={20}
-                  color={focused ? theme.colors.primary : theme.colors.textSlate}
-                />
-              </View>
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Reports"
-        component={ReportsTabScreen}
-        options={{
-          headerShown: false,
-          title: 'Reports',
-          tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIndicatorDot
-                    : navigationStyles.inactiveIndicatorDot
-                }
-              />
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIconContainer
-                    : navigationStyles.inactiveIconContainer
-                }
-              >
-                <ReportsIcon
-                  size={20}
-                  color={focused ? theme.colors.primary : theme.colors.textSlate}
-                />
-              </View>
-            </View>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Account"
-        component={SettingScreen}
-        options={{
-          headerShown: false,
-          title: 'Account',
-          tabBarIcon: ({ focused }) => (
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIndicatorDot
-                    : navigationStyles.inactiveIndicatorDot
-                }
-              />
-              <View
-                style={
-                  focused
-                    ? navigationStyles.activeIconContainer
-                    : navigationStyles.inactiveIconContainer
-                }
-              >
-                <SettingsIcon
-                  size={20}
-                  color={focused ? theme.colors.primary : theme.colors.textSlate}
-                />
-              </View>
-            </View>
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 export const AppNavigator: React.FC = () => {
   useNotificationListeners(navigationRef);
@@ -247,7 +56,13 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="PolicyAcceptance" component={PolicyAcceptanceScreen} />
-        <Stack.Screen name="MainTabs" component={DashboardTabNavigator} />
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Patients" component={PatientsScreen} />
+        <Stack.Screen name="Schedule" component={AppointmentsScreen} />
+        <Stack.Screen name="Reports" component={ReportsTabScreen} />
+        <Stack.Screen name="Account" component={SettingScreen} />
+        {/* Legacy alias support */}
+        <Stack.Screen name="MainTabs" component={HomeScreen} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} />
         <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} />
         <Stack.Screen name="PrescriptionSettings" component={PrescriptionSettingsScreen} />

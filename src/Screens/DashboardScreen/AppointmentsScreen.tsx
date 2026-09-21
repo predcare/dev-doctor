@@ -1,4 +1,4 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -111,12 +111,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
 
   const { data: apptStats, isFetching: apptStatsPending } = useMyAppointmentStats();
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchMyAppointments();
-    }, [fetchMyAppointments])
-  );
-
   const { mutate: changeStatus } = useChangeAppointmentStatus();
 
   const isCustomFilterApplied = useMemo(() => {
@@ -189,7 +183,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   );
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar={true} activeBottomTab="Schedule">
       <Header
         title="Manage Appointments"
         description="View and manage patient schedule"

@@ -1,4 +1,4 @@
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
@@ -81,14 +81,8 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
     [appNavigation]
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchPatientList();
-    }, [fetchPatientList])
-  );
-
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar={true} activeBottomTab="Patients">
       <View style={S.container}>
         <Header
           title="Patients"
@@ -194,8 +188,15 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
             }
           />
         )}
-        <TouchableOpacity style={S.fab} onPress={() => handleAddPatient()} activeOpacity={0.85}>
-          <PlusIcon color={theme.colors.surface} size={22} />
+        <TouchableOpacity
+          style={S.fab}
+          onPress={() => handleAddPatient()}
+          activeOpacity={0.85}
+          accessibilityRole="button"
+          accessibilityLabel="Add New Patient"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <PlusIcon color={theme.colors.surface} size={24} />
         </TouchableOpacity>
       </View>
     </SafeAreaWrapper>

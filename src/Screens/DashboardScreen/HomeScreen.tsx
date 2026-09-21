@@ -154,15 +154,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar={true} activeBottomTab="Home">
       <Header
         isHome
         onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
-        onProfilePress={() =>
-          navigation?.navigate(AppRoute.MAIN_TABS, {
-            screen: AppRoute.ACCOUNT,
-          })
-        }
+        onProfilePress={() => navigation?.navigate('Account' as any)}
       />
       <View style={{ flex: 1, position: 'relative' }}>
         <ScrollView
@@ -286,7 +282,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           {upcomiongApptsPending ? (
             <AppointmentSkeleton />
           ) : upcomingAppts && upcomingAppts?.meta?.total > 0 ? (
-            upcomingAppts?.data?.map(apt => {
+            upcomingAppts?.data?.map((apt: any) => {
               return (
                 <UpcomingAppointmentCard
                   key={`${apt.appointment_id}-${apt.id}`}

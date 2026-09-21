@@ -61,7 +61,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
   }, [openUploadModal]);
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar isPathClear>
       <View style={patientDetailsStyles.topBar}>
         <TouchableOpacity
           style={patientDetailsStyles.backCircle}

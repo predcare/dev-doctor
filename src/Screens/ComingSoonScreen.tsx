@@ -6,19 +6,30 @@ import { SafeAreaWrapper } from '../Layout/SafeAreaWrapper';
 import { comingSoonStyles } from '../styled/ComingSoonScreen.styled';
 import { theme } from '../styled/theme.styled';
 
+import { TabKey } from '../components/commons/CustomBottomBar/CustomBottomBar';
+
 interface ComingSoonScreenProps {
   title?: string;
   description?: string;
   icon?: React.ReactNode;
+  showBottomBar?: boolean;
+  activeBottomTab?: TabKey;
 }
 
 export const ComingSoonScreen: React.FC<ComingSoonScreenProps> = ({
   title = 'Module Coming Soon',
   description = 'We are working hard to bring you advanced clinical workflow tools. Stay tuned for upcoming updates!',
   icon,
+  showBottomBar = false,
+  activeBottomTab,
 }) => {
   return (
-    <SafeAreaWrapper backgroundColor={theme.colors.background} barStyle="dark-content">
+    <SafeAreaWrapper
+      backgroundColor={theme.colors.background}
+      barStyle="dark-content"
+      showBottomBar={showBottomBar}
+      activeBottomTab={activeBottomTab}
+    >
       <Header title={title} description={description} />
       <View style={comingSoonStyles.container}>
         <View style={comingSoonStyles.content}>

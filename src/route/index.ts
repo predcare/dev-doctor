@@ -91,6 +91,11 @@ export type RootStackParamList = {
         fromScreen?: string;
       }
     | undefined;
+  Home: undefined;
+  Patients: undefined;
+  Schedule: { refresh?: boolean } | undefined;
+  Reports: undefined;
+  Account: undefined;
   MainTabs: NavigatorScreenParams<DashboardTabParamList> | undefined;
 };
 
