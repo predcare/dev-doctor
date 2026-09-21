@@ -12,7 +12,7 @@ export enum NetworkRoot {
 }
 export enum ConsultType {
   VIDEO = 'video',
-  IN_PERSON = 'in_person',
+  IN_PERSON = 'in-person',
   CLINIC = 'clinic',
   INSTANT = 'instant',
 }

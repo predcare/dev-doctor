@@ -86,6 +86,7 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
   return (
     <View style={PredDatePickerstyles.columnContainer}>
       <FlatList
+        keyboardShouldPersistTaps="handled"
         ref={flatListRef}
         data={data}
         keyExtractor={(_, i) => i.toString()}

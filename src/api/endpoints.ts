@@ -28,6 +28,7 @@ export const endpoints = {
   profile: {
     get: '/users/profile',
     update: '/doctors/user/',
+    allPatients: '/users/doctor-all-users',
   },
   patients: {
     get: '/doctors/my-patients',
@@ -35,7 +36,6 @@ export const endpoints = {
     details: (id: number) => `/doctors/my-patients/${id}`,
     linkExisting: '/users/link-existing-patient',
     newCreate: '/users/add-patient',
-    sendCred: '/doctor/patients/send-credentials',
     emrRecords: (uid: string | number) => `/emr/doc-patient/${uid}`,
     emrShare: (emrId: string | number) => `/emr/visibility/${emrId}`,
     prescriptions: (uid: string | number) => `/prescriptions/patient/${uid}`,
@@ -52,7 +52,7 @@ export const endpoints = {
     heartbeat: '/doctor/appointments/heartbeat',
     statusChange: (appointmentId: number | string) =>
       `/doctor/appointments/${appointmentId}/status`,
-    bookByDoc: '/doctor/appointments/book',
+    bookByDoc: '/appointments/book',
     getdetails: (id: string | number) => `/doctor/appointments/${id}`,
     reschedule: (id: string | number) => `/doctor/appointments/${id}/reschedule`,
     heartBeat: '/doctor/appointments/heartbeat',
@@ -66,6 +66,8 @@ export const endpoints = {
     update: '/doctor-availabilities',
     docAvailabilities: '/doctor/doctor-availability/doctor/',
     fullAvailability: '/doctor/availability/full-overview',
+    doctorAvailDates: '/doctor-availabilities/available-dates',
+    getSlotsByDate: '/doctor-availabilities/slots-by-date',
   },
   commons: {
     country: '/common/countries',
@@ -109,6 +111,8 @@ export const successEndpoints = [
   endpoints.auth.verifyOtp,
   endpoints?.patients?.emrUpload,
   endpoints?.patients?.patientUpdate,
+  endpoints?.patients?.linkExisting,
+  endpoints?.patients?.newCreate,
 ];
 
 export const exclude401Routes = [

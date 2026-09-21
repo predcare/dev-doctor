@@ -1,32 +1,44 @@
 import React, { useCallback, useState } from 'react';
 import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {
+  Image,
+  PermissionsAndroid,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { GenderOptions } from '../../../../config/constants';
 import { formatDate } from '../../../../lib/common/common.utils';
+import { showInfoToast } from '../../../../lib/common/toast.utils';
 import { TAddPatientSchemaType } from '../../../../lib/schemas/addPatient.schema';
 import { BasicInfoStyles } from '../../../../styled/AddPatientStyles.styled';
 import { theme } from '../../../../styled/theme.styled';
+import { IAllPatientsDoc } from '../../../../typescripts/interfaces/patients.interfaces';
 import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
-import DatePickerModal from '../../../commons/DatePickerModal/DatePickerModal';
+import PredDatePickerModal from '../../../commons/PredDatePickerModal/PredDatePickerModal';
+import UploadOptionsModal from '../../../commons/UploadOptionsModal/UploadOptionsModal';
 import CalendarIcon from '../../../ui/icons/CalendarIcon';
 import BloodGroupModal from '../Modals/BloodGroupModal';
-import UserPickerModal, { MockUserItem } from '../Modals/UserPickerModal';
+import UserPickerModal from '../Modals/UserPickerModal';
 
 export interface BasicInfoFormProps {
   control: Control<TAddPatientSchemaType>;
   setValue: UseFormSetValue<TAddPatientSchemaType>;
   watch: UseFormWatch<TAddPatientSchemaType>;
   errors: FieldErrors<TAddPatientSchemaType>;
-  doctorName: string;
-  selectedUser?: MockUserItem | null;
-  setSelectedUser?: (u: MockUserItem | null) => void;
+  selectedUser?: IAllPatientsDoc | null;
+  setSelectedUser?: (u: IAllPatientsDoc | null) => void;
 }
 
 export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
-  ({ control, setValue, watch, errors, doctorName, selectedUser, setSelectedUser }) => {
+  ({ control, setValue, watch, errors, selectedUser, setSelectedUser }) => {
     const [showBGModal, setShowBGModal] = useState(false);
     const [showUserPicker, setShowUserPicker] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showUploadOptions, setShowUploadOptions] = useState(false);
     const { userData } = useAuthStore(state => state);
     const selectionMode = watch('selectionMode');
     const profileImage = watch('profile_image');
@@ -34,24 +46,109 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
     const bloodGroup = watch('blood_group');
     const genderValue = watch('gender');
 
-    const handlePickImage = async () => {
+    const handleGallery = () => {
       try {
-        const result = await launchImageLibrary({
-          mediaType: 'photo',
-          quality: 0.7,
-          maxWidth: 400,
-          maxHeight: 400,
-        });
-        if (!result.didCancel && result.assets && result.assets[0]?.uri) {
-          setValue('profile_image', result.assets[0].uri);
+        setShowUploadOptions(false);
+
+        setTimeout(
+          () => {
+            launchImageLibrary(
+              {
+                mediaType: 'photo',
+                quality: 0.8,
+                selectionLimit: 1,
+                includeBase64: false,
+              },
+              res => {
+                if (res.didCancel) return;
+                if (res.errorCode) {
+                  console.warn('launchImageLibrary errorCode:', res.errorCode, res.errorMessage);
+                  showInfoToast(
+                    res.errorMessage || `Gallery Error: ${res.errorCode}`,
+                    'Gallery Failure'
+                  );
+                  return;
+                }
+                if (res.assets && res.assets[0]) {
+                  const asset = res.assets[0];
+                  const fileObj = {
+                    uri: asset.uri || '',
+                    name: asset.fileName || `profile_${Date.now()}.png`,
+                    type: asset.type || 'image/png',
+                  };
+                  setValue('profile_image', fileObj, { shouldValidate: true });
+                  showInfoToast('Image selected from gallery', 'Gallery');
+                }
+              }
+            );
+          },
+          Platform.OS === 'android' ? 200 : 50
+        );
+      } catch (err: any) {
+        console.warn('handleGallery error:', err);
+        showInfoToast('Could not open gallery', 'Gallery Error');
+      }
+    };
+
+    const handleCamera = async () => {
+      try {
+        if (Platform.OS === 'android') {
+          const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA, {
+            title: 'Camera Permission Required',
+            message: 'App requires access to your camera to take profile photos.',
+            buttonPositive: 'OK',
+            buttonNegative: 'Cancel',
+          });
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            showInfoToast('Camera permission is required to capture photos', 'Camera Permission');
+            return;
+          }
         }
-      } catch (e) {
-        console.error('Image pick error:', e);
+
+        setShowUploadOptions(false);
+
+        setTimeout(
+          () => {
+            launchCamera(
+              {
+                mediaType: 'photo',
+                quality: 0.8,
+                saveToPhotos: false,
+                includeBase64: false,
+              },
+              res => {
+                if (res.didCancel) return;
+                if (res.errorCode) {
+                  console.warn('launchCamera errorCode:', res.errorCode, res.errorMessage);
+                  showInfoToast(
+                    res.errorMessage || `Camera Error: ${res.errorCode}`,
+                    'Camera Failure'
+                  );
+                  return;
+                }
+                if (res.assets && res.assets[0]) {
+                  const asset = res.assets[0];
+                  const fileObj = {
+                    uri: asset.uri || '',
+                    name: asset.fileName || `profile_${Date.now()}.jpg`,
+                    type: asset.type || 'image/jpeg',
+                  };
+                  setValue('profile_image', fileObj, { shouldValidate: true });
+                  showInfoToast('Photo captured successfully', 'Camera');
+                }
+              }
+            );
+          },
+          Platform.OS === 'android' ? 200 : 50
+        );
+      } catch (err: any) {
+        console.warn('handleCamera error:', err);
+        showInfoToast('Could not open camera', 'Camera Error');
       }
     };
 
     const handlePickUser = useCallback(
-      (u: MockUserItem) => {
+      (u: IAllPatientsDoc) => {
         if (setSelectedUser) {
           setSelectedUser(u);
         }
@@ -85,14 +182,21 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
       [setSelectedUser, setValue]
     );
 
+    const imageUri =
+      typeof profileImage === 'object' && profileImage
+        ? (profileImage as any)?.uri
+        : typeof profileImage === 'string'
+        ? profileImage
+        : undefined;
+
     return (
       <>
         <View style={BasicInfoStyles.group}>
           <Text style={BasicInfoStyles.lbl}>PROFILE IMAGE</Text>
           <View style={BasicInfoStyles.imgWrap}>
             <View style={BasicInfoStyles.imgCircle}>
-              {profileImage ? (
-                <Image source={{ uri: profileImage }} style={BasicInfoStyles.imgPreview} />
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} style={BasicInfoStyles.imgPreview} />
               ) : (
                 <View style={BasicInfoStyles.imgPlaceholder}>
                   <Text style={BasicInfoStyles.imgPlaceholderTxt}>👤</Text>
@@ -100,7 +204,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
               )}
               <TouchableOpacity
                 style={BasicInfoStyles.imgCameraBtn}
-                onPress={handlePickImage}
+                onPress={() => setShowUploadOptions(true)}
                 activeOpacity={0.8}
               >
                 <Text style={{ color: '#FFF', fontSize: 12 }}>📷</Text>
@@ -109,8 +213,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
             <Text style={BasicInfoStyles.imgHint}>Tap camera to upload</Text>
           </View>
         </View>
-
-        {/* Assigned Doctor */}
         <View style={BasicInfoStyles.group}>
           <Text style={BasicInfoStyles.lbl}>ASSIGNED DOCTOR</Text>
           <View style={BasicInfoStyles.lockedRow}>
@@ -123,8 +225,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
             Doctor is automatically assigned to your account
           </Text>
         </View>
-
-        {/* Registration Mode Selector */}
         <View style={BasicInfoStyles.group}>
           <Text style={BasicInfoStyles.lbl}>REGISTRATION MODE</Text>
           <View style={BasicInfoStyles.pillRow}>
@@ -145,8 +245,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
             })}
           </View>
         </View>
-
-        {/* Existing User Picker Field */}
         {selectionMode === 'existing_user' && (
           <View style={BasicInfoStyles.group}>
             <Text style={BasicInfoStyles.lbl}>
@@ -170,8 +268,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
             )}
           </View>
         )}
-
-        {/* Create New Patient Fields */}
         {selectionMode === 'create_new' && (
           <>
             <View style={BasicInfoStyles.group}>
@@ -197,8 +293,6 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                 <Text style={BasicInfoStyles.errTxt}>{String(errors.name.message)}</Text>
               )}
             </View>
-
-            {/* Date of Birth Picker Field */}
             <View style={BasicInfoStyles.group}>
               <Text style={BasicInfoStyles.lbl}>DATE OF BIRTH</Text>
               <TouchableOpacity
@@ -210,14 +304,12 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                 <CalendarIcon size={18} color={theme.colors.textMuted} />
               </TouchableOpacity>
             </View>
-
-            {/* Gender */}
             <View style={BasicInfoStyles.group}>
               <Text style={BasicInfoStyles.lbl}>
                 GENDER <Text style={BasicInfoStyles.req}>*</Text>
               </Text>
               <View style={BasicInfoStyles.pillRow}>
-                {['Male', 'Female', 'Other'].map(g => {
+                {GenderOptions.map(g => {
                   const gLower = g.toLowerCase();
                   const active = genderValue === gLower;
                   return (
@@ -256,11 +348,16 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
           </>
         )}
 
-        <DatePickerModal
+        <PredDatePickerModal
           visible={showDatePicker}
           value={dateOfBirth}
-          onChange={d => setValue('date_of_birth', d, { shouldValidate: true })}
-          onClose={() => setShowDatePicker(false)}
+          title="Select Date of Birth"
+          maxYear={new Date().getFullYear()}
+          onConfirm={d => {
+            setShowDatePicker(false);
+            setValue('date_of_birth', d, { shouldValidate: true });
+          }}
+          onCancel={() => setShowDatePicker(false)}
         />
         <BloodGroupModal
           visible={showBGModal}
@@ -272,6 +369,15 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
           visible={showUserPicker}
           onClose={() => setShowUserPicker(false)}
           onPick={handlePickUser}
+        />
+        <UploadOptionsModal
+          visible={showUploadOptions}
+          type="profile"
+          title="Upload Patient Photo"
+          subtitle="Choose a source to add patient profile picture"
+          onSelectCamera={handleCamera}
+          onSelectGallery={handleGallery}
+          onClose={() => setShowUploadOptions(false)}
         />
       </>
     );

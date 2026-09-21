@@ -15,7 +15,6 @@ import { getInitials } from '../lib/common/common.utils';
 import { headerStyles } from '../styled/Header.styled';
 import { theme } from '../styled/theme.styled';
 import { useAuthStore } from '../zustand/stores/useAuthStore';
-import useFcmToken from '../hooks/commons/useFcmToken';
 
 const getDefaultHeaderIcon = (title?: string) => {
   if (!title) return <SettingsIcon size={20} color={theme.colors.primary} />;
@@ -60,8 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const subText = description || subtitle;
   const { userData } = useAuthStore(state => state);
-  const { deviceInfo, fcmToken } = useFcmToken();
-  console.log('fcmToken', fcmToken)
   const { data: notificationData, isPending: isLoadingNotificationCount } = useNotificationCount();
   const isNotificationAvailable = useMemo(() => {
     return notificationData && notificationData?.data?.unread_count > 0 ? true : false;

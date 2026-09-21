@@ -49,7 +49,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const [refreshing, setRefreshing] = useState(false);
   const [filterStates, setFilterStates] = useState<FilterStates>({
     dateRange: 'today',
-    statuses: ['pending'],
+    statuses: ['upcoming'],
     fromDate: null,
     toDate: null,
     activeTarget: null,

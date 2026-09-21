@@ -17,7 +17,7 @@ export interface UploadOptionsModalProps {
   visible: boolean;
   title?: string;
   subtitle?: string;
-  type?: 'logo' | 'signature';
+  type?: 'logo' | 'signature' | 'profile';
   onSelectCamera: () => void;
   onSelectGallery: () => void;
   onClose: () => void;
@@ -109,9 +109,20 @@ export const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
 
   if (!visible) return null;
 
-  const displayTitle = title || `Upload ${type === 'logo' ? 'Clinic Logo' : 'Doctor Signature'}`;
+  const displayTitle =
+    title ||
+    (type === 'logo'
+      ? 'Upload Clinic Logo'
+      : type === 'profile'
+      ? 'Upload Profile Photo'
+      : 'Doctor Signature');
   const displaySubtitle =
-    subtitle || `Choose a source to add your ${type === 'logo' ? 'logo image' : 'signature'}`;
+    subtitle ||
+    (type === 'logo'
+      ? 'Choose a source to add your logo image'
+      : type === 'profile'
+      ? 'Choose a source to add profile picture'
+      : 'Choose a source to add your signature');
 
   return (
     <Modal
@@ -168,6 +179,8 @@ export const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
                     <Text style={styles.optionDesc}>
                       {type === 'signature'
                         ? 'Snap a clear photo of your signature on white paper'
+                        : type === 'profile'
+                        ? 'Take a photo using your device camera'
                         : 'Take a photo of your clinic logo'}
                     </Text>
                   </View>

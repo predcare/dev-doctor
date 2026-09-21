@@ -12,3 +12,5 @@ export const EMR_Record_Category = [
   'Vaccination Record',
   'Other',
 ];
+
+export const GenderOptions = ['Male', 'Female', 'Other'];

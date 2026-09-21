@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useDebounce } from '../../../../hooks/commons/useDebounce';
 import { useMyPatientList } from '../../../../hooks/react-query/patients/patients.hooks';
 import { capitalize } from '../../../../lib/common/common.utils';
 import { ISelectedPatients } from '../../../../Screens/DashboardScreen/BookAppointmentScreen';
@@ -14,7 +15,6 @@ interface BookingPatientSelectModalProps {
   onClose: () => void;
   selectedPatient: ISelectedPatients | null;
   onSelectPatient: (patient: ISelectedPatients) => void;
-  doctorId: string | number;
 }
 
 export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps> = ({
@@ -22,10 +22,9 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
   onClose,
   selectedPatient,
   onSelectPatient,
-  doctorId,
 }) => {
   const [patientSearch, setPatientSearch] = useState('');
-
+  const debounceSearch = useDebounce(patientSearch?.trim(), 500);
   const {
     data: myPatients,
     isPending: myPatientPending,
@@ -33,46 +32,13 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
     isError: isPatientError,
     error: patientError,
   } = useMyPatientList({
-    doctorId: visible ? doctorId : undefined,
+    limit: 10,
+    page: 1,
+    search: debounceSearch,
   });
 
-  const normalizedPatients = useMemo(() => {
-    const sourceList: any[] = Array.isArray(myPatients?.data)
-      ? myPatients.data
-      : Array.isArray(myPatients)
-      ? myPatients
-      : [];
-    return sourceList.map(item => {
-      const rawId = item.user_id;
-      const name = item.name || 'Unknown Patient';
-      const patientGenId = item?.patient_id;
-      const gender = item.gender || '';
-      const phone = item.phone_number || '';
-      return {
-        raw: item,
-        id: rawId,
-        idString: String(rawId),
-        name,
-        patientGenId,
-        gender,
-        phone,
-      };
-    });
-  }, [myPatients]);
-
-  const filteredPatients = useMemo(() => {
-    const q = patientSearch.toLowerCase().trim();
-    if (!q) return normalizedPatients;
-    return normalizedPatients.filter(
-      p =>
-        p.name.toLowerCase().includes(q) ||
-        p.patientGenId?.toLowerCase().includes(q) ||
-        p.phone.includes(q)
-    );
-  }, [normalizedPatients, patientSearch]);
-
   const renderEmptyState = () => {
-    if (isPatientError && normalizedPatients.length === 0) {
+    if (isPatientError && myPatients?.meta?.total === 0) {
       return (
         <CommonErrorCard
           title="Failed to Load Patients"
@@ -109,10 +75,11 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
 
           <TextInput
             style={S.searchInput}
-            placeholder="Search patient by name, ID or phone..."
+            placeholder="Search patient by name, email, phone or Id..."
             placeholderTextColor="#94A3B8"
             value={patientSearch}
             onChangeText={setPatientSearch}
+            keyboardType="default"
           />
 
           {myPatientPending ? (
@@ -121,24 +88,25 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
             </View>
           ) : (
             <FlatList
-              data={filteredPatients}
+              data={myPatients?.data || []}
+              keyboardShouldPersistTaps="handled"
               keyExtractor={(item, index) =>
-                item.idString !== '0' ? item.idString : `item-${index}`
+                item.patient_id !== '0' ? item.patient_id : `item-${index}`
               }
               style={S.patientList}
               ListEmptyComponent={renderEmptyState}
               renderItem={({ item }) => {
-                const isSelected = Number(selectedPatient?.id) === item.id;
+                const isSelected = selectedPatient?.patientGenId === item.patient_id;
                 return (
                   <TouchableOpacity
                     style={[S.patientItem, isSelected && S.patientItemSelected]}
                     activeOpacity={0.7}
                     onPress={() => {
                       onSelectPatient({
-                        id: item.id,
+                        id: Number(item.id),
                         name: item.name,
-                        patientGenId: item.patientGenId,
-                        Phone: item.phone,
+                        patientGenId: item.patient_id,
+                        Phone: Number(item.phone_number),
                         gender: item.gender,
                       });
                       onClose();
@@ -159,14 +127,13 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
                           </View>
                         )}
                       </View>
-
                       <View style={S.patientMetaRow}>
-                        <Text style={S.patientId}>ID: {item.patientGenId}</Text>
+                        <Text style={S.patientId}>ID: {item.patient_id || ''}</Text>
                       </View>
-
-                      {!!item.phone && <Text style={S.patientPhone}>📞 {item.phone}</Text>}
+                      {!!item.phone_number && (
+                        <Text style={S.patientPhone}>📞 {item.phone_number}</Text>
+                      )}
                     </View>
-
                     {isSelected && (
                       <View style={S.checkBadge}>
                         <Text style={S.checkBadgeText}>✓</Text>

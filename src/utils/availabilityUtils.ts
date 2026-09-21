@@ -24,6 +24,7 @@ export interface ISlotItem {
   displayTime: string;
   period: SlotPeriod;
   booked: boolean;
+  availability_id?: string | number;
 }
 
 export function formatTime12h(timeStr: string): string {

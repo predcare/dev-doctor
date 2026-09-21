@@ -3,6 +3,7 @@ import { PatientsQueryKeys } from '../query.keys';
 import {
   createNewPatient,
   deletePatient,
+  getAllPatients,
   getMyPatientsConsults,
   getMyPatientsEmrs,
   getMyPatientsInfo,
@@ -11,17 +12,12 @@ import {
   getPatientsFamilyMembers,
   IGetMyPatientsParams,
   linkExistingPatient,
-  sendPatientCredentials,
   shareEmrDocument,
   sharePrescription,
   updatePatient,
   uploadEmr,
 } from './patients.funcs';
-import {
-  ICreatePatientPayload,
-  ILinkExistingPatientPayload,
-  ISendPatientCredentialsPayload,
-} from './payload.interfaces';
+import { ILinkExistingPatientPayload } from './payload.interfaces';
 
 export const useMyPatientList = (params?: IGetMyPatientsParams) =>
   useQuery({
@@ -45,14 +41,7 @@ export const useLinkExistingPatient = () => {
 export const useCreateNewPatient = () => {
   return useMutation({
     mutationKey: [PatientsQueryKeys.NewCreate],
-    mutationFn: (payload: ICreatePatientPayload) => createNewPatient(payload),
-  });
-};
-
-export const useSendPatientCredentials = () => {
-  return useMutation({
-    mutationKey: [PatientsQueryKeys.SendCred],
-    mutationFn: (payload: ISendPatientCredentialsPayload) => sendPatientCredentials(payload),
+    mutationFn: (payload: FormData) => createNewPatient(payload),
   });
 };
 
@@ -146,3 +135,15 @@ export const useUpdatePatientInfo = () => {
     mutationFn: updatePatient,
   });
 };
+
+export const useGetAllPatients = (params?: {
+  page: number;
+  limit: number;
+  user_type: string;
+  search?: string;
+}) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.ALL_PATIENTS, params],
+    queryFn: () => getAllPatients(params),
+    enabled: !!params?.user_type && Boolean(params?.search && params?.search?.length >= 3),
+  });

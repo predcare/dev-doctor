@@ -100,7 +100,9 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
               }}
               editable={!myPatientPending}
               placeholder={
-                myPatientPending ? 'Loading patient records...' : 'Search by name, phone or ID...'
+                myPatientPending
+                  ? 'Loading patient records...'
+                  : 'Search by name, phone, email or ID...'
               }
               placeholderTextColor={theme.colors.textMuted}
             />
@@ -126,6 +128,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingBottom: 100 }}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
             <PatientSkeleton />
           </ScrollView>
@@ -134,6 +137,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingBottom: 100, justifyContent: 'center' }}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
             <CommonErrorCard
               title="Failed to Load Patients"
@@ -148,6 +152,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
           <FlatList
             data={patientsList}
             keyExtractor={item => String(item.id || item.patient_id || item.user_id)}
+            keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
               <PatientCard
                 age={getAge(item?.date_of_birth)}
@@ -156,6 +161,8 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
                 patientId={item?.patient_id}
                 condition={item?.medical_history}
                 phoneNumber={item?.phone_number}
+                profileImage={item?.profile_image}
+                email={item?.email}
                 onPress={() =>
                   handlePatientDetails({
                     name: item?.name,

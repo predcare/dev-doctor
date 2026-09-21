@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ChevronRightIcon from '../../../components/ui/icons/ChevronRightIcon';
-import { capitalizeFirstLetter } from '../../../lib/common/common.utils';
+import { capitalizeFirstLetter, getInitials } from '../../../lib/common/common.utils';
 import { theme } from '../../../styled/theme.styled';
 
 export interface PatientCardProps {
@@ -12,14 +12,20 @@ export interface PatientCardProps {
   age: string;
   condition?: string;
   phoneNumber?: string;
+  email?: string;
+  profileImage?: string;
 }
 
 export const PatientCard: React.FC<PatientCardProps> = React.memo(
-  ({ onPress, name, patientId, gender, age, condition, phoneNumber }) => {
+  ({ onPress, name, patientId, gender, age, condition, phoneNumber, email, profileImage }) => {
     return (
       <TouchableOpacity style={styles.txCard} onPress={onPress} activeOpacity={0.75}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarTxt}>PT</Text>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.avatarImg} resizeMode="cover" />
+          ) : (
+            <Text style={styles.avatarTxt}>{getInitials(name) || 'PT'}</Text>
+          )}
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.txName} numberOfLines={1}>
@@ -35,6 +41,9 @@ export const PatientCard: React.FC<PatientCardProps> = React.memo(
           </Text>
           <Text style={styles.txSub} numberOfLines={1}>
             Phone: +91-{phoneNumber || 'N/A'}
+          </Text>
+          <Text style={styles.txSub} numberOfLines={1}>
+            Email: {email || 'N/A'}
           </Text>
         </View>
         <ChevronRightIcon size={16} color={theme.colors.textMuted} />
@@ -62,16 +71,21 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    overflow: 'hidden',
+  },
+  avatarImg: {
+    width: '100%',
+    height: '100%',
   },
   avatarTxt: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.surface,
   },

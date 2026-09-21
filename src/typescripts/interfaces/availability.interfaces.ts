@@ -1,3 +1,6 @@
+import { IRootResponse } from "./common.interfaces";
+
+export type DoctorAvailTimeSlotsRoot = IRootResponse<IDoctorAvailTimeSlots>;
 export interface IMyAvailabilityRoot {
   success: boolean;
   count: number;
@@ -71,4 +74,31 @@ export interface IDocBookingAvailSlot {
   slot_duration: number;
   hide_fee: boolean;
   require_payment: boolean;
+}
+
+export interface IDoctorAvailTimeSlots {
+  doctor_id: string;
+  date: string;
+  slots: ITimeSlotsDoc[];
+}
+
+export interface ITimeSlotsDoc {
+  availability_id: string;
+  clinic_id: string;
+  clinic: {
+    id: string;
+    name: string;
+    city: string;
+  };
+  from: string;
+  to: string;
+  status: string;
+  consultation_type: string;
+  in_person_fee: string;
+  video_fee: string;
+  hide_fee: boolean;
+  require_payment: boolean;
+  slot_duration: number;
+  is_past?: boolean;
+  is_available?: boolean;
 }

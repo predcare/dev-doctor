@@ -10,6 +10,7 @@ export enum ProfileQueryKeys {
   Profile = 'Profile',
   UpdateProfile = 'UpdateProfile',
   DoctorProfile = 'DoctorProfile',
+  ALL_PATIENTS = 'ALL_PATIENTS',
 }
 
 export enum NotificationQueryKeys {
@@ -27,6 +28,7 @@ export enum PatientsQueryKeys {
   Prescriptions = 'Prescriptions',
   MyConsults = 'MyConsults',
   FamilyMembers = 'FamilyMembers',
+  ALL_PATIENTS = 'ALL_PATIENTS',
 }
 
 export enum CommonQueryKeys {
@@ -64,6 +66,8 @@ export enum DoctorAvailabilityQueryKeys {
   ByDoctor = 'DoctorAvailabilityByDoctor',
   AvailableSlots = 'DoctorAvailableSlots',
   ById = 'DoctorAvailabilityById',
+  GET_AVAIL_DATES = 'GET_AVAIL_DATES',
+  GET_SLOTS_BY_DATE = 'GET_SLOTS_BY_DATE',
 }
 
 export enum AppointmentsQueryKeys {

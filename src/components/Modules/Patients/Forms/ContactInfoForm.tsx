@@ -267,6 +267,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
                   onChangeText={v => onChange(v.replace(/\D/g, ''))}
                   onBlur={onBlur}
                   keyboardType="number-pad"
+                  maxLength={6}
                 />
               )}
             />

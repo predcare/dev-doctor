@@ -1,6 +1,7 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import {
+  DoctorAvailTimeSlotsRoot,
   IDocBookingAvailRoot,
   IMyAvailabilityDoc,
 } from '../../../typescripts/interfaces/availability.interfaces';
@@ -35,6 +36,35 @@ export const updateAvailability = async (id: number | string, body: any) => {
 export const getDocBookingAvails = async (doctorId: number, clinicId: number) => {
   const res = await axiosInstance.get<IDocBookingAvailRoot>(
     `${endpoints.availablity.fullAvailability}?doctor_id=${doctorId}&clinic_id=${clinicId}`
+  );
+  return res.data;
+};
+
+export const getDoctorAvailDates = async (params?: {
+  doctor_id: number;
+  consultation_type: string;
+  clinic_id: number;
+}) => {
+  const res = await axiosInstance.get<IRootResponse<string[]>>(
+    `${endpoints.availablity.doctorAvailDates}`,
+    {
+      params,
+    }
+  );
+  return res.data;
+};
+
+export const getDoctorTimingsByDate = async (params?: {
+  doctor_id: number;
+  date: string;
+  consultation_type: string;
+  clinic_id?: number;
+}) => {
+  const res = await axiosInstance.get<DoctorAvailTimeSlotsRoot>(
+    `${endpoints.availablity.getSlotsByDate}`,
+    {
+      params,
+    }
   );
   return res.data;
 };

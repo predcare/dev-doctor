@@ -10,74 +10,47 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import PopupAlert from '../../components/commons/PopupAlert/PopupAlert';
 import StepIndicator from '../../components/Modules/Patients/Components/StepIndicator';
 import BasicInfoForm from '../../components/Modules/Patients/Forms/BasicInfoForm';
 import ContactInfoForm from '../../components/Modules/Patients/Forms/ContactInfoForm';
 import MedicalInfoForm from '../../components/Modules/Patients/Forms/MedicalInfoForm';
-import { MockUserItem } from '../../components/Modules/Patients/Modals/UserPickerModal';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import {
   useCreateNewPatient,
   useLinkExistingPatient,
-  useSendPatientCredentials,
 } from '../../hooks/react-query/patients/patients.hooks';
 import { PatientsQueryKeys } from '../../hooks/react-query/query.keys';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { formatDateToYYYYMMDD, maskValue } from '../../lib/common/common.utils';
+import { showErrorToast } from '../../lib/common/toast.utils';
 import { AddPatientSchema, TAddPatientSchemaType } from '../../lib/schemas/addPatient.schema';
-import type { ProfileScreenNavigationProp, ProfileScreenRouteProp } from '../../route';
+import {
+  AppRoute,
+  type ProfileScreenNavigationProp,
+  type ProfileScreenRouteProp,
+} from '../../route';
 import { AddPatientStyles } from '../../styled/AddPatientStyles.styled';
 import { theme } from '../../styled/theme.styled';
+import { IAllPatientsDoc } from '../../typescripts/interfaces/patients.interfaces';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 
 export interface AddPatientScreenProps {
   navigation?: ProfileScreenNavigationProp;
   route?: ProfileScreenRouteProp;
 }
 
-export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, route }) => {
-  const user = route?.params ? (route.params as any)?.user : undefined;
+export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const { userData } = useAuthStore(state => state);
-  // Popup Alert State
-  const [alertConfig, setAlertConfig] = useState<{
-    visible: boolean;
-    type?: 'success' | 'error' | 'warning' | 'info';
-    title?: string;
-    message?: string;
-    onPress?: () => void;
-  }>({
-    visible: false,
-    type: 'info',
-    title: '',
-    message: '',
-  });
+  const { hideLoader, showLoader } = useLoadingStore(state => state);
 
-  const showAlert = (
-    type: 'success' | 'error' | 'warning' | 'info',
-    title: string,
-    message?: string,
-    onPress?: () => void
-  ) => {
-    setAlertConfig({
-      visible: true,
-      type,
-      title,
-      message,
-      onPress: () => {
-        setAlertConfig(prev => ({ ...prev, visible: false }));
-        if (onPress) onPress();
-      },
-    });
-  };
+  const [selectedUser, setSelectedUser] = useState<IAllPatientsDoc | null>(null);
 
-  const { mutate: createNewPatientMutation, isPending: createNewPatientPending } =
-    useCreateNewPatient();
-  const { mutate: sendCred, isPending: sendPending } = useSendPatientCredentials();
-  const { mutate: linkExistingPatientMutation, isPending: linkPending } = useLinkExistingPatient();
+  const { mutate: createNewPatientMutation } = useCreateNewPatient();
+  const { mutate: linkExistingPatientMutation } = useLinkExistingPatient();
 
   const {
     control,
@@ -93,7 +66,7 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
       selectionMode: 'create_new',
       selected_user_id: null,
       profile_image: undefined,
-      assigned_doctor_id: user?.id || 'DR-101',
+      assigned_doctor_id: String(userData?.id) || '',
       name: '',
       email: '',
       phone: '',
@@ -112,43 +85,40 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
     },
   });
 
-  const [selectedUser, setSelectedUser] = useState<MockUserItem | null>(null);
-
   const selectionMode = watch('selectionMode');
 
   const handleNext = useCallback(async () => {
+    if (!userData?.clinic?.id) return showErrorToast('Clinic not found');
     if (selectionMode === 'existing_user') {
       const isStep1Valid = await trigger(['selectionMode', 'selected_user_id']);
       if (!isStep1Valid || !selectedUser) {
-        showAlert('warning', 'Required', 'Please select an existing user');
+        showErrorToast('Please select an existing user');
         return;
       }
       setLoading(true);
+      showLoader('Please Wait... ');
       linkExistingPatientMutation(
         {
           user_id: selectedUser.id,
-          doctor_id: userData?.user_id || '',
+          clinic_id: userData?.clinic?.id || '',
         },
         {
-          onSuccess: async (res: any) => {
-            setLoading(false);
-            await queryClient.invalidateQueries({
-              queryKey: [PatientsQueryKeys.PatientsList],
-            });
-            showAlert(
-              'success',
-              'Patient Linked ✅',
-              `${selectedUser.name} has been added to your clinic.`,
-              () => {
-                if (navigation && navigation.canGoBack()) navigation.goBack();
-              }
-            );
+          onSuccess: async res => {
+            if (res?.success) {
+              await queryClient.invalidateQueries({
+                queryKey: [PatientsQueryKeys.PatientsList],
+              });
+              hideLoader();
+              setLoading(false);
+              navigation?.navigate(AppRoute.PATIENTS);
+            } else {
+              hideLoader();
+              setLoading(false);
+            }
           },
-          onError: (err: any) => {
+          onError: () => {
+            hideLoader();
             setLoading(false);
-            const msg =
-              err?.response?.data?.message || err?.message || 'Failed to link existing patient';
-            showAlert('error', 'Linking Failed', msg);
           },
         }
       );
@@ -192,97 +162,83 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
   }, [step, selectionMode, navigation]);
 
   const onSubmitNew = (formData: TAddPatientSchemaType) => {
+    if (!userData?.clinic?.id) return showErrorToast('Clinic Not Found');
     setLoading(true);
 
-    const payload = {
-      name: formData.name?.trim() || '',
-      email: formData.email?.trim() || null,
-      phone: formData.phone?.trim() || '',
-      alternate_number: formData.alternate_number?.trim() || null,
-      whatsapp_number: formData.whatsapp_number?.trim() || null,
-      gender: formData.gender || '',
-      date_of_birth: formData.date_of_birth ? formatDateToYYYYMMDD(formData.date_of_birth) : '',
-      address: formData.address?.trim() || '',
-      city: formData.city?.trim() || null,
-      state: formData.state?.trim() || null,
-      postal_code: formData.postal_code?.trim() || null,
-      country: formData.country?.trim() || null,
-      status: formData.status || 'active',
-      medical_history: formData.medical_history?.trim() || null,
-      doctor_id: userData?.user_id || '',
-      profile_image: undefined,
-    };
-    createNewPatientMutation(payload, {
-      onSuccess(res) {
-        if (res.success) {
-          const patId = res?.patient?.patient_id;
-          const patEmail = res?.patient?.email || formData.email?.trim();
-          const patName = res?.patient?.name || formData.name?.trim();
-          const patPhone = res?.patient?.phone_number || formData.phone?.trim();
+    const payload = new FormData();
+    payload.append('name', formData.name?.trim() || '');
+    payload.append('phone', formData.phone?.trim() || '');
+    payload.append('gender', formData.gender || '');
+    payload.append('address', formData.address?.trim() || '');
+    payload.append('clinic_id', String(userData?.clinic?.id || ''));
 
-          if (patEmail && patId) {
-            sendCred(
-              {
-                patient_id: patId,
-                email: patEmail,
-                name: patName,
-                phone: patPhone,
-              },
-              {
-                onSuccess: async () => {
-                  await queryClient.invalidateQueries({
-                    queryKey: [PatientsQueryKeys.PatientsList],
-                  });
-                  setLoading(false);
-                  showAlert(
-                    'success',
-                    'Patient Registered ✅',
-                    `${formData.name} registered and login credentials sent.`,
-                    () => {
-                      if (navigation && navigation.canGoBack()) navigation.goBack();
-                    }
-                  );
-                },
-                onError: async () => {
-                  await queryClient.invalidateQueries({
-                    queryKey: [PatientsQueryKeys.PatientsList],
-                  });
-                  setLoading(false);
-                  showAlert(
-                    'success',
-                    'Patient Registered ✅',
-                    `${formData.name} registered successfully.`,
-                    () => {
-                      if (navigation && navigation.canGoBack()) navigation.goBack();
-                    }
-                  );
-                },
-              }
-            );
-          } else {
-            queryClient.invalidateQueries({
-              queryKey: [PatientsQueryKeys.PatientsList],
-            });
-            setLoading(false);
-            showAlert(
-              'success',
-              'Patient Registered ✅',
-              `${formData.name} registered successfully.`,
-              () => {
-                if (navigation && navigation.canGoBack()) navigation.goBack();
-              }
-            );
-          }
+    if (formData.email?.trim()) {
+      payload.append('email', formData.email.trim());
+    }
+    if (formData.alternate_number?.trim()) {
+      payload.append('alternate_phone', formData.alternate_number.trim());
+      payload.append('alternate_number', formData.alternate_number.trim());
+    }
+    if (formData.whatsapp_number?.trim()) {
+      payload.append('whatsapp_number', formData.whatsapp_number.trim());
+    }
+    if (formData.date_of_birth) {
+      payload.append('date_of_birth', formatDateToYYYYMMDD(formData.date_of_birth));
+    }
+    if (formData.city?.trim()) {
+      payload.append('city', formData.city.trim());
+    }
+    if (formData.state?.trim()) {
+      payload.append('state', formData.state.trim());
+    }
+    if (formData.postal_code?.trim()) {
+      payload.append('postal_code', formData.postal_code.trim());
+    }
+    if (formData.country?.trim()) {
+      payload.append('country', formData.country.trim());
+    }
+    if (formData.status) {
+      payload.append('status', formData.status);
+    }
+    if (formData.medical_history?.trim()) {
+      payload.append('medical_history', formData.medical_history.trim());
+    }
+
+    if (formData.profile_image) {
+      const img = formData.profile_image as any;
+      if (typeof img === 'object' && img?.uri) {
+        payload.append('profile_image', {
+          uri: img.uri,
+          name: img.name || `profile_${Date.now()}.jpg`,
+          type: img.type || 'image/jpeg',
+        } as any);
+      } else if (typeof img === 'string' && img.length > 0) {
+        payload.append('profile_image', {
+          uri: img,
+          name: `profile_${Date.now()}.jpg`,
+          type: 'image/jpeg',
+        } as any);
+      }
+    }
+
+    showLoader('Creating Patient ...');
+    createNewPatientMutation(payload, {
+      async onSuccess(res) {
+        if (res.success) {
+          await queryClient.invalidateQueries({
+            queryKey: [PatientsQueryKeys.PatientsList],
+          });
+          setLoading(false);
+          hideLoader();
+          navigation?.navigate(AppRoute.PATIENTS);
         } else {
           setLoading(false);
-          showAlert('error', 'Registration Failed', res.message || 'Failed to create patient');
+          hideLoader();
         }
       },
-      onError: (error: any) => {
+      onError: () => {
         setLoading(false);
-        const msg =
-          error?.response?.data?.message || error?.message || 'Error creating patient registration';
-        showAlert('error', 'Error', msg);
+        hideLoader();
       },
     });
   };
@@ -326,9 +282,11 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
                   setValue={setValue}
                   watch={watch}
                   errors={errors}
-                  doctorName="Dr. Sarah Jenkins"
                   selectedUser={selectedUser}
-                  setSelectedUser={setSelectedUser}
+                  setSelectedUser={data => {
+                    setSelectedUser(data);
+                    setValue('selected_user_id', Number(data?.id) || null);
+                  }}
                 />
               )}
 
@@ -411,9 +369,9 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
                 ) : (
                   <Text style={AddPatientStyles.nextTxt}>
                     {selectionMode === 'existing_user'
-                      ? 'Add to My Clinic ✓'
+                      ? 'Add to My Clinic'
                       : step === 3
-                      ? 'Submit Patient ✓'
+                      ? 'Submit Patient'
                       : 'Next Step →'}
                   </Text>
                 )}
@@ -424,16 +382,6 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation, 
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
-
-      {/* Popup Alert Modal */}
-      <PopupAlert
-        visible={alertConfig.visible}
-        type={alertConfig.type}
-        title={alertConfig.title}
-        message={alertConfig.message}
-        onPress={alertConfig.onPress}
-        onCancel={() => setAlertConfig(prev => ({ ...prev, visible: false }))}
-      />
     </SafeAreaWrapper>
   );
 };

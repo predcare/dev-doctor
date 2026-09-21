@@ -50,16 +50,24 @@ export interface ILogoutPayload {
 export interface ICreateAppointmentPayload {
   doctor_id: number | string;
   patient_id: number | string;
+  clinic_id: number | string;
+  availability_id: (string | number)[];
   appointment_date: string;
   start_time: string;
   end_time: string;
-  consultation_type: 'video' | 'in-person';
-  appointment_fee: number;
-  appointment_type: 'first_visit';
-  appointment_status: 'confirmed';
-  payment_status: 'pending';
+  consultation_type: 'video' | 'in-person' | string;
+  appointment_type: 'first_visit' | string;
   reason: string | null;
-  symptoms: string | null;
-  appointment_slot_time: string | object;
-  clinic_id: number | string;
+  symptoms?: string | null;
+  medications?: string | null;
+  appointment_slot_time:
+    | Array<{
+        start: string;
+        end: string;
+        booked?: boolean;
+      }>
+    | string;
+  appointment_fee?: number;
+  appointment_status?: string;
+  payment_status?: string;
 }

@@ -17,7 +17,7 @@ export const BasicInfoSchema = yup.object().shape({
   assigned_doctor_id: yup
     .string()
     .required("Assigned doctor ID is required"),
-  profile_image: yup.string().optional().nullable(),
+  profile_image: yup.mixed().optional().nullable(),
   name: yup
     .string()
     .trim()
@@ -109,7 +109,7 @@ export const AddPatientSchema = yup.object().shape({
   assigned_doctor_id: yup
     .string()
     .required("Assigned doctor ID is required"),
-  profile_image: yup.string().optional().nullable(),
+  profile_image: yup.mixed().optional().nullable(),
 
   // Basic Info
   name: yup

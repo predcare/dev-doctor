@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -9,11 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useGetAllUsers } from '../../../../hooks/react-query/common/common.hooks';
-import { getInitials, maskValue } from '../../../../lib/common/common.utils';
+import { useDebounce } from '../../../../hooks/commons/useDebounce';
+import { useGetAllPatients } from '../../../../hooks/react-query/patients/patients.hooks';
+import { getInitials } from '../../../../lib/common/common.utils';
 import { theme } from '../../../../styled/theme.styled';
 import { IUserItem } from '../../../../typescripts/interfaces/allUsers.interfaces';
-import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
+import { IAllPatientsDoc } from '../../../../typescripts/interfaces/patients.interfaces';
 import CircleXIcon from '../../../ui/icons/CircleXIcon';
 import SearchIcon from '../../../ui/icons/SearchIcon';
 
@@ -23,40 +24,24 @@ export type MockUserItem = IUserItem; // Re-export for backward compatibility
 export interface UserPickerModalProps {
   visible: boolean;
   onClose: () => void;
-  users?: IUserItem[];
-  isLoading?: boolean;
-  onPick: (user: IUserItem) => void;
+  onPick?: (pat: IAllPatientsDoc) => void;
 }
 
 export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
-  ({ visible, onClose, users, isLoading: externalLoading, onPick }) => {
-    const { userData } = useAuthStore(state => state);
+  ({ visible, onClose, onPick }) => {
     const [searchText, setSearchText] = useState('');
+    const debounceSearch = useDebounce(searchText?.trim(), 500);
     const {
-      data: apiUsers,
-      isFetching: isFetchingUsers,
-      isLoading: isLoadingUsers,
+      data: allPatinets,
+      isFetching: isFetchingPatient,
       isError,
       refetch,
-    } = useGetAllUsers(userData?.user_id, visible);
-
-    const loading = externalLoading || (users === undefined && (isLoadingUsers || isFetchingUsers));
-
-    const filteredUsers = useMemo(() => {
-      if (!searchText.trim()) return apiUsers;
-      const q = searchText.toLowerCase().trim();
-      const rawDigits = q.replace(/\D/g, '');
-
-      return apiUsers?.filter(u => {
-        const nameMatch = u.name?.toLowerCase().includes(q);
-        const emailMatch = u.email?.toLowerCase().includes(q);
-        const phoneMatch = u.phone_number?.toLowerCase().includes(q);
-        const phoneDigitMatch =
-          rawDigits.length > 0 && u.phone_number?.replace(/\D/g, '').includes(rawDigits);
-
-        return nameMatch || emailMatch || phoneMatch || phoneDigitMatch;
-      });
-    }, [apiUsers, searchText]);
+    } = useGetAllPatients({
+      limit: 10,
+      page: 1,
+      search: debounceSearch,
+      user_type: 'patient',
+    });
 
     return (
       <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -79,7 +64,7 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
                 <SearchIcon size={18} color={theme.colors.textMuted} />
                 <TextInput
                   style={s.userSearchInput}
-                  placeholder="Search by name, email, or phone..."
+                  placeholder="Search by name, Patient-Id email, or phone..."
                   placeholderTextColor={theme.colors.textMuted}
                   value={searchText}
                   onChangeText={setSearchText}
@@ -91,18 +76,18 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
                     onPress={() => setSearchText('')}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
-                    <CircleXIcon size={16} color={theme.colors.textMuted} />
+                    <CircleXIcon size={16} />
                   </TouchableOpacity>
                 )}
               </View>
             </View>
 
-            {loading && apiUsers?.length === 0 ? (
+            {isFetchingPatient ? (
               <View style={s.centerState}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
                 <Text style={s.stateTxt}>Fetching existing users...</Text>
               </View>
-            ) : isError && apiUsers?.length === 0 ? (
+            ) : isError ? (
               <View style={s.centerState}>
                 <Text style={s.errorTxt}>Failed to load users.</Text>
                 <TouchableOpacity style={s.retryBtn} onPress={() => refetch()}>
@@ -111,18 +96,17 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
               </View>
             ) : (
               <FlatList
-                data={filteredUsers}
-                keyExtractor={item => String(item.id)}
+                data={allPatinets?.data || []}
+                keyExtractor={item => String(item.patient_id)}
                 renderItem={({ item }) => {
-                  const subText = maskValue(item.email) || maskValue(item.phone_number) || 'No contact details';
                   return (
                     <TouchableOpacity
                       style={s.userRow}
+                      activeOpacity={0.7}
                       onPress={() => {
-                        onPick(item);
+                        onPick?.(item);
                         onClose();
                       }}
-                      activeOpacity={0.7}
                     >
                       <View style={s.userAvatar}>
                         <Text style={s.userAvatarTxt}>{getInitials(item?.name || '')}</Text>
@@ -139,7 +123,7 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
                           ) : null}
                         </View>
                         <Text style={s.userSub} numberOfLines={1}>
-                          {subText}
+                          {item?.email || item?.phone_number}
                         </Text>
                       </View>
                       <View style={s.selectBtn}>

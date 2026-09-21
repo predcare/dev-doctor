@@ -3,19 +3,14 @@ import { endpoints } from '../../../api/endpoints';
 import { IPatientConsultApptRoot } from '../../../typescripts/interfaces/appointments.interfaces';
 import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
 import {
-  ICreatePatientResponse,
+  AllPatientRoot,
   ILinkExistingPatientResponse,
   IMyPatientDoc,
   IPatientFamilyMember,
 } from '../../../typescripts/interfaces/patients.interfaces';
 import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
-import {
-  ICreatePatientPayload,
-  ILinkExistingPatientPayload,
-  ISendPatientCredentialsPayload,
-  IUpdatePatientInfo,
-} from './payload.interfaces';
+import { ILinkExistingPatientPayload, IUpdatePatientInfo } from './payload.interfaces';
 
 export interface IGetMyPatientsParams {
   page?: number;
@@ -48,16 +43,8 @@ export const linkExistingPatient = async (payload: ILinkExistingPatientPayload) 
   return res.data;
 };
 
-export const createNewPatient = async (payload: ICreatePatientPayload) => {
-  const res = await axiosInstance.post<ICreatePatientResponse>(
-    endpoints.patients.newCreate,
-    payload
-  );
-  return res.data;
-};
-
-export const sendPatientCredentials = async (payload: ISendPatientCredentialsPayload) => {
-  const res = await axiosInstance.post<ICommonRoot>(endpoints.patients.sendCred, payload);
+export const createNewPatient = async (payload: FormData) => {
+  const res = await axiosInstance.post<ICommonRoot>(endpoints.patients.newCreate, payload);
   return res.data;
 };
 
@@ -128,5 +115,17 @@ export const getPatientsFamilyMembers = async (patientId: number | string) => {
 
 export const updatePatient = async (body: IUpdatePatientInfo) => {
   const res = await axiosInstance.put<ICommonRoot>(endpoints.patients.patientUpdate, body);
+  return res.data;
+};
+
+export const getAllPatients = async (params?: {
+  page: number;
+  limit: number;
+  user_type: string;
+  search?: string;
+}) => {
+  const res = await axiosInstance.get<AllPatientRoot>(`${endpoints.profile.allPatients}`, {
+    params,
+  });
   return res.data;
 };

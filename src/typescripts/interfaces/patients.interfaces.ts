@@ -1,3 +1,7 @@
+import { IRootResponse } from './common.interfaces';
+
+export type AllPatientRoot = IRootResponse<IAllPatientsDoc[]>;
+
 export interface IMyPatientListRoot {
   success: boolean;
   count: number;
@@ -10,12 +14,6 @@ export interface IPatientInfoRoot {
 }
 
 export interface ILinkExistingPatientResponse {
-  success: boolean;
-  message?: string;
-  patient?: IPatientBasicInfo;
-}
-
-export interface ICreatePatientResponse {
   success: boolean;
   message?: string;
   patient?: IPatientBasicInfo;
@@ -87,4 +85,17 @@ export interface IPatientFamilyMember {
   postal_code: string;
   country: string;
   profile_picture: string;
+}
+
+export interface IAllPatientsDoc {
+  id: string;
+  name: string;
+  email: string;
+  phone_number: string;
+  status: string;
+  profile_image: any;
+  patient_id: string;
+  is_superadmin: boolean;
+  gender: string;
+  date_of_birth: string;
 }

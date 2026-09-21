@@ -166,6 +166,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           contentContainerStyle={homeStyles.scrollContent}
           showsVerticalScrollIndicator={false}
           onScrollBeginDrag={() => setShowPeriodMenu(false)}
+          keyboardShouldPersistTaps="handled"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -248,6 +249,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingRight: theme.spacing.lg }}
+                keyboardShouldPersistTaps="handled"
               >
                 {homeStats.map(stat => (
                   <HomeStatsCard
