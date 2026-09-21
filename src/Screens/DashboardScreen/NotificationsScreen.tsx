@@ -49,7 +49,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
     refetch: notifyRefetch,
   } = useNotifications({
     page: 1,
-    limit: 10,
+    limit: 100,
   });
 
   const { mutate: deleteNotificationMutate } = useDeleteNotification();

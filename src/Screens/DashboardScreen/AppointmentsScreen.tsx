@@ -63,7 +63,7 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
 
   const queryParams: IMyApptQueryParams = useMemo(() => {
     const params: IMyApptQueryParams = {
-      limit: 10,
+      limit: 100,
       page: 1,
     };
 

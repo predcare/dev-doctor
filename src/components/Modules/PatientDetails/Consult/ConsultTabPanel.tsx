@@ -25,7 +25,7 @@ export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
     refetch: consultRefetch,
   } = useMyPatientConsults({
     patientId: patientId,
-    limit: 10,
+    limit: 100,
     page: 1,
     status: 'confirmed,in-progress,completed',
   });

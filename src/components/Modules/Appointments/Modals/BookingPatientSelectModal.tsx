@@ -32,7 +32,7 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
     isError: isPatientError,
     error: patientError,
   } = useMyPatientList({
-    limit: 10,
+    limit: 100,
     page: 1,
     search: debounceSearch,
   });

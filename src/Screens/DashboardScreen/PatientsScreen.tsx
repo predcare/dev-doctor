@@ -45,7 +45,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
     error: patientError,
   } = useMyPatientList({
     page: 1,
-    limit: 10,
+    limit: 100,
     search: debounceSearch,
   });
 

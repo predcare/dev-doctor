@@ -37,7 +37,7 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
       isError,
       refetch,
     } = useGetAllPatients({
-      limit: 10,
+      limit: 100,
       page: 1,
       search: debounceSearch,
       user_type: 'patient',
