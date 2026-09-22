@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -13,6 +14,7 @@ import { AssistanceBanner } from '../../components/Modules/Dashboard/AssistanceB
 import HomeStatsCard from '../../components/Modules/Dashboard/HomeStatsCard';
 import { QuickAccessCard } from '../../components/Modules/Dashboard/QuickAccessCard';
 import UpcomingAppointmentCard from '../../components/Modules/Dashboard/UpcomingAppointmentCard';
+import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { AppointmentSkeleton } from '../../components/Skeletons/AppointmentSkeleton';
 import { HomeStatSkeleton } from '../../components/Skeletons/HomeStatSkeleton';
 import {
@@ -28,13 +30,21 @@ import {
   WalletIcon,
 } from '../../components/ui/icons';
 import EmptyIcon from '../../components/ui/icons/EmptyIcon';
+import useDevicePermissions from '../../hooks/commons/useDevicePermissions';
+import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
+import { useChangeAppointmentStatus } from '../../hooks/react-query/appointments/appointments.hooks';
 import { useHomeUpcomingAppts } from '../../hooks/react-query/home/home.hooks';
+import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import { Header } from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
+import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { AppRoute, type HomeScreenProps } from '../../route';
 import { homeStyles } from '../../styled/HomeScreen.styled';
 import { theme } from '../../styled/theme.styled';
+import { IMyAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
 import { formatTime12h } from '../../utils/availabilityUtils';
+import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
+import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type PeriodKey = 'today' | 'week' | 'month';
 
@@ -72,11 +82,17 @@ const quickAccessItems = [
 ];
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const appNavigation = useNavigation();
   const [period, setPeriod] = useState<PeriodKey>('week');
   const [showPeriodMenu, setShowPeriodMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 155, right: 16 });
   const pillRef = useRef<View>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const { showLoader, hideLoader } = useLoadingStore(state => state);
+  const { setMeetingSession, setInPersonAppointment } = useMeetingStore(state => state);
+  const { requestAudioVideoPermissions } = useDevicePermissions();
+
+  const { mutate: changeStatus } = useChangeAppointmentStatus();
 
   const statsPending = false;
 
@@ -87,7 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   } = useHomeUpcomingAppts({
     page: 1,
     limit: 3,
-    status: 'upcoming,pending,completed',
+    status: 'upcoming,pending',
     date_range: 'today',
   });
 
@@ -145,6 +161,137 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       },
     ];
   }, [period]);
+
+  const handleJoinVideoCall = useCallback(
+    async (appointment: IMyAppointmentDoc) => {
+      if (!appointment) return;
+
+      const storeState = useMeetingStore.getState();
+      const isCallActive =
+        (storeState.callState === 'CONNECTED' || storeState.callState === 'CONNECTING') &&
+        Boolean(storeState.token && storeState.meetingId);
+
+      const isCurrentAppt =
+        isCallActive &&
+        (String(storeState.appointmentId) === String(appointment.id) ||
+          (Boolean(appointment.appointment_id) &&
+            storeState.appointmentGeneratedId === appointment.appointment_id));
+
+      if (isCurrentAppt) {
+        storeState.setIsInAppPip(false);
+        appNavigation.navigate(AppRoute.DOCTOR_MEETING);
+        return;
+      }
+
+      if (isCallActive) {
+        showInfoToast(
+          'You are currently in an active consultation. Please end that call first.',
+          'Active Call Ongoing'
+        );
+        return;
+      }
+
+      const hasPermissions = await requestAudioVideoPermissions();
+      if (!hasPermissions) {
+        showErrorToast('Camera and Microphone permissions are required to join the consultation.');
+        return;
+      }
+
+      const apptId = appointment.id;
+      let token: string | undefined;
+      let meetingId: string | undefined = appointment.meeting_id;
+      let call_duration_seconds: number | undefined = appointment.call_duration_seconds;
+      if (!apptId) {
+        showErrorToast('No valid appointment ID found to fetch token');
+        return;
+      }
+      if (!appointment?.patient_id)
+        return showErrorToast('No valid patient ID found to fetch token');
+
+      try {
+        const tokenResponse = await queryClient.fetchQuery({
+          queryKey: [MyAppointmentsQueryKeys.GET_TOKEN, 'token', apptId],
+          queryFn: () => getApptToken(apptId),
+        });
+        token = tokenResponse?.data?.token || '';
+        meetingId = tokenResponse?.data?.meeting_id || '';
+      } catch (error) {
+        console.error('Failed to fetch fresh appointment token:', error);
+      }
+
+      if (!token || !meetingId) {
+        return showErrorToast('Failed to fetch meeting credentials');
+      }
+
+      const cleanedToken = token?.trim().replace(/^["']|["']$/g, '');
+      const cleanedMeetingId = meetingId?.trim().replace(/^["']|["']$/g, '');
+
+      if (!cleanedToken || !cleanedMeetingId) {
+        showErrorToast('Meeting credentials missing or invalid');
+        return;
+      }
+
+      setMeetingSession({
+        token: cleanedToken,
+        meetingId: cleanedMeetingId,
+        appointmentId: apptId,
+        patientName: appointment.patientInfo?.name,
+        patientAlphanumericId: appointment.patientInfo?.patientId,
+        appointmentGeneratedId: appointment.appointment_id,
+        startTime: appointment.start_time,
+        endTime: appointment.end_time,
+        callDurationSeconds: call_duration_seconds ?? 0,
+        patientUserId: String(appointment?.patient_id),
+      });
+
+      appNavigation.navigate(AppRoute.DOCTOR_MEETING);
+    },
+    [navigation, queryClient, setMeetingSession, requestAudioVideoPermissions]
+  );
+
+  const handleStartConsulation = useCallback(
+    (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
+      if (status?.toLowerCase() === 'confirmed') {
+        showLoader('Loading...');
+        changeStatus(
+          { appointmentId, status: 'in_progress' },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries({
+                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+              });
+              hideLoader();
+              setInPersonAppointment({
+                apptIdforInPerson: String(appointmentId),
+                patientIdforInPerson: String(patientId),
+                patientNameforInPerson: String(patientName),
+                statusforInPerson: String(status),
+              });
+              appNavigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                patientId: patientId,
+                patientName: patientName,
+              });
+            },
+            onError: () => {
+              hideLoader();
+            },
+          }
+        );
+      } else {
+        setInPersonAppointment({
+          apptIdforInPerson: String(appointmentId),
+          patientIdforInPerson: String(patientId),
+          patientNameforInPerson: String(patientName),
+          statusforInPerson: String(status),
+        });
+        appNavigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
+          patientId: patientId,
+          patientName: patientName,
+        });
+      }
+    },
+    [changeStatus, queryClient, showLoader, hideLoader]
+  );
 
   useEffect(() => {
     const unsubscribe = navigation?.addListener('blur', () => {
@@ -284,7 +431,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           {upcomiongApptsPending ? (
             <AppointmentSkeleton />
           ) : upcomingAppts && upcomingAppts?.meta?.total > 0 ? (
-            upcomingAppts?.data?.map((apt: any) => {
+            upcomingAppts?.data?.map(apt => {
               return (
                 <UpcomingAppointmentCard
                   key={`${apt.appointment_id}-${apt.id}`}
@@ -297,11 +444,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   consultType={apt.consultation_type || 'ONLINE'}
                   chiefComplaint={apt.reason || ''}
                   isExpired={false}
-                  isJoinedOnce={false}
+                  isJoinedOnce={
+                    apt?.appointment_status === 'in_progress' ||
+                    apt?.appointment_status === 'in-progress'
+                  }
                   isCurrentApptInCall={false}
                   appointmentStatus={apt.appointment_status}
-                  onVideoCall={() => {}}
-                  onStartConsultation={() => {}}
+                  onVideoCall={() => {
+                    handleJoinVideoCall(apt);
+                  }}
+                  onStartConsultation={() => {
+                    handleStartConsulation(
+                      apt.id,
+                      Number(apt.patientInfo?.patientId),
+                      apt.patientInfo?.name || '',
+                      apt.appointment_status
+                    );
+                  }}
                 />
               );
             })

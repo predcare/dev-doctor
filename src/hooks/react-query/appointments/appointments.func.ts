@@ -2,9 +2,11 @@ import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
 import {
   IAppointmentInfoRoot,
+  TGetApptTokenRoot,
   TMyAppointmentRoot,
   TMyAppointmentStats,
 } from '../../../typescripts/interfaces/appointments.interfaces';
+import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
 import { ICreateAppointmentPayload } from '../auth/payload.interfaces';
 import { IMyApptQueryParams } from './payload.interafce';
 
@@ -23,7 +25,9 @@ export const getMyAppointmentStats = async (params?: { date?: string }) => {
 };
 
 export const getApptToken = async (appointmentId: number | string) => {
-  const res = await axiosInstance.get<any>(`${endpoints.appointments.getToken(appointmentId)}`);
+  const res = await axiosInstance.get<TGetApptTokenRoot>(
+    `${endpoints.appointments.getToken(appointmentId)}`
+  );
   return res.data;
 };
 
@@ -64,11 +68,16 @@ export const sendHeartBeat = async (
 
 export const changeAppointmentStatus = async (body: {
   appointmentId: number | string;
-  appointment_status: string;
+  status: number | string;
+  call_end_reason?: string;
 }) => {
-  const res = await axiosInstance.patch(endpoints.appointments.statusChange(body.appointmentId), {
-    appointment_status: body.appointment_status,
-  });
+  const res = await axiosInstance.patch<ICommonRoot>(
+    endpoints.appointments.statusChange(body.appointmentId),
+    {
+      status: body.status,
+      call_end_reason: body.call_end_reason,
+    }
+  );
   return res.data;
 };
 

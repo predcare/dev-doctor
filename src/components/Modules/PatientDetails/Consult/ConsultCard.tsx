@@ -13,6 +13,7 @@ interface ConsultCardProps {
   appointmentDate: string;
   startTime?: string;
   endTime?: string;
+  isJoinedOnce?: boolean;
   appointmentStatus?: string;
   appointmentType?: string;
   loading?: boolean;
@@ -30,6 +31,7 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
   patientId,
   patientName,
   startTime,
+  isJoinedOnce,
   onVideoCall,
   onStartConsultation,
   onCompleted,
@@ -127,7 +129,9 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
             disabled={loading}
           >
             <VideoIcon size={16} color="#FFFFFF" />
-            <Text style={consultTabStyles.btnJoinCallText}>Join Call</Text>
+            <Text style={consultTabStyles.btnJoinCallText}>
+              {isJoinedOnce ? 'Rejoin Call' : 'Join Call'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={consultTabStyles.btnJoinCall}

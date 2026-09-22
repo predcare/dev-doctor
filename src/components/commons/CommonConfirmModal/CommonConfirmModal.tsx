@@ -151,16 +151,11 @@ export default function CommonConfirmModal({
                 },
               ]}
             >
-              {/* Header Icon */}
               <View style={[styles.iconCircle, { backgroundColor: getBadgeBg() }]}>
                 {renderIcon()}
               </View>
-
-              {/* Title & Description */}
               <Text style={styles.titleText}>{title}</Text>
               {!!message && <Text style={styles.messageText}>{message}</Text>}
-
-              {/* Action Buttons */}
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.cancelBtn}

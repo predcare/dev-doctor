@@ -400,7 +400,7 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
             patient_last_heartbeat: null,
           };
 
-          await saveCall(payload);
+          // await saveCall(payload);
           await queryClient.invalidateQueries({ queryKey: [MyAppointmentsQueryKeys.MyAppointments] });
         }
       } catch (err) {

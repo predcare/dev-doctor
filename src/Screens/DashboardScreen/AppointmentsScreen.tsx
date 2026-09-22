@@ -22,6 +22,8 @@ import { queryClient } from '../../components/providers/ReactQueryProvider';
 import AppointmentSkeleton from '../../components/Skeletons/AppointmentSkeleton';
 import { CircleXIcon, FilterIcon, SearchIcon } from '../../components/ui/icons';
 import { useDebounce } from '../../hooks/commons/useDebounce';
+import useDevicePermissions from '../../hooks/commons/useDevicePermissions';
+import { getApptToken } from '../../hooks/react-query/appointments/appointments.func';
 import {
   useChangeAppointmentStatus,
   useMyAppointments,
@@ -32,12 +34,17 @@ import { MyAppointmentsQueryKeys } from '../../hooks/react-query/query.keys';
 import Header from '../../Layout/Header';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
 import { formatDate, formatDateToYYYYMMDD } from '../../lib/common/common.utils';
-import { showUnderDevelopmentToast } from '../../lib/common/toast.utils';
+import {
+  showErrorToast,
+  showInfoToast,
+  showUnderDevelopmentToast,
+} from '../../lib/common/toast.utils';
 import { AppRoute, type DoctorAppointmentsScreenProps } from '../../route';
 import { doctorAppointmentsStyles as S } from '../../styled/DoctorAppointmentsScreen.styled';
 import { theme } from '../../styled/theme.styled';
 import { IMyAppointmentDoc } from '../../typescripts/interfaces/appointments.interfaces';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
+import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 
 type TabType = 'both' | 'inperson' | 'video';
 
@@ -60,6 +67,8 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
   const [confirmCompleteAptId, setConfirmCompleteAptId] = useState<number | string | null>(null);
 
   const { showLoader, hideLoader } = useLoadingStore(state => state);
+  const { setMeetingSession, setInPersonAppointment } = useMeetingStore(state => state);
+  const { requestAudioVideoPermissions } = useDevicePermissions();
 
   const queryParams: IMyApptQueryParams = useMemo(() => {
     const params: IMyApptQueryParams = {
@@ -159,11 +168,102 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
     setSelectedDetailsApt(null);
   }, []);
 
+  const handleJoinVideoCall = useCallback(
+    async (appointment: IMyAppointmentDoc) => {
+      if (!appointment) return;
+
+      const storeState = useMeetingStore.getState();
+      const isCallActive =
+        (storeState.callState === 'CONNECTED' || storeState.callState === 'CONNECTING') &&
+        Boolean(storeState.token && storeState.meetingId);
+
+      const isCurrentAppt =
+        isCallActive &&
+        (String(storeState.appointmentId) === String(appointment.id) ||
+          (Boolean(appointment.appointment_id) &&
+            storeState.appointmentGeneratedId === appointment.appointment_id));
+
+      if (isCurrentAppt) {
+        storeState.setIsInAppPip(false);
+        navigation.navigate(AppRoute.DOCTOR_MEETING);
+        return;
+      }
+
+      if (isCallActive) {
+        showInfoToast(
+          'You are currently in an active consultation. Please end that call first.',
+          'Active Call Ongoing'
+        );
+        return;
+      }
+
+      const hasPermissions = await requestAudioVideoPermissions();
+      if (!hasPermissions) {
+        showErrorToast('Camera and Microphone permissions are required to join the consultation.');
+        return;
+      }
+
+      const apptId = appointment.id;
+      let token: string | undefined;
+      let meetingId: string | undefined = appointment.meeting_id;
+      let call_duration_seconds: number | undefined = appointment.call_duration_seconds;
+      if (!apptId) {
+        showErrorToast('No valid appointment ID found to fetch token');
+        return;
+      }
+      if (!appointment?.patient_id)
+        return showErrorToast('No valid patient ID found to fetch token');
+
+      try {
+        const tokenResponse = await queryClient.fetchQuery({
+          queryKey: [MyAppointmentsQueryKeys.MyAppointments, 'token', apptId],
+          queryFn: () => getApptToken(apptId),
+        });
+        token = tokenResponse?.data?.token || '';
+        meetingId = tokenResponse?.data?.meeting_id || '';
+      } catch (error) {
+        console.error('Failed to fetch fresh appointment token:', error);
+      }
+
+      if (!token || !meetingId) {
+        return showErrorToast('Failed to fetch meeting credentials');
+      }
+
+      const cleanedToken = token?.trim().replace(/^["']|["']$/g, '');
+      const cleanedMeetingId = meetingId?.trim().replace(/^["']|["']$/g, '');
+
+      if (!cleanedToken || !cleanedMeetingId) {
+        showErrorToast('Meeting credentials missing or invalid');
+        return;
+      }
+
+      setMeetingSession({
+        token: cleanedToken,
+        meetingId: cleanedMeetingId,
+        appointmentId: apptId,
+        patientName: appointment.patientInfo?.name,
+        patientAlphanumericId: appointment.patientInfo?.patientId,
+        appointmentGeneratedId: appointment.appointment_id,
+        startTime: appointment.start_time,
+        endTime: appointment.end_time,
+        callDurationSeconds: call_duration_seconds ?? 0,
+        patientUserId: String(appointment?.patient_id),
+      });
+
+      navigation.navigate(AppRoute.DOCTOR_MEETING);
+    },
+    [navigation, queryClient, setMeetingSession, requestAudioVideoPermissions]
+  );
+
   const handleMarkCompleted = useCallback(
     (appointmentId: number | string) => {
       showLoader('Loading...');
       changeStatus(
-        { appointmentId, appointment_status: 'completed' },
+        {
+          appointmentId,
+          status: 'completed',
+          call_end_reason: 'Call ended and Booking Completed by Doctor',
+        },
         {
           onSuccess: async () => {
             await queryClient.invalidateQueries({
@@ -178,6 +278,52 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
           },
         }
       );
+    },
+    [changeStatus, queryClient, showLoader, hideLoader]
+  );
+
+  const handleStartConsulation = useCallback(
+    (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
+      if (status?.toLowerCase() === 'confirmed') {
+        showLoader('Loading...');
+        changeStatus(
+          { appointmentId, status: 'in_progress' },
+          {
+            onSuccess: async () => {
+              await queryClient.invalidateQueries({
+                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+              });
+              hideLoader();
+              setConfirmCompleteAptId(null);
+              setInPersonAppointment({
+                apptIdforInPerson: String(appointmentId),
+                patientIdforInPerson: String(patientId),
+                patientNameforInPerson: String(patientName),
+                statusforInPerson: String(status),
+              });
+              navigation?.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                patientId: patientId,
+                patientName: patientName,
+              });
+            },
+            onError: () => {
+              hideLoader();
+              setConfirmCompleteAptId(null);
+            },
+          }
+        );
+      } else {
+        setInPersonAppointment({
+          apptIdforInPerson: String(appointmentId),
+          patientIdforInPerson: String(patientId),
+          patientNameforInPerson: String(patientName),
+          statusforInPerson: String(status),
+        });
+        navigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
+          patientId: patientId,
+          patientName: patientName,
+        });
+      }
     },
     [changeStatus, queryClient, showLoader, hideLoader]
   );
@@ -325,18 +471,26 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                 consultation_type={item.consultation_type}
                 startTime={item.start_time}
                 endTime={item.end_time}
-                isJoinedOnce={false}
-                callDurationSeconds={0}
+                isJoinedOnce={
+                  item?.appointment_status === 'in_progress' ||
+                  item?.appointment_status === 'in-progress'
+                }
+                callDurationSeconds={item?.call_duration_seconds || 0}
                 onViewDetails={() => setSelectedDetailsApt(item)}
                 onVideoCall={() => {
-                  showUnderDevelopmentToast();
+                  handleJoinVideoCall(item);
                 }}
                 onComplete={() => setConfirmCompleteAptId(item.id)}
                 onReschedule={() => {
                   showUnderDevelopmentToast();
                 }}
                 onStartConsultation={() => {
-                  showUnderDevelopmentToast();
+                  handleStartConsulation(
+                    item.id,
+                    Number(item.patientInfo?.patientId),
+                    item.patientInfo?.name || '',
+                    item.appointment_status
+                  );
                 }}
               />
             );

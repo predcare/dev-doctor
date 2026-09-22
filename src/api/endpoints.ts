@@ -47,11 +47,9 @@ export const endpoints = {
   },
   appointments: {
     get: '/appointments/my-appointments',
-    getToken: (appointmentId: number | string) =>
-      `/doctor/appointments/${appointmentId}/video-token`,
+    getToken: (appointmentId: number | string) => `/appointments/${appointmentId}/video-token`,
     heartbeat: '/doctor/appointments/heartbeat',
-    statusChange: (appointmentId: number | string) =>
-      `/doctor/appointments/${appointmentId}/status`,
+    statusChange: (appointmentId: number | string) => `/appointments/${appointmentId}/status`,
     bookByDoc: '/appointments/book',
     getdetails: (id: string | number) => `/doctor/appointments/${id}`,
     reschedule: (id: string | number) => `/doctor/appointments/${id}/reschedule`,

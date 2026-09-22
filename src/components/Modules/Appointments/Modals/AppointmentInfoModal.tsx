@@ -139,7 +139,7 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
         if (!appointment?.appointment_id || isPending) return;
         showLoader('Updating status...');
         changeStatus(
-          { appointmentId: appointment.appointment_id, appointment_status: statusId },
+          { appointmentId: appointment.appointment_id, status: statusId },
           {
             onSuccess: async () => {
               await queryClient.invalidateQueries({
@@ -243,7 +243,11 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
 
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Duration</Text>
-                  <Text style={styles.infoValue}>⏱ 0 min</Text>
+                  <Text style={styles.infoValue}>
+                    {appointment?.call_duration_seconds
+                      ? `⏱ ${Math.ceil(appointment.call_duration_seconds / 60)} min`
+                      : '-'}
+                  </Text>
                 </View>
 
                 <View style={[styles.infoRow, styles.infoRowLast]}>
@@ -258,7 +262,7 @@ export const AppointmentInfoModal: React.FC<AppointmentInfoModalProps> = React.m
                 <Text style={styles.sectionTitle}>CALL DETAILS</Text>
                 <View style={[styles.infoRow, styles.infoRowLast]}>
                   <Text style={styles.infoLabel}>Ended At</Text>
-                  <Text style={styles.infoValue}>23-Aug, 2026</Text>
+                  <Text style={styles.infoValue}>{formatDate(appointment?.call_end_time) || '-'}</Text>
                 </View>
                 <View style={[styles.infoRow, styles.infoRowLast]}>
                   <Text style={styles.infoLabel}>Reason</Text>

@@ -81,6 +81,7 @@ export enum MyAppointmentsQueryKeys {
   MyAppointmentsInfo = 'MyAppointmentsInfo',
   Token = 'Token',
   StatusChange = 'StatusChange',
+  GET_TOKEN = 'GET_TOKEN',
 }
 
 export enum AvailbilityQueryKeys {

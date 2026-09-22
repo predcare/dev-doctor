@@ -40,8 +40,11 @@ export const useSendHeartBeat = () =>
 
 export const useChangeAppointmentStatus = () => {
   return useMutation({
-    mutationFn: (payload: { appointmentId: number | string; appointment_status: string }) =>
-      changeAppointmentStatus(payload),
+    mutationFn: (payload: {
+      appointmentId: number | string;
+      status: number | string;
+      call_end_reason?: string;
+    }) => changeAppointmentStatus(payload),
   });
 };
 

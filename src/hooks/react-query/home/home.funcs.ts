@@ -1,6 +1,6 @@
 import axiosInstance from '../../../api/apiClient';
 import { endpoints } from '../../../api/endpoints';
-import { IMyAppointmentsRoot } from '../../../typescripts/interfaces/appointments.interfaces';
+import { THomeMyAppointmentsRoot } from '../../../typescripts/interfaces/appointments.interfaces';
 import { IHomeStatsRoot } from '../../../typescripts/interfaces/homes.interfaces';
 import { IMyApptQueryParams } from '../appointments/payload.interafce';
 
@@ -12,7 +12,7 @@ export const getHomeStats = async (params: { userId: number | string; period: st
 };
 
 export const getHomeUpcomingAppts = async (params: IMyApptQueryParams) => {
-  const res = await axiosInstance.get<IMyAppointmentsRoot>(`${endpoints.homes.upcomingAppts}`, {
+  const res = await axiosInstance.get<THomeMyAppointmentsRoot>(`${endpoints.homes.upcomingAppts}`, {
     params,
   });
   return res.data;

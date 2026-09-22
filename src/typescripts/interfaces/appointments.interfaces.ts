@@ -1,8 +1,10 @@
 import { IRootResponse } from './common.interfaces';
 
 export type TMyAppointmentRoot = IRootResponse<IMyAppointmentDoc[]>;
+export type THomeMyAppointmentsRoot = IRootResponse<IMyAppointmentDoc[]>;
 export type IPatientConsultApptRoot = IRootResponse<IMyAppointmentDoc[]>;
 export type TMyAppointmentStats = IRootResponse<IMyApptStatus>;
+export type TGetApptTokenRoot = IRootResponse<IGetApptTokenDoc>;
 
 export interface IAppointmentInfoRoot {
   success: boolean;
@@ -104,6 +106,10 @@ export interface IMyAppointmentDoc {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  call_end_time?: string;
+  meeting_id?: string;
+  token?: string;
+  call_duration_seconds?: number;
   doctorInfo: IDoctorInfo;
   clinicInfo: IClinicInfo;
   patientInfo: IPatientInfo;
@@ -145,4 +151,19 @@ export interface IMyApptStatus {
   completed_count: number;
   cancelled_count: number;
   pending_count: number;
+}
+
+export interface IGetApptTokenDoc {
+  token: string;
+  meeting_id: string;
+  appointment: ITokenAppt;
+}
+
+export interface ITokenAppt {
+  id: string;
+  appointment_id: string;
+  appointment_date: string;
+  start_time: string;
+  end_time: string;
+  slot_duration: number;
 }
