@@ -103,7 +103,7 @@ export const BookingPatientSelectModal: React.FC<BookingPatientSelectModalProps>
                     activeOpacity={0.7}
                     onPress={() => {
                       onSelectPatient({
-                        id: Number(item.id),
+                        id: Number(item.user_id),
                         name: item.name,
                         patientGenId: item.patient_id,
                         Phone: Number(item.phone_number),

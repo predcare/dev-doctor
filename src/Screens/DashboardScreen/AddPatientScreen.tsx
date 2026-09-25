@@ -1,15 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import StepIndicator from '../../components/Modules/Patients/Components/StepIndicator';
 import BasicInfoForm from '../../components/Modules/Patients/Forms/BasicInfoForm';
 import ContactInfoForm from '../../components/Modules/Patients/Forms/ContactInfoForm';
@@ -265,122 +257,107 @@ export const AddPatientScreen: React.FC<AddPatientScreenProps> = ({ navigation }
           </View>
         )}
 
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        <ScrollView
+          style={AddPatientStyles.scroll}
+          contentContainerStyle={AddPatientStyles.formContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <ScrollView
-            style={AddPatientStyles.scroll}
-            contentContainerStyle={AddPatientStyles.formContent}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={AddPatientStyles.cardContainer}>
-              {(step === 1 || selectionMode === 'existing_user') && (
-                <BasicInfoForm
-                  control={control}
-                  setValue={setValue}
-                  watch={watch}
-                  errors={errors}
-                  selectedUser={selectedUser}
-                  setSelectedUser={data => {
-                    setSelectedUser(data);
-                    setValue('selected_user_id', Number(data?.id) || null);
-                  }}
-                />
-              )}
-
-              {selectionMode === 'create_new' && step === 2 && (
-                <MedicalInfoForm control={control} />
-              )}
-
-              {selectionMode === 'create_new' && step === 3 && (
-                <ContactInfoForm
-                  control={control}
-                  setValue={setValue}
-                  watch={watch}
-                  errors={errors}
-                />
-              )}
-            </View>
-
-            {selectionMode === 'existing_user' && selectedUser && (
-              <View style={AddPatientStyles.confirmCard}>
-                <Text style={AddPatientStyles.confirmTitle}>Patient Summary</Text>
-                <View style={AddPatientStyles.confirmRow}>
-                  <Text style={AddPatientStyles.confirmLbl}>Name</Text>
-                  <Text style={AddPatientStyles.confirmVal}>{selectedUser?.name}</Text>
-                </View>
-                {selectedUser?.email ? (
-                  <View style={AddPatientStyles.confirmRow}>
-                    <Text style={AddPatientStyles.confirmLbl}>Email</Text>
-                    <Text style={AddPatientStyles.confirmVal}>
-                      {maskValue(selectedUser?.email)}
-                    </Text>
-                  </View>
-                ) : null}
-                {selectedUser?.phone_number ? (
-                  <View style={AddPatientStyles.confirmRow}>
-                    <Text style={AddPatientStyles.confirmLbl}>Phone</Text>
-                    <Text style={AddPatientStyles.confirmVal}>
-                      {maskValue(selectedUser?.phone_number)}
-                    </Text>
-                  </View>
-                ) : null}
-                {selectedUser?.gender ? (
-                  <View style={AddPatientStyles.confirmRow}>
-                    <Text style={AddPatientStyles.confirmLbl}>Gender</Text>
-                    <Text style={AddPatientStyles.confirmVal}>{selectedUser?.gender}</Text>
-                  </View>
-                ) : null}
-                <View style={AddPatientStyles.confirmInfoBox}>
-                  <Text style={AddPatientStyles.confirmInfoTxt}>
-                    ✓ All existing data (contact, medical history, address) will be used as-is from
-                    the database. Only clinic registration is needed.
-                  </Text>
-                </View>
-              </View>
+          <View style={AddPatientStyles.cardContainer}>
+            {(step === 1 || selectionMode === 'existing_user') && (
+              <BasicInfoForm
+                control={control}
+                setValue={setValue}
+                watch={watch}
+                errors={errors}
+                selectedUser={selectedUser}
+                setSelectedUser={data => {
+                  setSelectedUser(data);
+                  setValue('selected_user_id', Number(data?.id) || null);
+                }}
+              />
             )}
 
-            <View style={AddPatientStyles.btnRow}>
-              {selectionMode === 'create_new' && step > 1 && (
-                <TouchableOpacity
-                  style={AddPatientStyles.backSecBtn}
-                  onPress={handleBack}
-                  activeOpacity={0.8}
-                >
-                  <Text style={AddPatientStyles.backSecTxt}>← Back</Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                style={[
-                  AddPatientStyles.nextBtn,
-                  (selectionMode === 'existing_user' || step === 1) && { flex: 1 },
-                  (loading || (selectionMode === 'existing_user' && !selectedUser)) && {
-                    opacity: 0.55,
-                  },
-                ]}
-                onPress={handleNext}
-                disabled={loading || (selectionMode === 'existing_user' && !selectedUser)}
-                activeOpacity={0.85}
-              >
-                {loading ? (
-                  <ActivityIndicator color={theme.colors.surface} />
-                ) : (
-                  <Text style={AddPatientStyles.nextTxt}>
-                    {selectionMode === 'existing_user'
-                      ? 'Add to My Clinic'
-                      : step === 3
-                      ? 'Submit Patient'
-                      : 'Next Step →'}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
+            {selectionMode === 'create_new' && step === 2 && <MedicalInfoForm control={control} />}
 
-            <View style={{ height: 36 }} />
-          </ScrollView>
-        </KeyboardAvoidingView>
+            {selectionMode === 'create_new' && step === 3 && (
+              <ContactInfoForm
+                control={control}
+                setValue={setValue}
+                watch={watch}
+                errors={errors}
+              />
+            )}
+          </View>
+
+          {selectionMode === 'existing_user' && selectedUser && (
+            <View style={AddPatientStyles.confirmCard}>
+              <Text style={AddPatientStyles.confirmTitle}>Patient Summary</Text>
+              <View style={AddPatientStyles.confirmRow}>
+                <Text style={AddPatientStyles.confirmLbl}>Name</Text>
+                <Text style={AddPatientStyles.confirmVal}>{selectedUser?.name}</Text>
+              </View>
+              {selectedUser?.email ? (
+                <View style={AddPatientStyles.confirmRow}>
+                  <Text style={AddPatientStyles.confirmLbl}>Email</Text>
+                  <Text style={AddPatientStyles.confirmVal}>{maskValue(selectedUser?.email)}</Text>
+                </View>
+              ) : null}
+              {selectedUser?.phone_number ? (
+                <View style={AddPatientStyles.confirmRow}>
+                  <Text style={AddPatientStyles.confirmLbl}>Phone</Text>
+                  <Text style={AddPatientStyles.confirmVal}>
+                    {maskValue(selectedUser?.phone_number)}
+                  </Text>
+                </View>
+              ) : null}
+              {selectedUser?.gender ? (
+                <View style={AddPatientStyles.confirmRow}>
+                  <Text style={AddPatientStyles.confirmLbl}>Gender</Text>
+                  <Text style={AddPatientStyles.confirmVal}>{selectedUser?.gender}</Text>
+                </View>
+              ) : null}
+              <View style={AddPatientStyles.confirmInfoBox}>
+                <Text style={AddPatientStyles.confirmInfoTxt}>
+                  ✓ All existing data (contact, medical history, address) will be used as-is from
+                  the database. Only clinic registration is needed.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          <View style={AddPatientStyles.btnRow}>
+            {selectionMode === 'create_new' && step > 1 && (
+              <TouchableOpacity
+                style={AddPatientStyles.backSecBtn}
+                onPress={handleBack}
+                activeOpacity={0.8}
+              >
+                <Text style={AddPatientStyles.backSecTxt}>← Back</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={[AddPatientStyles.nextBtn]}
+              onPress={handleNext}
+              disabled={loading || (selectionMode === 'existing_user' && !selectedUser)}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color={theme.colors.surface} />
+              ) : (
+                <Text style={AddPatientStyles.nextTxt}>
+                  {selectionMode === 'existing_user'
+                    ? 'Add to My Clinic'
+                    : step === 3
+                    ? 'Submit Patient'
+                    : 'Next Step →'}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ height: 36 }} />
+        </ScrollView>
       </View>
     </SafeAreaWrapper>
   );

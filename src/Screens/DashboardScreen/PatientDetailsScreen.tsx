@@ -9,7 +9,6 @@ import PatientTabBar, {
   TabItem,
 } from '../../components/Modules/PatientDetails/PatientTabBar';
 import PrescriptionsTabPanel from '../../components/Modules/PatientDetails/PrescriptionsTabPanel';
-import RecordsTabPanel from '../../components/Modules/PatientDetails/RecordsTabPanel';
 import PatientDetailsSkeleton from '../../components/Skeletons/PatientDetailsSkeleton';
 import ChevronLeftIcon from '../../components/ui/icons/ChevronLeftIcon';
 import { useMyPatientInfo } from '../../hooks/react-query/patients/patients.hooks';
@@ -121,7 +120,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
             onTabPress={setActiveMainTab}
           />
           <View style={{ flex: 1 }}>
-            {activeMainTab === 'records' && <RecordsTabPanel patientId={patientId} />}
+            {/* {activeMainTab === 'records' && <RecordsTabPanel patientId={patientId} />} */}
 
             {activeMainTab === 'prescriptions' && <PrescriptionsTabPanel patientId={patientId} />}
             {/* {activeMainTab === 'invoice' && (

@@ -348,37 +348,45 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
           </>
         )}
 
-        <PredDatePickerModal
-          visible={showDatePicker}
-          value={dateOfBirth}
-          title="Select Date of Birth"
-          maxYear={new Date().getFullYear()}
-          onConfirm={d => {
-            setShowDatePicker(false);
-            setValue('date_of_birth', d, { shouldValidate: true });
-          }}
-          onCancel={() => setShowDatePicker(false)}
-        />
-        <BloodGroupModal
-          visible={showBGModal}
-          selectedGroup={bloodGroup || ''}
-          onSelect={bg => setValue('blood_group', bg, { shouldValidate: true })}
-          onClose={() => setShowBGModal(false)}
-        />
-        <UserPickerModal
-          visible={showUserPicker}
-          onClose={() => setShowUserPicker(false)}
-          onPick={handlePickUser}
-        />
-        <UploadOptionsModal
-          visible={showUploadOptions}
-          type="profile"
-          title="Upload Patient Photo"
-          subtitle="Choose a source to add patient profile picture"
-          onSelectCamera={handleCamera}
-          onSelectGallery={handleGallery}
-          onClose={() => setShowUploadOptions(false)}
-        />
+        {showDatePicker && (
+          <PredDatePickerModal
+            visible={showDatePicker}
+            value={dateOfBirth}
+            title="Select Date of Birth"
+            maxYear={new Date().getFullYear()}
+            onConfirm={d => {
+              setShowDatePicker(false);
+              setValue('date_of_birth', d, { shouldValidate: true });
+            }}
+            onCancel={() => setShowDatePicker(false)}
+          />
+        )}
+        {showBGModal && (
+          <BloodGroupModal
+            visible={showBGModal}
+            selectedGroup={bloodGroup || ''}
+            onSelect={bg => setValue('blood_group', bg, { shouldValidate: true })}
+            onClose={() => setShowBGModal(false)}
+          />
+        )}
+        {showUserPicker && (
+          <UserPickerModal
+            visible={showUserPicker}
+            onClose={() => setShowUserPicker(false)}
+            onPick={handlePickUser}
+          />
+        )}
+        {showUploadOptions && (
+          <UploadOptionsModal
+            visible={showUploadOptions}
+            type="profile"
+            title="Upload Patient Photo"
+            subtitle="Choose a source to add patient profile picture"
+            onSelectCamera={handleCamera}
+            onSelectGallery={handleGallery}
+            onClose={() => setShowUploadOptions(false)}
+          />
+        )}
       </>
     );
   }

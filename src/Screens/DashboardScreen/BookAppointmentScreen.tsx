@@ -88,6 +88,8 @@ export const BookAppointmentScreen: React.FC<BookAppointmentScreenProps> = () =>
     selectedSlots: null,
   });
 
+  console.log('selectedPatient', selectedPatient)
+
   const doctorId = Number(userData?.id || userData?.user_id || 0);
   const clinicId = Number(userData?.clinic?.id || userData?.clinic_id || 0);
 

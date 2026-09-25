@@ -85,7 +85,7 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
     <SafeAreaWrapper showBottomBar={true} activeBottomTab="Patients">
       <View style={S.container}>
         <Header
-          title="Patients"
+          title="My Patients"
           description="Manage and view your patient records"
           onNotificationPress={() => appNavigation?.navigate(AppRoute.NOTIFICATIONS)}
         />
