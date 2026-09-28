@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import ExistingSlotCard from '../../components/Modules/Availability/ExistingSlotCard';
 import SlotEditorCard from '../../components/Modules/Availability/SlotEditorCard';
@@ -25,6 +26,7 @@ export interface AvailabilityScreenProps {
 }
 
 export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const [showExistingSlots, setShowExistingSlots] = useState(true);
   const [showNewSlotForm, setShowNewSlotForm] = useState(false);
   const [editingSlot, setEditingSlot] = useState<IMyAvailabilityDoc | null>(null);
@@ -75,7 +77,7 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
   };
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar>
       <View style={S.container}>
         <View style={S.header}>
           <TouchableOpacity
@@ -183,7 +185,12 @@ export const AvailabilityScreen: React.FC<AvailabilityScreenProps> = ({ navigati
 
         {!showNewSlotForm && (
           <TouchableOpacity
-            style={S.fabBtn}
+            style={[
+              S.fabBtn,
+              {
+                bottom: Math.max(insets.bottom, 16) + 16,
+              },
+            ]}
             onPress={() => {
               setEditingSlot(null);
               setShowNewSlotForm(true);

@@ -276,7 +276,7 @@ export async function displayLocalSystemNotification(
  * Subscribes to notification click events when the app was running in the background
  */
 export function onBackgroundNotificationTap(
-  customNavRef?: any,
+  _customNavRef?: any,
   onTapCallback?: (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => void
 ): () => void {
   console.log('[FCM] Registered background notification tap listener');
@@ -285,25 +285,10 @@ export function onBackgroundNotificationTap(
     messagingInstance,
     (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => {
       console.log('[FCM] Notification opened app from background state:', remoteMessage);
+      const { handleNotificationClick } = require('./notificationRouter');
+      handleNotificationClick('Firebase onNotificationOpenedApp (Background)', remoteMessage);
       if (onTapCallback) {
         onTapCallback(remoteMessage);
-      } else if (remoteMessage?.data?.screen) {
-        const screenName = String(remoteMessage.data.screen);
-        let params = undefined;
-        if (remoteMessage.data.params) {
-          try {
-            params =
-              typeof remoteMessage.data.params === 'string'
-                ? JSON.parse(remoteMessage.data.params)
-                : remoteMessage.data.params;
-          } catch (e) {
-            params = remoteMessage.data.params;
-          }
-        }
-        if (customNavRef && customNavRef.isReady && customNavRef.isReady()) {
-          // @ts-ignore
-          customNavRef.navigate(screenName, params);
-        }
       }
     }
   );
@@ -313,41 +298,40 @@ export function onBackgroundNotificationTap(
 
 /**
  * 7. checkInitialNotification
- * Checks if the app was launched from a quit/killed state via a push notification tap
+ * Checks if the app was launched from a quit/killed state via a push notification tap (FCM or Notifee)
  */
 export async function checkInitialNotification(
-  customNavRef?: any,
+  _customNavRef?: any,
   onTapCallback?: (remoteMessage: FirebaseMessagingTypes.RemoteMessage) => void
 ): Promise<FirebaseMessagingTypes.RemoteMessage | null> {
   try {
     const messagingInstance = getMessaging();
     const remoteMessage = await getInitialNotification(messagingInstance);
     if (remoteMessage) {
-      console.log('[FCM] App launched from quit state via notification:', remoteMessage);
+      console.log(
+        '[FCM] App launched from quit state via notification (Cold Start):',
+        remoteMessage
+      );
+      const { handleNotificationClick } = require('./notificationRouter');
+      handleNotificationClick('Firebase getInitialNotification (Cold Start)', remoteMessage);
       if (onTapCallback) {
         onTapCallback(remoteMessage);
-      } else if (remoteMessage?.data?.screen) {
-        const screenName = String(remoteMessage.data.screen);
-        let params = undefined;
-        if (remoteMessage.data.params) {
-          try {
-            params =
-              typeof remoteMessage.data.params === 'string'
-                ? JSON.parse(remoteMessage.data.params)
-                : remoteMessage.data.params;
-          } catch (e) {
-            params = remoteMessage.data.params;
-          }
-        }
-        if (customNavRef && customNavRef.isReady && customNavRef.isReady()) {
-          // @ts-ignore
-          customNavRef.navigate(screenName, params);
-        }
       }
+      return remoteMessage;
+    }
+
+    const notifeeInitial = await notifee.getInitialNotification();
+    if (notifeeInitial?.notification) {
+      console.log(
+        '[Notifee] App launched from quit state via Notifee notification:',
+        notifeeInitial
+      );
+      const { handleNotificationClick } = require('./notificationRouter');
+      handleNotificationClick('Notifee getInitialNotification (Cold Start)', notifeeInitial);
     } else {
       console.log('[FCM] No initial notification found on cold launch');
     }
-    return remoteMessage;
+    return null;
   } catch (error) {
     console.error('[FCM] Error checking initial notification:', error);
     return null;

@@ -48,6 +48,7 @@ export interface IPatientPrescriptionDoc {
   follow_up_date?: string;
   referral_specialist?: string;
   referral_doctor_hospital?: string;
+  referral_doctor_name?: string;
   referral_reason?: string;
   notes?: string;
   digital_signature: any;
@@ -76,6 +77,19 @@ export interface IPatientPrescriptionDoc {
   patient_display_id?: string;
   visit_no?: number;
   email_sent_at?: string;
+  version_no: any;
+  version_name: any;
+  version_status: any;
+  published_at: any;
+  superseded_at: any;
+  superseded_by_version_id: any;
+  prescription_version_code: any;
+  verify_token: string;
+  send_channel: any;
+  amendment_note: any;
+  current_version_id: string;
+  published_version_count: number;
+  last_published_at: string;
 }
 
 export interface IPatientCustomVital {

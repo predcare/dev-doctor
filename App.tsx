@@ -8,6 +8,8 @@ import GlobalToast from './src/components/commons/Toast/GlobalToast';
 import GlobalMeetingManager from './src/components/Modules/DoctorMeeting/GlobalMeetingManager';
 import ReactQueryProvider from './src/components/providers/ReactQueryProvider';
 import AppNavigator from './src/navigation/AppNavigator';
+import SocketProvider from './src/components/commons/Sockets/SocketProvider';
+import SocketListeners from './src/components/commons/Sockets/SocketListeners';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -21,6 +23,8 @@ function App(): React.JSX.Element {
         <GlobalPopupAlert />
         <BackdropLoader />
         <EventListener />
+        <SocketProvider />
+        <SocketListeners />
       </SafeAreaProvider>
     </ReactQueryProvider>
   );

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import {
@@ -12,6 +13,7 @@ import {
 } from '../components/ui/icons';
 import { useNotificationCount } from '../hooks/react-query/notifications/notifications.hooks';
 import { getInitials } from '../lib/common/common.utils';
+import { AppRoute } from '../route';
 import { headerStyles } from '../styled/Header.styled';
 import { theme } from '../styled/theme.styled';
 import { useAuthStore } from '../zustand/stores/useAuthStore';
@@ -37,6 +39,7 @@ interface HeaderProps {
   title?: string;
   description?: string;
   subtitle?: string;
+  isIconShow?: boolean;
   icon?: React.ReactNode;
   onBackPress?: () => void;
   doctorName?: string;
@@ -53,16 +56,23 @@ export const Header: React.FC<HeaderProps> = ({
   description,
   subtitle,
   icon,
+  isIconShow = true,
   onBackPress,
-  onNotificationPress,
   onProfilePress,
 }) => {
-  const subText = description || subtitle;
+  const navigation = useNavigation();
+
   const { userData } = useAuthStore(state => state);
+
   const { data: notificationData, isPending: isLoadingNotificationCount } = useNotificationCount();
+
   const isNotificationAvailable = useMemo(() => {
     return notificationData && notificationData?.data?.unread_count > 0 ? true : false;
   }, [notificationData?.data?.unread_count]);
+
+  const handleMoveToNotify = () => {
+    navigation.navigate(AppRoute.NOTIFICATIONS);
+  };
 
   return (
     <View style={headerStyles.container}>
@@ -79,18 +89,22 @@ export const Header: React.FC<HeaderProps> = ({
               </TouchableOpacity>
             )}
             <View style={headerStyles.titleRow}>
-              <View style={headerStyles.titleIconBadge}>{icon || getDefaultHeaderIcon(title)}</View>
+              {isIconShow ? (
+                <View style={headerStyles.titleIconBadge}>
+                  {icon || getDefaultHeaderIcon(title)}
+                </View>
+              ) : null}
               <View style={headerStyles.titleTextGroup}>
                 <Text style={headerStyles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
                   {title}
                 </Text>
-                {subText ? (
+                {description || subtitle ? (
                   <Text
                     style={headerStyles.headerDescription}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {subText}
+                    {description || subtitle}
                   </Text>
                 ) : null}
               </View>
@@ -123,7 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
         <View style={headerStyles.actionsGroup}>
           <TouchableOpacity
             style={headerStyles.iconButton}
-            onPress={onNotificationPress}
+            onPress={handleMoveToNotify}
             activeOpacity={0.7}
           >
             {isLoadingNotificationCount ? (

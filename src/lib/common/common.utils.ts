@@ -280,3 +280,11 @@ export const getPayStatus = (statusStr: string) => {
   if (s === 'unpaid') return { bg: '#FEE2E2', txt: '#B91C1C', label: 'UNPAID' };
   return { bg: '#FEF3C7', txt: '#B45309', label: 'PENDING' };
 };
+
+export const _toTitleCase = (value: string): string => {
+  if (!value?.trim()) return '';
+  return value
+    .replace(/[_-]+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, char => char.toUpperCase());
+};

@@ -7,7 +7,7 @@ export const profileStyles = StyleSheet.create({
     backgroundColor: theme.colors.bg,
   },
   scrollContent: {
-    paddingBottom: 48,
+    paddingBottom: 0,
   },
 
   profileCard: {

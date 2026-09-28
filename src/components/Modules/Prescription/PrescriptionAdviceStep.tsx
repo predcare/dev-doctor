@@ -96,14 +96,30 @@ export const PrescriptionAdviceStep: React.FC = () => {
         </View>
 
         <View style={{ marginBottom: 12 }}>
-          <Text style={S.vitalLabel}>Doctor / Hospital</Text>
+          <Text style={S.vitalLabel}>Hospital</Text>
           <Controller
             control={control}
             name="referral_doctor_hospital"
             render={({ field: { onChange, value } }) => (
               <TextInput
                 style={S.consultInput}
-                placeholder="Referred doctor or hospital name..."
+                placeholder="Referred hospital name..."
+                placeholderTextColor={theme.colors.textMuted}
+                value={value || ''}
+                onChangeText={onChange}
+              />
+            )}
+          />
+        </View>
+        <View style={{ marginBottom: 12 }}>
+          <Text style={S.vitalLabel}>Doctor</Text>
+          <Controller
+            control={control}
+            name="referral_doctor_name"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={S.consultInput}
+                placeholder="Referred doctor name..."
                 placeholderTextColor={theme.colors.textMuted}
                 value={value || ''}
                 onChangeText={onChange}

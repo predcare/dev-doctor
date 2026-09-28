@@ -461,6 +461,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                       apt.appointment_status
                     );
                   }}
+                  onCardPress={() => {
+                    // @ts-ignore
+                    navigation?.navigate(AppRoute.APPOINTMENT_DETAILS, {
+                      appointmentId: Number(apt.id),
+                    });
+                  }}
                 />
               );
             })

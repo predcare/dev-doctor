@@ -36,6 +36,7 @@ export const AppRoute = {
   SCHEDULE: 'Schedule',
   REPORTS: 'Reports',
   ACCOUNT: 'Account',
+  APPOINTMENT_DETAILS: 'AppointmentDetails',
 } as const;
 
 export type RouteNames = (typeof AppRoute)[keyof typeof AppRoute];
@@ -97,6 +98,7 @@ export type RootStackParamList = {
   Reports: undefined;
   Account: undefined;
   MainTabs: NavigatorScreenParams<DashboardTabParamList> | undefined;
+  AppointmentDetails: { appointmentId?: number; isComingFromNotification?: boolean } | undefined;
 };
 
 /**

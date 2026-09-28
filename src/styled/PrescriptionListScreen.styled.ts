@@ -196,6 +196,7 @@ export const prescriptionListStyles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 10,
     elevation: 8,
+    zIndex: 999,
   },
 
   // Filter Modal Styles

@@ -9,8 +9,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
+import { getBottomBarHeight } from '../../components/commons/CustomBottomBar/CustomBottomBar';
 import PatientCard from '../../components/Modules/Patients/PatientCard';
 import PatientSkeleton from '../../components/Skeletons/PatientSkeleton';
 import { PlusIcon, SearchIcon } from '../../components/ui/icons';
@@ -33,6 +35,7 @@ export interface PatientsScreenProps {
 }
 
 export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
+  const insets = useSafeAreaInsets();
   const appNavigation = useNavigation();
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -196,7 +199,12 @@ export const PatientsScreen: React.FC<PatientsScreenProps> = () => {
           />
         )}
         <TouchableOpacity
-          style={S.fab}
+          style={[
+            S.fab,
+            {
+              bottom: getBottomBarHeight(insets.bottom) + 16,
+            },
+          ]}
           onPress={() => handleAddPatient()}
           activeOpacity={0.85}
           accessibilityRole="button"

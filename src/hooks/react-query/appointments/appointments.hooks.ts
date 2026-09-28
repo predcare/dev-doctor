@@ -59,7 +59,7 @@ export const useMyAppointmentInfo = (params?: { id?: number | string }) =>
     queryFn: () => getMyAppointmentInfo(params?.id!),
     enabled: !!params?.id,
     select: v => {
-      if (v) return v?.appointment;
+      if (v) return v?.data;
       return null;
     },
   });

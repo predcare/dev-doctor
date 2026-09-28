@@ -54,9 +54,13 @@ export const useCreateInvoices = () =>
     mutationFn: createInvoices,
   });
 
-export const useInvoicesStats = () =>
+export const useInvoicesStats = (params?: {
+  clinic_id?: string;
+  end_date?: string;
+  start_date?: string;
+}) =>
   useQuery({
-    queryKey: [MyInvoices.InvoicesStats],
-    queryFn: getInvoicesStats,
-    select: v => v.data,
+    queryKey: [MyInvoices.InvoicesStats, params],
+    queryFn: () => getInvoicesStats(params as any),
+    select: v => v?.data,
   });

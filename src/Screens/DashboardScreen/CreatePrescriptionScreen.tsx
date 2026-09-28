@@ -16,7 +16,6 @@ import PrescriptionClinicalNotesStep from '../../components/Modules/Prescription
 import PrescriptionDiagnosisStep from '../../components/Modules/Prescription/PrescriptionDiagnosisStep';
 import PrescriptionLabsStep from '../../components/Modules/Prescription/PrescriptionLabsStep';
 import PrescriptionMedicationsStep from '../../components/Modules/Prescription/PrescriptionMedicationsStep';
-import PrescriptionPatientHeaderCard from '../../components/Modules/Prescription/PrescriptionPatientHeaderCard';
 import PrescriptionVitalsStep from '../../components/Modules/Prescription/PrescriptionVitalsStep';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import CreatePrescriptionSkeleton from '../../components/Skeletons/CreatePrescriptionSkeleton';
@@ -200,6 +199,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
         _data?.follow_up_date?.trim() ||
         _data?.referral_specialist?.trim() ||
         _data?.referral_doctor_hospital?.trim() ||
+        _data?.referral_doctor_name?.trim() ||
         _data?.referral_reason?.trim() ||
         _data?.notes?.trim() ||
         (validMedications && validMedications.length > 0) ||
@@ -248,6 +248,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       follow_up_date: _data?.follow_up_date,
       referral_specialist: _data?.referral_specialist,
       referral_doctor_hospital: _data?.referral_doctor_hospital,
+      referral_doctor_name: _data?.referral_doctor_name,
       referral_reason: _data?.referral_reason,
       notes: _data?.notes,
       status: status,
@@ -511,14 +512,19 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     (Boolean(prescriptionId) && isPrescriptionInfoError);
 
   const displayPatientName =
-    patientInfo?.name || route?.params?.patientName || prescriptionInfo?.data?.patient_name || '';
+    `${patientInfo?.name} (#${
+      patientInfo?.patient_id
+    }) ${patientInfo?.gender[0].toUpperCase()}/${getAge(patientInfo?.date_of_birth || '')}` ||
+    route?.params?.patientName ||
+    prescriptionInfo?.data?.patient_name ||
+    '';
 
   const subtitle = isLoadingData
     ? 'Loading details...'
     : isFormError
     ? 'Error loading information'
     : displayPatientName
-    ? `Patient: ${displayPatientName}`
+    ? `${displayPatientName}`
     : prescriptionId
     ? 'Edit Existing Prescription'
     : 'Create New Prescription';
@@ -607,6 +613,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
         follow_up_date: rx.follow_up_date || rx.follow_up || '',
         referral_specialist: rx.referral_specialist || '',
         referral_doctor_hospital: rx.referral_doctor_hospital || '',
+        referral_doctor_name: rx.referral_doctor_name || '',
         referral_reason: rx.referral_reason || '',
         notes: rx.notes || '',
       });
@@ -723,119 +730,105 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
           />
         </ScrollView>
       ) : (
-        <>
-          <PrescriptionPatientHeaderCard
-            name={patientInfo?.name || '-'}
-            patientId={patientInfo?.patient_id || '-'}
-            age={getAge(patientInfo?.date_of_birth || '') || patientInfo?.age_display || ''}
-            bloodGroup={patientInfo?.blood_type || ''}
-            gender={patientInfo?.gender || '-'}
-            profileImg={patientInfo?.profile_image || ''}
-          />
-          <FormProvider {...methods}>
-            <KeyboardAvoidingView
-              style={{ flex: 1 }}
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            >
-              <View style={S.stepBarWrapper}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={S.stepBarContent}
-                >
-                  {PrescriptionSteps.map(step => {
-                    const active = step.id === activeStep;
-                    return (
-                      <TouchableOpacity
-                        key={step.id}
-                        style={[S.stepTab, active && S.stepTabActive]}
-                        onPress={() => setActiveStep(step.id)}
-                        activeOpacity={0.75}
-                      >
-                        <View style={[S.stepTabBadge, active && S.stepTabBadgeActive]}>
-                          <Text style={[S.stepTabBadgeText, active && S.stepTabBadgeTextActive]}>
-                            {step.stepNum}
-                          </Text>
-                        </View>
-                        <Text style={[S.stepTabTitle, active && S.stepTabTitleActive]}>
-                          {step.title}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-              </View>
+        <FormProvider {...methods}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          >
+            <View style={S.stepBarWrapper}>
               <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={S.stepBarContent}
               >
-                {renderStepForm()}
-              </ScrollView>
-              <View style={S.stickyBottomBar}>
-                <View style={S.autoSaveRow}>
-                  <View style={[S.autoSaveDot, { backgroundColor: currentAutoSave.color }]} />
-                  <Text style={S.autoSaveText}>{currentAutoSave.text}</Text>
-                </View>
-                <View style={S.bottomBtnRow}>
-                  <TouchableOpacity
-                    style={[S.btnPrev, isFirstStep && { opacity: 0.4 }]}
-                    onPress={handlePrevStep}
-                    disabled={isFirstStep}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={S.btnPrevText}>‹ Previous</Text>
-                  </TouchableOpacity>
-
-                  {isLastStep ? (
+                {PrescriptionSteps.map(step => {
+                  const active = step.id === activeStep;
+                  return (
                     <TouchableOpacity
-                      style={S.btnComplete}
-                      onPress={methods.handleSubmit(handleFinalSubmit)}
-                      disabled={
-                        createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
-                      }
-                      activeOpacity={0.85}
+                      key={step.id}
+                      style={[S.stepTab, active && S.stepTabActive]}
+                      onPress={() => setActiveStep(step.id)}
+                      activeOpacity={0.75}
                     >
-                      <Text style={S.btnCompleteText}>
-                        {createPrescriptionPending || updatePrescriptionPending
-                          ? 'Saving...'
-                          : prescriptionId
-                          ? 'Update Prescription'
-                          : 'Complete'}
+                      <View style={[S.stepTabBadge, active && S.stepTabBadgeActive]}>
+                        <Text style={[S.stepTabBadgeText, active && S.stepTabBadgeTextActive]}>
+                          {step.stepNum}
+                        </Text>
+                      </View>
+                      <Text style={[S.stepTabTitle, active && S.stepTabTitleActive]}>
+                        {step.title}
                       </Text>
                     </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      style={S.btnNext}
-                      onPress={handleNextStep}
-                      activeOpacity={0.85}
-                    >
-                      <Text style={S.btnNextText}>Next ›</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {renderStepForm()}
+            </ScrollView>
+            <View style={S.stickyBottomBar}>
+              <View style={S.autoSaveRow}>
+                <View style={[S.autoSaveDot, { backgroundColor: currentAutoSave.color }]} />
+                <Text style={S.autoSaveText}>{currentAutoSave.text}</Text>
+              </View>
+              <View style={S.bottomBtnRow}>
+                <TouchableOpacity
+                  style={[S.btnPrev, isFirstStep && { opacity: 0.4 }]}
+                  onPress={handlePrevStep}
+                  disabled={isFirstStep}
+                  activeOpacity={0.7}
+                >
+                  <Text style={S.btnPrevText}>‹ Previous</Text>
+                </TouchableOpacity>
 
-                {isLastStep && (
+                {isLastStep ? (
                   <TouchableOpacity
-                    style={S.btnSend}
-                    onPress={methods.handleSubmit(handleSendAndComplete)}
+                    style={S.btnComplete}
+                    onPress={methods.handleSubmit(handleFinalSubmit)}
                     disabled={
                       createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
                     }
                     activeOpacity={0.85}
                   >
-                    <Text style={S.btnSendText}>
-                      {resendEmailLoading
-                        ? 'Sending Prescription...'
-                        : 'Send Prescription to Patient'}
+                    <Text style={S.btnCompleteText}>
+                      {createPrescriptionPending || updatePrescriptionPending
+                        ? 'Saving...'
+                        : prescriptionId
+                        ? 'Update Prescription'
+                        : 'Complete'}
                     </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity style={S.btnNext} onPress={handleNextStep} activeOpacity={0.85}>
+                    <Text style={S.btnNextText}>Next ›</Text>
                   </TouchableOpacity>
                 )}
               </View>
-            </KeyboardAvoidingView>
-          </FormProvider>
-        </>
+
+              {isLastStep && (
+                <TouchableOpacity
+                  style={S.btnSend}
+                  onPress={methods.handleSubmit(handleSendAndComplete)}
+                  disabled={
+                    createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
+                  }
+                  activeOpacity={0.85}
+                >
+                  <Text style={S.btnSendText}>
+                    {resendEmailLoading
+                      ? 'Sending Prescription...'
+                      : 'Send Prescription to Patient'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </KeyboardAvoidingView>
+        </FormProvider>
       )}
     </SafeAreaWrapper>
   );

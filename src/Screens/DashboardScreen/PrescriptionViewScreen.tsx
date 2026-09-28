@@ -133,6 +133,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
       followUp: rxDoc.follow_up_date ? formatDate(rxDoc.follow_up_date, 'DD/MM/YYYY') : null,
       referralSpecialist: sanitizeText(rxDoc.referral_specialist),
       referralDoctorHospital: sanitizeText(rxDoc.referral_doctor_hospital),
+      referralDoctorName: sanitizeText(rxDoc.referral_doctor_name),
       referralReason: sanitizeText(rxDoc.referral_reason),
       pdfUrl: rxDoc.pdf_url,
     };
@@ -280,24 +281,29 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
   }
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar isPathClear>
       <View style={S.header}>
-        <TouchableOpacity style={S.backCircle} onPress={handleBack} activeOpacity={0.7}>
-          <ChevronLeftIcon size={24} strokeWidth={2.5} />
-        </TouchableOpacity>
-        <Text style={S.headerTitle}>Summary</Text>
-        <View style={S.headerRight}>
-          <TouchableOpacity style={S.editPill} activeOpacity={0.7} onPress={handleEdit}>
-            <EditIcon size={14} color={TEAL} />
-            <Text style={S.editPillTxt}>Edit</Text>
+        <View style={S.headerLeft}>
+          <TouchableOpacity style={S.backCircle} onPress={handleBack} activeOpacity={0.7}>
+            <ChevronLeftIcon size={24} strokeWidth={2.5} />
           </TouchableOpacity>
-          <Text style={S.rxIdBadge}>{displayData.rxId}</Text>
+          <Text style={S.headerTitle}>Summary</Text>
+        </View>
+        <View style={S.headerRight}>
+          {rxDoc && rxDoc?.published_version_count < 2 && (
+            <TouchableOpacity style={S.editPill} activeOpacity={0.7} onPress={handleEdit}>
+              <EditIcon size={14} color={TEAL} />
+              <Text style={S.editPillTxt}>Edit</Text>
+            </TouchableOpacity>
+          )}
+          {displayData.rxId ? <Text style={S.rxIdBadge}>{displayData.rxId}</Text> : null}
         </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        keyboardShouldPersistTaps="handled"
+        // contentContainerStyle={{ paddingBottom: 30 }}
       >
         <View style={S.clinicCard}>
           <View style={{ flex: 1 }}>
@@ -563,6 +569,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
         {/* Referral Card */}
         {(displayData.referralSpecialist ||
           displayData.referralDoctorHospital ||
+          displayData.referralDoctorName ||
           displayData.referralReason) && (
           <View style={S.outerSection}>
             <View style={S.referralCard}>
@@ -575,8 +582,11 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
               )}
               {displayData.referralDoctorHospital && (
                 <Text style={S.referralTxt}>
-                  Doctor / Hospital: {displayData.referralDoctorHospital}
+                  Hospital Name: {displayData.referralDoctorHospital}
                 </Text>
+              )}
+              {displayData.referralDoctorName && (
+                <Text style={S.referralTxt}>Doctor Name: {displayData.referralDoctorName}</Text>
               )}
               {displayData.referralReason && (
                 <Text style={{ fontSize: 13, color: '#475569', marginTop: 2 }}>
@@ -628,39 +638,51 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
       {/* Bottom Bar */}
       <View style={S.bottomBar}>
         <View style={S.shareBtnRow}>
-          <TouchableOpacity
-            style={[S.shareBtn, resendEmailLoading && { opacity: 0.7 }]}
-            onPress={handleResendToPatient}
-            disabled={resendEmailLoading}
-            activeOpacity={0.85}
-          >
-            {resendEmailLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <>
-                <Text style={{ fontSize: 16, color: '#FFFFFF' }}>📧</Text>
-                <Text style={S.shareBtnTxt}>Resend to Patient</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          {rxDoc && rxDoc?.published_version_count < 2 && (
+            <TouchableOpacity
+              style={[S.shareBtn, resendEmailLoading && { opacity: 0.7 }]}
+              onPress={handleResendToPatient}
+              disabled={resendEmailLoading}
+              activeOpacity={0.85}
+            >
+              {resendEmailLoading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <>
+                  <Text style={{ fontSize: 16, color: '#FFFFFF' }}>📧</Text>
+                  <Text style={S.shareBtnTxt}>Resend to Patient</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
-            style={[S.shareBtnDocBtn, downloadPdfLoading && { opacity: 0.7 }]}
+            style={[
+              !(rxDoc && rxDoc?.published_version_count < 2)
+                ? S.shareBtnDocBtnFull
+                : S.shareBtnDocBtn,
+              downloadPdfLoading && { opacity: 0.7 },
+            ]}
             onPress={handleDownloadPDF}
             disabled={downloadPdfLoading}
             activeOpacity={0.85}
           >
             {downloadPdfLoading ? (
-              <View style={{ alignItems: 'center' }}>
+              <View style={{ alignItems: 'center', flexDirection: 'row', gap: 6 }}>
                 <ActivityIndicator color={TEAL} size="small" />
                 {downloadProgress > 0 && downloadProgress < 100 ? (
-                  <Text style={{ fontSize: 9, color: TEAL, fontWeight: '700' }}>
+                  <Text style={{ fontSize: 11, color: TEAL, fontWeight: '700' }}>
                     {downloadProgress}%
                   </Text>
                 ) : null}
               </View>
             ) : (
-              <Text style={{ fontSize: 22, color: TEAL }}>📥</Text>
+              <>
+                <Text style={{ fontSize: 22, color: TEAL }}>📥</Text>
+                {!(rxDoc && rxDoc?.published_version_count < 2) && (
+                  <Text style={S.shareBtnDocBtnFullTxt}>Download PDF</Text>
+                )}
+              </>
             )}
           </TouchableOpacity>
         </View>

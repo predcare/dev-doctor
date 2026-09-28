@@ -63,6 +63,7 @@ export const createPrescriptionSchema = yup.object().shape({
   follow_up_date: yup.string().optional(),
   referral_specialist: yup.string().optional(),
   referral_doctor_hospital: yup.string().optional(),
+  referral_doctor_name: yup.string().optional(),
   referral_reason: yup.string().optional(),
   notes: yup.string().optional(),
 });

@@ -17,9 +17,10 @@ register();
 const messagingInstance = getMessaging();
 setBackgroundMessageHandler(messagingInstance, async remoteMessage => {
   console.log('[FCM] Background Message Handler Received:', remoteMessage);
+  const isDataOnlyMessage = !remoteMessage.notification;
   const title = remoteMessage.notification?.title || remoteMessage.data?.title;
   const body = remoteMessage.notification?.body || remoteMessage.data?.body;
-  if (title || body) {
+  if (isDataOnlyMessage && (title || body)) {
     await displayLocalSystemNotification(
       String(title || 'New Notification'),
       String(body || ''),

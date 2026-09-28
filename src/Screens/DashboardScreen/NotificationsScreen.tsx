@@ -195,9 +195,9 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ naviga
       const patientId = notif.associate_patient_id || metadata.patient_id;
 
       if (meetingId || notif.event_action === 'meeting_started') {
-        navigation.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
+        navigation.navigate(AppRoute.APPOINTMENT_DETAILS, { appointmentId: appointmentId });
       } else if (appointmentId || notif.event_category === 'appointment') {
-        navigation.navigate(AppRoute.DOCTOR_APPOINTMENTS, { refresh: true });
+        navigation.navigate(AppRoute.APPOINTMENT_DETAILS, { appointmentId: appointmentId });
       } else if (patientId || notif.event_category === 'patient_management') {
         navigation.navigate(AppRoute.PATIENT_DETAILS, {
           patientId: patientId ? String(patientId) : '',

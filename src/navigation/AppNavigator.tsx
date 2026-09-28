@@ -25,6 +25,7 @@ import PrescriptionSettingsScreen from '../Screens/DashboardScreen/PrescriptionS
 import PrescriptionViewScreen from '../Screens/DashboardScreen/PrescriptionViewScreen';
 import RescheduleAppointmentScreen from '../Screens/DashboardScreen/RescheduleAppointmentScreen';
 import SettingScreen from '../Screens/DashboardScreen/SettingScreen';
+import AppointmentDetailsScreen from '../Screens/DashboardScreen/AppointmentDetailsScreen';
 import SplashScreen from '../Screens/SplashScreen';
 import { navigationRef } from './navigationRef';
 
@@ -86,6 +87,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="CreateInvoice" component={CreateInvoiceScreen} />
         <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />
         <Stack.Screen name="PrescriptionList" component={PrescriptionListScreen} />
+        <Stack.Screen name="AppointmentDetails" component={AppointmentDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

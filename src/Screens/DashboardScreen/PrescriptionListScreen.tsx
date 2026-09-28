@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
+import { getBottomBarHeight } from '../../components/commons/CustomBottomBar/CustomBottomBar';
 import SelectPatientModal from '../../components/commons/SelectPatientModal/SelectPatientModal';
 import PrescriptionFilterModal from '../../components/Modules/Prescription/PrescriptionFilterModal';
 import PrescriptionItemCard from '../../components/Modules/Prescription/PrescriptionItemCard';
@@ -45,6 +47,7 @@ const initialFilterState: IPrescriptionFilterState = {
 };
 
 export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [filterState, setFilterState] = useState<IPrescriptionFilterState>(initialFilterState);
   const [showFilterModal, setShowFilterModal] = useState(false);
@@ -88,7 +91,7 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
   });
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar>
       <View style={S.header}>
         <TouchableOpacity
           onPress={() => navigation?.goBack()}
@@ -118,8 +121,6 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
           <FilterIcon size={18} color={theme.colors.textPrimary} />
         </TouchableOpacity>
       </View>
-
-      {/* Filter Chips */}
       <View style={S.chipRow}>
         {[
           { label: 'All', value: 'all' },
@@ -162,6 +163,7 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
           keyExtractor={item => String(item.id)}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             <View style={S.txHeader}>
               <Text style={S.txLabel}>PRESCRIPTION RECORDS</Text>
@@ -193,7 +195,12 @@ export const PrescriptionListScreen: React.FC<PrescriptionListScreenProps> = ({ 
       )}
 
       <TouchableOpacity
-        style={S.fab}
+        style={[
+          S.fab,
+          {
+            bottom: getBottomBarHeight(insets.bottom) + 16,
+          },
+        ]}
         onPress={() => setShowSelectPatientModal(true)}
         activeOpacity={0.85}
       >

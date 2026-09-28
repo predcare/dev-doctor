@@ -292,13 +292,22 @@ export const RescheduleAppointmentScreen: React.FC<RescheduleAppointmentScreenPr
           <Text style={S.cardLabel}>CURRENT APPOINTMENT DETAILS</Text>
           <View style={S.patientInfoRow}>
             <View style={S.avatarCircle}>
-              <Text style={S.avatarText}>{getInitials(apptInfo?.patient_name || '')}</Text>
+              <Text style={S.avatarText}>
+                {getInitials(apptInfo?.patient?.name || (apptInfo as any)?.patient_name || '')}
+              </Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={S.patientName}>{apptInfo?.patient_name || 'N/A'}</Text>
+              <Text style={S.patientName}>
+                {apptInfo?.patient?.name || (apptInfo as any)?.patient_name || 'N/A'}
+              </Text>
               <Text style={S.patientSub}>
-                {apptInfo?.patient_gender || ''}{' '}
-                {apptInfo?.patient_dob ? `/ ${getAge(apptInfo?.patient_dob, { large: true })}` : ''}
+                {apptInfo?.patient?.gender || (apptInfo as any)?.patient_gender || ''}{' '}
+                {apptInfo?.patient?.date_of_birth || (apptInfo as any)?.patient_dob
+                  ? `/ ${getAge(
+                      apptInfo?.patient?.date_of_birth || (apptInfo as any)?.patient_dob,
+                      { large: true }
+                    )}`
+                  : ''}
               </Text>
             </View>
           </View>

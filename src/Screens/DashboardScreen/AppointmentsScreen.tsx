@@ -476,7 +476,6 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                   item?.appointment_status === 'in-progress'
                 }
                 callDurationSeconds={item?.call_duration_seconds || 0}
-                onViewDetails={() => setSelectedDetailsApt(item)}
                 onVideoCall={() => {
                   handleJoinVideoCall(item);
                 }}
@@ -491,6 +490,11 @@ export const AppointmentsScreen: React.FC<DoctorAppointmentsScreenProps> = () =>
                     item.patientInfo?.name || '',
                     item.appointment_status
                   );
+                }}
+                onViewDetails={() => {
+                  navigation.navigate(AppRoute.APPOINTMENT_DETAILS, {
+                    appointmentId: Number(item.id),
+                  });
                 }}
               />
             );

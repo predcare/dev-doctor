@@ -99,7 +99,7 @@ export const DoctorProfileScreen: React.FC<DoctorProfileScreenProps> = () => {
   }
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar>
       <View style={doctorProfileStyles.header}>
         <TouchableOpacity
           style={doctorProfileStyles.backBtn}

@@ -8,7 +8,8 @@ import { getItem, STORAGE_KEYS } from '../lib/common/asyncStorage';
 import { resetAndNavigate, resetToLogin, resetToMainTabs } from '../lib/common/navigation.utils';
 import { AppRoute, type SplashScreenNavigationProp, type SplashScreenRouteProp } from '../route';
 import { Splashstyles } from '../styled/SplashScreen.styled';
-import { theme } from '../styled/theme.styled';
+import { checkInitialNotification } from '../utils/firebaseMessaging';
+import { consumeTargetRoute } from '../utils/notificationRouter';
 import { useAuthStore } from '../zustand/stores/useAuthStore';
 
 export interface SplashScreenProps {
@@ -90,6 +91,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
     };
 
     const startAuthentication = async () => {
+      await checkInitialNotification();
       const doctorData = await authenticateAndLoad();
 
       if (!isMounted) return;
@@ -100,7 +102,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
       } else if (navigation) {
         if (doctorData) {
           if (doctorData.has_accepted_policies) {
-            resetToMainTabs(navigation);
+            const target = consumeTargetRoute();
+            if (target && target.name !== AppRoute.HOME) {
+              navigation?.reset({ index: 0, routes: [target as any] });
+            } else {
+              resetToMainTabs(navigation);
+            }
           } else {
             resetAndNavigate(navigation, AppRoute.POLICY_ACCEPTANCE);
           }
@@ -122,7 +129,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
   }, [fadeAnim, scaleAnim, pulseAnim, navigation, onFinish, setUserData, logout]);
 
   return (
-    <SafeAreaWrapper backgroundColor={theme.colors.primaryDark}>
+    <SafeAreaWrapper>
       <View style={Splashstyles.container}>
         <View style={Splashstyles.circleContainer}>
           <View style={[Splashstyles.circle, Splashstyles.circle1]} />

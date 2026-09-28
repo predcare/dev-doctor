@@ -21,6 +21,7 @@ export interface AppointmentCardProps {
   onStartConsultation?: () => void;
   onVideoCall?: () => void;
   onActionPress?: () => void;
+  onCardPress?: () => void;
 }
 
 export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
@@ -39,6 +40,7 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
   onStartConsultation,
   onVideoCall,
   onActionPress,
+  onCardPress,
 }) => {
   const displayApptId = appointmentGeneratedId || id;
 
@@ -73,7 +75,12 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
   };
 
   return (
-    <View style={homeStyles.appointmentCard}>
+    <TouchableOpacity
+      style={homeStyles.appointmentCard}
+      activeOpacity={onCardPress ? 0.85 : 1}
+      onPress={onCardPress}
+      disabled={!onCardPress}
+    >
       <View style={homeStyles.apptHeaderRow}>
         <View style={homeStyles.timeGroup}>
           <ClockIcon size={14} color={theme.colors.primary} />
@@ -167,7 +174,7 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
