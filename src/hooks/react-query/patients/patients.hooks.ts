@@ -59,7 +59,6 @@ export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
     queryFn: () => getMyPatientsEmrs(params?.patientId!),
     enabled: !!params?.patientId,
     select: v => {
-      if (Array.isArray(v)) return v;
       if (Array.isArray(v?.data)) return v.data;
       return [];
     },

@@ -9,13 +9,15 @@ import { showInfoToast, showSuccessToast } from '../../../lib/common/toast.utils
 import { RootStackParamList } from '../../../route';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import { theme } from '../../../styled/theme.styled';
+import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import CommonEmptyCard from '../../commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../commons/CommonErrorCard/CommonErrorCard';
 import MedicalRecordsSkeleton from '../../Skeletons/MedicalRecordsSkeleton';
 import DocumentActionsModal from './DocumentActionsModal';
 import EMRUploadModal from './EMRUploadModal';
-import MedicalDocumentCard, { MedicalDocument } from './MedicalDocumentCard';
+import MedicalDocumentCard from './MedicalDocumentCard';
 
 type RecordsTabRouteProp = RouteProp<RootStackParamList, 'PatientDetails'>;
 
@@ -27,6 +29,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
   const route = useRoute<RecordsTabRouteProp>();
   const navigation = useNavigation();
   const { userData } = useAuthStore(state => state);
+  const { hideLoader, showLoader } = useLoadingStore(state => state);
   const {
     data: emrData,
     isPending: isEMRPending,
@@ -36,16 +39,13 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
   } = useMyPatientEmrs({
     patientId: patientId,
   });
-  const {
-    mutate: shareEmrDocumentMutate,
-    isPending: isShareEmrDocumentPending,
-    variables: shareEmrVariables,
-  } = useShareEmrDocument();
+  const { mutate: shareEmrDocumentMutate, isPending: isShareEmrDocumentPending } =
+    useShareEmrDocument();
 
   const [refreshing, setRefreshing] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const [selectedDocForAction, setSelectedDocForAction] = useState<MedicalDocument | null>(null);
+  const [selectedDocForAction, setSelectedDocForAction] = useState<IPatientEMRDoc | null>(null);
   const [showActionsModal, setShowActionsModal] = useState(false);
 
   const onRefresh = useCallback(async () => {
@@ -54,29 +54,33 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
     setRefreshing(false);
   }, [refetchEmr]);
 
-  const handleDocumentClick = (doc: MedicalDocument) => {
+  const handleDocumentClick = (doc: IPatientEMRDoc) => {
     setSelectedDocForAction(doc);
     setShowActionsModal(true);
   };
 
   const handleToggleShare = (docId: string | number, newShareState: boolean) => {
+    showLoader('Sharing EMR Document');
     shareEmrDocumentMutate(
       {
         docId,
         body: { visible_to_patient: newShareState },
       },
       {
-        onSuccess: res => {
+        onSuccess: async res => {
           if (res?.success) {
             showSuccessToast(res?.message);
-            refetchEmr();
+            await refetchEmr();
           }
+        },
+        onSettled: () => {
+          hideLoader();
         },
       }
     );
   };
 
-  const handleOpenDocument = (doc: MedicalDocument) => {
+  const handleOpenDocument = (doc: IPatientEMRDoc) => {
     const fullUrl = doc.document_url;
     showInfoToast(`Opening "${doc.title || 'Document'}"...`, 'Opening Document');
     if (fullUrl) {
@@ -86,7 +90,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
     }
   };
 
-  const handleSaveToDevice = (doc: MedicalDocument) => {
+  const handleSaveToDevice = (doc: IPatientEMRDoc) => {
     const fullUrl = doc.document_url;
     if (fullUrl) {
       Linking.openURL(fullUrl).catch(() => {
@@ -148,12 +152,9 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
           data={emrData || []}
           keyExtractor={item => String(item.id)}
           renderItem={({ item }) => {
-            const isUpdatingShare =
-              isShareEmrDocumentPending && String(shareEmrVariables?.docId) === String(item.id);
             const isDoctorUploaded =
               String(item?.owner_id) === String(userData?.id) ||
               String(item?.created_by) === String(userData?.id);
-
             return (
               <MedicalDocumentCard
                 document_type={item.document_type}
@@ -163,7 +164,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
                 created_at={item?.created_at}
                 doctor_id={item?.doctor_id}
                 isDoctorUploaded={isDoctorUploaded}
-                isUpdatingShare={isUpdatingShare}
+                isUpdatingShare={isShareEmrDocumentPending}
                 document_url={item?.document_url}
                 onPress={() => handleDocumentClick(item)}
                 onToggleShare={newVal => handleToggleShare(item.id, newVal)}

@@ -43,6 +43,7 @@ import {
 import { AppRoute, type CreatePrescriptionScreenProps } from '../../route';
 import { createPrescriptionStyles as S } from '../../styled/CreatePrescriptionScreen.styled';
 import { theme } from '../../styled/theme.styled';
+import { UserRoles } from '../../typescripts/enums';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
@@ -223,7 +224,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
       patient_id: patientId ?? rx?.patient_id ?? '',
       clinic_id: userData?.clinic?.id ?? rx?.clinic_id ?? '',
       appointment_id: apptIdforInPerson || appointmentId || '',
-      type: 'doctor',
+      type: UserRoles.DOCTOR,
       chief_complaints: _data?.chief_complaints,
       diagnosis: _data?.diagnosis,
       symptoms: _data?.chief_complaints,

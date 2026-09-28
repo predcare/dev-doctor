@@ -12,13 +12,13 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { theme } from '../../../styled/theme.styled';
-import { MedicalDocument } from './MedicalDocumentCard';
+import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
 
 export interface DocumentActionsModalProps {
   visible: boolean;
-  document: MedicalDocument | null;
-  onOpenDocument: (doc: MedicalDocument) => void;
-  onSaveToDevice: (doc: MedicalDocument) => void;
+  document: IPatientEMRDoc | null;
+  onOpenDocument: (doc: IPatientEMRDoc) => void;
+  onSaveToDevice: (doc: IPatientEMRDoc) => void;
   onClose: () => void;
 }
 
@@ -108,9 +108,7 @@ export const DocumentActionsModal: React.FC<DocumentActionsModalProps> = ({
   const ext = (cleanPath.split('.').pop() || '').toLowerCase();
   const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
   const openTitle = isImage ? 'Open Image' : 'Open File';
-  const openSubtitle = isImage
-    ? 'Preview high-resolution image'
-    : 'View medical document file';
+  const openSubtitle = isImage ? 'Preview high-resolution image' : 'View medical document file';
 
   return (
     <Modal

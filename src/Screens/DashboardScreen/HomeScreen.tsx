@@ -414,7 +414,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={homeStyles.sectionHeader}>
             <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
             <TouchableOpacity
-              onPress={() => navigation?.navigate(AppRoute.PATIENTS)}
+              onPress={() => navigation?.navigate(AppRoute.SCHEDULE)}
               activeOpacity={0.7}
               style={{
                 width: 100,
