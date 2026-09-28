@@ -271,3 +271,12 @@ export const getCallDisconnectedInfo = (
     leftText: `${formatMMSS(leftSec)} left`,
   };
 };
+
+export const getPayStatus = (statusStr: string) => {
+  const s = (statusStr || '').toLowerCase().trim();
+  if (s === 'paid') return { bg: '#D1FAE5', txt: '#065F46', label: 'PAID' };
+  if (s === 'overdue' || s === 'cancelled')
+    return { bg: '#FEE2E2', txt: '#B91C1C', label: s.toUpperCase() };
+  if (s === 'unpaid') return { bg: '#FEE2E2', txt: '#B91C1C', label: 'UNPAID' };
+  return { bg: '#FEF3C7', txt: '#B45309', label: 'PENDING' };
+};

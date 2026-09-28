@@ -1,3 +1,4 @@
+import '@react-native-firebase/app';
 import notifee, { AndroidImportance } from '@notifee/react-native';
 import {
   AuthorizationStatus,
@@ -5,14 +6,16 @@ import {
   getInitialNotification,
   getMessaging,
   getToken,
+  isDeviceRegisteredForRemoteMessages,
   onMessage,
   onNotificationOpenedApp,
   onTokenRefresh,
+  registerDeviceForRemoteMessages,
   requestPermission,
 } from '@react-native-firebase/messaging';
 import { PermissionsAndroid, Platform } from 'react-native';
-import { showInfoToast } from '../lib/common/toast.utils';
 import { getItem, setItem, STORAGE_KEYS } from '../lib/common/asyncStorage';
+import { showInfoToast } from '../lib/common/toast.utils';
 
 export interface DeviceSessionFields {
   platform: string;
@@ -73,26 +76,73 @@ export async function requestNotificationPermission(): Promise<{
 
 /**
  * 2. getFirebaseToken
- * Fetches the current FCM token for this device and persists it in AsyncStorage
+ * Fetches the current FCM token for this device with automatic retry for transient errors (e.g. SERVICE_NOT_AVAILABLE)
+ * and persists it in AsyncStorage
  */
-export async function getFirebaseToken(): Promise<string | null> {
+export async function getFirebaseToken(
+  retries: number = 2,
+  delayMs: number = 1500
+): Promise<string | null> {
+  const messagingInstance = getMessaging();
+
+  // Register remote messages if not yet registered (critical on iOS, recommended on Android)
   try {
-    const messagingInstance = getMessaging();
-    const token = await getToken(messagingInstance);
-    if (token) {
-      console.log('[FCM] Device Firebase FCM Token:', token);
-      await setItem(STORAGE_KEYS.FCM_TOKEN, token);
-      return token;
-    } else {
-      console.warn('[FCM] Failed to retrieve FCM token: Token is empty');
-      const cachedToken = await getItem(STORAGE_KEYS.FCM_TOKEN);
-      return cachedToken;
+    const isRegistered = isDeviceRegisteredForRemoteMessages(messagingInstance);
+    if (!isRegistered) {
+      await registerDeviceForRemoteMessages(messagingInstance);
     }
-  } catch (error) {
-    console.error('[FCM] Error getting Firebase token:', error);
-    const cachedToken = await getItem(STORAGE_KEYS.FCM_TOKEN);
-    return cachedToken;
+  } catch (regError) {
+    console.warn('[FCM] registerDeviceForRemoteMessages warning:', regError);
   }
+
+  for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    try {
+      const token = await getToken(messagingInstance);
+      if (token) {
+        console.log('[FCM] Device Firebase FCM Token:', token);
+        await setItem(STORAGE_KEYS.FCM_TOKEN, token);
+        return token;
+      } else {
+        console.warn('[FCM] Failed to retrieve FCM token: Token is empty');
+        break;
+      }
+    } catch (error: any) {
+      const errorMsg = String(error?.message || error || '');
+      const errorCode = error?.code || '';
+      const isServiceUnavailable =
+        errorMsg.includes('SERVICE_NOT_AVAILABLE') ||
+        errorCode === 'messaging/unknown' ||
+        errorMsg.includes('ExecutionException') ||
+        errorMsg.includes('java.io.IOException');
+
+      console.warn(`[FCM] Token fetch error details [attempt ${attempt}/${retries + 1}]:`, {
+        code: errorCode,
+        message: errorMsg,
+      });
+
+      if (isServiceUnavailable && attempt <= retries) {
+        console.warn(
+          `[FCM] Retrying in ${delayMs * attempt}ms... (Check device internet connection / Google Play Services)`
+        );
+        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+        continue;
+      }
+
+      if (isServiceUnavailable) {
+        console.warn(
+          '[FCM] Google Play Services / Firebase connection failed. On a physical device, verify:\n' +
+          '1. Device has active internet (try switching Wi-Fi / Mobile Data).\n' +
+          '2. "Private DNS" or AdBlocker is disabled in Android Settings.\n' +
+          '3. Google Play Services app is updated and enabled.'
+        );
+      } else {
+        console.error('[FCM] Error getting Firebase token:', error);
+      }
+    }
+  }
+
+  const cachedToken = await getItem(STORAGE_KEYS.FCM_TOKEN);
+  return cachedToken;
 }
 
 /**
@@ -369,4 +419,3 @@ export async function getDeviceSessionFields(): Promise<DeviceSessionFields> {
     fcm_token: token,
   };
 }
-

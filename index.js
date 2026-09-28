@@ -2,6 +2,7 @@
  * @format
  */
 
+import '@react-native-firebase/app';
 import { getMessaging, setBackgroundMessageHandler } from '@react-native-firebase/messaging';
 import { register } from '@videosdk.live/react-native-sdk';
 import { AppRegistry } from 'react-native';

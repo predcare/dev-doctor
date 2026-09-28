@@ -48,7 +48,7 @@ export const createNewPatient = async (payload: FormData) => {
   return res.data;
 };
 
-export const getMyPatientsInfo = async (patientId: number) => {
+export const getMyPatientsInfo = async (patientId: number | string) => {
   const res = await axiosInstance.get<IRootResponse<IMyPatientDoc>>(
     `${endpoints.patients.details(patientId)}`
   );

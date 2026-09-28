@@ -1,11 +1,13 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { MyInvoices } from '../query.keys';
 import {
   createInvoices,
   getInvoicePdf,
   getInvoiceSettings,
+  getInvoicesStats,
   getMyAllInvoices,
   getMyPatientInvoices,
+  IGetMyAllInvoicesParams,
 } from './invoices.funcs';
 
 export const useMPatientsInvoices = (params?: { doctorId?: number | string }) =>
@@ -13,7 +15,7 @@ export const useMPatientsInvoices = (params?: { doctorId?: number | string }) =>
     queryKey: [MyInvoices.PatientInvoices, params],
     queryFn: () => getMyPatientInvoices(params?.doctorId!),
     enabled: !!params?.doctorId,
-    select: v => v.invoices,
+    select: v => v.data || (v as any).invoices,
   });
 
 export const useDownloadInvoicePdf = () =>
@@ -29,15 +31,32 @@ export const useInvoiceSettings = (params?: { doctorId?: number | string }) =>
     select: v => v.settings,
   });
 
-export const useMyAllInvoices = (params?: { doctorId?: number | string }) =>
-  useQuery({
+export const useMyAllInvoices = (params?: Omit<IGetMyAllInvoicesParams, 'page'>) =>
+  useInfiniteQuery({
     queryKey: [MyInvoices.AllInvoices, params],
-    queryFn: () => getMyAllInvoices(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: v => v.invoices,
+    queryFn: ({ pageParam = 1 }) =>
+      getMyAllInvoices({
+        ...params,
+        page: Number(pageParam),
+        limit: params?.limit ?? 10,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage?.meta?.hasNextPage) {
+        return (lastPage.meta.page || 1) + 1;
+      }
+      return undefined;
+    },
   });
 
 export const useCreateInvoices = () =>
   useMutation({
     mutationFn: createInvoices,
+  });
+
+export const useInvoicesStats = () =>
+  useQuery({
+    queryKey: [MyInvoices.InvoicesStats],
+    queryFn: getInvoicesStats,
+    select: v => v.data,
   });

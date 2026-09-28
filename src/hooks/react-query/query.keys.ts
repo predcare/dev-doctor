@@ -96,6 +96,7 @@ export enum MyInvoices {
   PatientInvoices = 'PatientInvoices',
   AllInvoices = 'AllInvoices',
   InvoiceSettings = 'InvoiceSettings',
+  InvoicesStats = 'InvoicesStats',
 }
 
 export enum HomeApiQuery {

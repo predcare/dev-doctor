@@ -16,7 +16,6 @@ import DoctorMeetingScreen from '../Screens/DashboardScreen/DoctorMeetingScreen'
 import DoctorProfileScreen from '../Screens/DashboardScreen/DoctorProfileScreen';
 import EditPatientScreen from '../Screens/DashboardScreen/EditPatientScreen';
 import HomeScreen from '../Screens/DashboardScreen/HomeScreen';
-import InvoiceListScreen from '../Screens/DashboardScreen/InvoiceListScreen';
 import InvoiceSettingsScreen from '../Screens/DashboardScreen/InvoiceSettingsScreen';
 import NotificationsScreen from '../Screens/DashboardScreen/NotificationsScreen';
 import PatientDetailsScreen from '../Screens/DashboardScreen/PatientDetailsScreen';
@@ -42,6 +41,14 @@ const ReportsTabScreen = () => (
   />
 );
 
+const InvoicesTabScreen = () => (
+  <ComingSoonScreen
+    title="Invoices"
+    description="Please visit the Invoices tab to view and manage your invoices."
+    showBottomBar={true}
+  />
+);
+
 export const AppNavigator: React.FC = () => {
   useNotificationListeners(navigationRef);
   return (
@@ -61,7 +68,6 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Schedule" component={AppointmentsScreen} />
         <Stack.Screen name="Reports" component={ReportsTabScreen} />
         <Stack.Screen name="Account" component={SettingScreen} />
-        {/* Legacy alias support */}
         <Stack.Screen name="MainTabs" component={HomeScreen} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} />
         <Stack.Screen name="DoctorProfile" component={DoctorProfileScreen} />
@@ -76,7 +82,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="RescheduleAppointment" component={RescheduleAppointmentScreen} />
         <Stack.Screen name="DoctorMeeting" component={DoctorMeetingScreen} />
         <Stack.Screen name="PatientDetails" component={PatientDetailsScreen} />
-        <Stack.Screen name="InvoiceList" component={InvoiceListScreen} />
+        <Stack.Screen name="InvoiceList" component={InvoicesTabScreen} />
         <Stack.Screen name="CreateInvoice" component={CreateInvoiceScreen} />
         <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />
         <Stack.Screen name="PrescriptionList" component={PrescriptionListScreen} />

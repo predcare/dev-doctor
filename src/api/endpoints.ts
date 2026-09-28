@@ -1,6 +1,6 @@
 export const baseUrl = 'https://api-dev.predcare.in';
 export const localBaseUrl = 'https://chant-abrasion-sustainer.ngrok-free.dev';
-export const baseUrlApi = `${baseUrl}/api/v1`;
+export const baseUrlApi = `${localBaseUrl}/api/v1`;
 
 export const mediaPaths = (fileName?: string) => {
   if (!fileName) return '';
@@ -9,12 +9,12 @@ export const mediaPaths = (fileName?: string) => {
     return rawImg;
   }
   if (rawImg.startsWith('/')) {
-    return `${baseUrl}${rawImg}`;
+    return `${localBaseUrl}${rawImg}`;
   }
   if (rawImg.startsWith('storage/')) {
-    return `${baseUrl}/${rawImg}`;
+    return `${localBaseUrl}/${rawImg}`;
   }
-  return `${baseUrl}/storage/${rawImg}`;
+  return `${localBaseUrl}/storage/${rawImg}`;
 };
 
 export const endpoints = {
@@ -33,7 +33,7 @@ export const endpoints = {
   patients: {
     get: '/doctors/my-patients',
     delete: '/doctor/patients/',
-    details: (id: number) => `/doctors/my-patients/${id}`,
+    details: (id: number | string) => `/doctors/my-patients/${id}`,
     linkExisting: '/users/link-existing-patient',
     newCreate: '/users/add-patient',
     emrRecords: (uid: string | number) => `/emr/doc-patient/${uid}`,
@@ -76,11 +76,12 @@ export const endpoints = {
     policyAccept: '/users/user-policy-acceptances',
   },
   invoices: {
-    getAll: (uid: string | number) => `/doctor/invoices/doctor/${uid}`,
+    getAll: `/invoices/my-invoices/`,
     patientInvoices: '/doctor/invoices/doctor/',
     downloadPdf: (invoiceId: number | string) => `/doctor/invoices/${invoiceId}/pdf`,
     invoiceSettings: '/doctor/invoices/settings/',
-    create: '/doctor/invoices',
+    create: '/invoices/manual',
+    stats: '/invoices/stats',
   },
   prescritions: {
     create: '/prescriptions',

@@ -105,20 +105,34 @@ export const InvoicePreviewModal: React.FC<InvoicePreviewModalProps> = ({
                 <Text style={[styles.thCell, { flex: 1, textAlign: 'right' }]}>Total (₹)</Text>
               </View>
 
-              {(invoice.items || []).map((item, idx) => (
-                <View key={item.id || idx} style={styles.tableRow}>
-                  <Text style={[styles.tdCell, { flex: 2, fontWeight: '600' }]}>{item.name}</Text>
-                  <Text style={[styles.tdCell, { flex: 0.6, textAlign: 'center' }]}>
-                    {item.qty}
-                  </Text>
-                  <Text style={[styles.tdCell, { flex: 1, textAlign: 'right' }]}>
-                    {parseFloat(String(item.price || 0)).toFixed(2)}
-                  </Text>
-                  <Text style={[styles.tdCell, { flex: 1, textAlign: 'right', fontWeight: '700' }]}>
-                    {Number(item.total || 0).toFixed(2)}
-                  </Text>
-                </View>
-              ))}
+              {(invoice.items || []).map((item, idx) => {
+                const itemName = item.item_name || item.name || 'Item';
+                const itemQty = item.qty || 1;
+                const unitPrice = parseFloat(String(item.unit_price || item.price || 0));
+                const itemTotal =
+                  item.amount !== undefined
+                    ? parseFloat(String(item.amount))
+                    : item.total !== undefined
+                    ? parseFloat(String(item.total))
+                    : Number(itemQty) * unitPrice;
+
+                return (
+                  <View key={item.id || idx} style={styles.tableRow}>
+                    <Text style={[styles.tdCell, { flex: 2, fontWeight: '600' }]}>{itemName}</Text>
+                    <Text style={[styles.tdCell, { flex: 0.6, textAlign: 'center' }]}>
+                      {itemQty}
+                    </Text>
+                    <Text style={[styles.tdCell, { flex: 1, textAlign: 'right' }]}>
+                      {unitPrice.toFixed(2)}
+                    </Text>
+                    <Text
+                      style={[styles.tdCell, { flex: 1, textAlign: 'right', fontWeight: '700' }]}
+                    >
+                      {itemTotal.toFixed(2)}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
 
             {/* Summary Totals */}

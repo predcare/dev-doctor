@@ -45,7 +45,7 @@ export const useCreateNewPatient = () => {
   });
 };
 
-export const useMyPatientInfo = (params?: { patientId?: number }) =>
+export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
   useQuery({
     queryKey: [PatientsQueryKeys.PatientInfo, params],
     queryFn: () => getMyPatientsInfo(params?.patientId!),

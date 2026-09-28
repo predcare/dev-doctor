@@ -11,7 +11,7 @@ export const homeStyles = StyleSheet.create({
   scrollContent: {
     paddingTop: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: 110,
+    paddingBottom: 40,
   },
 
   // Search Input Bar

@@ -1,243 +1,68 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import CommonEmptyCard from '../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
-import SelectPatientModal, {
-  SelectablePatient,
-} from '../../components/commons/SelectPatientModal/SelectPatientModal';
-import InvoiceFilterModal from '../../components/Modules/Invoice/InvoiceFilterModal';
-import InvoicePreviewModal from '../../components/Modules/Invoice/InvoicePreviewModal';
 import InvoiceSkeleton from '../../components/Skeletons/InvoiceSkeleton';
+import { ChevronLeftIcon, ChevronRightIcon, SearchIcon } from '../../components/ui/icons';
+import { useDebounce } from '../../hooks/commons/useDebounce';
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  FilterIcon,
-  PlusIcon,
-  SearchIcon,
-} from '../../components/ui/icons';
-import { useMyAllInvoices } from '../../hooks/react-query/invoices/invoices.hooks';
+  useInvoicesStats,
+  useMyAllInvoices,
+} from '../../hooks/react-query/invoices/invoices.hooks';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
-import type { InvoiceListScreenProps } from '../../route';
+import { capitalize, formatDate, getPayStatus } from '../../lib/common/common.utils';
+import { type InvoiceListScreenProps } from '../../route';
 import { invoiceListStyles as S } from '../../styled/InvoiceListScreen.styled';
 import { theme } from '../../styled/theme.styled';
-import { IInvoiceDoc } from '../../typescripts/interfaces/invoices.interfaces';
-import { useAuthStore } from '../../zustand/stores/useAuthStore';
-
-const fmtAmt = (num: number) =>
-  `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-const formatDate = (isoStr: string) => {
-  if (!isoStr) return '';
-  const d = new Date(isoStr);
-  if (isNaN(d.getTime())) return isoStr;
-  return d.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-};
-
-/**
- * Checks if a date falls within the selected date range filter.
- */
-const isDateInRange = (
-  dateStr: string,
-  dateRange: 'Today' | 'This Week' | 'Current Month' | 'Current Year' | 'Custom',
-  customFrom: string,
-  customTo: string
-): boolean => {
-  if (!dateStr) return true;
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return true;
-
-  const now = new Date();
-
-  if (dateRange === 'Today') {
-    return (
-      d.getFullYear() === now.getFullYear() &&
-      d.getMonth() === now.getMonth() &&
-      d.getDate() === now.getDate()
-    );
-  }
-
-  if (dateRange === 'This Week') {
-    const startOfWeek = new Date(now);
-    const day = now.getDay();
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Monday start
-    startOfWeek.setDate(diff);
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    return d >= startOfWeek && d <= endOfWeek;
-  }
-
-  if (dateRange === 'Current Month') {
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  }
-
-  if (dateRange === 'Current Year') {
-    return d.getFullYear() === now.getFullYear();
-  }
-
-  if (dateRange === 'Custom') {
-    let fromValid = true;
-    let toValid = true;
-
-    if (customFrom) {
-      const fromDate = new Date(customFrom + 'T00:00:00');
-      if (!isNaN(fromDate.getTime())) {
-        fromValid = d >= fromDate;
-      }
-    }
-
-    if (customTo) {
-      const toDate = new Date(customTo + 'T23:59:59');
-      if (!isNaN(toDate.getTime())) {
-        toValid = d <= toDate;
-      }
-    }
-
-    return fromValid && toValid;
-  }
-
-  return true;
-};
-
-const getStatusStyle = (statusStr: string) => {
-  const s = (statusStr || '').toLowerCase().trim();
-  if (s === 'paid') return { bg: '#D1FAE5', txt: '#065F46', label: 'PAID' };
-  if (s === 'overdue' || s === 'cancelled')
-    return { bg: '#FEE2E2', txt: '#B91C1C', label: s.toUpperCase() };
-  return { bg: '#FEF3C7', txt: '#B45309', label: 'PENDING' };
-};
 
 export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation }) => {
   const [search, setSearch] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'All' | 'Paid' | 'Pending' | 'Overdue'>('All');
+  const debouncedSearch = useDebounce(search, 400);
+  const [activeFilter, setActiveFilter] = useState<'All' | 'Paid' | 'Unpaid'>('All');
   const [showPicker, setShowPicker] = useState(false);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [selectedInvoiceForPreview, setSelectedInvoiceForPreview] = useState<IInvoiceDoc | null>(
-    null
-  );
 
-  // Filter Modal State — Initial default Date Range is "Today" and Status is "All"
-  const [dateRange, setDateRange] = useState<
-    'Today' | 'This Week' | 'Current Month' | 'Current Year' | 'Custom'
-  >('Today');
-  const [customFrom, setCustomFrom] = useState('');
-  const [customTo, setCustomTo] = useState('');
-  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set(['All']));
+  const paymentStatusParam = useMemo(() => {
+    if (activeFilter === 'All') return undefined;
+    return activeFilter.toLowerCase();
+  }, [activeFilter]);
 
-  const { userData } = useAuthStore(state => state);
   const {
-    data: allInvoices,
-    isPending: allInvoicesPending,
+    data,
+    isPending,
     isError,
     refetch,
     isRefetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useMyAllInvoices({
-    doctorId: userData?.user_id,
+    search: debouncedSearch,
+    payment_status: paymentStatusParam,
+    limit: 10,
   });
 
-  // Date-filtered invoices base set
-  const dateFilteredInvoices = useMemo(() => {
-    if (!allInvoices || !Array.isArray(allInvoices)) return [];
-    return allInvoices.filter(inv =>
-      isDateInRange(inv.created_at, dateRange, customFrom, customTo)
-    );
-  }, [allInvoices, dateRange, customFrom, customTo]);
+  const { data: invoiceStats, isPending: isPendingInvoiceStats } = useInvoicesStats();
 
-  // Dynamically calculated stats scoped strictly to selected Date Range Filter
-  const totalCollected = useMemo(() => {
-    return dateFilteredInvoices
-      .filter(i => (i.payment_status || '').toLowerCase().trim() === 'paid')
-      .reduce((sum, i) => sum + parseFloat(i.grand_total || '0'), 0);
-  }, [dateFilteredInvoices]);
+  const invoicesList = useMemo(() => {
+    return data?.pages?.flatMap(page => page.data || []) ?? [];
+  }, [data]);
 
-  const outstanding = useMemo(() => {
-    return dateFilteredInvoices
-      .filter(i => (i.payment_status || '').toLowerCase().trim() !== 'paid')
-      .reduce((sum, i) => sum + parseFloat(i.grand_total || '0'), 0);
-  }, [dateFilteredInvoices]);
-
-  // Full filtered invoice list (Search + Chip + Modal Status + Date Range)
-  const filteredInvoices = useMemo(() => {
-    return dateFilteredInvoices.filter(inv => {
-      const invNum = (inv.invoice_number || '').toLowerCase();
-      const patName = (inv.patient_name || '').toLowerCase();
-      const patId = String(inv.patient_id || '').toLowerCase();
-      const searchLower = search.toLowerCase().trim();
-
-      const matchSearch =
-        !searchLower ||
-        invNum.includes(searchLower) ||
-        patName.includes(searchLower) ||
-        patId.includes(searchLower);
-
-      const statusNormalized = (inv.payment_status || 'pending').toLowerCase().trim();
-
-      let matchChip = true;
-      if (activeFilter === 'Paid') matchChip = statusNormalized === 'paid';
-      else if (activeFilter === 'Pending') matchChip = statusNormalized === 'pending';
-      else if (activeFilter === 'Overdue')
-        matchChip = statusNormalized === 'overdue' || statusNormalized === 'cancelled';
-
-      let matchStatusModal = statusFilter.has('All');
-      if (!matchStatusModal) {
-        statusFilter.forEach(sf => {
-          const sfLower = sf.toLowerCase().trim();
-          if (sfLower === statusNormalized) matchStatusModal = true;
-          if (
-            sfLower === 'overdue' &&
-            (statusNormalized === 'overdue' || statusNormalized === 'cancelled')
-          ) {
-            matchStatusModal = true;
-          }
-        });
-      }
-
-      return matchSearch && matchChip && matchStatusModal;
-    });
-  }, [dateFilteredInvoices, search, activeFilter, statusFilter]);
-
-  const handleSelectPatient = (patient: SelectablePatient) => {
-    setShowPicker(false);
-    console.log('patient', patient);
-    navigation?.navigate('CreateInvoice', {
-      patientId: patient.id,
-      patientName: patient.name,
-    });
-  };
-
-  const toggleStatusFilter = (s: string) => {
-    setStatusFilter(prev => {
-      const next = new Set(prev);
-      if (s === 'All') return new Set(['All']);
-      next.delete('All');
-      if (next.has(s)) {
-        next.delete(s);
-        if (next.size === 0) next.add('All');
-      } else {
-        next.add(s);
-      }
-      return next;
-    });
-  };
-
-  const resetFilters = () => {
-    setDateRange('Today');
-    setCustomFrom('');
-    setCustomTo('');
-    setStatusFilter(new Set(['All']));
-    setActiveFilter('All');
-    setSearch('');
+  const handleEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
   };
 
   return (
-    <SafeAreaWrapper>
+    <SafeAreaWrapper showBottomBar isPathClear>
       <View style={S.header}>
         <TouchableOpacity
           onPress={() => navigation?.goBack()}
@@ -248,10 +73,8 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
         </TouchableOpacity>
         <Text style={S.headerTitle}>Invoices</Text>
       </View>
-
-      {/* Search Row */}
       <View style={S.searchRow}>
-        <View style={S.searchPill}>
+        <View style={[S.searchPill, { marginRight: 0 }]}>
           <SearchIcon size={16} color="#9CA3AF" />
           <TextInput
             style={S.searchInput}
@@ -261,16 +84,9 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
             placeholderTextColor="#9CA3AF"
           />
         </View>
-        <TouchableOpacity
-          style={S.filterIconBtn}
-          onPress={() => setShowFilterModal(true)}
-          activeOpacity={0.7}
-        >
-          <FilterIcon size={18} color={theme.colors.textPrimary} />
-        </TouchableOpacity>
       </View>
       <View style={S.chipRow}>
-        {(['All', 'Paid', 'Pending', 'Overdue'] as const).map(f => (
+        {(['All', 'Paid', 'Unpaid'] as const).map(f => (
           <TouchableOpacity
             key={f}
             style={[S.chip, activeFilter === f && S.chipActive]}
@@ -283,26 +99,21 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
       </View>
 
       <FlatList
-        data={filteredInvoices}
-        keyExtractor={item => String(item.id)}
+        data={invoicesList || []}
+        keyExtractor={(item, index) => `${item.invoice_number}-${index}`}
         renderItem={({ item }) => {
-          const { bg, txt, label } = getStatusStyle(item.payment_status);
-          const grandTotalNum = parseFloat(item.grand_total || '0');
+          const { bg, txt, label } = getPayStatus(item.payment_status);
           return (
-            <TouchableOpacity
-              style={S.txCard}
-              onPress={() => setSelectedInvoiceForPreview(item)}
-              activeOpacity={0.75}
-            >
+            <TouchableOpacity style={S.txCard} activeOpacity={0.75}>
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                  <Text style={S.txName}>{item.patient_name || 'Patient'}</Text>
+                  <Text style={S.txName}>{item.invoice_number || ``}</Text>
                   <View style={[S.badge, { backgroundColor: bg, marginLeft: 8 }]}>
                     <Text style={[S.badgeTxt, { color: txt }]}>{label}</Text>
                   </View>
                 </View>
                 <Text style={S.txSub}>
-                  #{item.invoice_number || `INV-${item.id}`} • {formatDate(item.created_at)}
+                  {formatDate(item.created_at)} • {capitalize(item.payment_mode)}
                 </Text>
               </View>
 
@@ -310,10 +121,12 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
                 <Text
                   style={[
                     S.txAmt,
-                    (label === 'OVERDUE' || label === 'CANCELLED') && { color: '#EF4444' },
+                    (label === 'OVERDUE' || label === 'CANCELLED' || label === 'UNPAID') && {
+                      color: '#EF4444',
+                    },
                   ]}
                 >
-                  {fmtAmt(grandTotalNum)}
+                  {item.grand_total ? `₹${item.grand_total}` : 'N/A'}
                 </Text>
 
                 <View style={{ paddingLeft: 4 }}>
@@ -328,22 +141,22 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
             <View style={S.statsRow}>
               <View style={S.statCardTeal}>
                 <Text style={S.statLabelWhite}>OUTSTANDING</Text>
-                <Text style={S.statAmtWhite}>{fmtAmt(outstanding)}</Text>
+                <Text style={S.statAmtWhite}>$2,333</Text>
               </View>
               <View style={S.statCardWhite}>
                 <Text style={S.statLabelGray}>TOTAL COLLECTED</Text>
-                <Text style={S.statAmtDark}>{fmtAmt(totalCollected)}</Text>
+                <Text style={S.statAmtDark}>$4,500</Text>
               </View>
             </View>
 
             <View style={S.txHeader}>
               <Text style={S.txLabel}>RECENT TRANSACTIONS</Text>
-              <Text style={S.txCount}>TOTAL {filteredInvoices.length} INVOICES</Text>
+              <Text style={S.txCount}>TOTAL 10 INVOICES</Text>
             </View>
           </View>
         }
         ListEmptyComponent={
-          allInvoicesPending ? (
+          isPending ? (
             <InvoiceSkeleton />
           ) : isError ? (
             <CommonErrorCard
@@ -354,15 +167,20 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
             />
           ) : (
             <CommonEmptyCard
-              title={dateRange === 'Today' ? 'No Invoices Found Today' : 'No Invoices Found'}
-              message={
-                dateRange === 'Today'
-                  ? 'Switch to another date range or tap + to create a new invoice.'
-                  : 'Try adjusting your search or filter settings.'
-              }
+              title="No Invoices Found"
+              message="Try adjusting your search or filter settings, or tap + to create a new invoice."
             />
           )
         }
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View style={{ paddingVertical: 16, alignItems: 'center' }}>
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            </View>
+          ) : null
+        }
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -374,36 +192,11 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
         }
       />
 
-      <TouchableOpacity style={S.fab} onPress={() => setShowPicker(true)} activeOpacity={0.85}>
-        <PlusIcon size={24} color={theme.colors.surface} />
-      </TouchableOpacity>
-
-      <SelectPatientModal
-        title="Select Patient for Invoice"
-        visible={showPicker}
-        onClose={() => setShowPicker(false)}
-        onSelectPatient={handleSelectPatient}
-      />
-
-      <InvoiceFilterModal
-        visible={showFilterModal}
-        onClose={() => setShowFilterModal(false)}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-        customFrom={customFrom}
-        setCustomFrom={setCustomFrom}
-        customTo={customTo}
-        setCustomTo={setCustomTo}
-        statusFilter={statusFilter}
-        toggleStatusFilter={toggleStatusFilter}
-        onReset={resetFilters}
-        onApply={() => setShowFilterModal(false)}
-      />
-      <InvoicePreviewModal
+      {/* <InvoicePreviewModal
         visible={!!selectedInvoiceForPreview}
         invoice={selectedInvoiceForPreview}
-        onClose={() => setSelectedInvoiceForPreview(null)}
-      />
+        onClose={() => {}}
+      /> */}
     </SafeAreaWrapper>
   );
 };
