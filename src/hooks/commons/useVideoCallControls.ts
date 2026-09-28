@@ -5,7 +5,6 @@ import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
-import { ISaveCallPayload, saveCall } from '../react-query/appointments/appointments.func';
 import { MyAppointmentsQueryKeys } from '../react-query/query.keys';
 
 const { PiPModule } = NativeModules;
@@ -368,40 +367,11 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
 
       const storeState = useMeetingStore.getState();
       const appointmentId = storeState.appointmentId;
-      const callDurationSeconds = storeState.callDurationSeconds;
-
       try {
         if (appointmentId) {
-          const callEndTime = new Date().toISOString();
-          const callStartTime = callStartTimeRef.current || callEndTime;
-          const startedMs = Date.parse(callStartTime);
-          const accumulatedSeconds = !isNaN(startedMs)
-            ? Math.max(0, Math.floor((Date.now() - startedMs) / 1000))
-            : 0;
-
-          const isTimeUp = reason === 'time_up';
-          const scheduledSeconds = callDurationSeconds || 0;
-          const markCompleted =
-            isTimeUp || (scheduledSeconds > 0 && accumulatedSeconds >= scheduledSeconds);
-
-          const payload: ISaveCallPayload = {
-            appointment_id: appointmentId,
-            call_start_time: callStartTime,
-            call_end_time: callEndTime,
-            call_duration_seconds: accumulatedSeconds,
-            accumulated_call_seconds: accumulatedSeconds,
-            call_end_reason: reason,
-            max_participants: Math.max(1, maxParticipantsRef.current || 1),
-            mark_completed: markCompleted,
-            call_timer_started_at: callStartTime,
-            call_elapsed_seconds: accumulatedSeconds,
-            call_timer_paused: false,
-            doctor_last_heartbeat: callEndTime,
-            patient_last_heartbeat: null,
-          };
-
-          // await saveCall(payload);
-          await queryClient.invalidateQueries({ queryKey: [MyAppointmentsQueryKeys.MyAppointments] });
+          await queryClient.invalidateQueries({
+            queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+          });
         }
       } catch (err) {
         console.warn('[saveCall Error]:', err);

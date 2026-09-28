@@ -1,28 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
-import type {
-  IHeartbeatResponseData,
-  ISendHeartbeatPayload,
-} from '../react-query/appointments/appointments.func';
-import { useSendHeartBeat } from '../react-query/appointments/appointments.hooks';
 
 export const useMeetingHeartbeat = (onServerEndCall?: () => void) => {
   const { appointmentId, callState, remoteParticipantId } = useMeetingStore();
-  const sendHeartbeatMutation = useSendHeartBeat();
 
   const callTimerStartedAt = useRef<string | null>(null);
   const callElapsedSeconds = useRef<number>(0);
   const callTimerPaused = useRef<boolean>(false);
   const isHeartbeatPendingRef = useRef<boolean>(false);
 
-  const [heartbeatData, setHeartbeatData] = useState<IHeartbeatResponseData | null>(null);
+  const [heartbeatData, setHeartbeatData] = useState<any | null>(null);
 
   // Both Doctor AND Patient must be connected for heartbeat to fire
   const isBothConnected =
     callState === 'CONNECTED' && Boolean(remoteParticipantId) && Boolean(appointmentId);
 
   const applyHeartbeatResponse = useCallback(
-    (data: IHeartbeatResponseData) => {
+    (data: any) => {
       if (!data) return;
 
       setHeartbeatData(data);
@@ -62,7 +56,7 @@ export const useMeetingHeartbeat = (onServerEndCall?: () => void) => {
           }
         }
 
-        const payload: ISendHeartbeatPayload = {
+        const payload = {
           appointment_id: appointmentId!,
           role: 'doctor',
           call_timer_started_at: callTimerStartedAt.current,
@@ -70,16 +64,16 @@ export const useMeetingHeartbeat = (onServerEndCall?: () => void) => {
           call_timer_paused: opts?.paused ?? callTimerPaused.current,
         };
 
-        const res = await sendHeartbeatMutation.mutateAsync(payload);
-        const responseData = res?.data || (res as any);
-        applyHeartbeatResponse(responseData);
+        // const res = await sendHeartbeatMutation.mutateAsync(payload);
+        // const responseData = res?.data || (res as any);
+        // applyHeartbeatResponse(responseData);
       } catch (err) {
         console.warn('[Heartbeat Error]:', err);
       } finally {
         isHeartbeatPendingRef.current = false;
       }
     },
-    [appointmentId, isBothConnected, sendHeartbeatMutation, applyHeartbeatResponse]
+    [appointmentId, isBothConnected, applyHeartbeatResponse]
   );
 
   const sendHeartbeatOnceRef = useRef(sendHeartbeatOnce);
