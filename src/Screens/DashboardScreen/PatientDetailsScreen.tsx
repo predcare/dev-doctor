@@ -65,11 +65,15 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
       <View style={patientDetailsStyles.topBar}>
         <TouchableOpacity
           style={patientDetailsStyles.backCircle}
-          onPress={() =>
-            navigation?.navigate(AppRoute.MAIN_TABS, {
-              screen: AppRoute.PATIENTS,
-            })
-          }
+          onPress={() => {
+            if (navigation?.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation?.navigate(AppRoute.MAIN_TABS, {
+                screen: AppRoute.PATIENTS,
+              });
+            }
+          }}
           activeOpacity={0.8}
         >
           <ChevronLeftIcon size={20} color={theme.colors.textInverted} strokeWidth={2.5} />

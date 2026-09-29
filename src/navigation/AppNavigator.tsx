@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import useGlobalAndroidBackHandler from '../hooks/commons/useGlobalAndroidBackHandler';
 import useNotificationListeners from '../hooks/commons/useNotificationListeners';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import LoginScreen from '../Screens/Auth/LoginScreen';
@@ -52,6 +53,7 @@ const InvoicesTabScreen = () => (
 
 export const AppNavigator: React.FC = () => {
   useNotificationListeners(navigationRef);
+  useGlobalAndroidBackHandler();
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator

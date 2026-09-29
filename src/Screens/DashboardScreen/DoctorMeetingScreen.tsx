@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect } from 'react';
 import { Text, View } from 'react-native';
 import CommonErrorCard from '../../components/commons/CommonErrorCard/CommonErrorCard';
 import { SafeAreaWrapper } from '../../Layout/SafeAreaWrapper';
@@ -17,10 +18,12 @@ export const DoctorMeetingScreen: React.FC<DoctorMeetingScreenProps> = ({ naviga
     setIsInAppPip,
   } = useMeetingStore(state => state);
 
-  // When focused on DoctorMeetingScreen, ensure In-App PiP overlay is hidden
-  useEffect(() => {
-    setIsInAppPip(false);
-  }, [setIsInAppPip]);
+  // When focused on DoctorMeetingScreen (mount, pop back from sub-screens, or expanding PiP), ensure In-App PiP overlay is hidden and full meeting stage is rendered
+  useFocusEffect(
+    useCallback(() => {
+      setIsInAppPip(false);
+    }, [setIsInAppPip])
+  );
 
   // Intercept navigation pop (back gesture / header back) to switch active call to In-App PiP mode
   useEffect(() => {
