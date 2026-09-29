@@ -46,17 +46,17 @@ export const LocalParticipantView: React.FC<LocalParticipantViewProps> = ({
   const cardStyle: StyleProp<ViewStyle> = inPipMode
     ? {
         position: 'absolute',
-        top: 8,
-        right: 8,
-        width: 72,
-        height: 98,
-        borderRadius: 10,
+        top: 6,
+        right: 6,
+        width: 40,
+        height: 56,
+        borderRadius: 5,
         backgroundColor: '#0D131E',
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.3)',
+        borderColor: 'rgba(255, 255, 255, 0.25)',
         zIndex: 100,
         elevation: 10,
       }
@@ -69,21 +69,37 @@ export const LocalParticipantView: React.FC<LocalParticipantViewProps> = ({
           streamURL={streamUrl}
           objectFit="cover"
           zOrder={1}
-          style={{ width: '100%', height: '100%', borderRadius: inPipMode ? 10 : 16 }}
+          style={{ width: '100%', height: '100%', borderRadius: inPipMode ? 5 : 16 }}
           mirror={facingMode === 'front'}
         />
       ) : (
-        <Text style={[S.pipAvatarTxt, inPipMode && { fontSize: 20 }]}>P</Text>
+        <Text style={[S.pipAvatarTxt, inPipMode && { fontSize: 11 }]}>P</Text>
       )}
 
       {!isMicOn && (
-        <View style={[S.pipMuteBadge, inPipMode && { top: 4, right: 4, width: 16, height: 16, borderRadius: 8 }]}>
+        <View
+          style={[
+            S.pipMuteBadge,
+            inPipMode && { top: 2, right: 2, width: 11, height: 11, borderRadius: 6 },
+          ]}
+        >
           <TinyMicOffIcon />
         </View>
       )}
 
-      <View style={[S.pipYouBadge, inPipMode && { bottom: 4, left: 4, paddingHorizontal: 4, paddingVertical: 1 }]}>
-        <Text style={[S.pipYouTxt, inPipMode && { fontSize: 7 }]}>YOU</Text>
+      <View
+        style={[
+          S.pipYouBadge,
+          inPipMode && {
+            bottom: 2,
+            left: 2,
+            paddingHorizontal: 2.5,
+            paddingVertical: 0.5,
+            borderRadius: 2,
+          },
+        ]}
+      >
+        <Text style={[S.pipYouTxt, inPipMode && { fontSize: 5 }]}>YOU</Text>
       </View>
     </View>
   );

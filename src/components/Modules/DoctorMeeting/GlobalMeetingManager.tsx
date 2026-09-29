@@ -43,7 +43,7 @@ export const GlobalMeetingManager: React.FC = () => {
     const isCalling = (callState === 'CONNECTED' || callState === 'CONNECTING') && Boolean(callmeetingId);
 
     try {
-      PipHandler.setDefaultPipDimensions(300, 500);
+      PipHandler.setDefaultPipDimensions(9, 16);
       PipHandler.setMeetingScreenState(isCalling);
     } catch (_) {}
 
@@ -81,7 +81,7 @@ export const GlobalMeetingManager: React.FC = () => {
         if (!canGoBack) {
           // Root screen reached during active call -> enter Native OS PiP mode
           try {
-            PipHandler.enterPipMode(300, 500);
+            PipHandler.enterPipMode(9, 16);
             return true;
           } catch (_) {}
         }
