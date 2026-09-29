@@ -1,13 +1,12 @@
+import PipHandler from '@videosdk.live/react-native-pip-android';
 import { useMeeting } from '@videosdk.live/react-native-sdk';
 import { useCallback, useEffect, useRef } from 'react';
-import { AppState, AppStateStatus, NativeModules, Platform } from 'react-native';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { showErrorToast, showInfoToast } from '../../lib/common/toast.utils';
 import { useLoadingStore } from '../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../zustand/stores/useMeetingStore';
 import { MyAppointmentsQueryKeys } from '../react-query/query.keys';
-
-const { PiPModule } = NativeModules;
 
 export const useVideoCallControls = (onLeaveCallback?: () => void) => {
   const hasJoinedRef = useRef(false);
@@ -77,8 +76,10 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
       hasJoinedRef.current = false;
       isJoiningRef.current = false;
       isLeavingRef.current = false;
-      if (Platform.OS === 'android' && PiPModule?.setCallActive) {
-        PiPModule.setCallActive(false).catch?.(() => {});
+      if (Platform.OS === 'android') {
+        try {
+          PipHandler.setMeetingScreenState(false);
+        } catch (_) {}
       }
       resetMeetingStore();
       if (onLeaveCallback) {
@@ -376,8 +377,10 @@ export const useVideoCallControls = (onLeaveCallback?: () => void) => {
       } catch (err) {
         console.warn('[saveCall Error]:', err);
       } finally {
-        if (Platform.OS === 'android' && PiPModule?.setCallActive) {
-          PiPModule.setCallActive(false).catch?.(() => {});
+        if (Platform.OS === 'android') {
+          try {
+            PipHandler.setMeetingScreenState(false);
+          } catch (_) {}
         }
         try {
           if (leave) {

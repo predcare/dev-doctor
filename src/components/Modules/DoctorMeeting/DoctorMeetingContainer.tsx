@@ -11,6 +11,7 @@ import { DoctorMeetingHeader } from './DoctorMeetingHeader';
 import { LocalParticipantView } from './LocalParticipantView';
 import { MeetingControlBar } from './MeetingControlBar';
 import { MeetingStageContainer } from './MeetingStageContainer';
+import { PipMeetingView } from './PipMeetingView';
 
 export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ navigation }) => {
   const {
@@ -145,14 +146,12 @@ export const DoctorMeetingContainer: React.FC<DoctorMeetingScreenProps> = ({ nav
     }
   }, [isTimeUp, endCall]);
 
-  // If in Native Android PiP mode, show full-screen pure video stream
+  // If in Native Android PiP mode, show both remote & local video streams without header or bottom bar
   if (isNativePip) {
     return (
       <View style={S.container}>
-        <MeetingStageContainer
-          callState={callState}
-          remoteParticipantId={remoteParticipantId}
-          errorMessage={errorMessage}
+        <PipMeetingView
+          localParticipantId={localParticipant?.id}
           onGoBack={handleEnterPip}
         />
       </View>

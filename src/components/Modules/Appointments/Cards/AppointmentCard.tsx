@@ -15,6 +15,7 @@ import theme from '../../../../styled/theme.styled';
 import { useMeetingStore } from '../../../../zustand/stores/useMeetingStore';
 import CustomKebabMenu from '../../../ui/CustomMenu/CustomKebabMenu';
 import {
+  CalendarIcon,
   CheckIcon,
   CircleXIcon,
   ClinicIcon,
@@ -276,28 +277,48 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             style={[
               S.chip,
               {
-                backgroundColor: isVideo ? '#E6F7F5' : '#FFF3E6',
-                borderColor: isVideo ? '#B2DFDB' : '#FDDCB5',
+                backgroundColor: isVideo ? '#F0FDFA' : '#FFF7ED',
+                borderColor: isVideo ? '#99F6E4' : '#FED7AA',
               },
             ]}
           >
             {isVideo ? (
-              <VideoIcon size={12} color={TEAL} />
+              <VideoIcon size={11} color={TEAL} />
             ) : (
-              <ClinicIcon size={12} color="#F97316" />
+              <ClinicIcon size={11} color="#EA580C" />
             )}
-            <Text style={[S.chipText, { color: isVideo ? TEAL : '#F97316' }]}>
+            <Text
+              style={[S.chipText, { color: isVideo ? TEAL : '#EA580C' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.7}
+            >
               {isVideo ? 'Video Call' : 'In-Clinic'}
             </Text>
           </View>
-          <View style={[S.chip, { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' }]}>
-            <ClockIcon size={12} color="#475569" />
-            <Text style={[S.chipText, { color: '#475569' }]}>{appointment_date}</Text>
+
+          <View style={[S.chip, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+            <CalendarIcon size={11} color="#475569" />
+            <Text
+              style={[S.chipText, { color: '#475569' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.7}
+            >
+              {appointment_date}
+            </Text>
           </View>
 
-          <View style={[S.chip, { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0' }]}>
-            <ClockIcon size={12} color="#475569" />
-            <Text style={[S.chipText, { color: '#475569' }]}>{formattedTime}</Text>
+          <View style={[S.chip, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
+            <ClockIcon size={11} color="#475569" />
+            <Text
+              style={[S.chipText, { color: '#475569' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.7}
+            >
+              {formattedTime}
+            </Text>
           </View>
         </View>
 

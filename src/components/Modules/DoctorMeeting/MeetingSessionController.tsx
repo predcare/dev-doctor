@@ -9,7 +9,7 @@ import { AppRoute } from '../../../route';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import { DoctorMeetingContainer } from './DoctorMeetingContainer';
 import { InAppPipOverlay } from './InAppPipOverlay';
-import { MeetingStageContainer } from './MeetingStageContainer';
+import { PipMeetingView } from './PipMeetingView';
 
 const MeetingSessionController: React.FC = () => {
   const {
@@ -22,7 +22,7 @@ const MeetingSessionController: React.FC = () => {
     resetMeetingStore,
   } = useMeetingStore();
 
-  const { joinCall, endCall } = useVideoCallControls(() => {
+  const { joinCall, endCall, localParticipant } = useVideoCallControls(() => {
     if (navigationRef.isReady()) {
       replace('DoctorAppointments');
     }
@@ -79,10 +79,8 @@ const MeetingSessionController: React.FC = () => {
   if (isNativePip) {
     return (
       <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#000000', zIndex: 999999 }]}>
-        <MeetingStageContainer
-          callState={callState}
-          remoteParticipantId={remoteParticipantId}
-          errorMessage={errorMessage}
+        <PipMeetingView
+          localParticipantId={localParticipant?.id}
           onGoBack={handleEndCall}
         />
       </View>

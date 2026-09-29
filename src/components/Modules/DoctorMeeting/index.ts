@@ -7,3 +7,4 @@ export * from './DoctorMeetingContainer';
 export * from './InAppPipOverlay';
 export * from './RemotePipVideoView';
 export * from './GlobalMeetingManager';
+export * from './PipMeetingView';

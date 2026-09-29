@@ -1,12 +1,11 @@
+import PipHandler, { usePipModeListener } from '@videosdk.live/react-native-pip-android';
 import { MeetingProvider } from '@videosdk.live/react-native-sdk';
 import React, { useEffect } from 'react';
-import { BackHandler, DeviceEventEmitter, NativeModules, Platform } from 'react-native';
+import { BackHandler, Platform } from 'react-native';
 import { navigationRef, replace } from '../../../navigation/navigationRef';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import MeetingSessionController from './MeetingSessionController';
-
-const { PiPModule } = NativeModules;
 
 export const GlobalMeetingManager: React.FC = () => {
   const { userData } = useAuthStore();
@@ -18,64 +17,82 @@ export const GlobalMeetingManager: React.FC = () => {
     setIsInAppPip,
   } = useMeetingStore();
 
+  const inPipMode = usePipModeListener();
+
+  // Sync VideoSDK native PiP state with store and navigation
   useEffect(() => {
-    if (Platform.OS !== 'android' || !PiPModule) return;
+    if (Platform.OS !== 'android') return;
+    const activePip = Boolean(inPipMode);
+    setIsNativePip(activePip);
 
-    const isCalling = (callState === 'CONNECTED' || callState === 'CONNECTING') && !!callmeetingId;
-    if (PiPModule.setCallActive) {
-      PiPModule.setCallActive(isCalling).catch?.(() => {});
-    }
-
-    const subscription = DeviceEventEmitter.addListener('onPiPModeChanged', (isInPip: boolean) => {
-      setIsNativePip(isInPip);
-      if (!isInPip) {
-        // Restoring from OS Native Android PiP -> navigate directly to full-screen DoctorMeeting screen
-        setIsInAppPip(false);
-        if (navigationRef.isReady()) {
+    if (!activePip && (callState === 'CONNECTED' || callState === 'CONNECTING')) {
+      // Returned from Native OS PiP -> bring full DoctorMeeting view into focus
+      setIsInAppPip(false);
+      if (navigationRef.isReady()) {
+        const currentRouteName = navigationRef.getCurrentRoute()?.name;
+        if (currentRouteName !== 'DoctorMeeting') {
           (navigationRef as any).navigate('DoctorMeeting');
         }
       }
-    });
-
-    let backSubscription: any;
-    if (isCalling) {
-      backSubscription = BackHandler.addEventListener('hardwareBackPress', () => {
-        if (navigationRef.isReady()) {
-          const currentRouteName = navigationRef.getCurrentRoute()?.name;
-          const canGoBack = navigationRef.canGoBack();
-
-          if (currentRouteName === 'DoctorMeeting') {
-            if (canGoBack) {
-              // Standard back navigation will fire DoctorMeetingScreen's beforeRemove, enabling In-App PiP
-              return false;
-            } else {
-              // Fallback if DoctorMeeting is root: navigate to DoctorAppointments in app with In-App PiP
-              useMeetingStore.getState().setIsInAppPip(true);
-              replace('DoctorAppointments');
-              return true;
-            }
-          }
-
-          if (!canGoBack) {
-            // Root screen reached while call is active -> enter Native OS PiP mode
-            if (PiPModule.enterPiP) {
-              PiPModule.enterPiP().catch?.(() => {});
-              return true;
-            }
-          }
-        }
-        return false;
-      });
     }
+  }, [inPipMode, callState, setIsNativePip, setIsInAppPip]);
+
+  // Configure PiP dimensions and enable auto-PiP when consultation is active
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const isCalling = (callState === 'CONNECTED' || callState === 'CONNECTING') && Boolean(callmeetingId);
+
+    try {
+      PipHandler.setDefaultPipDimensions(300, 500);
+      PipHandler.setMeetingScreenState(isCalling);
+    } catch (_) {}
 
     return () => {
-      subscription.remove();
-      backSubscription?.remove();
-      if (PiPModule.setCallActive) {
-        PiPModule.setCallActive(false).catch?.(() => {});
+      if (Platform.OS === 'android') {
+        try {
+          PipHandler.setMeetingScreenState(false);
+        } catch (_) {}
       }
     };
-  }, [callState, callmeetingId, setIsNativePip, setIsInAppPip]);
+  }, [callState, callmeetingId]);
+
+  // Back button handling on Android root screen during active call
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const isCalling = (callState === 'CONNECTED' || callState === 'CONNECTING') && Boolean(callmeetingId);
+    if (!isCalling) return;
+
+    const backSubscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (navigationRef.isReady()) {
+        const currentRouteName = navigationRef.getCurrentRoute()?.name;
+        const canGoBack = navigationRef.canGoBack();
+
+        if (currentRouteName === 'DoctorMeeting') {
+          if (canGoBack) {
+            // Standard back navigation fires DoctorMeeting's beforeRemove to trigger In-App PiP
+            return false;
+          } else {
+            useMeetingStore.getState().setIsInAppPip(true);
+            replace('DoctorAppointments');
+            return true;
+          }
+        }
+
+        if (!canGoBack) {
+          // Root screen reached during active call -> enter Native OS PiP mode
+          try {
+            PipHandler.enterPipMode(300, 500);
+            return true;
+          } catch (_) {}
+        }
+      }
+      return false;
+    });
+
+    return () => {
+      backSubscription.remove();
+    };
+  }, [callState, callmeetingId]);
 
   const hasActiveMeeting = Boolean(
     callToken && callmeetingId && callState !== 'ENDED' && callState !== 'IDLE'

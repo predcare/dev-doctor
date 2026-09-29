@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { NativeModules, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import PipHandler from '@videosdk.live/react-native-pip-android';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import { SocketEvents } from '../../../config/socket.constants';
 import { showInfoToast } from '../../../lib/common/toast.utils';
@@ -10,8 +11,6 @@ import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import useIncomingCallStore from '../../../zustand/stores/useIncomingCallStore';
 import { useSocketStore } from '../../../zustand/stores/useSocketStore';
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
-
-const { PiPModule } = NativeModules;
 
 const SocketListeners = () => {
   const { socketConnection } = useSocketStore();
@@ -65,8 +64,10 @@ const SocketListeners = () => {
 
       if (isCallActiveForThisAppt) {
         // Dismiss Native PiP on Android if active
-        if (Platform.OS === 'android' && PiPModule?.setCallActive) {
-          PiPModule.setCallActive(false).catch?.(() => {});
+        if (Platform.OS === 'android') {
+          try {
+            PipHandler.setMeetingScreenState(false);
+          } catch (_) {}
         }
 
         // Clean up meeting state & loaders
