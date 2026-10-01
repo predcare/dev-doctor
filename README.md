@@ -58,6 +58,28 @@ npm run ios
 yarn ios
 ```
 
+---
+
+#### 📱 iOS Simulator & Architecture Notes
+
+##### 1. Running on Specific Simulators
+```sh
+# Run on default/booted simulator
+npm run ios
+
+# Run on a specific simulator
+npm run ios -- --simulator="iPhone 18 Pro"
+npm run ios -- --simulator="iPhone 18 Pro Max"
+npm run ios -- --simulator="iPhone 17"
+```
+
+##### 2. Xcode & iOS UIScene Lifecycle
+Newer iOS versions require the `UIScene` lifecycle for window management:
+- Configured in [Info.plist](file:///Users/pred/Documents/PredCare/predcaredoctor/ios/predcaredoctor/Info.plist) (`UIApplicationSceneManifest`)
+- Implemented in [AppDelegate.swift](file:///Users/pred/Documents/PredCare/predcaredoctor/ios/predcaredoctor/AppDelegate.swift) (`SceneDelegate` & `UISceneSession` configuration)
+
+---
+
 If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
 
 This is one way to run your app — you can also build it directly from Android Studio or Xcode.
