@@ -1,29 +1,45 @@
-import React from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import BackdropLoader from './src/components/commons/BackdropLoader/BackdropLoader';
-import EventListener from './src/components/commons/EventListener/EventListener';
-import GlobalPopupAlert from './src/components/commons/PopupAlert/GlobalPopupAlert';
-import GlobalToast from './src/components/commons/Toast/GlobalToast';
-import GlobalMeetingManager from './src/components/Modules/DoctorMeeting/GlobalMeetingManager';
-import ReactQueryProvider from './src/components/providers/ReactQueryProvider';
-import AppNavigator from './src/navigation/AppNavigator';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
 
-function App(): React.JSX.Element {
+import { NewAppScreen } from '@react-native/new-app-screen';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+
+function App() {
   const isDarkMode = useColorScheme() === 'dark';
+
   return (
-    <ReactQueryProvider>
-      <SafeAreaProvider>
-        <AppNavigator />
-        <GlobalMeetingManager />
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <GlobalToast />
-        <GlobalPopupAlert />
-        <BackdropLoader />
-        <EventListener />
-      </SafeAreaProvider>
-    </ReactQueryProvider>
+    <SafeAreaProvider>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <AppContent />
+    </SafeAreaProvider>
   );
 }
+
+function AppContent() {
+  const safeAreaInsets = useSafeAreaInsets();
+
+  return (
+    <View style={styles.container}>
+      <NewAppScreen
+        templateFileName="App.tsx"
+        safeAreaInsets={safeAreaInsets}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default App;
