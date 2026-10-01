@@ -24,6 +24,18 @@ With Metro running, open a new terminal window/pane from the root of your React 
 
 ### Android
 
+Ensure you have Android Studio and the Android SDK installed. If Gradle cannot find the SDK, configure `android/local.properties`:
+```properties
+sdk.dir=/Users/pred/Library/Android/sdk
+```
+Or export `ANDROID_HOME` in your `~/.zshrc`:
+```sh
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+```
+
+Run the Android app:
 ```sh
 # Using npm
 npm run android
