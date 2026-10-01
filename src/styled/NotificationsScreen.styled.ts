@@ -94,4 +94,96 @@ export const notificationsStyles = StyleSheet.create({
   },
 });
 
+export const notificationCardStyles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    backgroundColor: '#EF4444',
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 80,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  deleteText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  cardTouchable: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 14,
+  },
+  cardIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  cardBody: {
+    flex: 1,
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
+    flex: 1,
+    marginRight: 8,
+  },
+  cardTime: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#94A3B8',
+    flexShrink: 0,
+  },
+  cardDesc: {
+    fontSize: 12,
+    color: '#64748B',
+    lineHeight: 19,
+  },
+  metadataContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 8,
+  },
+  metadataChip: {
+    backgroundColor: '#F1F5F9',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  metadataChipText: {
+    fontSize: 11,
+    color: '#475569',
+    fontWeight: '500',
+  },
+});
+
 export default notificationsStyles;

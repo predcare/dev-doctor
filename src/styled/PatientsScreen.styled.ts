@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { theme } from './theme.styled';
 
-export const MyPatientsStyles = StyleSheet.create({
+export const PatientsStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bg,
@@ -60,6 +60,15 @@ export const MyPatientsStyles = StyleSheet.create({
     paddingVertical: 0,
     marginLeft: 8,
   },
+  clearSearchBtn: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: theme.colors.redBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 6,
+  },
 
   txHeader: {
     flexDirection: 'row',
@@ -83,21 +92,21 @@ export const MyPatientsStyles = StyleSheet.create({
 
   fab: {
     position: 'absolute',
-    bottom: 80,
-    right: 18,
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
     elevation: 8,
     zIndex: 999,
   },
 });
 
-export default MyPatientsStyles;
+export default PatientsStyles;

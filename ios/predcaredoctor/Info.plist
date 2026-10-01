@@ -33,8 +33,32 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- Camera -->
+	<key>NSCameraUsageDescription</key>
+	<string>PRED Doctor needs camera access to capture patient profile photos and EMR documents.</string>
+	<!-- Microphone -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PRED Doctor needs microphone access for teleconsultation audio and video calls.</string>
+	<!-- Photo Library / Gallery -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PRED Doctor needs access to your photos to upload patient records and documents.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>PRED Doctor needs permission to save medical records and reports to your photos.</string>
+	<!-- Bluetooth -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>PRED Doctor uses Bluetooth to connect wireless headsets during consultations.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>PRED Doctor uses Bluetooth to route audio to your Bluetooth accessories.</string>
+	<!-- Location -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>PRED Doctor requires location access to find nearby clinics and emergency services.</string>
+	<!-- Background Audio, VoIP & Remote Notifications -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>voip</string>
+		<string>remote-notification</string>
+	</array>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

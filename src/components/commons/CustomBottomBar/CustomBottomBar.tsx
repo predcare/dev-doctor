@@ -43,7 +43,7 @@ export const BOTTOM_BAR_TABS: TabConfig[] = [
     icon: ({ color, size }) => <PatientsIcon size={size} color={color} />,
   },
   {
-    key: 'Schedule',
+    key: 'Appointments',
     label: 'Schedule',
     icon: ({ color, size }) => <ScheduleIcon size={size} color={color} />,
   },
@@ -152,7 +152,7 @@ export const CustomBottomBar: React.FC<CustomBottomBarProps> = ({
       return;
     }
 
-    const params = tabKey === 'Schedule' ? { refresh: true } : undefined;
+    const params = tabKey === 'Appointments' ? { refresh: true } : undefined;
 
     if (isPathClear) {
       if (navigationRef.isReady()) {

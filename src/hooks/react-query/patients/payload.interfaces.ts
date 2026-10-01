@@ -19,3 +19,9 @@ export interface IUpdatePatientInfo {
   medical_history: string;
   blood_type?: string;
 }
+
+export interface IGetMyPatientConsultsInfiniteParams {
+  patientId: string | number;
+  status?: string;
+  limit?: number;
+}

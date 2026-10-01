@@ -2,10 +2,9 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import {
+  ArrowLeftIcon,
   BellIcon,
   CalendarIcon,
-  ChevronLeftIcon,
-  ClinicIcon,
   InfoCircleIcon,
   InvoiceIcon,
   PatientsIcon,
@@ -43,13 +42,8 @@ interface HeaderProps {
   subtitle?: string;
   isIconShow?: boolean;
   icon?: React.ReactNode;
+  isBackBtn?: boolean;
   onBackPress?: () => void;
-  doctorName?: string;
-  specialty?: string;
-  clinicName?: string;
-  unreadCount?: number;
-  onNotificationPress?: () => void;
-  onProfilePress?: () => void;
   rightAction?: React.ReactNode;
 }
 
@@ -60,13 +54,8 @@ export const Header: React.FC<HeaderProps> = ({
   subtitle,
   icon,
   isIconShow = true,
+  isBackBtn,
   onBackPress,
-  doctorName,
-  specialty,
-  clinicName,
-  unreadCount,
-  onNotificationPress,
-  onProfilePress,
   rightAction,
 }) => {
   const navigation = useNavigation();
@@ -76,41 +65,22 @@ export const Header: React.FC<HeaderProps> = ({
   const { data: notificationData, isPending: isLoadingNotificationCount } = useNotificationCount();
 
   const effectiveUnreadCount = useMemo(() => {
-    if (typeof unreadCount === 'number') return unreadCount;
     return notificationData?.data?.unread_count ?? 0;
-  }, [unreadCount, notificationData?.data?.unread_count]);
+  }, [notificationData?.data?.unread_count]);
 
   const isNotificationAvailable = useMemo(() => {
     return effectiveUnreadCount > 0;
   }, [effectiveUnreadCount]);
 
-  const handleNotificationPress = () => {
-    if (onNotificationPress) {
-      onNotificationPress();
-    } else {
-      navigation.navigate(AppRoute.NOTIFICATIONS);
-    }
-  };
-
-  const displayName = useMemo(() => {
-    const raw = doctorName || userData?.name || 'Doctor';
-    return raw.trim();
-  }, [doctorName, userData?.name]);
-
-  const initials = useMemo(() => {
-    const cleanName = displayName.replace(/^(Dr\.?|Prof\.?|Doctor)\s+/i, '').trim();
-    return getInitials(cleanName || displayName);
-  }, [displayName]);
 
 
-  // Responsive font size and line height based on name length to handle long names cleanly
   const nameFontSize = useMemo(() => {
-    const len = displayName.length;
+    const len = (userData?.name || "Dr").length;
     if (len > 30) return 14;
     if (len > 22) return 15;
     if (len > 16) return 16;
     return 17;
-  }, [displayName]);
+  }, [userData?.name]);
 
   const nameLineHeight = useMemo(() => {
     if (nameFontSize <= 14) return 18;
@@ -136,18 +106,20 @@ export const Header: React.FC<HeaderProps> = ({
       <View style={headerStyles.topRow}>
         {!isHome ? (
           <View style={headerStyles.titleContainer}>
-            {onBackPress && (
+            {isBackBtn && (
               <TouchableOpacity
                 style={headerStyles.backButton}
                 onPress={onBackPress}
                 activeOpacity={0.7}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
               >
-                <ChevronLeftIcon size={20} color={theme.colors.dark} />
+                <ArrowLeftIcon size={20} color={theme.colors.dark} />
               </TouchableOpacity>
             )}
             <View style={headerStyles.titleRow}>
-              {isIconShow ? (
+              {isIconShow && !isBackBtn ? (
                 <View style={headerStyles.titleIconBadge}>
                   {icon || getDefaultHeaderIcon(title)}
                 </View>
@@ -180,12 +152,12 @@ export const Header: React.FC<HeaderProps> = ({
         ) : (
           <TouchableOpacity
             style={headerStyles.profileGroup}
-            onPress={onProfilePress}
+            onPress={() => navigation.navigate(AppRoute.PROFILE)}
             activeOpacity={0.75}
           >
             <View style={headerStyles.avatarWrapper}>
               <View style={headerStyles.avatarContainer}>
-                <Text style={headerStyles.avatarText}>{initials}</Text>
+                <Text style={headerStyles.avatarText}>{getInitials(userData?.name || "Dr")}</Text>
               </View>
               <View style={headerStyles.onlineBadge} />
             </View>
@@ -216,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <TouchableOpacity
               style={headerStyles.iconButton}
-              onPress={handleNotificationPress}
+              onPress={() => navigation.navigate(AppRoute.NOTIFICATIONS)}
               activeOpacity={0.7}
               accessibilityRole="button"
               accessibilityLabel="Notifications"
@@ -241,20 +213,6 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </View>
       </View>
-
-      {clinicName ? (
-        <View style={headerStyles.clinicBar}>
-          <View style={headerStyles.clinicInfo}>
-            <ClinicIcon size={14} color={theme.colors.primary} />
-            <Text style={headerStyles.clinicName} numberOfLines={1} ellipsizeMode="tail">
-              {clinicName}
-            </Text>
-          </View>
-          <View style={headerStyles.statusBadge}>
-            <Text style={headerStyles.statusText}>Active</Text>
-          </View>
-        </View>
-      ) : null}
     </View>
   );
 };

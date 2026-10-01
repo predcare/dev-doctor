@@ -19,22 +19,13 @@ export interface SafeAreaWrapperProps {
   style?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   backgroundColor?: string;
-
-  // Status Bar Options
   barStyle?: 'light-content' | 'dark-content';
   statusBarColor?: string;
   hideStatusBar?: boolean;
-
-  // Header Integration
   header?: React.ReactNode;
-  hasHeader?: boolean;
   headerBackgroundColor?: string;
-
-  // Layout & Edges
   edges?: Array<'top' | 'right' | 'bottom' | 'left'>;
   fullBleed?: boolean;
-
-  // Bottom Navigation Bar
   showBottomBar?: boolean;
   activeBottomTab?: TabKey;
   visibleBottomTabs?: TabKey[];
@@ -66,7 +57,6 @@ export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
   contentContainerStyle,
   backgroundColor = theme.colors.background,
   header,
-  hasHeader = false,
   headerBackgroundColor = theme.colors.surface,
   edges = ['top', 'right', 'bottom', 'left'],
   fullBleed = false,
@@ -77,9 +67,6 @@ export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
   isPathClear,
 }) => {
   const insets = useSafeAreaInsets();
-
-  const isHeaderPresent = Boolean(header) || hasHeader;
-
   const topInset = fullBleed
     ? 0
     : edges.includes('top')
@@ -87,13 +74,10 @@ export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
         ? Math.max(insets.top, StatusBar.currentHeight || 0)
         : insets.top
       : 0;
-
   const rightInset = fullBleed ? 0 : edges.includes('right') ? insets.right : 0;
   const leftInset = fullBleed ? 0 : edges.includes('left') ? insets.left : 0;
   const bottomInset = fullBleed ? 0 : edges.includes('bottom') ? insets.bottom : 0;
-
   const bottomBarHeight = showBottomBar ? getBottomBarHeight(bottomInset) : 0;
-
 
   return (
     <View
@@ -119,21 +103,13 @@ export const SafeAreaWrapper: React.FC<SafeAreaWrapperProps> = ({
         >
           {header}
         </View>
-      ) : hasHeader && topInset > 0 ? (
-        <View
-          style={{
-            height: topInset,
-            backgroundColor: headerBackgroundColor,
-            width: '100%',
-          }}
-        />
       ) : null}
 
       <View
         style={[
           safeAreaStyles.innerContainer,
           {
-            paddingTop: isHeaderPresent ? 0 : topInset,
+            paddingTop: Boolean(header) ? 0 : topInset,
             paddingBottom: showBottomBar ? bottomBarHeight : bottomInset,
           },
           contentContainerStyle,

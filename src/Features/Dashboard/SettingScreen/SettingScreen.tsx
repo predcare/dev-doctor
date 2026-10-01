@@ -1,22 +1,104 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
+import LogoutOptionsModal from '../../../components/commons/LogoutOptionsModal/LogoutOptionsModal';
+import { queryClient } from '../../../components/providers/ReactQueryProvider';
+import { useUserLogout } from '../../../hooks/react-query/auth/auth.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { resetToLogin } from '../../../lib/commons/navigation.utils';
 import { AppRoute } from '../../../route';
+import { setIntentionalLogoutMode } from '../../../services/api/apiClient';
+import profileStyles from '../../../styled/ProfileScreen.styled';
+import { useAlertStore } from '../../../zustand/stores/useAlertStore';
+import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
+import AccountSettingsSection from './Componenets/AccountSettingsSection';
+import AppSettingsSection from './Componenets/AppSettingsSection';
+import SettingsProfileCard from './Componenets/SettingsProfileCard';
+import SupportSection from './Componenets/SupportSection';
+import WalletSection from './Componenets/WalletSection';
 
-const SettingScreen = () => {
+const SettingScreen: React.FC = () => {
     const navigation = useNavigation();
+    const [subExpanded, setSubExpanded] = useState(false);
+    const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
+    const showComingSoon = useAlertStore(state => state.showComingSoon);
+    const logout = useAuthStore(state => state.logout);
+    const { hideLoader, showLoader } = useLoadingStore(state => state);
+    const { mutate: userLogout, isPending: isLogoutLoading } = useUserLogout();
+
+    const handleLogout = () => {
+        setLogoutModalVisible(true);
+    };
+
+    const handleConfirmLogout = async (allDevices: boolean) => {
+        showLoader(allDevices ? 'Signing out of all devices...' : 'Signing out...');
+        setIntentionalLogoutMode(true);
+        userLogout(
+            { all_devices: allDevices },
+            {
+                onSettled: async () => {
+                    setLogoutModalVisible(false);
+                    await queryClient.cancelQueries();
+                    await queryClient.clear();
+                    await logout();
+                    hideLoader();
+                    resetToLogin(navigation);
+                    setTimeout(() => {
+                        setIntentionalLogoutMode(false);
+                    }, 1000);
+                },
+            }
+        );
+    };
     return (
-        <SafeAreaWrapper showBottomBar>
-            <Header
-                title="Settings"
-                description="Manage your App Settings"
-                onNotificationPress={() => navigation?.navigate(AppRoute.NOTIFICATIONS)}
+        <SafeAreaWrapper
+            showBottomBar
+            header={<Header title="Settings" description="Manage your App Settings" />}
+        >
+            <ScrollView
+                style={profileStyles.container}
+                contentContainerStyle={profileStyles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <SettingsProfileCard onEditProfile={() => navigation?.navigate(AppRoute.PROFILE)} />
+                <AccountSettingsSection
+                    onNavigateProfile={() => navigation?.navigate(AppRoute.PROFILE)}
+                    onNavigatePrescription={() => (navigation as any)?.navigate('PrescriptionSettings')}
+                    onNavigateInvoice={() => (navigation as any)?.navigate('InvoiceSettings')}
+                    subExpanded={subExpanded}
+                    onToggleSubscription={() => setSubExpanded(v => !v)}
+                    onManageSubscription={() =>
+                        showComingSoon('Subscription management feature is coming soon.')
+                    }
+                    onAddonPress={addonName => showComingSoon(`${addonName} add-on purchase is coming soon.`)}
+                />
+                <WalletSection
+                    onTopUp={() => showComingSoon('Messaging credits top-up feature is coming soon.')}
+                />
+                <AppSettingsSection
+                    onGCToggle={() => showComingSoon('Google Calendar sync is coming soon.')}
+                    onNotifToggle={() => showComingSoon('Notification settings is coming soon.')}
+                    onFaceIDToggle={() => showComingSoon('Face ID is coming soon.')}
+                    onThemePress={() => showComingSoon('Theme customization feature is coming soon.')}
+                />
+                <SupportSection
+                    onContactSupport={() => showComingSoon('Contact Support is coming soon.')}
+                    onHelpCenter={() => showComingSoon('Help Center feature is coming soon.')}
+                    onPrivacyPolicy={() => showComingSoon('Privacy Policy feature is coming soon.')}
+                    onTermsOfService={() => showComingSoon('Terms of Service feature is coming soon.')}
+                    onCompliance={() => showComingSoon('HIPAA & Data Compliance feature is coming soon.')}
+                    onLogout={handleLogout}
+                />
+            </ScrollView>
+            <LogoutOptionsModal
+                visible={logoutModalVisible}
+                onClose={() => setLogoutModalVisible(false)}
+                onConfirmLogout={handleConfirmLogout}
+                isLoading={isLogoutLoading}
             />
-            <View>
-                <Text>HomeScreen</Text>
-            </View>
         </SafeAreaWrapper>
     );
 };

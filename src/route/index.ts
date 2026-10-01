@@ -1,7 +1,4 @@
-import type {
-  NavigatorScreenParams,
-  RouteProp
-} from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 /**
@@ -12,7 +9,8 @@ export const AppRoute = {
   LOGIN: 'Login',
   POLICY_ACCEPTANCE: 'PolicyAcceptance',
   NOTIFICATIONS: 'Notifications',
-  DOCTOR_PROFILE: 'DoctorProfile',
+  ACCOUNT: 'Account',
+  PROFILE: 'Profile',
   PRESCRIPTION_SETTINGS: 'PrescriptionSettings',
   PRESCRIPTION_VIEW: 'PrescriptionView',
   INVOICE_SETTINGS: 'InvoiceSettings',
@@ -33,7 +31,8 @@ export const AppRoute = {
   PATIENTS: 'Patients',
   SCHEDULE: 'Schedule',
   REPORTS: 'Reports',
-  ACCOUNT: 'Account',
+  APPOINTMENTS: 'Appointments',
+  APPOINTMENT_DETAILS: 'AppointmentDetails',
 } as const;
 
 export type RouteNames = (typeof AppRoute)[keyof typeof AppRoute];
@@ -51,8 +50,8 @@ export type RootStackParamList = {
   Schedule: { refresh?: boolean } | undefined;
   Reports: undefined;
   Account: undefined;
+  Profile: undefined;
   Notifications: { user?: any } | undefined;
-  DoctorProfile: { user?: any } | undefined;
   PrescriptionSettings: { user?: any } | undefined;
   PrescriptionView:
     | {
@@ -62,12 +61,14 @@ export type RootStackParamList = {
         fromScreen?: string;
       }
     | undefined;
+  Appointments: undefined;
+  AppointmentDetails: { appointmentId?: string } | undefined;
   PrescriptionList: { user?: any } | undefined;
   InvoiceSettings: { user?: any } | undefined;
   AddPatient: { user?: any } | undefined;
   EditPatient: { patientId?: string | number; patientName?: string } | undefined;
   Availability: { user?: any } | undefined;
-  BookAppointment: { user?: any; patientId?: string } | undefined;
+  BookAppointment: undefined;
   DoctorAppointments: { user?: any; refresh?: boolean } | undefined;
   RescheduleAppointment: { appointmentId?: number; patientId?: string | number } | undefined;
   DoctorMeeting:
@@ -103,7 +104,7 @@ export type RootStackParamList = {
 export type DashboardTabParamList = {
   Home: undefined;
   Patients: undefined;
-  Schedule: { refresh?: boolean } | undefined;
+  Appointments: { refresh?: boolean } | undefined;
   Reports: undefined;
   Account: undefined;
 };
@@ -180,18 +181,6 @@ export type EditPatientScreenRouteProp = RouteProp<RootStackParamList, 'EditPati
 export interface EditPatientScreenProps {
   navigation?: EditPatientScreenNavigationProp;
   route?: EditPatientScreenRouteProp;
-}
-
-
-
-export type DoctorProfileScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'DoctorProfile'
->;
-export type DoctorProfileScreenRouteProp = RouteProp<RootStackParamList, 'DoctorProfile'>;
-export interface DoctorProfileScreenProps {
-  navigation?: DoctorProfileScreenNavigationProp;
-  route?: DoctorProfileScreenRouteProp;
 }
 
 export type PatientDetailsScreenNavigationProp = NativeStackNavigationProp<
@@ -274,3 +263,4 @@ export interface HomeScreenProps {
   route?: HomeScreenRouteProp;
 }
 
+export type RecordsTabRouteProp = RouteProp<RootStackParamList, 'PatientDetails'>;

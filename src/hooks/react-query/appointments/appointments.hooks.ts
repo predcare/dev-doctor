@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { MyAppointmentsQueryKeys } from '../query.keys';
 import {
   bookAppointments,
@@ -17,6 +17,24 @@ export const useMyAppointments = (params: IMyApptQueryParams) =>
   useQuery({
     queryKey: [MyAppointmentsQueryKeys.MyAppointments, params],
     queryFn: () => getMyAppointments(params),
+  });
+
+export const useMyInfiniteAppointments = (params: IMyApptQueryParams) =>
+  useInfiniteQuery({
+    queryKey: [MyAppointmentsQueryKeys.MyAppointments, 'infinite', params],
+    queryFn: ({ pageParam = 1 }) =>
+      getMyAppointments({
+        ...params,
+        page: Number(pageParam),
+        limit: params?.limit ?? 15,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage?.meta?.hasNextPage) {
+        return (lastPage?.meta?.page || 1) + 1;
+      }
+      return undefined;
+    },
   });
 
 export const useMyAppointmentStats = (params?: { date?: string }) =>

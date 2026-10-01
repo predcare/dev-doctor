@@ -154,43 +154,6 @@ export const checkIsExpired = (
   return false;
 };
 
-export const getTimeUntilStart = (startTime?: string): string => {
-  if (!startTime || typeof startTime !== 'string') {
-    console.warn('Invalid startTime provided to getTimeUntilStart:', startTime);
-    return '';
-  }
-
-  const now = new Date();
-
-  const [hours, minutes, seconds] = startTime.split(':').map(Number);
-
-  const start = new Date();
-  start.setHours(hours, minutes, seconds || 0, 0);
-
-  const diffMs = start.getTime() - now.getTime();
-
-  if (diffMs <= 0) {
-    return 'Started';
-  }
-
-  const totalMinutes = Math.ceil(diffMs / (1000 * 60));
-
-  const hoursLeft = Math.floor(totalMinutes / 60);
-  const minutesLeft = totalMinutes % 60;
-
-  if (hoursLeft > 0 && minutesLeft > 0) {
-    return `${hoursLeft} hour${hoursLeft > 1 ? 's' : ''} ${minutesLeft} minute${
-      minutesLeft > 1 ? 's' : ''
-    }`;
-  }
-
-  if (hoursLeft > 0) {
-    return `${hoursLeft} hour${hoursLeft > 1 ? 's' : ''}`;
-  }
-
-  return `${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}`;
-};
-
 export const capitalize = (value: string): string => {
   if (!value) return '';
   return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
@@ -287,24 +250,41 @@ export const calculateRemainingCallTime = (
   return `${mm}:${ss} mins remaining`;
 };
 
-export const getCallDisconnectedInfo = (
-  startTime?: string,
-  endTime?: string,
-  callDurationSeconds?: number
-): { usedText: string; leftText: string } | null => {
-  if (!startTime || !endTime) return null;
+// export const getCallDisconnectedInfo = (
+//   startTime?: string,
+//   endTime?: string,
+//   callDurationSeconds?: number
+// ): { usedText: string; leftText: string } | null => {
+//   if (!startTime || !endTime) return null;
 
-  const parseTimeToSeconds = (t: string) => {
-    const parts = t.split(':').map(Number);
-    return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
-  };
+//   const parseTimeToSeconds = (t: string) => {
+//     const parts = t.split(':').map(Number);
+//     return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
+//   };
 
-  const scheduledSec = Math.max(0, parseTimeToSeconds(endTime) - parseTimeToSeconds(startTime));
-  const usedSec = Math.max(0, Number(callDurationSeconds) || 0);
-  const leftSec = Math.max(0, scheduledSec - usedSec);
+//   const scheduledSec = Math.max(0, parseTimeToSeconds(endTime) - parseTimeToSeconds(startTime));
+//   const usedSec = Math.max(0, Number(callDurationSeconds) || 0);
+//   const leftSec = Math.max(0, scheduledSec - usedSec);
 
-  return {
-    usedText: formatMMSS(usedSec),
-    leftText: `${formatMMSS(leftSec)} left`,
-  };
+//   return {
+//     usedText: formatMMSS(usedSec),
+//     leftText: `${formatMMSS(leftSec)} left`,
+//   };
+// };
+
+export const getPayStatus = (statusStr: string) => {
+  const s = (statusStr || '').toLowerCase().trim();
+  if (s === 'paid') return { bg: '#D1FAE5', txt: '#065F46', label: 'PAID' };
+  if (s === 'overdue' || s === 'cancelled')
+    return { bg: '#FEE2E2', txt: '#B91C1C', label: s.toUpperCase() };
+  if (s === 'unpaid') return { bg: '#FEE2E2', txt: '#B91C1C', label: 'UNPAID' };
+  return { bg: '#FEF3C7', txt: '#B45309', label: 'PENDING' };
+};
+
+export const _toTitleCase = (value: string): string => {
+  if (!value?.trim()) return '';
+  return value
+    .replace(/[_-]+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, char => char.toUpperCase());
 };

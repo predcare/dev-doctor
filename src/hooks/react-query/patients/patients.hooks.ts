@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { PatientsQueryKeys } from '../query.keys';
 import {
   createNewPatient,
@@ -17,12 +17,33 @@ import {
   updatePatient,
   uploadEmr,
 } from './patients.funcs';
-import { ILinkExistingPatientPayload } from './payload.interfaces';
+import {
+  IGetMyPatientConsultsInfiniteParams,
+  ILinkExistingPatientPayload,
+} from './payload.interfaces';
 
 export const useMyPatientList = (params?: IGetMyPatientsParams) =>
   useQuery({
     queryKey: [PatientsQueryKeys.PatientsList, params],
     queryFn: () => getMyPatientsList(params),
+  });
+
+export const useMyPatientInfiniteList = (params?: Omit<IGetMyPatientsParams, 'page'>) =>
+  useInfiniteQuery({
+    queryKey: [PatientsQueryKeys.PatientsList, 'infinite', params],
+    queryFn: ({ pageParam = 1 }) =>
+      getMyPatientsList({
+        ...params,
+        page: Number(pageParam),
+        limit: params?.limit ?? 15,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage?.meta?.hasNextPage) {
+        return (lastPage?.meta?.page || 1) + 1;
+      }
+      return undefined;
+    },
   });
 
 export const useDeletePatient = () => {
@@ -115,6 +136,25 @@ export const useMyPatientConsults = (params: {
   useQuery({
     queryKey: [PatientsQueryKeys.MyConsults, params],
     queryFn: () => getMyPatientsConsults(params),
+    enabled: !!params?.patientId,
+  });
+
+export const useMyPatientInfiniteConsults = (params: IGetMyPatientConsultsInfiniteParams) =>
+  useInfiniteQuery({
+    queryKey: [PatientsQueryKeys.MyConsults, 'infinite', params],
+    queryFn: ({ pageParam = 1 }) =>
+      getMyPatientsConsults({
+        ...params,
+        page: Number(pageParam),
+        limit: params?.limit ?? 10,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage?.meta?.hasNextPage) {
+        return (lastPage?.meta?.page || 1) + 1;
+      }
+      return undefined;
+    },
     enabled: !!params?.patientId,
   });
 export const useMyPatientFamilyMembers = (params?: { patientId?: number | string }) =>

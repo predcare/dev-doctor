@@ -3,8 +3,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import LoginScreen from '../Features/Auth/LoginScreen';
 import PolicyAcceptanceScreen from '../Features/Auth/PolicyAcceptanceScreen';
+import ComingSoonScreen from '../Features/ComingSoonScreen';
+import AppointmentDetailsScreen from '../Features/Dashboard/AppointmentScreen/AppointmentDetailsScreen';
+import AppointmentsScreen from '../Features/Dashboard/AppointmentScreen/AppointmentScreen';
+import BookAppointmentScreen from '../Features/Dashboard/AppointmentScreen/BookAppointmentScreen';
+import AvailabilityScreen from '../Features/Dashboard/Availability/AvailabilityScreen';
 import HomeScreen from '../Features/Dashboard/HomeScreen/HomeScreen';
-import Patients from '../Features/Dashboard/Patients/Patients';
+import NotificationScreen from '../Features/Dashboard/NotificationScreen/NotificationScreen';
+import AddPatientScreen from '../Features/Dashboard/PatientScreen/AddPatientScreen';
+import EditPatientScreen from '../Features/Dashboard/PatientScreen/EditPatientScreen';
+import PatientDetailsScreen from '../Features/Dashboard/PatientScreen/PatientDetailsScreen';
+import PatinetScreen from '../Features/Dashboard/PatientScreen/PatientScreen';
+import { ProfileScreen } from '../Features/Dashboard/ProfileScreen/ProfileScreen';
 import SettingScreen from '../Features/Dashboard/SettingScreen/SettingScreen';
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
@@ -14,6 +24,14 @@ export type { DashboardTabParamList, RootStackParamList };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+const ReportsTabScreen = () => (
+  <ComingSoonScreen
+    title="Analytics & Reports"
+    description="Your analytics and reports will appear here."
+    showBottomBar={true}
+    activeBottomTab="Reports"
+  />
+);
 
 export const AppNavigator: React.FC = () => {
   return (
@@ -30,7 +48,17 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="PolicyAcceptance" component={PolicyAcceptanceScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Account" component={SettingScreen} />
-        <Stack.Screen name="Patients" component={Patients} />
+        <Stack.Screen name="Patients" component={PatinetScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Reports" component={ReportsTabScreen} />
+        <Stack.Screen name="Availability" component={AvailabilityScreen} />
+        <Stack.Screen name="Notifications" component={NotificationScreen} />
+        <Stack.Screen name="PatientDetails" component={PatientDetailsScreen} />
+        <Stack.Screen name="EditPatient" component={EditPatientScreen} />
+        <Stack.Screen name="AddPatient" component={AddPatientScreen} />
+        <Stack.Screen name="Appointments" component={AppointmentsScreen} />
+        <Stack.Screen name="AppointmentDetails" component={AppointmentDetailsScreen} />
+        <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

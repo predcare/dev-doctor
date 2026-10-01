@@ -24,13 +24,12 @@ export const ComingSoonScreen: React.FC<ComingSoonScreenProps> = ({
   return (
     <SafeAreaWrapper
       backgroundColor={theme.colors.background}
-      hasHeader={true}
       headerBackgroundColor={theme.colors.surface}
       barStyle="dark-content"
       showBottomBar={showBottomBar}
       activeBottomTab={activeBottomTab}
+      header={<Header title={title} description={description} />}
     >
-      <Header title={title} description={description} />
       <View style={comingSoonStyles.container}>
         <View style={comingSoonStyles.content}>
           <View style={comingSoonStyles.card}>

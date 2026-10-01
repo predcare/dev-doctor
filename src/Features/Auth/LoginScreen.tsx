@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
@@ -205,211 +206,216 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
 
   return (
     <SafeAreaWrapper style={loginStyles.safeArea}>
-      <ScrollView
-        style={loginStyles.scrollContainer}
-        contentContainerStyle={loginStyles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        automaticallyAdjustKeyboardInsets={true}
-        bounces={true}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={loginStyles.keyboardAvoid}
       >
-        <View style={loginStyles.logoContainer}>
-          <Image source={Assets.logo2} style={loginStyles.logo} resizeMode="contain" />
-        </View>
-        <View style={[loginStyles.card, { width: cardWidth }]}>
-          <View style={loginStyles.titleContainer}>
-            <Text style={loginStyles.title}>{!otpSent ? 'Welcome, Doctor' : 'Verify OTP'}</Text>
-            <Text style={loginStyles.subtitle}>
-              {otpSent
-                ? loginMode === 'mobile'
-                  ? `OTP sent via SMS & WhatsApp to ${maskedIdentifier()}`
-                  : `OTP sent to ${maskedIdentifier()}`
-                : 'Choose your preferred login method'}
-            </Text>
+        <ScrollView
+          style={loginStyles.scrollContainer}
+          contentContainerStyle={loginStyles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          automaticallyAdjustKeyboardInsets={true}
+          bounces={true}
+        >
+          <View style={loginStyles.logoContainer}>
+            <Image source={Assets.logo2} style={loginStyles.logo} resizeMode="contain" />
           </View>
-          {!otpSent ? (
-            <>
-              <View style={loginStyles.tabContainer}>
-                <Pressable
-                  style={({ pressed }) => [
-                    loginStyles.tabButton,
-                    loginMode === 'mobile' && loginStyles.tabButtonActive,
-                    pressed && { opacity: 0.8 },
-                  ]}
-                  onPress={() => switchMode('mobile')}
-                >
-                  <PhoneIcon
-                    size={18}
-                    color={loginMode === 'mobile' ? theme.colors.surface : theme.colors.textMuted}
-                  />
-                  <Text
-                    style={[
-                      loginStyles.tabText,
-                      loginMode === 'mobile' && loginStyles.tabTextActive,
-                    ]}
-                  >
-                    Mobile
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  style={({ pressed }) => [
-                    loginStyles.tabButton,
-                    loginMode === 'email' && loginStyles.tabButtonActive,
-                    pressed && { opacity: 0.8 },
-                  ]}
-                  onPress={() => switchMode('email')}
-                >
-                  <MailIcon
-                    size={18}
-                    color={loginMode === 'email' ? theme.colors.surface : theme.colors.textMuted}
-                  />
-                  <Text
-                    style={[
-                      loginStyles.tabText,
-                      loginMode === 'email' && loginStyles.tabTextActive,
-                    ]}
-                  >
-                    Email
-                  </Text>
-                </Pressable>
-              </View>
-              <View style={loginStyles.inputSection}>
-                <Text style={loginStyles.label}>
-                  {loginMode === 'mobile' ? 'Mobile Number' : 'Email Address'}
-                </Text>
-                <View
-                  style={[
-                    loginStyles.inputRow,
-                    errors.identifier ? loginStyles.inputError : null,
-                  ]}
-                >
-                  <View style={loginStyles.inputIcon}>
-                    {loginMode === 'mobile' ? (
-                      <PhoneIcon size={20} color="#666666" />
-                    ) : (
-                      <MailIcon size={20} color="#666666" />
-                    )}
-                  </View>
-                  <Controller
-                    control={control}
-                    name="identifier"
-                    render={({ field: { onChange, value } }) => (
-                      <TextInput
-                        key={loginMode}
-                        style={loginStyles.inputField}
-                        placeholder={
-                          loginMode === 'mobile'
-                            ? 'Enter 10-digit mobile number'
-                            : 'Enter email address'
-                        }
-                        placeholderTextColor="#999999"
-                        keyboardType={loginMode === 'mobile' ? 'number-pad' : 'email-address'}
-                        maxLength={loginMode === 'mobile' ? 10 : undefined}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        autoComplete={loginMode === 'mobile' ? 'tel' : 'email'}
-                        textContentType={
-                          loginMode === 'mobile' ? 'telephoneNumber' : 'emailAddress'
-                        }
-                        autoFocus={true}
-                        value={value}
-                        onChangeText={text => {
-                          if (loginMode === 'mobile') {
-                            const cleanNum = text.replace(/\D/g, '').slice(0, 10);
-                            onChange(cleanNum);
-                          } else {
-                            onChange(text);
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                </View>
-                {errors.identifier ? (
-                  <Text style={loginStyles.errorText}>{errors.identifier.message}</Text>
-                ) : null}
-              </View>
-            </>
-          ) : (
-            <View style={loginStyles.otpSection}>
-              <Text style={loginStyles.label}>Enter 6-digit OTP</Text>
-              <Controller
-                control={control}
-                name="otp"
-                render={({ field: { onChange, value = '' } }) => (
-                  <OtpInput
-                    value={value}
-                    onChange={val => {
-                      onChange(val);
-                      if (val.length === 6 && !verifyOtpPending) {
-                        Keyboard.dismiss();
-                        const currentValues = getValues();
-                        onSubmitVerifyOtp({ ...currentValues, otp: val });
-                      }
-                    }}
-                    numInputs={6}
-                  />
-                )}
-              />
-              {errors.otp ? (
-                <Text style={loginStyles.errorText}>{errors.otp.message}</Text>
-              ) : null}
-              <View style={loginStyles.resendContainer}>
-                <Text style={loginStyles.resendText}>Didn't receive OTP? </Text>
-                <Pressable
-                  onPress={() => handleSubmit(onSubmitResendOtp)()}
-                  disabled={sendOtpPending}
-                  style={({ pressed }) => [(pressed || sendOtpPending) && { opacity: 0.6 }]}
-                >
-                  <Text style={loginStyles.resendLink}>
-                    {sendOtpPending ? 'Resending...' : 'Resend'}
-                  </Text>
-                </Pressable>
-              </View>
-              <Pressable
-                style={({ pressed }) => [
-                  loginStyles.changeNumberBtn,
-                  pressed && { opacity: 0.6 },
-                ]}
-                onPress={() => {
-                  setOtpSent(false);
-                  setValue('otp', '');
-                }}
-              >
-                <Text style={loginStyles.changeNumberText}>
-                  ← Change {loginMode === 'mobile' ? 'Mobile Number' : 'Email'}
-                </Text>
-              </Pressable>
+          <View style={[loginStyles.card, { width: cardWidth }]}>
+            <View style={loginStyles.titleContainer}>
+              <Text style={loginStyles.title}>{!otpSent ? 'Welcome, Doctor' : 'Verify OTP'}</Text>
+              <Text style={loginStyles.subtitle}>
+                {otpSent
+                  ? loginMode === 'mobile'
+                    ? `OTP sent via SMS & WhatsApp to ${maskedIdentifier()}`
+                    : `OTP sent to ${maskedIdentifier()}`
+                  : 'Choose your preferred login method'}
+              </Text>
             </View>
-          )}
-          <Pressable
-            disabled={isVerifyDisabled || sendOtpPending || verifyOtpPending}
-            style={({ pressed }) => [
-              loginStyles.primaryButton,
-              (isVerifyDisabled || sendOtpPending || verifyOtpPending) &&
-              loginStyles.buttonDisabled,
-              pressed &&
-              !isVerifyDisabled &&
-              !sendOtpPending &&
-              !verifyOtpPending && { opacity: 0.85 },
-            ]}
-            onPress={handlePrimaryPress}
-          >
-            {sendOtpPending || verifyOtpPending ? (
-              <ActivityIndicator color={theme.colors.surface} />
-            ) : !otpSent ? (
-              <Text style={loginStyles.primaryButtonText}>Send OTP</Text>
+            {!otpSent ? (
+              <>
+                <View style={loginStyles.tabContainer}>
+                  <Pressable
+                    style={({ pressed }) => [
+                      loginStyles.tabButton,
+                      loginMode === 'mobile' && loginStyles.tabButtonActive,
+                      pressed && { opacity: 0.8 },
+                    ]}
+                    onPress={() => switchMode('mobile')}
+                  >
+                    <PhoneIcon
+                      size={18}
+                      color={loginMode === 'mobile' ? theme.colors.surface : theme.colors.textMuted}
+                    />
+                    <Text
+                      style={[
+                        loginStyles.tabText,
+                        loginMode === 'mobile' && loginStyles.tabTextActive,
+                      ]}
+                    >
+                      Mobile
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={({ pressed }) => [
+                      loginStyles.tabButton,
+                      loginMode === 'email' && loginStyles.tabButtonActive,
+                      pressed && { opacity: 0.8 },
+                    ]}
+                    onPress={() => switchMode('email')}
+                  >
+                    <MailIcon
+                      size={18}
+                      color={loginMode === 'email' ? theme.colors.surface : theme.colors.textMuted}
+                    />
+                    <Text
+                      style={[
+                        loginStyles.tabText,
+                        loginMode === 'email' && loginStyles.tabTextActive,
+                      ]}
+                    >
+                      Email
+                    </Text>
+                  </Pressable>
+                </View>
+                <View style={loginStyles.inputSection}>
+                  <Text style={loginStyles.label}>
+                    {loginMode === 'mobile' ? 'Mobile Number' : 'Email Address'}
+                  </Text>
+                  <View
+                    style={[
+                      loginStyles.inputRow,
+                      errors.identifier ? loginStyles.inputError : null,
+                    ]}
+                  >
+                    <View style={loginStyles.inputIcon}>
+                      {loginMode === 'mobile' ? (
+                        <PhoneIcon size={20} color="#666666" />
+                      ) : (
+                        <MailIcon size={20} color="#666666" />
+                      )}
+                    </View>
+                    <Controller
+                      control={control}
+                      name="identifier"
+                      render={({ field: { onChange, value } }) => (
+                        <TextInput
+                          key={loginMode}
+                          style={loginStyles.inputField}
+                          placeholder={
+                            loginMode === 'mobile'
+                              ? 'Enter 10-digit mobile number'
+                              : 'Enter email address'
+                          }
+                          placeholderTextColor="#999999"
+                          keyboardType={loginMode === 'mobile' ? 'number-pad' : 'email-address'}
+                          maxLength={loginMode === 'mobile' ? 10 : undefined}
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          autoComplete={loginMode === 'mobile' ? 'tel' : 'email'}
+                          textContentType={
+                            loginMode === 'mobile' ? 'telephoneNumber' : 'emailAddress'
+                          }
+                          autoFocus={true}
+                          value={value}
+                          onChangeText={text => {
+                            if (loginMode === 'mobile') {
+                              const cleanNum = text.replace(/\D/g, '').slice(0, 10);
+                              onChange(cleanNum);
+                            } else {
+                              onChange(text);
+                            }
+                          }}
+                        />
+                      )}
+                    />
+                  </View>
+                  {errors.identifier ? (
+                    <Text style={loginStyles.errorText}>{errors.identifier.message}</Text>
+                  ) : null}
+                </View>
+              </>
             ) : (
-              <View style={loginStyles.verifyBtnInner}>
-                <Text style={loginStyles.verifyBtnIcon}>✓</Text>
-                <Text style={loginStyles.primaryButtonText}>Verify OTP</Text>
+              <View style={loginStyles.otpSection}>
+                <Text style={loginStyles.label}>Enter 6-digit OTP</Text>
+                <Controller
+                  control={control}
+                  name="otp"
+                  render={({ field: { onChange, value = '' } }) => (
+                    <OtpInput
+                      value={value}
+                      onChange={val => {
+                        onChange(val);
+                        if (val.length === 6 && !verifyOtpPending) {
+                          Keyboard.dismiss();
+                          const currentValues = getValues();
+                          onSubmitVerifyOtp({ ...currentValues, otp: val });
+                        }
+                      }}
+                      numInputs={6}
+                    />
+                  )}
+                />
+                {errors.otp ? (
+                  <Text style={loginStyles.errorText}>{errors.otp.message}</Text>
+                ) : null}
+                <View style={loginStyles.resendContainer}>
+                  <Text style={loginStyles.resendText}>Didn't receive OTP? </Text>
+                  <Pressable
+                    onPress={() => handleSubmit(onSubmitResendOtp)()}
+                    disabled={sendOtpPending}
+                    style={({ pressed }) => [(pressed || sendOtpPending) && { opacity: 0.6 }]}
+                  >
+                    <Text style={loginStyles.resendLink}>
+                      {sendOtpPending ? 'Resending...' : 'Resend'}
+                    </Text>
+                  </Pressable>
+                </View>
+                <Pressable
+                  style={({ pressed }) => [
+                    loginStyles.changeNumberBtn,
+                    pressed && { opacity: 0.6 },
+                  ]}
+                  onPress={() => {
+                    setOtpSent(false);
+                    setValue('otp', '');
+                  }}
+                >
+                  <Text style={loginStyles.changeNumberText}>
+                    ← Change {loginMode === 'mobile' ? 'Mobile Number' : 'Email'}
+                  </Text>
+                </Pressable>
               </View>
             )}
-          </Pressable>
-        </View>
-      </ScrollView>
+            <Pressable
+              disabled={isVerifyDisabled || sendOtpPending || verifyOtpPending}
+              style={({ pressed }) => [
+                loginStyles.primaryButton,
+                (isVerifyDisabled || sendOtpPending || verifyOtpPending) &&
+                loginStyles.buttonDisabled,
+                pressed &&
+                !isVerifyDisabled &&
+                !sendOtpPending &&
+                !verifyOtpPending && { opacity: 0.85 },
+              ]}
+              onPress={handlePrimaryPress}
+            >
+              {sendOtpPending || verifyOtpPending ? (
+                <ActivityIndicator color={theme.colors.surface} />
+              ) : !otpSent ? (
+                <Text style={loginStyles.primaryButtonText}>Send OTP</Text>
+              ) : (
+                <View style={loginStyles.verifyBtnInner}>
+                  <Text style={loginStyles.verifyBtnIcon}>✓</Text>
+                  <Text style={loginStyles.primaryButtonText}>Verify OTP</Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaWrapper>
   );
 };
