@@ -1,0 +1,148 @@
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { PatientsQueryKeys } from '../query.keys';
+import {
+  createNewPatient,
+  deletePatient,
+  getAllPatients,
+  getMyPatientsConsults,
+  getMyPatientsEmrs,
+  getMyPatientsInfo,
+  getMyPatientsList,
+  getMyPatientsPrescriptions,
+  getPatientsFamilyMembers,
+  IGetMyPatientsParams,
+  linkExistingPatient,
+  shareEmrDocument,
+  sharePrescription,
+  updatePatient,
+  uploadEmr,
+} from './patients.funcs';
+import { ILinkExistingPatientPayload } from './payload.interfaces';
+
+export const useMyPatientList = (params?: IGetMyPatientsParams) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.PatientsList, params],
+    queryFn: () => getMyPatientsList(params),
+  });
+
+export const useDeletePatient = () => {
+  return useMutation({
+    mutationFn: (patientId: number | string) => deletePatient(patientId),
+  });
+};
+
+export const useLinkExistingPatient = () => {
+  return useMutation({
+    mutationKey: [PatientsQueryKeys.LinkExisting],
+    mutationFn: (payload: ILinkExistingPatientPayload) => linkExistingPatient(payload),
+  });
+};
+
+export const useCreateNewPatient = () => {
+  return useMutation({
+    mutationKey: [PatientsQueryKeys.NewCreate],
+    mutationFn: (payload: FormData) => createNewPatient(payload),
+  });
+};
+
+export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.PatientInfo, params],
+    queryFn: () => getMyPatientsInfo(params?.patientId!),
+    enabled: !!params?.patientId,
+    select: v => (!v?.data ? null : v.data),
+  });
+
+export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.EmrRecords, params],
+    queryFn: () => getMyPatientsEmrs(params?.patientId!),
+    enabled: !!params?.patientId,
+    select: v => {
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
+  });
+
+export const useMyPatientPrescriptions = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.Prescriptions, params],
+    queryFn: () => getMyPatientsPrescriptions(params?.patientId!),
+    enabled: !!params?.patientId,
+    select: v => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
+  });
+
+export const useShareEmrDocument = () => {
+  return useMutation({
+    mutationFn: ({
+      docId,
+      body,
+    }: {
+      docId: string | number;
+      body: { visible_to_patient: boolean };
+    }) => shareEmrDocument(docId, body),
+  });
+};
+
+export const useSharePrescription = () => {
+  return useMutation({
+    mutationFn: ({
+      presId,
+      body,
+    }: {
+      presId: string | number;
+      body: { visible_to_patient: number };
+    }) => sharePrescription(presId, body),
+  });
+};
+
+export const useUploadEmr = () => {
+  return useMutation({
+    mutationFn: (body: FormData) => uploadEmr(body),
+  });
+};
+
+export const useMyPatientConsults = (params: {
+  page: number;
+  limit: number;
+  patientId: string | number;
+  status?: string;
+}) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.MyConsults, params],
+    queryFn: () => getMyPatientsConsults(params),
+    enabled: !!params?.patientId,
+  });
+export const useMyPatientFamilyMembers = (params?: { patientId?: number | string }) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.FamilyMembers, params],
+    queryFn: () => getPatientsFamilyMembers(params?.patientId!),
+    enabled: !!params?.patientId,
+    select: v => {
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v?.data)) return v.data;
+      return [];
+    },
+  });
+
+export const useUpdatePatientInfo = () => {
+  return useMutation({
+    mutationFn: updatePatient,
+  });
+};
+
+export const useGetAllPatients = (params?: {
+  page: number;
+  limit: number;
+  user_type: string;
+  search?: string;
+}) =>
+  useQuery({
+    queryKey: [PatientsQueryKeys.ALL_PATIENTS, params],
+    queryFn: () => getAllPatients(params),
+    enabled: !!params?.user_type && Boolean(params?.search && params?.search?.length >= 3),
+  });
