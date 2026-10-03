@@ -104,3 +104,6 @@ export enum HomeApiQuery {
   STATS = 'STATS',
   UPCOMING_APPOITMENTS = 'UPCOMING_APPOITMENTS',
 }
+export enum DoctorStatsQueryKeys {
+  DOCTOR_STATS = 'DOCTOR_STATS',
+}

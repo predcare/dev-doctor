@@ -103,6 +103,9 @@ export const endpoints = {
     stats: (doctorId: string | number) => `/doctor/appointments/doctor/${doctorId}/stats`,
     upcomingAppts: `/appointments/my-appointments`,
   },
+  stats: {
+    get: '/stats/doctor',
+  },
 };
 
 export const successEndpoints = [

@@ -25,6 +25,7 @@ import {
 } from '../../../components/ui/icons';
 import EmptyIcon from '../../../components/ui/icons/EmptyIcon';
 import { useHomeUpcomingAppts } from '../../../hooks/react-query/home/home.hooks';
+import { useDoctorStats } from '../../../hooks/react-query/stats/stats.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import { formatTime12h } from '../../../lib/commons/availability.utils';
@@ -32,19 +33,19 @@ import { showErrorToast, showInfoToast } from '../../../lib/commons/toast.utils'
 import { AppRoute } from '../../../route';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import theme from '../../../styled/theme.styled';
+import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import AssistanceBanner from './components/AssistanceBanner';
 import HomeStatsCard from './components/HomeStatsCard';
 import QuickAccessCard from './components/QuickAccessCard';
 import UpcomingAppointmentCard from './components/UpcomingAppointmentCard';
 import UpcomingAppointmentSkeleton from './Skeletons/AppointmentSkeleton';
-import HomeStatSkeleton from './Skeletons/HomeStatSkeleton';
 
-type PeriodKey = 'today' | 'week' | 'month';
+type PeriodKey = 'today' | 'last_7_days' | 'last_30_days';
 
 const PERIOD_LABELS: Record<PeriodKey, string> = {
     today: 'Today',
-    week: 'This Week',
-    month: 'This Month',
+    last_7_days: 'Last 7 Days',
+    last_30_days: 'Last 30 Days',
 };
 
 const quickAccessItems = [
@@ -76,13 +77,19 @@ const quickAccessItems = [
 
 export const HomeScreen: React.FC = () => {
     const appNavigation = useNavigation();
-    const [period, setPeriod] = useState<PeriodKey>('week');
+    const [period, setPeriod] = useState<PeriodKey>('today');
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
     const [menuPos, setMenuPos] = useState({ top: 155, right: 16 });
     const pillRef = useRef<ViewInstance>(null);
     const [refreshing, setRefreshing] = useState(false);
 
-    const statsPending = false;
+    const { userData } = useAuthStore((state) => state)
+
+    const { data: statsInfo, isPending: statsPending, refetch: refetchStats } = useDoctorStats({
+        date_filter: period,
+        clinic_id: Number(userData?.clinic?.id) || 0,
+    })
+
 
     const {
         data: upcomingAppts,
@@ -112,38 +119,42 @@ export const HomeScreen: React.FC = () => {
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        await Promise.all([refetchAppointments()]);
+        await Promise.all([refetchAppointments(), refetchStats()]);
         setRefreshing(false);
-    }, [refetchAppointments]);
+    }, [refetchAppointments, refetchStats]);
 
     const homeStats = useMemo(() => {
         return [
             {
                 id: '1',
                 label: 'Upcoming Appts',
-                value: 0,
+                value: statsInfo?.upcoming_appointments || 0,
                 icon: <ClockIcon size={20} color="#8B5CF6" />,
                 iconBg: '#F3E8FF',
             },
             {
                 id: '2',
                 label:
-                    period === 'today' ? 'Today Appts' : period === 'week' ? 'Week Appts' : 'Month Appts',
-                value: 0,
+                    period === 'today'
+                        ? 'Today Appts'
+                        : period === 'last_7_days'
+                            ? '7 Days Appts'
+                            : '30 Days Appts',
+                value: statsInfo?.week_appointments || 0,
                 icon: <CalendarIcon size={20} color="#0EA5E9" />,
                 iconBg: '#E0F2FE',
             },
             {
                 id: '3',
                 label: 'Earnings',
-                value: 0,
+                value: `₹${statsInfo?.earnings || 0}`,
                 icon: <WalletIcon size={20} color="#10B981" />,
                 iconBg: '#D1FAE5',
             },
             {
                 id: '4',
                 label: 'Total Patients',
-                value: 0,
+                value: statsInfo?.total_patients || 0,
                 icon: <PatientsIcon size={20} color="#F59E0B" />,
                 iconBg: '#FEF3C7',
             },
@@ -241,26 +252,23 @@ export const HomeScreen: React.FC = () => {
                             </View>
                         </View>
 
-                        {statsPending ? (
-                            <HomeStatSkeleton />
-                        ) : (
-                            <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={{ paddingRight: theme.spacing.lg }}
-                                keyboardShouldPersistTaps="handled"
-                            >
-                                {homeStats.map(stat => (
-                                    <HomeStatsCard
-                                        key={stat.id}
-                                        label={stat.label}
-                                        value={String(stat.value)}
-                                        icon={stat.icon}
-                                        iconBg={stat.iconBg}
-                                    />
-                                ))}
-                            </ScrollView>
-                        )}
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingRight: theme.spacing.lg }}
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            {homeStats.map(stat => (
+                                <HomeStatsCard
+                                    key={stat.id}
+                                    label={stat.label}
+                                    value={String(stat.value)}
+                                    icon={stat.icon}
+                                    iconBg={stat.iconBg}
+                                    loading={statsPending}
+                                />
+                            ))}
+                        </ScrollView>
                     </View>
 
                     <View style={homeStyles.sectionHeader}>
