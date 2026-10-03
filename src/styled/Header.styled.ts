@@ -13,7 +13,7 @@ export const headerStyles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
-    elevation: 2,
+    elevation: 0,
   },
   topRow: {
     flexDirection: 'row',
