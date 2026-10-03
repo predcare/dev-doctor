@@ -13,11 +13,14 @@ export const AppRoute = {
   PROFILE: 'Profile',
   PRESCRIPTION_SETTINGS: 'PrescriptionSettings',
   PRESCRIPTION_VIEW: 'PrescriptionView',
+  VIEW_PRESCRIPTION: 'ViewPrescription',
+  INVOICES: 'Invoices',
   INVOICE_SETTINGS: 'InvoiceSettings',
   ADD_PATIENT: 'AddPatient',
   EDIT_PATIENT: 'EditPatient',
   AVAILABILITY: 'Availability',
   BOOK_APPOINTMENT: 'BookAppointment',
+  PRESCRIPTION: 'Prescription',
   DOCTOR_APPOINTMENTS: 'DoctorAppointments',
   RESCHEDULE_APPOINTMENT: 'RescheduleAppointment',
   DOCTOR_MEETING: 'DoctorMeeting',
@@ -64,6 +67,16 @@ export type RootStackParamList = {
   Appointments: undefined;
   AppointmentDetails: { appointmentId?: string } | undefined;
   PrescriptionList: { user?: any } | undefined;
+  Prescription: undefined;
+  ViewPrescription:
+    | {
+        rxId?: string | number;
+        patientId?: string | number;
+        patientName?: string;
+        fromScreen?: string;
+      }
+    | undefined;
+  Invoices: undefined;
   InvoiceSettings: { user?: any } | undefined;
   AddPatient: { user?: any } | undefined;
   EditPatient: { patientId?: string | number; patientName?: string } | undefined;

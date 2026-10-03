@@ -1,0 +1,856 @@
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import {
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import CommonErrorCard from '../../../components/commons/CommonErrorCard/CommonErrorCard';
+import { queryClient } from '../../../components/providers/ReactQueryProvider';
+import { useMyPatientInfo } from '../../../hooks/react-query/patients/patients.hooks';
+import {
+    ICreatePrescriptionPayload,
+    IUpdatePrescriptionPayload,
+} from '../../../hooks/react-query/prescriptions/payload.interfaces';
+import {
+    useCreatePrescription,
+    useGetPrescriptionDetails,
+    useResendPrescriptionEmail,
+    useUpdatePrescription,
+} from '../../../hooks/react-query/prescriptions/prescriptions.hooks';
+import { PatientsQueryKeys, PrescriptionQueryKeys } from '../../../hooks/react-query/query.keys';
+import Header from '../../../Layout/Header';
+import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { getAge } from '../../../lib/commons/common.utils';
+import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
+import {
+    createPrescriptionSchema,
+    TCreatePrescriptionFormValues,
+} from '../../../lib/schemas/createPrescription.schema';
+import { AppRoute, CreatePrescriptionScreenProps } from '../../../route';
+import createPrescriptionStyles from '../../../styled/CreatePrescriptionScreen.styled';
+import theme from '../../../styled/theme.styled';
+import { UserRoles } from '../../../typescripts/enums';
+import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
+import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
+import PrescriptionAdviceStep from './Components/PrescriptionAdviceStep';
+import PrescriptionClinicalNotesStep from './Components/PrescriptionClinicalNotesStep';
+import PrescriptionDiagnosisStep from './Components/PrescriptionDiagnosisStep';
+import PrescriptionLabsStep from './Components/PrescriptionLabsStep';
+import PrescriptionMedicationsStep from './Components/PrescriptionMedicationsStep';
+import PrescriptionVitalsStep from './Components/PrescriptionVitalsStep';
+import CreatePrescriptionSkeleton from './Skeletons/CreatePrescriptionSkeleton';
+
+export type PrescriptionStep =
+    | 'clinical'
+    | 'diagnosis'
+    | 'vitals'
+    | 'medications'
+    | 'labs'
+    | 'advice';
+
+export interface PrescriptionStepItem {
+    id: PrescriptionStep;
+    title: string;
+    stepNum: number;
+}
+
+const PrescriptionSteps: PrescriptionStepItem[] = [
+    { id: 'clinical', title: 'Clinical Notes', stepNum: 1 },
+    { id: 'diagnosis', title: 'Diagnosis', stepNum: 2 },
+    { id: 'vitals', title: 'Vitals', stepNum: 3 },
+    { id: 'medications', title: 'Medications', stepNum: 4 },
+    { id: 'labs', title: 'Lab Tests', stepNum: 5 },
+    { id: 'advice', title: 'Advice', stepNum: 6 },
+];
+
+const defaultFormValues: TCreatePrescriptionFormValues = {
+    chief_complaints: '',
+    examination_notes: '',
+    diagnosis: '',
+    treatment_plan: '',
+    chronic_conditions: '',
+    drug_allergies: '',
+    blood_pressure: '',
+    pulse: '',
+    temperature: '',
+    spo2: '',
+    weight: '',
+    height: '',
+    bmi: '',
+    custom_vitals: [],
+    medications: [
+        {
+            name: '',
+            strength: '',
+            strengthUnit: 'mg',
+            dosage: '',
+            timing: '',
+            durationNum: '',
+            durationUnit: 'days',
+            instructions: '',
+        },
+    ],
+    lab_tests_structured: [
+        {
+            instructions: '',
+            name: '',
+        },
+    ],
+    general_advice: '',
+    follow_up_date: '',
+    referral_specialist: '',
+    referral_doctor_hospital: '',
+    referral_reason: '',
+    notes: '',
+};
+
+export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> = ({ route }) => {
+    const navigation = useNavigation();
+    const patientId = route?.params?.patientId;
+    const prescriptionId = route?.params?.prescriptionId;
+    const [activeStep, setActiveStep] = useState<PrescriptionStep>('clinical');
+    const { userData } = useAuthStore(state => state);
+    const currentPrescriptionId = useRef<number | null>(
+        prescriptionId ? Number(prescriptionId) : null
+    );
+    const [autoSaveStatus, setAutoSaveStatus] = useState<
+        'idle' | 'typing' | 'saving' | 'saved' | 'error'
+    >('idle');
+    const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+    const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const isInitialLoadRef = useRef<boolean>(true);
+
+    const { showLoader, hideLoader } = useLoadingStore(state => state);
+    const { appointmentId, apptIdforInPerson, clearInPersonAppointment } = useMeetingStore(
+        state => state
+    );
+    const {
+        data: patientInfo,
+        isPending: patientInfoPending,
+        isError: isPatientInfoError,
+        refetch: refetchPatientInfo,
+    } = useMyPatientInfo({
+        patientId: Number(patientId),
+    });
+
+    const {
+        data: prescriptionInfo,
+        isPending: prescriptionInfoLoading,
+        isError: isPrescriptionInfoError,
+        refetch: refetchPrescriptionInfo,
+    } = useGetPrescriptionDetails({
+        id: Number(prescriptionId),
+    });
+
+    const { mutate: createPrescription, isPending: createPrescriptionPending } =
+        useCreatePrescription();
+    const { mutate: updatePrescription, isPending: updatePrescriptionPending } =
+        useUpdatePrescription();
+    const { mutate: resendEmailMutation, isPending: resendEmailLoading } =
+        useResendPrescriptionEmail();
+
+    const methods = useForm<TCreatePrescriptionFormValues>({
+        resolver: yupResolver(createPrescriptionSchema),
+        defaultValues: defaultFormValues,
+    });
+
+    const stepIndex = PrescriptionSteps.findIndex(s => s.id === activeStep);
+    const isFirstStep = stepIndex === 0;
+    const isLastStep = stepIndex === PrescriptionSteps.length - 1;
+
+    const handleNextStep = () => {
+        if (!isLastStep) {
+            setActiveStep(PrescriptionSteps[stepIndex + 1].id);
+        }
+    };
+
+    const handlePrevStep = () => {
+        if (!isFirstStep) {
+            setActiveStep(PrescriptionSteps[stepIndex - 1].id);
+        }
+    };
+
+    const hasAnyContent = (_data: TCreatePrescriptionFormValues) => {
+        const validMedications = _data?.medications?.filter(m => m?.name && m.name.trim() !== '');
+        const validCustomVitals = _data?.custom_vitals?.filter(
+            v => (v?.name && v.name.trim() !== '') || (v?.value && v.value.trim() !== '')
+        );
+        const validLabTests = _data?.lab_tests_structured?.filter(l => l?.name && l.name.trim() !== '');
+
+        return Boolean(
+            _data?.chief_complaints?.trim() ||
+            _data?.examination_notes?.trim() ||
+            _data?.diagnosis?.trim() ||
+            _data?.treatment_plan?.trim() ||
+            _data?.chronic_conditions?.trim() ||
+            _data?.drug_allergies?.trim() ||
+            _data?.blood_pressure?.trim() ||
+            _data?.pulse?.trim() ||
+            _data?.temperature?.trim() ||
+            _data?.spo2?.trim() ||
+            _data?.weight?.trim() ||
+            _data?.height?.trim() ||
+            _data?.bmi?.trim() ||
+            _data?.general_advice?.trim() ||
+            _data?.follow_up_date?.trim() ||
+            _data?.referral_specialist?.trim() ||
+            _data?.referral_doctor_hospital?.trim() ||
+            _data?.referral_doctor_name?.trim() ||
+            _data?.referral_reason?.trim() ||
+            _data?.notes?.trim() ||
+            (validMedications && validMedications.length > 0) ||
+            (validCustomVitals && validCustomVitals.length > 0) ||
+            (validLabTests && validLabTests.length > 0)
+        );
+    };
+
+    const buildPrescriptionPayload = (
+        _data: TCreatePrescriptionFormValues,
+        status: 'draft' | 'completed' = 'draft'
+    ): ICreatePrescriptionPayload => {
+        const rx = prescriptionInfo?.data;
+        const validMedications = _data?.medications?.filter(m => m?.name && m.name.trim() !== '');
+        const validCustomVitals = _data?.custom_vitals?.filter(
+            v => (v?.name && v.name.trim() !== '') || (v?.value && v.value.trim() !== '')
+        );
+        const validLabTests = _data?.lab_tests_structured?.filter(l => l?.name && l.name.trim() !== '');
+
+        const rawPayload: Record<string, any> = {
+            doctor_id: userData?.user_id || '',
+            patient_id: patientId ?? rx?.patient_id ?? '',
+            clinic_id: userData?.clinic?.id ?? rx?.clinic_id ?? '',
+            appointment_id: apptIdforInPerson || appointmentId || '',
+            type: UserRoles.DOCTOR,
+            chief_complaints: _data?.chief_complaints,
+            diagnosis: _data?.diagnosis,
+            symptoms: _data?.chief_complaints,
+            examination_notes: _data?.examination_notes,
+            treatment_plan: _data?.treatment_plan,
+            drug_allergies: _data?.drug_allergies || '',
+            chronic_conditions: _data?.chronic_conditions || '',
+            blood_pressure: _data?.blood_pressure,
+            pulse: _data?.pulse,
+            temperature: _data?.temperature,
+            spo2: _data?.spo2,
+            weight: _data?.weight,
+            height: _data?.height,
+            bmi: _data?.bmi,
+            custom_vitals: validCustomVitals,
+            medications: validMedications,
+            lab_tests: validLabTests,
+            lab_tests_structured: validLabTests,
+            general_advice: _data?.general_advice,
+            follow_up: _data?.follow_up_date,
+            follow_up_date: _data?.follow_up_date,
+            referral_specialist: _data?.referral_specialist,
+            referral_doctor_hospital: _data?.referral_doctor_hospital,
+            referral_doctor_name: _data?.referral_doctor_name,
+            referral_reason: _data?.referral_reason,
+            notes: _data?.notes,
+            status: status,
+        };
+
+        return Object.fromEntries(
+            Object.entries(rawPayload).filter(([_, val]) => {
+                if (val === null || val === undefined || val === '') return false;
+                if (Array.isArray(val) && val.length === 0) return false;
+                return true;
+            })
+        ) as unknown as ICreatePrescriptionPayload;
+    };
+
+    const handleBack = () => {
+        if (prescriptionId) {
+            if (navigation && navigation.canGoBack()) {
+                navigation.goBack();
+            } else {
+                (navigation as any)?.navigate(AppRoute.PRESCRIPTION_VIEW, {
+                    rxId: Number(prescriptionId),
+                    patientName: patientInfo?.name,
+                    fromScreen: route?.params?.fromScreen,
+                });
+            }
+        } else if (apptIdforInPerson) {
+            if (navigation && navigation.canGoBack()) {
+                navigation.goBack();
+            } else {
+                (navigation as any)?.navigate(AppRoute.DOCTOR_APPOINTMENTS as any);
+            }
+        } else if (navigation && navigation.canGoBack()) {
+            navigation.goBack();
+        } else if (route?.params?.fromScreen === AppRoute.PRESCRIPTION_LIST) {
+            (navigation as any)?.navigate(AppRoute.PRESCRIPTION_LIST);
+        } else if (patientId) {
+            (navigation as any)?.navigate(AppRoute.PATIENT_DETAILS, {
+                patientId: patientId,
+                patientName: patientInfo?.name,
+            });
+        } else {
+            (navigation as any)?.navigate(AppRoute.PRESCRIPTION_LIST);
+        }
+    };
+
+    const triggerAutoSave = (formValues: TCreatePrescriptionFormValues) => {
+        if (!hasAnyContent(formValues)) return;
+
+        setAutoSaveStatus('saving');
+        const payload = buildPrescriptionPayload(formValues, 'draft');
+        const activeId =
+            currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+        const getFormattedTime = () => {
+            const date = new Date();
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+
+        if (activeId) {
+            updatePrescription(
+                {
+                    id: activeId,
+                    payload: payload as unknown as IUpdatePrescriptionPayload,
+                },
+                {
+                    onSuccess: () => {
+                        setAutoSaveStatus('saved');
+                        setLastSavedAt(getFormattedTime());
+                    },
+                    onError: () => {
+                        setAutoSaveStatus('error');
+                    },
+                }
+            );
+        } else {
+            createPrescription(payload, {
+                onSuccess: async response => {
+                    const createId = response?.data?.id;
+                    if (createId) {
+                        currentPrescriptionId.current = Number(createId);
+                    }
+                    await queryClient.invalidateQueries({
+                        queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                    });
+                    await queryClient.invalidateQueries({
+                        queryKey: [PatientsQueryKeys.Prescriptions],
+                    });
+                    setAutoSaveStatus('saved');
+                    setLastSavedAt(getFormattedTime());
+                },
+                onError: () => {
+                    setAutoSaveStatus('error');
+                },
+            });
+        }
+    };
+
+    const handleFinalSubmit = (_data: TCreatePrescriptionFormValues) => {
+        if (!hasAnyContent(_data)) {
+            showErrorToast(
+                'Please enter at least one detail (e.g. Diagnosis, Symptoms, Vitals, or Medications) to complete the prescription.',
+                'Prescription Empty'
+            );
+            return;
+        }
+
+        if (autoSaveTimerRef.current) {
+            clearTimeout(autoSaveTimerRef.current);
+        }
+
+        const payload = buildPrescriptionPayload(_data, 'completed');
+        const activeId =
+            currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+        if (activeId) {
+            showLoader('Updating prescription...');
+            updatePrescription(
+                {
+                    id: activeId,
+                    payload: payload as unknown as IUpdatePrescriptionPayload,
+                },
+                {
+                    onSuccess: async () => {
+                        await queryClient.invalidateQueries({
+                            queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                        });
+                        await queryClient.invalidateQueries({
+                            queryKey: [PatientsQueryKeys.Prescriptions],
+                        });
+                        clearInPersonAppointment();
+                        showSuccessToast('Prescription updated successfully');
+                        hideLoader();
+                        (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                            rxId: String(activeId),
+                            patientId: patientId || prescriptionInfo?.data?.patient_id,
+                            patientName: patientInfo?.name || route?.params?.patientName || '',
+                            fromScreen: route?.params?.fromScreen,
+                        });
+                    },
+                    onError: () => {
+                        hideLoader();
+                    },
+                }
+            );
+        } else {
+            showLoader('Creating new prescription...');
+            createPrescription(payload, {
+                onSuccess: async response => {
+                    const createId = response?.data?.id;
+                    if (createId) {
+                        currentPrescriptionId.current = Number(createId);
+                    }
+                    await queryClient.invalidateQueries({
+                        queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                    });
+                    await queryClient.invalidateQueries({
+                        queryKey: [PatientsQueryKeys.Prescriptions],
+                    });
+                    clearInPersonAppointment();
+                    showSuccessToast('Prescription created successfully');
+                    hideLoader();
+                    (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                        rxId: String(createId || currentPrescriptionId.current),
+                        patientId: patientId || prescriptionInfo?.data?.patient_id,
+                        patientName: patientInfo?.name || route?.params?.patientName || '',
+                        fromScreen: route?.params?.fromScreen,
+                    });
+                },
+                onError: () => {
+                    hideLoader();
+                },
+            });
+        }
+    };
+
+    const handleSendAndComplete = (_data: TCreatePrescriptionFormValues) => {
+        if (!hasAnyContent(_data)) {
+            showErrorToast(
+                'Please enter at least one detail (e.g. Diagnosis, Symptoms, Vitals, or Medications) to complete and send the prescription.',
+                'Prescription Empty'
+            );
+            return;
+        }
+
+        if (autoSaveTimerRef.current) {
+            clearTimeout(autoSaveTimerRef.current);
+        }
+
+        const payload = buildPrescriptionPayload(_data, 'completed');
+        const activeId =
+            currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+        showLoader('Sending prescription to patient...');
+
+        const triggerEmailAndNavigate = (rxId: string | number) => {
+            resendEmailMutation(rxId, {
+                onSuccess: async res => {
+                    await queryClient.invalidateQueries({
+                        queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                    });
+                    await queryClient.invalidateQueries({
+                        queryKey: [PatientsQueryKeys.Prescriptions],
+                    });
+                    clearInPersonAppointment();
+                    showSuccessToast(res?.message || "Prescription completed & sent to patient's email.");
+                    hideLoader();
+                    (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                        rxId: String(rxId),
+                        patientId: patientId || prescriptionInfo?.data?.patient_id,
+                        patientName: patientInfo?.name || route?.params?.patientName || '',
+                        fromScreen: route?.params?.fromScreen,
+                    });
+                },
+                onError: async (e: any) => {
+                    await queryClient.invalidateQueries({
+                        queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                    });
+                    await queryClient.invalidateQueries({
+                        queryKey: [PatientsQueryKeys.Prescriptions],
+                    });
+                    clearInPersonAppointment();
+                    const msg =
+                        e?.response?.data?.message || 'Prescription completed, but failed to send email.';
+                    showErrorToast(msg, 'Email Error');
+                    hideLoader();
+                    (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                        rxId: String(rxId),
+                        patientId: patientId || prescriptionInfo?.data?.patient_id,
+                        patientName: patientInfo?.name || route?.params?.patientName || '',
+                        fromScreen: route?.params?.fromScreen,
+                    });
+                },
+            });
+        };
+
+        if (activeId) {
+            updatePrescription(
+                {
+                    id: activeId,
+                    payload: payload as unknown as IUpdatePrescriptionPayload,
+                },
+                {
+                    onSuccess: () => {
+                        triggerEmailAndNavigate(activeId);
+                    },
+                    onError: () => {
+                        hideLoader();
+                    },
+                }
+            );
+        } else {
+            createPrescription(payload, {
+                onSuccess: response => {
+                    const createId = response?.data?.id;
+                    if (createId) {
+                        currentPrescriptionId.current = Number(createId);
+                    }
+                    triggerEmailAndNavigate(createId || currentPrescriptionId.current || '');
+                },
+                onError: () => {
+                    hideLoader();
+                },
+            });
+        }
+    };
+
+    const renderStepForm = () => {
+        switch (activeStep) {
+            case 'clinical':
+                return <PrescriptionClinicalNotesStep />;
+            case 'diagnosis':
+                return <PrescriptionDiagnosisStep />;
+            case 'vitals':
+                return <PrescriptionVitalsStep />;
+            case 'medications':
+                return <PrescriptionMedicationsStep />;
+            case 'labs':
+                return <PrescriptionLabsStep />;
+            case 'advice':
+                return <PrescriptionAdviceStep />;
+            default:
+                return <PrescriptionClinicalNotesStep />;
+        }
+    };
+
+    const isLoadingData =
+        (Boolean(patientId) && patientInfoPending) ||
+        (Boolean(prescriptionId) && prescriptionInfoLoading);
+
+    const isFormError =
+        (Boolean(patientId) && isPatientInfoError) ||
+        (Boolean(prescriptionId) && isPrescriptionInfoError);
+
+    const displayPatientName =
+        `${patientInfo?.name} (#${patientInfo?.patient_id
+        }) ${patientInfo?.gender[0].toUpperCase()}/${getAge(patientInfo?.date_of_birth || '')}` ||
+        route?.params?.patientName ||
+        prescriptionInfo?.data?.patient_name ||
+        '';
+
+    const subtitle = isLoadingData
+        ? 'Loading details...'
+        : isFormError
+            ? 'Error loading information'
+            : displayPatientName
+                ? `${displayPatientName}`
+                : prescriptionId
+                    ? 'Edit Existing Prescription'
+                    : 'Create New Prescription';
+
+    const currentAutoSave = useMemo(() => {
+        switch (autoSaveStatus) {
+            case 'typing':
+                return {
+                    color: '#F59E0B',
+                    text: 'Auto-save active',
+                };
+            case 'saving':
+                return {
+                    color: '#3B82F6',
+                    text: 'Saving draft...',
+                };
+            case 'saved':
+                return {
+                    color: theme.colors.success,
+                    text: lastSavedAt ? `Saved at ${lastSavedAt}` : 'Draft saved',
+                };
+            case 'error':
+                return {
+                    color: theme.colors.danger || '#EF4444',
+                    text: 'Auto-save failed',
+                };
+            default:
+                return {
+                    color: theme.colors.success,
+                    text: 'Auto-save active',
+                };
+        }
+    }, [autoSaveStatus, lastSavedAt]);
+
+    useEffect(() => {
+        setActiveStep('clinical');
+        if (prescriptionId && prescriptionInfo?.data) {
+            const rx = prescriptionInfo.data;
+            currentPrescriptionId.current = Number(prescriptionId);
+            methods.reset({
+                chief_complaints: rx.chief_complaints || rx.symptoms || '',
+                examination_notes: rx.examination_notes || '',
+                diagnosis: rx.diagnosis || '',
+                treatment_plan: rx.treatment_plan || '',
+                chronic_conditions: rx.chronic_conditions || '',
+                drug_allergies: rx.drug_allergies || '',
+                blood_pressure: rx.blood_pressure || '',
+                pulse: rx.pulse || '',
+                temperature: rx.temperature || '',
+                spo2: rx.spo2 || '',
+                weight: rx.weight || '',
+                height: rx.height || '',
+                bmi: rx.bmi || '',
+                custom_vitals: rx.custom_vitals || [],
+                medications:
+                    Array.isArray(rx.medications) && rx.medications.length > 0
+                        ? rx.medications.map(m => ({
+                            name: m.name || '',
+                            strength: m.strength || '',
+                            strengthUnit: m.strengthUnit || 'mg',
+                            dosage: m.dosage || '',
+                            timing: m.timing || '',
+                            durationNum: m.durationNum || '',
+                            durationUnit: m.durationUnit || 'days',
+                            instructions: m.instructions || '',
+                        }))
+                        : [
+                            {
+                                name: '',
+                                strength: '',
+                                strengthUnit: 'mg',
+                                dosage: '',
+                                timing: '',
+                                durationNum: '',
+                                durationUnit: 'days',
+                                instructions: '',
+                            },
+                        ],
+                lab_tests_structured: Array.isArray(rx.lab_tests)
+                    ? rx.lab_tests.map(l => ({
+                        name: l.name || l.text || '',
+                        instructions: l.instructions || '',
+                    }))
+                    : [],
+                general_advice: rx.general_advice || '',
+                follow_up_date: rx.follow_up_date || rx.follow_up || '',
+                referral_specialist: rx.referral_specialist || '',
+                referral_doctor_hospital: rx.referral_doctor_hospital || '',
+                referral_doctor_name: rx.referral_doctor_name || '',
+                referral_reason: rx.referral_reason || '',
+                notes: rx.notes || '',
+            });
+        } else if (!prescriptionId) {
+            currentPrescriptionId.current = null;
+            setAutoSaveStatus('idle');
+            setLastSavedAt(null);
+            methods.reset(defaultFormValues);
+        }
+    }, [prescriptionId, prescriptionInfo?.data, methods]);
+
+    useEffect(() => {
+        if (isLoadingData) {
+            isInitialLoadRef.current = true;
+            return;
+        }
+        const timer = setTimeout(() => {
+            isInitialLoadRef.current = false;
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [isLoadingData]);
+
+    useEffect(() => {
+        const subscription = methods.watch(value => {
+            if (isInitialLoadRef.current || isLoadingData) return;
+            if (!hasAnyContent(value as TCreatePrescriptionFormValues)) return;
+
+            setAutoSaveStatus('typing');
+
+            if (autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+            }
+
+            autoSaveTimerRef.current = setTimeout(() => {
+                triggerAutoSave(methods.getValues());
+            }, 2000);
+        });
+
+        return () => {
+            subscription.unsubscribe();
+            if (autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+            }
+        };
+    }, [methods, isLoadingData]);
+
+    return (
+        <SafeAreaWrapper
+            header={
+                <Header
+                    title={prescriptionId ? 'Edit Prescription' : 'Create Prescription'}
+                    description={subtitle}
+                    isBackBtn
+                    onBackPress={handleBack}
+                />
+            }
+        >
+            {isLoadingData ? (
+                <CreatePrescriptionSkeleton />
+            ) : isFormError ? (
+                <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ paddingVertical: 40, justifyContent: 'center' }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <CommonErrorCard
+                        title="Failed to Load Data"
+                        message="Something went wrong while fetching details."
+                        onRetry={() => {
+                            if (patientId) refetchPatientInfo();
+                            if (prescriptionId) refetchPrescriptionInfo();
+                        }}
+                    />
+                </ScrollView>
+            ) : (
+                <FormProvider {...methods}>
+                    <KeyboardAvoidingView
+                        style={{ flex: 1 }}
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    >
+                        <View style={createPrescriptionStyles.stepBarWrapper}>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={createPrescriptionStyles.stepBarContent}
+                            >
+                                {PrescriptionSteps.map(step => {
+                                    const active = step.id === activeStep;
+                                    return (
+                                        <TouchableOpacity
+                                            key={step.id}
+                                            style={[
+                                                createPrescriptionStyles.stepTab,
+                                                active && createPrescriptionStyles.stepTabActive,
+                                            ]}
+                                            onPress={() => setActiveStep(step.id)}
+                                            activeOpacity={0.75}
+                                        >
+                                            <View
+                                                style={[
+                                                    createPrescriptionStyles.stepTabBadge,
+                                                    active && createPrescriptionStyles.stepTabBadgeActive,
+                                                ]}
+                                            >
+                                                <Text
+                                                    style={[
+                                                        createPrescriptionStyles.stepTabBadgeText,
+                                                        active && createPrescriptionStyles.stepTabBadgeTextActive,
+                                                    ]}
+                                                >
+                                                    {step.stepNum}
+                                                </Text>
+                                            </View>
+                                            <Text
+                                                style={[
+                                                    createPrescriptionStyles.stepTabTitle,
+                                                    active && createPrescriptionStyles.stepTabTitleActive,
+                                                ]}
+                                            >
+                                                {step.title}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </ScrollView>
+                        </View>
+                        <ScrollView
+                            style={{ flex: 1 }}
+                            contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+                            showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps="handled"
+                        >
+                            {renderStepForm()}
+                        </ScrollView>
+                        <View style={createPrescriptionStyles.stickyBottomBar}>
+                            <View style={createPrescriptionStyles.autoSaveRow}>
+                                <View
+                                    style={[
+                                        createPrescriptionStyles.autoSaveDot,
+                                        { backgroundColor: currentAutoSave.color },
+                                    ]}
+                                />
+                                <Text style={createPrescriptionStyles.autoSaveText}>{currentAutoSave.text}</Text>
+                            </View>
+                            <View style={createPrescriptionStyles.bottomBtnRow}>
+                                <TouchableOpacity
+                                    style={[createPrescriptionStyles.btnPrev, isFirstStep && { opacity: 0.4 }]}
+                                    onPress={handlePrevStep}
+                                    disabled={isFirstStep}
+                                    activeOpacity={0.7}
+                                >
+                                    <Text style={createPrescriptionStyles.btnPrevText}>‹ Previous</Text>
+                                </TouchableOpacity>
+
+                                {isLastStep ? (
+                                    <TouchableOpacity
+                                        style={createPrescriptionStyles.btnComplete}
+                                        onPress={() => methods.handleSubmit(handleFinalSubmit)()}
+                                        disabled={
+                                            createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
+                                        }
+                                        activeOpacity={0.85}
+                                    >
+                                        <Text style={createPrescriptionStyles.btnCompleteText}>
+                                            {createPrescriptionPending || updatePrescriptionPending
+                                                ? 'Saving...'
+                                                : prescriptionId
+                                                    ? 'Update Prescription'
+                                                    : 'Complete'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={createPrescriptionStyles.btnNext}
+                                        onPress={handleNextStep}
+                                        activeOpacity={0.85}
+                                    >
+                                        <Text style={createPrescriptionStyles.btnNextText}>Next ›</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
+                            {isLastStep && (
+                                <TouchableOpacity
+                                    style={createPrescriptionStyles.btnSend}
+                                    onPress={() => methods.handleSubmit(handleSendAndComplete)()}
+                                    disabled={
+                                        createPrescriptionPending || updatePrescriptionPending || resendEmailLoading
+                                    }
+                                    activeOpacity={0.85}
+                                >
+                                    <Text style={createPrescriptionStyles.btnSendText}>
+                                        {resendEmailLoading
+                                            ? 'Sending Prescription...'
+                                            : 'Send Prescription to Patient'}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    </KeyboardAvoidingView>
+                </FormProvider>
+            )}
+        </SafeAreaWrapper>
+    );
+};
+
+export default CreatePrescriptionScreen;

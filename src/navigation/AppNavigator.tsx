@@ -19,6 +19,10 @@ import SettingScreen from '../Features/Dashboard/SettingScreen/SettingScreen';
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import { navigationRef } from './navigationRef';
+import PrescritionScreen from '../Features/Dashboard/PrescriptionScreen/PrescritionScreen';
+import ViewPrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/ViewPrescriptionScreen';
+import CreatePrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/CreatePrescriptionScreen';
+import InvoicesScreen from '../Features/Dashboard/InvoicesScreen/InvoicesScreen';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -59,6 +63,10 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Appointments" component={AppointmentsScreen} />
         <Stack.Screen name="AppointmentDetails" component={AppointmentDetailsScreen} />
         <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} />
+        <Stack.Screen name="Prescription" component={PrescritionScreen} />
+        <Stack.Screen name="ViewPrescription" component={ViewPrescriptionScreen} />
+        <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />
+        <Stack.Screen name="Invoices" component={InvoicesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

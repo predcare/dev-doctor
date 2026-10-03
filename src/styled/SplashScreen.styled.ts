@@ -111,10 +111,17 @@ export const Splashstyles = StyleSheet.create({
   footer: {
     position: 'absolute',
     bottom: 50,
+    alignItems: 'center',
   },
   footerText: {
     fontSize: 13,
     color: '#C7C7CC',
     letterSpacing: 0.5,
+  },
+  versionText: {
+    fontSize: 11,
+    color: '#8E8E93',
+    letterSpacing: 0.5,
+    marginTop: 4,
   },
 });

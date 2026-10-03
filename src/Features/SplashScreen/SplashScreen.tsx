@@ -9,6 +9,7 @@ import { consumeTargetRoute, resetAndNavigate, resetToLogin, resetToMainTabs } f
 import { AppRoute, SplashScreenNavigationProp, SplashScreenRouteProp } from '../../route';
 import { Splashstyles } from '../../styled/SplashScreen.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
+import { APP_BUILD, APP_VERSION } from '../../config/constants';
 
 export interface SplashScreenProps {
   navigation?: SplashScreenNavigationProp;
@@ -169,6 +170,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
 
         <View style={Splashstyles.footer}>
           <Text style={Splashstyles.footerText}>Powered by PRED Care</Text>
+          <Text style={Splashstyles.versionText}>v{APP_VERSION} (Build {APP_BUILD})</Text>
         </View>
       </View>
     </SafeAreaWrapper>

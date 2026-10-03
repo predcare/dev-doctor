@@ -13,6 +13,7 @@ import {
 } from '../../../../components/ui/icons';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import theme from '../../../../styled/theme.styled';
+import { APP_DISPLAY_VERSION } from '../../../../config/constants';
 import SettingsRowItem from './SettingsRowItem';
 import SettingsSectionLabel from './SettingsSectionLabel';
 
@@ -142,7 +143,7 @@ export const SupportSection = React.memo<SupportSectionProps>(
           <ChevronRightIcon size={16} color={theme.colors.danger} />
         </TouchableOpacity>
 
-        <Text style={profileStyles.versionText}>VERSION 2.4.0 (BUILD 882)</Text>
+        <Text style={profileStyles.versionText}>{APP_DISPLAY_VERSION}</Text>
         <View style={{ height: 20 }} />
       </>
     );

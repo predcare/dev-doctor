@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { PrescriptionQueryKeys } from '../query.keys';
 import {
   ICreatePrescriptionPayload,
@@ -60,5 +60,26 @@ export const useGetAllPrescriptions = (params?: IGetDoctorPrescriptionsParams) =
   return useQuery({
     queryKey: [PrescriptionQueryKeys.GetAllPrescriptions, params],
     queryFn: () => getAllPrescriptionsForDoctor(params),
+  });
+};
+
+export const useGetInfinitePrescriptions = (
+  params?: Omit<IGetDoctorPrescriptionsParams, 'page'>
+) => {
+  return useInfiniteQuery({
+    queryKey: [PrescriptionQueryKeys.GetAllPrescriptions, 'infinite', params],
+    queryFn: ({ pageParam = 1 }) =>
+      getAllPrescriptionsForDoctor({
+        ...params,
+        page: Number(pageParam),
+        limit: params?.limit ?? 15,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage?.meta?.hasNextPage) {
+        return (lastPage?.meta?.page || 1) + 1;
+      }
+      return undefined;
+    },
   });
 };

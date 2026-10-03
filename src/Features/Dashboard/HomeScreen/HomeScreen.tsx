@@ -57,7 +57,7 @@ const quickAccessItems = [
     {
         id: 'q2',
         label: 'WRITE RX',
-        screen: 'PrescriptionList' as const,
+        screen: 'Prescription' as const,
         icon: <PrescriptionIcon size={30} color={theme.colors.primary} />,
     },
     {
@@ -69,7 +69,7 @@ const quickAccessItems = [
     {
         id: 'q4',
         label: 'BILLING',
-        screen: 'InvoiceList' as const,
+        screen: 'Invoices' as const,
         icon: <InvoiceIcon size={30} color={theme.colors.primary} />,
     },
 ];

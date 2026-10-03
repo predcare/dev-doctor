@@ -21,6 +21,11 @@ export const prescriptionViewStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.surfaceBorder,
   },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   backCircle: {
     width: 50,
     height: 50,
@@ -30,7 +35,7 @@ export const prescriptionViewStyles = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
   },
   headerTitle: { fontSize: 18, fontWeight: '700', color: theme.colors.textPrimary },
-  headerRight: { flexDirection: 'row', alignItems: 'center' },
+  headerRight: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   editPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -42,7 +47,7 @@ export const prescriptionViewStyles = StyleSheet.create({
   },
   editPillTxt: { fontSize: 13, fontWeight: '600', color: theme.colors.primary, marginLeft: 4 },
   rxIdBadge: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
     color: theme.colors.textSlate,
     backgroundColor: theme.colors.surfaceSecondary,
@@ -331,6 +336,21 @@ export const prescriptionViewStyles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceSecondary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  shareBtnDocBtnFull: {
+    flex: 1,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: theme.colors.surfaceSecondary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  shareBtnDocBtnFullTxt: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.primary,
   },
 
   // Medical background (Allergies & Chronic) - Full width
