@@ -24,8 +24,8 @@ graph TD
    - **App ID**: `com.predcaredoctor` in `android/app/build.gradle` ✅
    - **Display Name**: `PRED Doctor` in `android/app/src/main/res/values/strings.xml` and `app.json` ✅
    - **Version Settings** (in `android/app/build.gradle` & `package.json`):
-     - `versionCode 1` ✅
-     - `versionName "1.0.0"` ✅
+     - `versionCode 2` (incremented from 1) ✅
+     - `versionName "1.0.1"` ✅
      > *Note: For every subsequent Play Store upload, `versionCode` must increment by +1.*
 
 2. **Permissions & Play Store Compliance Audit** [COMPLETED]
