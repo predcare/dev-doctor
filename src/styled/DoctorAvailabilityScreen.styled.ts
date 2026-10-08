@@ -33,8 +33,8 @@ export const availabilityStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
 
@@ -44,7 +44,7 @@ export const availabilityStyles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 120,
+    paddingBottom: 20,
   },
 
   sectionHeader: {
@@ -55,15 +55,15 @@ export const availabilityStyles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionHeaderText: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     letterSpacing: 0.2,
   },
   sectionHeaderIcon: {
-    fontSize: 14,
+    fontSize: 12,
     color: theme.colors.primary,
-    fontWeight: 'bold',
+    fontWeight: theme.fontWeight.medium,
   },
 
   fabBtn: {
@@ -102,8 +102,8 @@ export const availabilityStyles = StyleSheet.create({
     shadowRadius: 10,
   },
   saveBtnTxt: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
     letterSpacing: 0.4,
   },
@@ -117,8 +117,8 @@ export const availabilityStyles = StyleSheet.create({
     borderColor: '#FECACA',
   },
   cancelBtnTxt: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.danger,
     letterSpacing: 0.3,
   },
@@ -145,8 +145,8 @@ export const SlotEditCardStyles = StyleSheet.create({
     marginBottom: 14,
   },
   slotTitle: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   removeBtn: {
@@ -156,8 +156,8 @@ export const SlotEditCardStyles = StyleSheet.create({
     backgroundColor: '#FEF2F2',
   },
   removeTxt: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.danger,
   },
   tabRow: {
@@ -180,20 +180,20 @@ export const SlotEditCardStyles = StyleSheet.create({
     borderRadius: 20,
   },
   tabTxt: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
   tabTxtActive: {
     color: theme.colors.surface,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   errorTxt: {
     color: theme.colors.danger,
-    fontSize: 12,
+    fontSize: 11,
     marginTop: 4,
     marginBottom: 8,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
   },
   actionRow: {
     flexDirection: 'row',
@@ -210,8 +210,8 @@ export const SlotEditCardStyles = StyleSheet.create({
   },
   saveBtnTxt: {
     color: theme.colors.surface,
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
   cancelBtn: {
     flex: 1,
@@ -223,8 +223,8 @@ export const SlotEditCardStyles = StyleSheet.create({
   },
   cancelBtnTxt: {
     color: theme.colors.textSlate,
-    fontSize: 14,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
   },
 });
 
@@ -258,14 +258,14 @@ export const ExitingSlotsStyled = StyleSheet.create({
   },
   slotTypeLabel: {
     fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
   },
   slotCardMode: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     marginTop: 1,
   },
@@ -298,8 +298,8 @@ export const ExitingSlotsStyled = StyleSheet.create({
     marginBottom: 8,
   },
   consultationChip: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   slotCardGrid: {
@@ -323,14 +323,14 @@ export const ExitingSlotsStyled = StyleSheet.create({
   },
   slotCardGridLabel: {
     fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   slotCardGridValue: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
   slotFeesRow: {
@@ -349,20 +349,20 @@ export const ExitingSlotsStyled = StyleSheet.create({
   },
   slotFeeLabel: {
     fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   slotFeeTypeLabel: {
     fontSize: 9,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     marginBottom: 2,
   },
   slotFeeValue: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   slotDatesRow: {
@@ -373,19 +373,20 @@ export const ExitingSlotsStyled = StyleSheet.create({
   },
   slotDatesLabel: {
     fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
     marginBottom: 3,
   },
   slotDatesValue: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.dark,
+    fontWeight: theme.fontWeight.regular,
   },
   moreDatesLink: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   slotLeaveRow: {
     backgroundColor: '#FEF2F2',
@@ -395,19 +396,20 @@ export const ExitingSlotsStyled = StyleSheet.create({
   },
   slotLeaveLabel: {
     fontSize: 9,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.danger,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
     marginBottom: 2,
   },
   slotLeaveValue: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.danger,
+    fontWeight: theme.fontWeight.regular,
   },
   moreLeavesLink: {
     color: theme.colors.danger,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
 });
 export default availabilityStyles;

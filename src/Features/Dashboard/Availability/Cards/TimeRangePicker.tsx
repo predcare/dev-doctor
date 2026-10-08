@@ -162,13 +162,13 @@ const s = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   timeLabel: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
@@ -192,8 +192,8 @@ const s = StyleSheet.create({
     paddingVertical: 10,
   },
   timeDropdownText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
   timeDropdownChevron: {
@@ -201,8 +201,8 @@ const s = StyleSheet.create({
     color: theme.colors.textMuted,
   },
   timeSeparator: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
   ampmGroup: {
@@ -222,8 +222,8 @@ const s = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   ampmBtnText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
   },
   ampmBtnTextActive: {
@@ -242,8 +242,8 @@ const s = StyleSheet.create({
     width: '80%',
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     marginBottom: 16,
     textAlign: 'center',
@@ -265,8 +265,8 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   modalOptionTxt: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
 });

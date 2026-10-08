@@ -210,13 +210,13 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   navTxt: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.primary,
-    fontWeight: 'bold',
+    fontWeight: theme.fontWeight.semibold,
   },
   monthTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   weekRow: {
@@ -226,8 +226,8 @@ const s = StyleSheet.create({
   weekTxt: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   grid: {
@@ -260,13 +260,13 @@ const s = StyleSheet.create({
     borderRadius: 18,
   },
   dayTxt: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
   dayTxtSelected: {
     color: theme.colors.surface,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   dayTxtPast: {
     color: theme.colors.textMuted,
@@ -278,8 +278,8 @@ const s = StyleSheet.create({
     borderTopColor: theme.colors.bg,
   },
   chipsTitle: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     marginBottom: 6,
     letterSpacing: 0.5,
@@ -302,13 +302,13 @@ const s = StyleSheet.create({
     backgroundColor: theme.colors.danger,
   },
   chipTxt: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.surface,
   },
   chipX: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: 'rgba(255,255,255,0.8)',
   },
 });

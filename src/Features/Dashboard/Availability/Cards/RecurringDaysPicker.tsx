@@ -259,8 +259,8 @@ const s = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.8,
     marginBottom: 6,
@@ -277,12 +277,12 @@ const s = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   dateTxt: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
   phTxt: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textMuted,
   },
   daysScrollContent: {
@@ -306,13 +306,13 @@ const s = StyleSheet.create({
     borderRadius: 20,
   },
   dayPillTxt: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
   dayPillTxtSel: {
     color: theme.colors.surface,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   modalOverlay: {
     flex: 1,
@@ -341,14 +341,14 @@ const s = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceBorder,
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   modalCloseX: {
-    fontSize: 18,
+    fontSize: 16,
     color: theme.colors.textMuted,
-    fontWeight: 'bold',
+    fontWeight: theme.fontWeight.medium,
   },
   calHeader: {
     flexDirection: 'row',
@@ -365,13 +365,13 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   navTxt: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.primary,
-    fontWeight: 'bold',
+    fontWeight: theme.fontWeight.semibold,
   },
   monthTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   weekRow: {
@@ -381,8 +381,8 @@ const s = StyleSheet.create({
   weekTxt: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   grid: {
@@ -411,21 +411,21 @@ const s = StyleSheet.create({
     borderRadius: 18,
   },
   dayTxt: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.dark,
   },
   dayTxtSelected: {
     color: theme.colors.surface,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   dayTxtPast: {
     color: theme.colors.textMuted,
   },
   cellErrorTxt: {
     color: theme.colors.danger,
-    fontSize: 11,
+    fontSize: 10,
     marginTop: 4,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
   },
 });
 

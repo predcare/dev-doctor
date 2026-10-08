@@ -260,7 +260,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                   {formatDisplayDate(recurring_start_date) || 'Not set'}
                 </Text>
               </View>
-              <Text style={{ fontSize: 13, color: theme.colors.textMuted }}>→</Text>
+              <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>→</Text>
               <View style={ExitingSlotsStyled.slotFeeCell}>
                 <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>TO</Text>
                 <Text style={ExitingSlotsStyled.slotCardGridValue}>

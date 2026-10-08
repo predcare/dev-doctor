@@ -281,8 +281,8 @@ const s = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   radioGroup: {
@@ -309,13 +309,13 @@ const s = StyleSheet.create({
     fontSize: 20,
   },
   radioLabel: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
   radioLabelSelected: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   consultationCheckBadge: {
     position: 'absolute',
@@ -329,9 +329,9 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   consultationCheckText: {
-    fontSize: 10,
+    fontSize: 9,
     color: theme.colors.surface,
-    fontWeight: '800',
+    fontWeight: theme.fontWeight.semibold,
   },
   durationBtn: {
     backgroundColor: theme.colors.background,
@@ -345,8 +345,8 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
   },
   durationBtnTxt: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
   },
   durationMenu: {
@@ -367,12 +367,12 @@ const s = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
   },
   durationItemTxt: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.dark,
   },
   durationItemTxtSel: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   feeCardsContainer: {
     gap: 12,
@@ -399,8 +399,8 @@ const s = StyleSheet.create({
     fontSize: 15,
   },
   feeCardTitle: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   inPersonBadge: {
@@ -412,16 +412,16 @@ const s = StyleSheet.create({
     borderColor: theme.colors.tealBdr,
   },
   inPersonBadgeTxt: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   feeInputGroup: {
     marginBottom: 4,
   },
   feeLabel: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
@@ -432,8 +432,8 @@ const s = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 14,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     borderWidth: 1.5,
     borderColor: theme.colors.surfaceBorder,
@@ -444,8 +444,8 @@ const s = StyleSheet.create({
     marginVertical: 12,
   },
   optionsSubheader: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -477,22 +477,22 @@ const s = StyleSheet.create({
   },
   checkmark: {
     color: theme.colors.surface,
-    fontSize: 12,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
   },
   checkboxLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.dark,
-    fontWeight: '600',
+    fontWeight: theme.fontWeight.medium,
   },
   checkboxHint: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
     marginTop: 1,
   },
   errorText: {
     color: theme.colors.danger,
-    fontSize: 12,
+    fontSize: 11,
     marginTop: 4,
   },
 });
