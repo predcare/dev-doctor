@@ -224,6 +224,15 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                     </Text>
                   </View>
                 )}
+                {!!metadata.consultation_type && (
+                  <View style={notificationCardStyles.metadataChip}>
+                    <Text style={notificationCardStyles.metadataChipText}>
+                      {metadata.consultation_type.toLowerCase() === 'video'
+                        ? '📹 Video'
+                        : '🏥 In-person'}
+                    </Text>
+                  </View>
+                )}
               </View>
             )}
           </View>

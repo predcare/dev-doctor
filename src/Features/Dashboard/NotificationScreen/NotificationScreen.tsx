@@ -28,6 +28,7 @@ import {
     useMarkNoShowNotifications,
 } from '../../../hooks/react-query/notifications/notifications.hooks';
 import { NotificationQueryKeys } from '../../../hooks/react-query/query.keys';
+import { resolveNotificationModalNavigation } from '../../../lib/commons/notificationModal.utils';
 import { showSuccessToast } from '../../../lib/commons/toast.utils';
 import notificationsStyles from '../../../styled/NotificationsScreen.styled';
 import theme from '../../../styled/theme.styled';
@@ -81,7 +82,7 @@ const NotificationScreen: React.FC = () => {
     const {
         data: notificationResponse,
         isLoading: isNotifyLoading,
-        isError: isNotifyError, 
+        isError: isNotifyError,
         refetch: notifyRefetch,
         fetchNextPage,
         hasNextPage,
@@ -183,6 +184,16 @@ const NotificationScreen: React.FC = () => {
         []
     );
 
+    const handleNotificationPress = useCallback(
+        (item: any) => {
+            const target = resolveNotificationModalNavigation(item);
+            if (target?.name) {
+                (navigation.navigate as any)(target.name, target.params);
+            }
+        },
+        [navigation]
+    );
+
     return (
         <SafeAreaWrapper
             showBottomBar
@@ -227,6 +238,7 @@ const NotificationScreen: React.FC = () => {
                             <NotificationCard
                                 item={item}
                                 onDelete={() => handleDeleteNotification(item.id)}
+                                onPress={() => handleNotificationPress(item)}
                                 icon={getNotificationIcon(item.event_category, item.event_action)}
                             />
                         )}
