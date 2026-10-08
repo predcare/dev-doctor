@@ -59,15 +59,15 @@ export interface IFormStates {
 const PeriodIcon = ({ period }: { period: string }) => {
     switch (period) {
         case 'MORNING':
-            return <Text style={{ fontSize: 18 }}>🌅</Text>;
+            return <Text style={{ fontSize: 16 }}>🌅</Text>;
         case 'AFTERNOON':
-            return <Text style={{ fontSize: 18 }}>☀️</Text>;
+            return <Text style={{ fontSize: 16 }}>☀️</Text>;
         case 'EVENING':
-            return <Text style={{ fontSize: 18 }}>🌇</Text>;
+            return <Text style={{ fontSize: 16 }}>🌇</Text>;
         case 'NIGHT':
-            return <Text style={{ fontSize: 18 }}>🌙</Text>;
+            return <Text style={{ fontSize: 16 }}>🌙</Text>;
         default:
-            return <Text style={{ fontSize: 18 }}>⏰</Text>;
+            return <Text style={{ fontSize: 16 }}>⏰</Text>;
     }
 };
 
@@ -527,7 +527,7 @@ export const BookAppointmentScreen: React.FC = () => {
                                 {formStates.selectedSlots && formStates.selectedSlots.length > 0 && (
                                     <View style={bookAppointmentStyles.slotSummaryBox}>
                                         <Text style={bookAppointmentStyles.slotSummaryText}>
-                                            <Text style={{ fontWeight: '700' }}>
+                                            <Text style={{ fontWeight: '600' }}>
                                                 {formStates.selectedSlots.length} Slot
                                                 {formStates.selectedSlots.length > 1 ? 's' : ''} Selected
                                             </Text>{' '}

@@ -35,8 +35,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
     letterSpacing: 0.1,
     flex: 1,
@@ -45,8 +45,8 @@ export const bookAppointmentStyles = StyleSheet.create({
   // Sections
   section: { marginBottom: 20 },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     marginBottom: 8,
     letterSpacing: 0.4,
@@ -66,14 +66,14 @@ export const bookAppointmentStyles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedText: {
-    fontSize: 15,
+    fontSize: 13,
     color: theme.colors.dark,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
   },
   placeholderText: {
     color: theme.colors.textMuted,
     fontWeight: '400',
-    fontSize: 15,
+    fontSize: 13,
   },
   selectButtonIcon: { fontSize: 14, color: theme.colors.textSlate },
   dateSelectedCard: {
@@ -103,14 +103,14 @@ export const bookAppointmentStyles = StyleSheet.create({
     paddingVertical: 4,
   },
   dateLeafDay: {
-    fontSize: 19,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '600',
     color: theme.colors.primary,
     lineHeight: 22,
   },
   dateLeafMonth: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.primaryDark,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -119,14 +119,14 @@ export const bookAppointmentStyles = StyleSheet.create({
     flex: 1,
   },
   dateDetailsFull: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.dark,
     marginBottom: 2,
   },
   dateDetailsRel: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 11,
+    fontWeight: '400',
     color: theme.colors.textSlate,
   },
   dateChangeBtn: {
@@ -139,8 +139,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     marginLeft: 8,
   },
   dateChangeBtnText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.primary,
   },
   patientInfo: {
@@ -152,12 +152,12 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderLeftColor: theme.colors.primary,
   },
   patientInfoText: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.primary,
     marginBottom: 3,
   },
   helperText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.danger,
     marginTop: 4,
   },
@@ -165,7 +165,7 @@ export const bookAppointmentStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 10,
     padding: 14,
-    fontSize: 15,
+    fontSize: 13,
     color: theme.colors.dark,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
@@ -190,8 +190,8 @@ export const bookAppointmentStyles = StyleSheet.create({
   typeButtonIconWrapper: { marginBottom: 10 },
   typeButtonIcon: { fontSize: 32, marginBottom: 8 },
   typeButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textSlate,
     letterSpacing: 0.2,
   },
@@ -209,17 +209,17 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   feeLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.dark,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
   },
   feeAmount: {
-    fontSize: 22,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 18,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
   feeNote: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
     marginTop: 6,
     fontStyle: 'italic',
@@ -234,7 +234,7 @@ export const bookAppointmentStyles = StyleSheet.create({
   },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 1.5 },
-  legendText: { fontSize: 12, color: theme.colors.textSlate },
+  legendText: { fontSize: 11, color: theme.colors.textSlate },
 
   // Multi-slot summary
   slotSummaryBox: {
@@ -250,15 +250,15 @@ export const bookAppointmentStyles = StyleSheet.create({
     marginBottom: 10,
   },
   slotSummaryText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.primary,
     flex: 1,
     flexWrap: 'wrap',
   },
   slotClearText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.danger,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     marginLeft: 8,
   },
 
@@ -274,8 +274,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceBorder,
   },
   periodTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
 
@@ -308,8 +308,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderColor: theme.colors.primary,
   },
   slotButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.dark,
     textAlign: 'center',
   },
@@ -327,8 +327,8 @@ export const bookAppointmentStyles = StyleSheet.create({
   },
   bookButtonDisabled: { opacity: 0.45 },
   bookButtonText: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
     letterSpacing: 0.5,
   },
@@ -362,11 +362,11 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceBorder,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
-  modalClose: { fontSize: 22, color: theme.colors.textSlate, fontWeight: 'bold' },
+  modalClose: { fontSize: 16, color: theme.colors.textSlate, fontWeight: '500' },
   dateList: { maxHeight: 400 },
   dateItem: {
     flexDirection: 'row',
@@ -388,15 +388,15 @@ export const bookAppointmentStyles = StyleSheet.create({
   dateItemIcon: { fontSize: 22, marginRight: 12 },
   dateItemText: { flex: 1 },
   dateItemDate: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     marginBottom: 2,
   },
   dateItemDateSelected: { color: theme.colors.primary },
   dateItemSublabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.textSlate,
   },
   dateItemSublabelSelected: {
@@ -407,16 +407,16 @@ export const bookAppointmentStyles = StyleSheet.create({
     justifyContent: 'center',
     gap: 4,
   },
-  dateItemType: { fontSize: 12, color: theme.colors.textSlate, fontWeight: '500' },
-  dateItemTypeSelected: { color: theme.colors.primary, fontWeight: '600' },
-  dateItemCheck: { fontSize: 18, color: theme.colors.primary, fontWeight: 'bold' },
+  dateItemType: { fontSize: 11, color: theme.colors.textSlate, fontWeight: '400' },
+  dateItemTypeSelected: { color: theme.colors.primary, fontWeight: '500' },
+  dateItemCheck: { fontSize: 14, color: theme.colors.primary, fontWeight: '600' },
   searchInput: {
     margin: 20,
     marginBottom: 12,
     backgroundColor: theme.colors.background,
     borderRadius: 10,
     padding: 14,
-    fontSize: 15,
+    fontSize: 13,
     color: theme.colors.dark,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
@@ -448,8 +448,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     marginRight: 12,
   },
   patientAvatarText: {
-    fontSize: 18,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
   },
   patientDetails: { flex: 1 },
@@ -461,8 +461,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     gap: 8,
   },
   patientName: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     flex: 1,
   },
@@ -473,8 +473,8 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderRadius: 12,
   },
   patientBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '500',
     color: theme.colors.primary,
   },
   patientMetaRow: {
@@ -485,7 +485,7 @@ export const bookAppointmentStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   patientId: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
   },
   bloodBadge: {
@@ -495,12 +495,12 @@ export const bookAppointmentStyles = StyleSheet.create({
     borderRadius: 6,
   },
   bloodBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: '#EF4444',
   },
   patientPhone: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
   },
   checkBadge: {
@@ -514,8 +514,8 @@ export const bookAppointmentStyles = StyleSheet.create({
   },
   checkBadgeText: {
     color: theme.colors.surface,
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 11,
+    fontWeight: '600',
   },
 
   // Skeleton Loading
@@ -545,14 +545,14 @@ export const bookAppointmentStyles = StyleSheet.create({
     marginBottom: 10,
   },
   errorTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     marginBottom: 4,
     textAlign: 'center',
   },
   errorSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
     textAlign: 'center',
     marginBottom: 16,
@@ -565,20 +565,20 @@ export const bookAppointmentStyles = StyleSheet.create({
   },
   retryButtonText: {
     color: theme.colors.surface,
-    fontWeight: '600',
-    fontSize: 13,
+    fontWeight: '500',
+    fontSize: 12,
   },
 
   // Empty State
   emptyState: { alignItems: 'center', padding: 40 },
   emptyStateText: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textSlate,
     marginBottom: 8,
   },
   emptyStateSubtext: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textMuted,
     textAlign: 'center',
   },

@@ -176,7 +176,7 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                       onPress={() => updateFilterState('from_date', '')}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
-                      <Text style={{ fontSize: 13, color: '#9CA3AF', fontWeight: '700' }}>✕</Text>
+                      <Text style={{ fontSize: 12, color: '#9CA3AF', fontWeight: '500' }}>✕</Text>
                     </TouchableOpacity>
                   ) : null}
                 </TouchableOpacity>
@@ -214,7 +214,7 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
                       onPress={() => updateFilterState('to_date', '')}
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     >
-                      <Text style={{ fontSize: 13, color: '#9CA3AF', fontWeight: '700' }}>✕</Text>
+                      <Text style={{ fontSize: 12, color: '#9CA3AF', fontWeight: '500' }}>✕</Text>
                     </TouchableOpacity>
                   ) : null}
                 </TouchableOpacity>

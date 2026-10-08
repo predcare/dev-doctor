@@ -178,7 +178,7 @@ export const PrescriptionScreen: React.FC = () => {
             {prescriptionsLoading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="large" color={theme.colors.primary} />
-                    <Text style={{ marginTop: 12, fontSize: 13, color: '#64748B' }}>
+                    <Text style={{ marginTop: 12, fontSize: 12, color: '#64748B' }}>
                         Loading prescriptions...
                     </Text>
                 </View>

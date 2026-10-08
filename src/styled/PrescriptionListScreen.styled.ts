@@ -29,8 +29,8 @@ export const prescriptionListStyles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
 
@@ -56,7 +56,7 @@ export const prescriptionListStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textPrimary,
     paddingVertical: 0,
     marginLeft: 8,
@@ -92,8 +92,8 @@ export const prescriptionListStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   chipTxt: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textSlate,
   },
   chipTxtActive: {
@@ -114,14 +114,14 @@ export const prescriptionListStyles = StyleSheet.create({
     paddingVertical: 12,
   },
   txLabel: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.textMuted,
     letterSpacing: 0.8,
   },
   txCount: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.textMuted,
     letterSpacing: 0.5,
   },
@@ -143,12 +143,12 @@ export const prescriptionListStyles = StyleSheet.create({
     shadowRadius: 4,
   },
   txName: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   txSub: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textMuted,
     marginTop: 2,
   },
@@ -159,7 +159,7 @@ export const prescriptionListStyles = StyleSheet.create({
   },
   badgeTxt: {
     fontSize: 9,
-    fontWeight: '800',
+    fontWeight: '600',
     letterSpacing: 0.5,
   },
 
@@ -169,13 +169,13 @@ export const prescriptionListStyles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
     marginBottom: 6,
   },
   emptySub: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSlate,
     textAlign: 'center',
   },
@@ -231,18 +231,18 @@ export const prescriptionListStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeTxt: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSecondary,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   filterTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   resetTxt: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   filterSection: {
@@ -260,13 +260,13 @@ export const prescriptionListStyles = StyleSheet.create({
     paddingVertical: 14,
   },
   filterSectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   filterSectionBadge: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.textMuted,
     letterSpacing: 0.5,
   },
@@ -288,13 +288,13 @@ export const prescriptionListStyles = StyleSheet.create({
     borderWidth: 1.5,
   },
   radioTxt: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textSecondary,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   radioTxtActive: {
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   radio: {
     width: 20,
@@ -323,13 +323,13 @@ export const prescriptionListStyles = StyleSheet.create({
     paddingBottom: 12,
   },
   filterSectionSub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
     marginTop: 2,
   },
   dateLabel: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.textMuted,
     letterSpacing: 0.8,
     paddingHorizontal: 14,
@@ -349,7 +349,7 @@ export const prescriptionListStyles = StyleSheet.create({
   },
   dateInputTxt: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSecondary,
     paddingVertical: 0,
     marginLeft: 10,
@@ -372,8 +372,8 @@ export const prescriptionListStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   statusBtnTxt: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
   },
   statusBtnTxtActive: {
@@ -384,8 +384,8 @@ export const prescriptionListStyles = StyleSheet.create({
     paddingVertical: 16,
   },
   resetRowTxt: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   applyBtn: {
@@ -398,7 +398,7 @@ export const prescriptionListStyles = StyleSheet.create({
   },
   applyBtnTxt: {
     color: theme.colors.surface,
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

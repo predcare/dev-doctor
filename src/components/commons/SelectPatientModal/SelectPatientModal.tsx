@@ -171,8 +171,8 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceBorder,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.dark,
   },
   closeBtn: {
@@ -184,9 +184,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeTxt: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textMuted,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   searchBox: {
     flexDirection: 'row',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.dark,
     marginLeft: 8,
   },
@@ -212,13 +212,13 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
   },
   emptyTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.dark,
     marginBottom: 4,
   },
   emptySub: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textMuted,
   },
   patientRow: {
@@ -236,17 +236,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarTxt: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   patientName: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.dark,
   },
   patientSub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
     marginTop: 2,
   },
@@ -257,8 +257,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   selectBtnTxt: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
     color: theme.colors.surface,
   },
   separator: {
