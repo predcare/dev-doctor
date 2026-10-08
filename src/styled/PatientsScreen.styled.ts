@@ -28,8 +28,8 @@ export const PatientsStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
 
@@ -55,7 +55,7 @@ export const PatientsStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.dark,
     paddingVertical: 0,
     marginLeft: 8,
@@ -78,14 +78,14 @@ export const PatientsStyles = StyleSheet.create({
     paddingVertical: 10,
   },
   txLabel: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.8,
   },
   txCount: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.5,
   },

@@ -55,8 +55,8 @@ export const notificationsStyles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
     marginLeft: 8,
   },
@@ -72,8 +72,8 @@ export const notificationsStyles = StyleSheet.create({
     gap: 4,
   },
   markReadText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.primaryDark,
     letterSpacing: -0.1,
   },
@@ -84,8 +84,8 @@ export const notificationsStyles = StyleSheet.create({
     paddingBottom: 40,
   },
   groupLabel: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '500',
     color: theme.colors.primaryDark,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -114,8 +114,8 @@ export const notificationCardStyles = StyleSheet.create({
   },
   deleteText: {
     color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '500',
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -150,22 +150,22 @@ export const notificationCardStyles = StyleSheet.create({
     marginBottom: 4,
   },
   cardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: '#0F172A',
     flex: 1,
     marginRight: 8,
   },
   cardTime: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: '400',
     color: '#94A3B8',
     flexShrink: 0,
   },
   cardDesc: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#64748B',
-    lineHeight: 19,
+    lineHeight: 16,
   },
   metadataContainer: {
     flexDirection: 'row',
@@ -180,9 +180,9 @@ export const notificationCardStyles = StyleSheet.create({
     paddingVertical: 4,
   },
   metadataChipText: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#475569',
-    fontWeight: '500',
+    fontWeight: '400',
   },
 });
 

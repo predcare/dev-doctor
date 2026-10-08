@@ -99,7 +99,7 @@ export const AppointmentFilterModal: React.FC<AppointmentFilterModalProps> = Rea
               <Text style={S.sheetTitle}>Schedule Filters</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                 <TouchableOpacity onPress={handleResetAll} activeOpacity={0.7}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: theme.colors.primary }}>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: theme.colors.primary }}>
                     Clear
                   </Text>
                 </TouchableOpacity>

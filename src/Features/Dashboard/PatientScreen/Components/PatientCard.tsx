@@ -85,17 +85,17 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   avatarTxt: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
   },
   txName: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   txSub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textSlate,
     marginTop: 2,
   },

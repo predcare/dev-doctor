@@ -34,8 +34,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
 
@@ -60,8 +60,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderColor: theme.colors.primary,
   },
   statLabel: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.8,
     marginBottom: 4,
@@ -70,15 +70,15 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     color: theme.colors.overlayWhite80,
   },
   statValue: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   statValueActive: {
     color: theme.colors.textInverted,
   },
   statSub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textSlate,
     marginTop: 2,
   },
@@ -117,8 +117,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.regular,
     color: theme.colors.textPrimary,
     paddingVertical: 0,
   },
@@ -181,8 +181,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   tabText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
   },
 
@@ -196,20 +196,20 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     gap: 8,
   },
   filterBannerTxt: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.primary,
-    fontWeight: '500',
+    fontWeight: theme.fontWeight.regular,
   },
   filterBannerCountTxt: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.primary,
-    fontWeight: '600',
+    fontWeight: theme.fontWeight.medium,
     letterSpacing: 0.3,
   },
   filterBannerClear: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.primary,
-    fontWeight: '600',
+    fontWeight: theme.fontWeight.medium,
   },
 
   // List & Cards
@@ -251,22 +251,22 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   patientAvatarText: {
     color: theme.colors.textInverted,
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
   patientName: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   patientAge: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
   },
   aptIdText: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
-    fontWeight: '500',
+    fontWeight: theme.fontWeight.regular,
     marginTop: 1,
   },
   statusBadge: {
@@ -283,8 +283,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderRadius: 3,
   },
   statusText: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 9,
+    fontWeight: theme.fontWeight.semibold,
     letterSpacing: 0.3,
   },
 
@@ -308,8 +308,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderWidth: 1,
   },
   chipText: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Action Buttons
@@ -341,13 +341,13 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     flex: 1,
   },
   cancelledTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.danger,
   },
   cancelledSubtext: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: theme.fontWeight.regular,
     color: theme.colors.danger,
     marginTop: 2,
   },
@@ -361,8 +361,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   joinButtonText: {
     color: theme.colors.textInverted,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
   completeButton: {
     backgroundColor: theme.colors.primary,
@@ -411,8 +411,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     paddingVertical: 12,
   },
   kebabMenuText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Details Modal
@@ -437,14 +437,14 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceBorder,
   },
   modalTitle: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   modalClose: {
-    fontSize: 20,
+    fontSize: 16,
     color: theme.colors.textSlate,
-    fontWeight: 'bold',
+    fontWeight: theme.fontWeight.medium,
   },
   modalBody: {
     padding: 16,
@@ -457,7 +457,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   reasonText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
     lineHeight: 16,
   },
@@ -477,8 +477,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   modalDeleteBtnTxt: {
     color: theme.colors.surface,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
   modalCloseFooterBtn: {
     flex: 1,
@@ -491,8 +491,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   modalCloseFooterBtnTxt: {
     color: theme.colors.dark,
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Filter Bottom Sheet Modal
@@ -529,13 +529,13 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceSecondary,
   },
   sheetTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   sheetSectionTitle: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 1,
     marginTop: 20,
@@ -547,7 +547,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     paddingVertical: 12,
   },
   filterOptionTxt: {
-    fontSize: 15,
+    fontSize: 13,
     flex: 1,
   },
   filterFooter: {
@@ -567,8 +567,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   btnResetTxt: {
     color: theme.colors.textSlate,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
   },
   btnApply: {
     flex: 1.5,
@@ -579,8 +579,8 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   btnApplyTxt: {
     color: theme.colors.textInverted,
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
 
   // Empty state
@@ -590,13 +590,13 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     padding: 40,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginTop: 12,
   },
   emptyText: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSlate,
     textAlign: 'center',
     marginTop: 4,
@@ -615,14 +615,14 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   disconnectedText: {
     color: '#6D28D9',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     textAlign: 'center',
   },
   activeCallNotice: {
     color: '#9A3412',
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: theme.fontWeight.regular,
     textAlign: 'center',
     paddingBottom: 10,
   },
@@ -664,13 +664,13 @@ export const appointmentDetailsStyles = StyleSheet.create({
     gap: 6,
   },
   apptIdLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   apptIdValue: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   statusBadge: {
@@ -687,8 +687,8 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 3.5,
   },
   statusBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.3,
   },
@@ -703,11 +703,11 @@ export const appointmentDetailsStyles = StyleSheet.create({
     alignItems: 'center',
   },
   statusInfoText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
   },
   statusInfoBold: {
-    fontWeight: '600',
+    fontWeight: '500',
     color: theme.colors.textPrimary,
   },
 
@@ -729,8 +729,8 @@ export const appointmentDetailsStyles = StyleSheet.create({
     backgroundColor: theme.colors.info,
   },
   actionCtaText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textInverted,
     letterSpacing: 0.3,
   },
@@ -760,13 +760,13 @@ export const appointmentDetailsStyles = StyleSheet.create({
     gap: 8,
   },
   cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   cardHeaderLink: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.primaryDark,
   },
 
@@ -795,8 +795,8 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 32,
   },
   doctorInitials: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     color: theme.colors.primaryDark,
   },
   verifiedBadge: {
@@ -811,17 +811,17 @@ export const appointmentDetailsStyles = StyleSheet.create({
     gap: 3,
   },
   doctorName: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   doctorSpecialty: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.primaryDark,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   doctorClinic: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textMuted,
     marginTop: 2,
   },
@@ -838,12 +838,12 @@ export const appointmentDetailsStyles = StyleSheet.create({
     alignItems: 'center',
   },
   statValue: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
     marginTop: 1,
   },
@@ -867,9 +867,9 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 6,
   },
   tagPillText: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textSecondary,
-    fontWeight: '500',
+    fontWeight: '400',
   },
 
   // Schedule & Appointment Details
@@ -898,23 +898,23 @@ export const appointmentDetailsStyles = StyleSheet.create({
     flex: 1,
   },
   detailLabel: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
-    fontWeight: '600',
+    fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
   detailValue: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
     marginTop: 2,
   },
   detailSubValue: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
     marginTop: 2,
-    lineHeight: 17,
+    lineHeight: 16,
   },
   mapActionBtn: {
     flexDirection: 'row',
@@ -928,8 +928,8 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 6,
   },
   mapActionBtnText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.primaryDark,
   },
 
@@ -945,12 +945,12 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceSecondary,
   },
   patientInfoLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textMuted,
   },
   patientInfoVal: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textPrimary,
     maxWidth: '65%',
     textAlign: 'right',
@@ -971,14 +971,14 @@ export const appointmentDetailsStyles = StyleSheet.create({
     gap: 6,
   },
   noteTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   noteText: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSecondary,
-    lineHeight: 19,
+    lineHeight: 17,
   },
 
   // Billing
@@ -988,12 +988,12 @@ export const appointmentDetailsStyles = StyleSheet.create({
     paddingVertical: 7,
   },
   billLabel: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSecondary,
   },
   billValue: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textPrimary,
   },
   billTotalRow: {
@@ -1005,13 +1005,13 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderTopColor: theme.colors.surfaceBorder,
   },
   billTotalLabel: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   billTotalValue: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   paymentBadgeRow: {
@@ -1024,7 +1024,7 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 10,
   },
   paymentBadgeLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textMuted,
   },
   paymentStatusBadge: {
@@ -1033,8 +1033,8 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 6,
   },
   paymentStatusText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '600',
     textTransform: 'capitalize',
   },
 
@@ -1087,23 +1087,23 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderRadius: 12,
   },
   joinButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: '#FFFFFF',
     marginLeft: 6,
   },
   prescriptionButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
     marginLeft: 6,
   },
   activeCallNotice: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.warning,
     textAlign: 'center',
     marginTop: 8,
-    fontWeight: '500',
+    fontWeight: '400',
   },
 });
 export default doctorAppointmentsStyles;

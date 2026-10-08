@@ -41,8 +41,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceSecondary,
   },
   sheetTitle: {
-    fontSize: 18,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     letterSpacing: -0.2,
   },
@@ -54,9 +54,9 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeBtnTxt: {
-    fontSize: 18,
+    fontSize: 16,
     color: theme.colors.textSlate,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Body Scroll
@@ -65,8 +65,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     paddingBottom: 20,
   },
   sectionTitle: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 1.1,
     textTransform: 'uppercase',
@@ -100,12 +100,12 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
   },
   optionText: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textPrimary,
   },
   optionTextActive: {
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
 
@@ -118,8 +118,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     marginBottom: 12,
   },
   inputGroupLabel: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 0.8,
     marginBottom: 6,
@@ -147,21 +147,21 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     flex: 1,
   },
   dateInputText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.medium,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.regular,
     color: theme.colors.textPrimary,
   },
   dateInputPlaceholder: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
   clearBtn: {
     padding: 4,
   },
   clearBtnTxt: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textMuted,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Inline Calendar Card Widget
@@ -184,8 +184,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     padding: 6,
   },
   inlineCalMonthTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   inlineCalWeekRow: {
@@ -195,8 +195,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
   inlineCalWeekTxt: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
   },
   inlineCalDaysGrid: {
@@ -220,13 +220,13 @@ export const appointmentFilterModalStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   inlineCalDayTxt: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.medium,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.regular,
     color: theme.colors.textPrimary,
   },
   inlineCalDayTxtSelected: {
     color: theme.colors.textInverted,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
 
   // Footer Actions
@@ -252,8 +252,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
   },
   btnResetTxt: {
     color: theme.colors.primary,
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
   },
   btnApply: {
     flex: 1.2,
@@ -270,8 +270,8 @@ export const appointmentFilterModalStyles = StyleSheet.create({
   },
   btnApplyTxt: {
     color: theme.colors.textInverted,
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
 });
 

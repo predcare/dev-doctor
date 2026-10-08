@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuItemText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
   },
   divider: {
     height: 1,

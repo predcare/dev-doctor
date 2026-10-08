@@ -277,7 +277,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
         <View style={ContactInfoStyles.infoBox}>
           <Text style={{ fontSize: 15 }}>ℹ️</Text>
           <Text style={ContactInfoStyles.infoTxt}>
-            <Text style={{ fontWeight: '800' }}>Note:</Text> Patient will receive login credentials
+            <Text style={{ fontWeight: '600' }}>Note:</Text> Patient will receive login credentials
             via SMS/Email after registration.
           </Text>
         </View>

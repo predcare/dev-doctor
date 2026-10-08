@@ -305,7 +305,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
                                 {cat}
                               </Text>
                               {isSelected && (
-                                <Text style={{ color: '#0F766E', fontWeight: '700', fontSize: 13 }}>
+                                <Text style={{ color: '#0F766E', fontWeight: '600', fontSize: 12 }}>
                                   ✓
                                 </Text>
                               )}

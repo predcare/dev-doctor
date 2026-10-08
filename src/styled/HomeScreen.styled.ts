@@ -30,7 +30,7 @@ export const homeStyles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginLeft: theme.spacing.sm,
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.textPrimary,
   },
 
@@ -45,8 +45,8 @@ export const homeStyles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   insightsTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   periodPill: {
@@ -61,8 +61,8 @@ export const homeStyles = StyleSheet.create({
     gap: 4,
   },
   periodPillText: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   screenBackdrop: {
@@ -91,11 +91,11 @@ export const homeStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceSecondary,
   },
   periodMenuItemText: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textPrimary,
   },
   periodMenuItemTextActive: {
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
 
@@ -124,14 +124,14 @@ export const homeStyles = StyleSheet.create({
     alignItems: 'center',
   },
   statTileValue: {
-    fontSize: 25,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 22,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginBottom: 3,
   },
   statTileLabel: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
 
@@ -142,14 +142,14 @@ export const homeStyles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   sectionLink: {
-    fontSize: theme.fontSize.sm,
+    fontSize: 12,
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
   },
 
   appointmentCard: {
@@ -188,8 +188,8 @@ export const homeStyles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   apptTime: {
-    fontSize: 12.5,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11.5,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   liveStatusBadge: {
@@ -210,8 +210,8 @@ export const homeStyles = StyleSheet.create({
     backgroundColor: '#16A34A',
   },
   liveStatusText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.semibold,
     color: '#15803D',
   },
   apptDistanceBadge: {
@@ -221,8 +221,8 @@ export const homeStyles = StyleSheet.create({
     borderRadius: 10,
   },
   apptDistance: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
   consultBadge: {
@@ -244,8 +244,8 @@ export const homeStyles = StyleSheet.create({
     borderColor: '#FED7AA',
   },
   consultBadgeText: {
-    fontSize: 11.5,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10.5,
+    fontWeight: theme.fontWeight.semibold,
     letterSpacing: 0.2,
   },
   apptPatientRow: {
@@ -266,8 +266,8 @@ export const homeStyles = StyleSheet.create({
     flexShrink: 0,
   },
   apptAvatarText: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
     letterSpacing: 0.5,
   },
@@ -280,8 +280,8 @@ export const homeStyles = StyleSheet.create({
     alignItems: 'center',
   },
   apptPatientName: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     letterSpacing: 0.1,
   },
@@ -292,9 +292,9 @@ export const homeStyles = StyleSheet.create({
     marginLeft: 6,
   },
   patientMetaText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
-    fontWeight: theme.fontWeight.medium,
+    fontWeight: theme.fontWeight.regular,
     marginTop: 2,
   },
   apptIdBadge: {
@@ -306,9 +306,9 @@ export const homeStyles = StyleSheet.create({
     marginTop: 4,
   },
   aptIdText: {
-    fontSize: 10.5,
+    fontSize: 10,
     color: theme.colors.textSlate,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
     letterSpacing: 0.2,
   },
   chevronWrapper: {
@@ -328,12 +328,12 @@ export const homeStyles = StyleSheet.create({
     marginBottom: 12,
   },
   symptomsText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
-    lineHeight: 17,
+    lineHeight: 16,
   },
   symptomsLabel: {
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   apptFooterRow: {
@@ -357,8 +357,8 @@ export const homeStyles = StyleSheet.create({
     paddingRight: 8,
   },
   viewDetailsText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   detailsBtn: {
@@ -370,13 +370,13 @@ export const homeStyles = StyleSheet.create({
     alignSelf: 'center',
   },
   detailsBtnText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
   },
   grayDisabled: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
   },
   joinBtn: {
@@ -401,8 +401,8 @@ export const homeStyles = StyleSheet.create({
     elevation: 0,
   },
   joinBtnText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
     letterSpacing: 0.2,
   },
@@ -439,15 +439,15 @@ export const homeStyles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   supportTitle: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
     marginBottom: 6,
   },
   supportSub: {
-    fontSize: 13,
+    fontSize: 12,
     color: 'rgba(255, 255, 255, 0.85)',
-    lineHeight: 18,
+    lineHeight: 16,
     marginBottom: theme.spacing.lg,
   },
   supportBtn: {
@@ -458,8 +458,8 @@ export const homeStyles = StyleSheet.create({
     borderRadius: 22,
   },
   supportBtnText: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.accent,
   },
 
@@ -484,8 +484,8 @@ export const homeStyles = StyleSheet.create({
     ...globalShadows.card,
   },
   quickAccessLabel: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
     letterSpacing: 0.4,
     marginTop: 8,
@@ -504,15 +504,15 @@ export const homeStyles = StyleSheet.create({
     marginBottom: 20,
   },
   emptyText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: '#94A3B8',
     marginBottom: 5,
     textAlign: 'center',
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_500Medium',
   },
   emptySub: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#CBD5E1',
     textAlign: 'center',
     fontFamily: 'Inter_400Regular',
@@ -530,8 +530,8 @@ export const homeStyles = StyleSheet.create({
     elevation: 3,
   },
   bookNowBtnText: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
   },
 });

@@ -15,8 +15,8 @@ export const patientProfileTabStyles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   editProfileBtnText: {
-    fontSize: theme.fontSize.xs || 13,
-    fontWeight: theme.fontWeight.bold || '700',
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   card: {
@@ -32,8 +32,8 @@ export const patientProfileTabStyles = StyleSheet.create({
     shadowRadius: 3,
   },
   cardSectionTitle: {
-    fontSize: theme.fontSize.xs || 13,
-    fontWeight: theme.fontWeight.bold || '800',
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md || 12,
     marginHorizontal: theme.spacing.md || 14,
@@ -50,8 +50,8 @@ export const patientProfileTabStyles = StyleSheet.create({
     marginBottom: theme.spacing.md || 12,
   },
   cardHeaderTitle: {
-    fontSize: theme.fontSize.xs || 13,
-    fontWeight: theme.fontWeight.bold || '800',
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     letterSpacing: 0.1,
     textTransform: 'uppercase',
@@ -70,15 +70,15 @@ export const patientProfileTabStyles = StyleSheet.create({
     gap: 12,
   },
   infoLabel: {
-    fontSize: theme.fontSize.xs || 12,
+    fontSize: 11,
     color: theme.colors.textMuted,
-    fontWeight: '600',
+    fontWeight: '500',
     flex: 1,
   },
   infoValue: {
-    fontSize: theme.fontSize.xs || 13,
+    fontSize: 12,
     color: theme.colors.textPrimary,
-    fontWeight: '600',
+    fontWeight: '500',
     flex: 2,
     textAlign: 'right',
   },
@@ -100,14 +100,14 @@ export const patientProfileTabStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   vitalValue: {
-    fontSize: theme.fontSize.sm || 15,
-    fontWeight: theme.fontWeight.bold || '800',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   vitalLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: theme.colors.textSlate,
-    fontWeight: '600',
+    fontWeight: '500',
     marginTop: 3,
   },
   alertBox: {
@@ -120,12 +120,12 @@ export const patientProfileTabStyles = StyleSheet.create({
     marginBottom: 10,
   },
   alertLabel: {
-    fontSize: theme.fontSize.xs || 12,
-    fontWeight: theme.fontWeight.bold || '700',
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
     marginBottom: 3,
   },
   alertText: {
-    fontSize: theme.fontSize.xs || 13,
+    fontSize: 12,
     color: theme.colors.textSecondary,
     lineHeight: 18,
   },
@@ -171,16 +171,16 @@ export const patientProfileTabStyles = StyleSheet.create({
     alignItems: 'center',
   },
   familyAvatarText: {
-    fontSize: theme.fontSize.sm || 14,
-    fontWeight: theme.fontWeight.bold || '700',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary || '#0F766E',
   },
   familyHeaderInfo: {
     flex: 1,
   },
   familyMemberName: {
-    fontSize: theme.fontSize.sm || 14,
-    fontWeight: theme.fontWeight.bold || '700',
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary || '#0F172A',
     marginBottom: 2,
   },
@@ -197,8 +197,8 @@ export const patientProfileTabStyles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm || 6,
   },
   relationBadgeText: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.semibold || '600',
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.accent || '#0284C7',
     textTransform: 'capitalize',
   },
@@ -209,8 +209,8 @@ export const patientProfileTabStyles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm || 6,
   },
   patientIdPillText: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.semibold || '600',
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate || '#64748B',
   },
   familyCardBody: {
@@ -225,14 +225,14 @@ export const patientProfileTabStyles = StyleSheet.create({
     alignItems: 'center',
   },
   familyDetailLabel: {
-    fontSize: theme.fontSize.xs || 12,
+    fontSize: 11,
     color: theme.colors.textMuted || '#94A3B8',
-    fontWeight: '500',
+    fontWeight: '400',
   },
   familyDetailValue: {
-    fontSize: theme.fontSize.xs || 12,
+    fontSize: 11,
     color: theme.colors.textSecondary || '#334155',
-    fontWeight: '600',
+    fontWeight: '500',
   },
   emptyFamilyContainer: {
     flex: 1,
@@ -241,7 +241,7 @@ export const patientProfileTabStyles = StyleSheet.create({
     height: 200,
   },
   emptyFamilyText: {
-    fontSize: theme.fontSize.xs || 12,
+    fontSize: 11,
     color: theme.colors.textMuted || '#94A3B8',
     fontWeight: '500',
   },

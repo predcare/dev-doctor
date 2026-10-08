@@ -44,15 +44,15 @@ export const logoutOptionsModalStyles = StyleSheet.create({
     marginBottom: 6,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
     letterSpacing: -0.3,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: theme.colors.textSlate,
-    lineHeight: 20,
+    lineHeight: 17,
   },
   closeBtn: {
     padding: 6,
@@ -97,8 +97,8 @@ export const logoutOptionsModalStyles = StyleSheet.create({
     marginRight: 8,
   },
   optionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '500',
     color: theme.colors.textPrimary,
     marginBottom: 2,
   },
@@ -106,9 +106,9 @@ export const logoutOptionsModalStyles = StyleSheet.create({
     color: theme.colors.danger,
   },
   optionSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSlate,
-    lineHeight: 18,
+    lineHeight: 16,
   },
   radioCircle: {
     width: 22,
@@ -144,8 +144,8 @@ export const logoutOptionsModalStyles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   cancelButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
   },
   confirmButton: {
@@ -165,8 +165,8 @@ export const logoutOptionsModalStyles = StyleSheet.create({
     marginBottom: 10,
   },
   confirmButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textInverted,
   },
 });

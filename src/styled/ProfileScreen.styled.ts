@@ -34,8 +34,8 @@ export const profileStyles = StyleSheet.create({
     flexShrink: 0,
   },
   avatarText: {
-    fontSize: theme.fontSize.md + 1,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
   profileInfo: {
@@ -44,17 +44,17 @@ export const profileStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   doctorName: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     marginBottom: 2,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   medicalDegree: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textMuted,
     fontWeight: theme.fontWeight.regular,
-    lineHeight: 16,
+    lineHeight: 15,
   },
   editProfileBtn: {
     backgroundColor: theme.colors.primarySoft,
@@ -67,15 +67,15 @@ export const profileStyles = StyleSheet.create({
     alignSelf: 'center',
   },
   editProfileBtnTxt: {
-    fontSize: theme.fontSize.xs,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
 
   // Section Label
   sectionLabel: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 1.1,
     textTransform: 'uppercase',
@@ -121,15 +121,15 @@ export const profileStyles = StyleSheet.create({
     marginRight: 13,
   },
   rowLabel: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     flex: 1,
   },
   rowValue: {
-    fontSize: theme.fontSize.xs + 1,
+    fontSize: 12,
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
     marginRight: 6,
   },
 
@@ -150,8 +150,8 @@ export const profileStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   expandedMeta: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -164,8 +164,8 @@ export const profileStyles = StyleSheet.create({
     marginBottom: 10,
   },
   planName: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
   },
   activeBadge: {
@@ -175,8 +175,8 @@ export const profileStyles = StyleSheet.create({
     borderRadius: 20,
   },
   activeBadgeTxt: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.success,
   },
   renewalRow: {
@@ -185,7 +185,7 @@ export const profileStyles = StyleSheet.create({
     marginBottom: 14,
   },
   renewalText: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textMuted,
     marginLeft: 6,
   },
@@ -197,8 +197,8 @@ export const profileStyles = StyleSheet.create({
     alignItems: 'center',
   },
   manageSubTxt: {
-    fontSize: theme.fontSize.xs + 1,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
 
@@ -220,16 +220,16 @@ export const profileStyles = StyleSheet.create({
     marginRight: 12,
   },
   addonIconTxt: {
-    fontSize: 17,
+    fontSize: 15,
   },
   addonName: {
-    fontSize: theme.fontSize.xs + 1,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     marginBottom: 1,
   },
   addonSub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
   },
   addonBtn: {
@@ -239,8 +239,8 @@ export const profileStyles = StyleSheet.create({
     paddingVertical: 5,
   },
   addonBtnTxt: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Wallet
@@ -251,8 +251,8 @@ export const profileStyles = StyleSheet.create({
     borderRadius: 20,
   },
   topUpTxt: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
     letterSpacing: 0.5,
   },
@@ -285,13 +285,13 @@ export const profileStyles = StyleSheet.create({
     marginRight: 12,
   },
   policyTitle: {
-    fontSize: theme.fontSize.xs + 1,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     marginBottom: 1,
   },
   policySub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
   },
 
@@ -321,15 +321,15 @@ export const profileStyles = StyleSheet.create({
     flex: 1,
   },
   logoutTitle: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.danger,
     marginBottom: 2,
   },
 
   versionText: {
     textAlign: 'center',
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
     marginTop: 24,
     marginBottom: 8,
@@ -351,12 +351,12 @@ export const doctorProfileStyles = StyleSheet.create({
     gap: 16,
   },
   loadTxt: {
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.textMuted,
     marginTop: 10,
   },
   errTxt: {
-    fontSize: 15,
+    fontSize: 13,
     color: theme.colors.body,
     textAlign: 'center',
   },
@@ -368,8 +368,8 @@ export const doctorProfileStyles = StyleSheet.create({
   },
   retryTxt: {
     color: theme.colors.surface,
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
   },
 
   // Header
@@ -395,8 +395,8 @@ export const doctorProfileStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     flex: 1,
     textAlign: 'center',
@@ -413,8 +413,8 @@ export const doctorProfileStyles = StyleSheet.create({
     borderColor: theme.colors.mintBdr,
   },
   editTxt: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
 
@@ -462,8 +462,8 @@ export const doctorProfileStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarTxt: {
-    fontSize: 24,
-    fontWeight: '900',
+    fontSize: 20,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
   },
   verifiedBadge: {
@@ -480,8 +480,8 @@ export const doctorProfileStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   drName: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     letterSpacing: 0.3,
     marginBottom: 5,
@@ -494,9 +494,9 @@ export const doctorProfileStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   drId: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
-    fontWeight: theme.fontWeight.medium,
+    fontWeight: theme.fontWeight.regular,
   },
   dot: {
     width: 4,
@@ -518,8 +518,8 @@ export const doctorProfileStyles = StyleSheet.create({
     borderRadius: 3,
   },
   activeTxt: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
   },
 
   // Card container
@@ -535,13 +535,13 @@ export const doctorProfileStyles = StyleSheet.create({
     gap: 8,
   },
   emptyTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.dark,
     marginTop: 4,
   },
   emptySub: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textMuted,
   },
   emptyBtn: {
@@ -554,8 +554,8 @@ export const doctorProfileStyles = StyleSheet.create({
     borderColor: theme.colors.mintBdr,
   },
   emptyBtnTxt: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
 
@@ -580,8 +580,8 @@ export const doctorProfileStyles = StyleSheet.create({
     shadowRadius: 8,
   },
   primaryBtnTxt: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.surface,
   },
   secondaryBtn: {
@@ -596,8 +596,8 @@ export const doctorProfileStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   secondaryBtnTxt: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
   mapBtn: {

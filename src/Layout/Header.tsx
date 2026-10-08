@@ -76,10 +76,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const nameFontSize = useMemo(() => {
     const len = (userData?.name || "Dr").length;
-    if (len > 30) return 14;
-    if (len > 22) return 15;
-    if (len > 16) return 16;
-    return 17;
+    if (len > 30) return 13;
+    if (len > 22) return 13;
+    if (len > 16) return 14;
+    return 15;
   }, [userData?.name]);
 
   const nameLineHeight = useMemo(() => {

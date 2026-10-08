@@ -368,7 +368,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                 )}
                             />
                             {errors.address && (
-                                <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
+                                <Text style={{ color: '#EF4444', fontSize: 10, marginTop: 4 }}>
                                     {errors.address.message}
                                 </Text>
                             )}
@@ -385,7 +385,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                 <Text style={editPatientStyles.chevron}>▼</Text>
                             </TouchableOpacity>
                             {errors.country && (
-                                <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
+                                <Text style={{ color: '#EF4444', fontSize: 10, marginTop: 4 }}>
                                     {errors.country.message}
                                 </Text>
                             )}
@@ -402,7 +402,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                 <Text style={editPatientStyles.chevron}>▼</Text>
                             </TouchableOpacity>
                             {errors.state && (
-                                <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
+                                <Text style={{ color: '#EF4444', fontSize: 10, marginTop: 4 }}>
                                     {errors.state.message}
                                 </Text>
                             )}
@@ -422,7 +422,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                     <Text style={editPatientStyles.chevron}>▼</Text>
                                 </TouchableOpacity>
                                 {errors.city && (
-                                    <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
+                                    <Text style={{ color: '#EF4444', fontSize: 10, marginTop: 4 }}>
                                         {errors.city.message}
                                     </Text>
                                 )}
@@ -446,7 +446,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                     )}
                                 />
                                 {errors.postal_code && (
-                                    <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
+                                    <Text style={{ color: '#EF4444', fontSize: 10, marginTop: 4 }}>
                                         {errors.postal_code.message}
                                     </Text>
                                 )}
@@ -479,7 +479,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                 )}
                             />
                             {errors.medical_history && (
-                                <Text style={{ color: '#EF4444', fontSize: 11, marginTop: 4 }}>
+                                <Text style={{ color: '#EF4444', fontSize: 10, marginTop: 4 }}>
                                     {errors.medical_history.message}
                                 </Text>
                             )}

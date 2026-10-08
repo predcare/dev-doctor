@@ -18,14 +18,14 @@ export const editPatientStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   backArrow: {
-    fontSize: 26,
+    fontSize: 20,
     color: theme.colors.surface,
     lineHeight: 30,
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '600',
     color: theme.colors.surface,
     marginLeft: 12,
   },
@@ -38,8 +38,8 @@ export const editPatientStyles = StyleSheet.create({
     borderColor: theme.colors.mintBdr,
   },
   idBadgeTxt: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   sectionRow: {
@@ -56,8 +56,8 @@ export const editPatientStyles = StyleSheet.create({
     marginRight: 10,
   },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
     flex: 1,
   },
@@ -70,8 +70,8 @@ export const editPatientStyles = StyleSheet.create({
     borderColor: theme.colors.surfaceBorder,
   },
   cantEditTxt: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.textMuted,
   },
   card: {
@@ -86,8 +86,8 @@ export const editPatientStyles = StyleSheet.create({
     marginBottom: 14,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
     marginBottom: 6,
   },
@@ -100,9 +100,9 @@ export const editPatientStyles = StyleSheet.create({
     paddingVertical: 12,
   },
   lockedText: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textMuted,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   readOnlyCard: {
     backgroundColor: theme.colors.surface,
@@ -128,8 +128,8 @@ export const editPatientStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   readOnlyAvatarTxt: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: '600',
     color: '#4F46E5',
   },
   readOnlyHeaderInfo: {
@@ -137,8 +137,8 @@ export const editPatientStyles = StyleSheet.create({
     marginLeft: 12,
   },
   readOnlyName: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   readOnlySubRow: {
@@ -147,8 +147,8 @@ export const editPatientStyles = StyleSheet.create({
     marginTop: 2,
   },
   readOnlyId: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.textMuted,
   },
   viewOnlyTag: {
@@ -162,8 +162,8 @@ export const editPatientStyles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   viewOnlyTagTxt: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: '#64748B',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -180,8 +180,8 @@ export const editPatientStyles = StyleSheet.create({
     borderColor: '#EDF2F7',
   },
   readOnlyNoticeTxt: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: '400',
     color: '#64748B',
     flex: 1,
     marginLeft: 7,
@@ -214,16 +214,16 @@ export const editPatientStyles = StyleSheet.create({
     flex: 1,
   },
   readOnlyLabel: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '500',
     color: theme.colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
     marginBottom: 2,
   },
   readOnlyValue: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textPrimary,
   },
   readOnlyGridRow: {
@@ -247,7 +247,7 @@ export const editPatientStyles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 11,
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textPrimary,
   },
   textArea: {
@@ -266,9 +266,9 @@ export const editPatientStyles = StyleSheet.create({
     alignItems: 'center',
   },
   pickerTxt: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textPrimary,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   chevron: {
     fontSize: 10,
@@ -288,15 +288,15 @@ export const editPatientStyles = StyleSheet.create({
     paddingVertical: 11,
   },
   bmiVal: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
     marginRight: 6,
   },
   bmiUnit: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.primaryDark,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   btnRow: {
     flexDirection: 'row',
@@ -314,8 +314,8 @@ export const editPatientStyles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelTxt: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
   },
   saveBtn: {
@@ -326,8 +326,8 @@ export const editPatientStyles = StyleSheet.create({
     alignItems: 'center',
   },
   saveTxt: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.surface,
   },
   modalOverlay: {
@@ -350,14 +350,14 @@ export const editPatientStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceBorder,
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
   },
   modalClose: {
-    fontSize: 18,
+    fontSize: 16,
     color: theme.colors.textMuted,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   modalOpt: {
     flexDirection: 'row',
@@ -371,16 +371,16 @@ export const editPatientStyles = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
   },
   modalOptTxt: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textSecondary,
   },
   modalOptTxtSelected: {
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   checkmark: {
-    fontSize: 16,
+    fontSize: 14,
     color: theme.colors.primary,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 });

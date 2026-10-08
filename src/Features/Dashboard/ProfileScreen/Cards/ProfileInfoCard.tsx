@@ -68,18 +68,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   lbl: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.9,
     marginBottom: 4,
   },
   val: {
-    fontSize: theme.fontSize.sm,
-    // fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
     color: theme.colors.dark,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   tagRow: {
     flexDirection: 'row',
@@ -96,8 +95,8 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.mintBdr,
   },
   tagTxt: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   rightActionContainer: {

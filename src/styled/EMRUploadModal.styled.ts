@@ -28,13 +28,13 @@ export const emrUploadModalStyles = StyleSheet.create({
     marginBottom: 4,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     letterSpacing: -0.2,
   },
   headerSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: theme.colors.textSlate,
     marginTop: 2,
   },
@@ -47,9 +47,9 @@ export const emrUploadModalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     color: theme.colors.textSlate,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
   },
   headerDivider: {
     height: 1,
@@ -63,8 +63,8 @@ export const emrUploadModalStyles = StyleSheet.create({
     marginBottom: 2,
   },
   fieldLabel: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
     marginBottom: 6,
   },
@@ -86,11 +86,11 @@ export const emrUploadModalStyles = StyleSheet.create({
     borderColor: theme.colors.danger,
   },
   selectPlaceholder: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textMuted,
   },
   selectValueText: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textPrimary,
     fontWeight: theme.fontWeight.medium,
   },
@@ -105,7 +105,7 @@ export const emrUploadModalStyles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textPrimary,
   },
   textInputError: {
@@ -129,8 +129,8 @@ export const emrUploadModalStyles = StyleSheet.create({
     borderColor: theme.colors.danger,
   },
   chooseFileText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: '#475569',
   },
   selectedFileBadge: {
@@ -152,8 +152,8 @@ export const emrUploadModalStyles = StyleSheet.create({
     gap: 8,
   },
   selectedFileName: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
     flex: 1,
   },
@@ -166,9 +166,9 @@ export const emrUploadModalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   removeFileTxt: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.danger,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
   },
   shareContainer: {
     backgroundColor: '#ECFDF5',
@@ -187,13 +187,13 @@ export const emrUploadModalStyles = StyleSheet.create({
     marginRight: 12,
   },
   shareTitle: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: '#065F46',
     marginBottom: 2,
   },
   shareSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#047857',
   },
   toggleSwitch: {
@@ -211,8 +211,8 @@ export const emrUploadModalStyles = StyleSheet.create({
     backgroundColor: '#9CA3AF',
   },
   toggleSwitchText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
   },
   uploadButton: {
@@ -229,12 +229,12 @@ export const emrUploadModalStyles = StyleSheet.create({
     elevation: 3,
   },
   uploadButtonText: {
-    fontSize: 16,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
   },
   errorText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.danger,
     marginTop: 4,
   },
@@ -266,13 +266,13 @@ export const emrUploadModalStyles = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
   },
   inlineDropdownText: {
-    fontSize: 14,
+    fontSize: 13,
     color: theme.colors.textPrimary,
-    fontWeight: theme.fontWeight.medium,
+    fontWeight: theme.fontWeight.regular,
   },
   inlineDropdownTextActive: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
 });
 

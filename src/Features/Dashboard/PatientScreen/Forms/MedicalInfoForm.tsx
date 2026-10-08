@@ -56,7 +56,7 @@ export const MedicalInfoForm: React.FC<MedicalInfoFormProps> = React.memo(
       <View style={MedicalInfoStyles.infoBox}>
         <Text style={{ fontSize: 15 }}>ℹ️</Text>
         <Text style={MedicalInfoStyles.infoTxt}>
-          <Text style={{ fontWeight: '800' }}>Note:</Text> Medical history is optional but helps
+          <Text style={{ fontWeight: '600' }}>Note:</Text> Medical history is optional but helps
           doctors provide better personalized clinical care.
         </Text>
       </View>

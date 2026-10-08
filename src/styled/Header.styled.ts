@@ -61,7 +61,7 @@ export const headerStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.dark,
     letterSpacing: -0.2,
   },
@@ -123,15 +123,15 @@ export const headerStyles = StyleSheet.create({
   welcomeText: {
     fontSize: 11,
     color: theme.colors.textMuted,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
     letterSpacing: 0.4,
-    textTransform: 'uppercase',
     marginBottom: 1,
   },
   doctorName: {
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     letterSpacing: -0.2,
+    fontSize: 13,
   },
   specialtyBadgeRow: {
     flexDirection: 'row',

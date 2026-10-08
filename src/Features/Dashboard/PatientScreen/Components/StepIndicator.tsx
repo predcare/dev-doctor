@@ -90,27 +90,27 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   stepN: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textMuted,
   },
   stepNActive: {
     color: theme.colors.surface,
   },
   stepL: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
     marginTop: 6,
     textAlign: 'center',
   },
   stepLDone: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   stepLActive: {
     color: theme.colors.dark,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
   },
   lineTrack: {
     flex: 1,

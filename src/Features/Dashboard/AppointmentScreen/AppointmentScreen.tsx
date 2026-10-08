@@ -303,7 +303,7 @@ export const AppointmentsScreen: React.FC = () => {
                                 doctorAppointmentsStyles.tabText,
                                 {
                                     color: activeTab === t.key ? '#FFFFFF' : '#374151',
-                                    fontWeight: activeTab === t.key ? '700' : '600',
+                                    fontWeight: activeTab === t.key ? '600' : '500',
                                 },
                             ]}
                         >

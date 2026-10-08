@@ -24,9 +24,9 @@ export const patientDetailsStyles = StyleSheet.create({
     alignItems: 'center',
   },
   backArrow: {
-    fontSize: 24,
+    fontSize: 18,
     color: theme.colors.textInverted,
-    fontWeight: theme.fontWeight.bold,
+    fontWeight: theme.fontWeight.semibold,
     marginTop: -2,
   },
   topBarTitleContainer: {
@@ -34,13 +34,13 @@ export const patientDetailsStyles = StyleSheet.create({
     marginLeft: theme.spacing.md,
   },
   topBarTitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: theme.colors.textInverted,
-    fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
+    fontWeight: theme.fontWeight.semibold,
+    fontFamily: 'Inter_600SemiBold',
   },
   topBarSubTitle: {
-    fontSize: 11,
+    fontSize: 10,
     color: 'rgba(255, 255, 255, 0.78)',
     fontFamily: 'Inter_500Medium',
     marginTop: 1,
@@ -71,23 +71,23 @@ export const patientDetailsStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileAvatarText: {
-    fontSize: 22,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 18,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   profileInfoGroup: {
     flex: 1,
     marginLeft: theme.spacing.lg,
   },
   profileName: {
-    fontSize: theme.fontSize.lg,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 15,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   profileIdText: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textSlate,
     marginTop: 2,
     fontFamily: 'Inter_500Medium',
@@ -107,10 +107,10 @@ export const patientDetailsStyles = StyleSheet.create({
     borderColor: theme.colors.mintBdr,
   },
   profileChipText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_500Medium',
   },
 
   // Main Tab Navigation Bar
@@ -128,15 +128,15 @@ export const patientDetailsStyles = StyleSheet.create({
     position: 'relative',
   },
   mainTabLabel: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_500Medium',
   },
   mainTabLabelActive: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
+    fontWeight: theme.fontWeight.semibold,
+    fontFamily: 'Inter_600SemiBold',
   },
   mainTabIndicator: {
     position: 'absolute',
@@ -169,15 +169,15 @@ export const patientDetailsStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   subTabText: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_500Medium',
   },
   subTabTextActive: {
     color: theme.colors.textInverted,
-    fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
+    fontWeight: theme.fontWeight.semibold,
+    fontFamily: 'Inter_600SemiBold',
   },
   subTabBadge: {
     marginLeft: 6,
@@ -190,10 +190,10 @@ export const patientDetailsStyles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.25)',
   },
   subTabBadgeText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_500Medium',
   },
   subTabBadgeTextActive: {
     color: theme.colors.textInverted,
@@ -208,7 +208,7 @@ export const patientDetailsStyles = StyleSheet.create({
     marginLeft: 'auto',
   },
   addDocBtnText: {
-    fontSize: 20,
+    fontSize: 18,
     color: theme.colors.textInverted,
     fontWeight: '300',
     lineHeight: 24,
@@ -216,12 +216,12 @@ export const patientDetailsStyles = StyleSheet.create({
 
   // Section Titles
   cardSectionTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
 
   // Record Card
@@ -249,22 +249,22 @@ export const patientDetailsStyles = StyleSheet.create({
     marginRight: theme.spacing.md,
   },
   recordIconText: {
-    fontSize: 13,
-    fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.semibold,
+    fontFamily: 'Inter_600SemiBold',
   },
   recordTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   recordSub: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textSlate,
     marginTop: 2,
   },
   recordMeta: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textMuted,
     marginTop: 4,
   },
@@ -275,8 +275,8 @@ export const patientDetailsStyles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   pillText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
   },
   shareRow: {
     flexDirection: 'row',
@@ -288,15 +288,15 @@ export const patientDetailsStyles = StyleSheet.create({
     borderTopColor: theme.colors.surfaceSecondary,
   },
   shareLabel: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
   },
   shareSub: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textMuted,
   },
   chevronText: {
-    fontSize: 20,
+    fontSize: 16,
     color: theme.colors.textMuted,
     marginLeft: 8,
   },
@@ -317,18 +317,18 @@ export const patientDetailsStyles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   emptyIconText: {
-    fontSize: 20,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 16,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
   },
   emptyTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textSecondary,
     marginBottom: 4,
   },
   emptyText: {
-    fontSize: theme.fontSize.xs,
+    fontSize: 11,
     color: theme.colors.textMuted,
     textAlign: 'center',
   },
@@ -353,16 +353,16 @@ export const patientDetailsStyles = StyleSheet.create({
     borderBottomColor: theme.colors.primary,
   },
   consultStepTabTitle: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_500Medium',
     textAlign: 'center',
   },
   consultStepTabTitleActive: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.bold,
-    fontFamily: 'Inter_700Bold',
+    fontWeight: theme.fontWeight.semibold,
+    fontFamily: 'Inter_600SemiBold',
   },
 
   consultSectionCard: {
@@ -374,18 +374,18 @@ export const patientDetailsStyles = StyleSheet.create({
     ...globalShadows.card,
   },
   consultSectionTitle: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginBottom: theme.spacing.md,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   consultTextArea: {
     backgroundColor: theme.colors.background,
     borderRadius: theme.borderRadius.sm,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.textPrimary,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
@@ -396,14 +396,14 @@ export const patientDetailsStyles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     paddingHorizontal: theme.spacing.md,
     height: 44,
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.textPrimary,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
   },
   vitalLabel: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
     marginBottom: 4,
   },
@@ -424,7 +424,7 @@ export const patientDetailsStyles = StyleSheet.create({
   vitalInput: {
     flex: 1,
     paddingHorizontal: 12,
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.textPrimary,
   },
   vitalUnitTag: {
@@ -436,8 +436,8 @@ export const patientDetailsStyles = StyleSheet.create({
     borderLeftColor: theme.colors.surfaceBorder,
   },
   vitalUnitText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
 
@@ -460,8 +460,8 @@ export const patientDetailsStyles = StyleSheet.create({
     borderColor: theme.colors.mintBdr,
   },
   bmiAutoText: {
-    fontSize: 10,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 9,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
 
@@ -481,20 +481,20 @@ export const patientDetailsStyles = StyleSheet.create({
     marginRight: 8,
   },
   medNumText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   medCardTitle: {
-    fontSize: theme.fontSize.sm,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     flex: 1,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   removeText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.danger,
   },
   unitSelectBtn: {
@@ -508,8 +508,8 @@ export const patientDetailsStyles = StyleSheet.create({
     borderBottomRightRadius: theme.borderRadius.sm,
   },
   unitSelectText: {
-    fontSize: 12,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 11,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
   pickerSelectBtn: {
@@ -524,7 +524,7 @@ export const patientDetailsStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   pickerSelectText: {
-    fontSize: theme.fontSize.sm,
+    fontSize: 13,
     color: theme.colors.textPrimary,
   },
 
@@ -539,10 +539,10 @@ export const patientDetailsStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   addOutlineBtnText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   addPrimaryBtn: {
     backgroundColor: theme.colors.primarySoft,
@@ -554,10 +554,10 @@ export const patientDetailsStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   addPrimaryBtnText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   draftBtn: {
     backgroundColor: theme.colors.surfaceSecondary,
@@ -569,10 +569,10 @@ export const patientDetailsStyles = StyleSheet.create({
     marginTop: 8,
   },
   draftBtnText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_500Medium',
   },
 
   consultDateBtn: {
@@ -611,7 +611,7 @@ export const patientDetailsStyles = StyleSheet.create({
     marginRight: 6,
   },
   autoSaveText: {
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textSlate,
     fontWeight: theme.fontWeight.medium,
   },
@@ -629,10 +629,10 @@ export const patientDetailsStyles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceSecondary,
   },
   btnPrevText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_500Medium',
   },
   btnNext: {
     flex: 1,
@@ -642,10 +642,10 @@ export const patientDetailsStyles = StyleSheet.create({
     alignItems: 'center',
   },
   btnNextText: {
-    fontSize: 14,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   btnComplete: {
     flex: 1,
@@ -655,10 +655,10 @@ export const patientDetailsStyles = StyleSheet.create({
     alignItems: 'center',
   },
   btnCompleteText: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 
@@ -678,10 +678,10 @@ export const prescriptionTabstyles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   countBadge: {
     backgroundColor: theme.colors.primarySoft,
@@ -692,10 +692,10 @@ export const prescriptionTabstyles = StyleSheet.create({
     borderRadius: 12,
   },
   countBadgeText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_500Medium',
   },
   addBtn: {
     width: 36,
@@ -728,10 +728,10 @@ export const recordTabstyles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    fontSize: theme.fontSize.md,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   countBadge: {
     backgroundColor: theme.colors.primarySoft,
@@ -742,10 +742,10 @@ export const recordTabstyles = StyleSheet.create({
     borderRadius: 12,
   },
   countBadgeText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_500Medium',
   },
   uploadBtn: {
     width: 36,
@@ -813,10 +813,10 @@ export const prescriptionCardstyles = StyleSheet.create({
     borderRadius: 6,
   },
   idText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
     color: '#2563EB',
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_500Medium',
   },
   statusBadge: {
     flexDirection: 'row',
@@ -847,9 +847,9 @@ export const prescriptionCardstyles = StyleSheet.create({
     backgroundColor: '#D97706',
   },
   statusText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.semibold,
-    fontFamily: 'Inter_600SemiBold',
+    fontSize: 10,
+    fontWeight: theme.fontWeight.medium,
+    fontFamily: 'Inter_500Medium',
   },
   statusTextSuccess: {
     color: '#15803D',
@@ -858,15 +858,15 @@ export const prescriptionCardstyles = StyleSheet.create({
     color: '#B45309',
   },
   diagnosisTitle: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.bold,
+    fontSize: 13,
+    fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
-    lineHeight: 20,
+    lineHeight: 18,
     marginBottom: 2,
-    fontFamily: 'Inter_700Bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   patientName: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSecondary,
     marginBottom: 4,
     textTransform: 'capitalize',
@@ -886,7 +886,7 @@ export const prescriptionCardstyles = StyleSheet.create({
     gap: 5,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textMuted,
     fontFamily: 'Inter_500Medium',
   },

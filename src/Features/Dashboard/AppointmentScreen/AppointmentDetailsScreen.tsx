@@ -438,7 +438,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
                                         <Text
                                             style={[
                                                 appointmentDetailsStyles.detailValue,
-                                                { marginTop: 4, fontWeight: '500' },
+                                                { marginTop: 4, fontWeight: '400' },
                                             ]}
                                         >
                                             {typeof apptInfo.reason === 'string'

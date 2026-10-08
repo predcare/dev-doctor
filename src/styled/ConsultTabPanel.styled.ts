@@ -36,8 +36,8 @@ export const consultTabStyles = StyleSheet.create({
     gap: 8,
   },
   consultIdText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
     color: theme.colors.textMuted,
     letterSpacing: 0.5,
   },
@@ -53,16 +53,16 @@ export const consultTabStyles = StyleSheet.create({
     backgroundColor: theme.colors.accentLight,
   },
   typeVideoText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '500',
     color: theme.colors.accent,
   },
   typeInPersonBg: {
     backgroundColor: theme.colors.primarySoft,
   },
   typeInPersonText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '500',
     color: theme.colors.primary,
   },
   patientHeader: {
@@ -82,21 +82,21 @@ export const consultTabStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.primary,
   },
   patientMeta: {
     flex: 1,
   },
   patientName: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.textPrimary,
     marginBottom: 2,
   },
   patientSubText: {
-    fontSize: 12,
+    fontSize: 11,
     color: theme.colors.textSlate,
   },
   dateTimeBox: {
@@ -114,8 +114,8 @@ export const consultTabStyles = StyleSheet.create({
     gap: 6,
   },
   dateTimeText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '500',
     color: theme.colors.textSecondary,
   },
   divider: {
@@ -142,8 +142,8 @@ export const consultTabStyles = StyleSheet.create({
     borderRadius: 8,
   },
   btnJoinCallText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: theme.colors.textInverted,
   },
   btnInPerson: {
@@ -157,8 +157,8 @@ export const consultTabStyles = StyleSheet.create({
     borderRadius: 8,
   },
   btnInPersonText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: theme.colors.textInverted,
   },
   btnCompleted: {
@@ -174,8 +174,8 @@ export const consultTabStyles = StyleSheet.create({
     borderRadius: 8,
   },
   btnCompletedText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '500',
     color: theme.colors.textSlate,
   },
   statusBadge: {
@@ -184,7 +184,7 @@ export const consultTabStyles = StyleSheet.create({
     borderRadius: 6,
   },
   statusText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10,
+    fontWeight: '600',
   },
 });
