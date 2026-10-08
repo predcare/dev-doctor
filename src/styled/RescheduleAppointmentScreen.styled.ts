@@ -1,484 +1,303 @@
-import { Platform, StyleSheet } from 'react-native';
-import theme from './theme.styled';
+import { StyleSheet } from 'react-native';
+import { theme } from './theme.styled';
 
 export const rescheduleAppointmentStyles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
   },
-
-  // Header
-  headerWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingTop: Platform.OS === 'ios' ? 16 : 14,
-    paddingBottom: 14,
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  backPill: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#EBEBEB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 22,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    letterSpacing: -0.2,
-  },
-
-  // Content
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 40,
   },
-
-  // Current Appointment Card
-  currentCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-  },
-  cardLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#94A3B8',
+  sectionLabel: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
     letterSpacing: 0.8,
+    fontWeight: '500',
     marginBottom: 10,
+    marginTop: 8,
   },
-  patientInfoRow: {
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: theme.colors.primaryDark,
+    marginTop: 14,
+    marginBottom: 6,
+  },
+  optionalHint: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: theme.colors.textMuted,
+  },
+  patientCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    marginBottom: 16,
+    shadowColor: 'rgba(15, 23, 42, 0.06)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 2,
+    gap: 12,
   },
-  avatarCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: theme.colors.primary,
+  patientAvatarWrapper: {
+    position: 'relative',
+  },
+  patientAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: theme.colors.primarySoft,
+    borderWidth: 1.5,
+    borderColor: theme.colors.mintBdr,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
   },
-  avatarText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#FFFFFF',
+  patientAvatarText: {
+    color: theme.colors.primaryDark,
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  patientDetails: {
+    flex: 1,
+    minWidth: 0,
   },
   patientName: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  patientSub: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-    marginVertical: 12,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-    gap: 8,
-  },
-  detailLabel: {
-    fontSize: 13,
-    color: '#64748B',
-  },
-  detailValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-    flexShrink: 1,
-    textAlign: 'right',
-  },
-
-  // Section Headers
-  sectionTitle: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 10,
+    fontWeight: '500',
+    color: theme.colors.textPrimary,
+    marginBottom: 4,
+  },
+  patientIdBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.surfaceSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 2.5,
+    borderRadius: 6,
+  },
+  patientId: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
     letterSpacing: 0.2,
   },
-  outerLabel: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 10,
-  },
-
-  // Date Horizontal Strip
-  dateStrip: {
+  patientActiveBadge: {
     flexDirection: 'row',
-    gap: 10,
-    marginBottom: 16,
-  },
-  dateCard: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.mintBg,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
+    borderWidth: 1,
+    borderColor: theme.colors.mintBdr,
+  },
+  patientActiveText: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: theme.colors.primary,
+    letterSpacing: 0.2,
+  },
+  consultationRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 12,
+  },
+  consultationChip: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 70,
+    gap: 8,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    borderRadius: 12,
+    paddingVertical: 12,
   },
-  dateCardActive: {
-    backgroundColor: '#E6F7F5',
+  consultationChipActive: {
+    backgroundColor: theme.colors.primarySoft,
     borderColor: theme.colors.primary,
   },
-  dateDayLabel: {
+  consultationChipText: {
     fontSize: 12,
-    color: '#64748B',
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
+  },
+  consultationChipTextActive: {
+    color: theme.colors.primaryDark,
+    fontWeight: '500',
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  dateChipCard: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    backgroundColor: theme.colors.surface,
+    alignItems: 'center',
+    minWidth: 78,
+  },
+  dateChipCardActive: {
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.primary,
+  },
+  dateChipTopText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
+    marginBottom: 2,
+  },
+  dateChipTopTextActive: {
+    color: theme.colors.primaryDark,
+    fontWeight: '500',
+  },
+  dateChipBottomText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: theme.colors.textPrimary,
+  },
+  dateChipBottomTextActive: {
+    color: theme.colors.primaryDark,
     fontWeight: '600',
   },
-  dateDayLabelActive: {
-    color: theme.colors.primary,
-  },
-  dateNum: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginTop: 2,
-  },
-  dateNumActive: {
-    color: theme.colors.primary,
-  },
-  calendarPillBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  calendarIconBtn: {
+    width: 48,
+    height: 52,
     borderRadius: 12,
-    backgroundColor: '#F1F5F9',
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1',
+    backgroundColor: theme.colors.primarySoft,
+    borderWidth: 1,
+    borderColor: theme.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 6,
   },
-  calendarPillTxt: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#334155',
+  slotGroupContainer: {
+    marginBottom: 14,
   },
-
-  // Slot Grid & Grouping
-  periodHeader: {
+  slotGroupTitle: {
     fontSize: 12,
-    fontWeight: '800',
-    color: '#94A3B8',
+    fontWeight: '500',
+    color: theme.colors.textMuted,
     letterSpacing: 0.8,
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 8,
+    marginBottom: 8,
   },
   slotsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
+    marginBottom: 12,
+  },
+  slotBtn: {
+    width: '48%',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    backgroundColor: theme.colors.surface,
+    alignItems: 'center',
+  },
+  slotBtnActive: {
+    backgroundColor: theme.colors.primaryDark,
+    borderColor: theme.colors.primaryDark,
+  },
+  slotText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+  },
+  slotTextActive: {
+    color: theme.colors.surface,
+    fontWeight: '500',
+  },
+  emptyText: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
+    fontStyle: 'italic',
+    marginBottom: 12,
+  },
+  reasonInput: {
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+    minHeight: 84,
+    textAlignVertical: 'top',
     marginBottom: 14,
   },
-  timeChip: {
-    width: '47.5%',
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-  },
-  timeChipBooked: {
-    opacity: 0.4,
-    borderWidth: 2,
-    borderColor: '#4D4D4D',
-  },
-  timeChipActive: {
-    backgroundColor: '#E6F7F5',
-    borderColor: theme.colors.primary,
-  },
-  timeChipCurrent: {
-    backgroundColor: '#E6F7F5',
-    borderColor: theme.colors.primary,
-  },
-  timeChipText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  timeChipTextBooked: {
-    color: '#94A3B8',
-  },
-  timeChipTextActive: {
-    color: theme.colors.primary,
-  },
-
-  // Empty Slots State
-  emptySlotsCard: {
-    backgroundColor: '#FFFFFF',
+  summaryBox: {
+    backgroundColor: theme.colors.primarySoft,
+    borderWidth: 1,
+    borderColor: theme.colors.primaryLight,
     borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginVertical: 10,
-  },
-  emptySlotsTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#334155',
-    marginTop: 6,
-  },
-  emptySlotsSubtext: {
-    fontSize: 13,
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-
-  // Inputs Section
-  fieldLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginTop: 14,
-    marginBottom: 6,
-  },
-  fieldOptional: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#64748B',
-  },
-  fieldInput: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 14,
-    color: '#0F172A',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    textAlignVertical: 'top',
-  },
-
-  // Summary Strip Box (New Schedule vs Previous)
-  bookingButtonRow: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.primary,
-    borderRadius: 14,
-    padding: 14,
-    marginTop: 20,
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  bookingButton: {
-    flex: 1,
-  },
-  bookingButtonText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: 'rgba(255, 255, 255, 0.75)',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  bookingButtonValue: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginTop: 4,
-  },
-  dottedDivider: {
-    width: 1,
-    height: 40,
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-    borderStyle: 'dashed',
-    marginHorizontal: 12,
-  },
-
-  // Confirm Button
-  bookBtn: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 16,
     marginTop: 8,
-    elevation: 3,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  bookBtnDisabled: {
-    opacity: 0.45,
-  },
-  bookBtnText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: 0.3,
-  },
-
-  // Calendar Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  modalBox: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-  },
-  modalHead: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 16,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  modalClose: {
-    fontSize: 20,
-    color: '#64748B',
-    fontWeight: 'bold',
-  },
-  calendarInner: {},
-  calNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  calNavBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  calNavText: {
-    fontSize: 16,
-    color: '#334155',
-    fontWeight: 'bold',
-  },
-  calMonthLabel: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#0F172A',
-  },
-  calWeekRow: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  calWeekDay: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#94A3B8',
-  },
-  calGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  calCell: {
-    width: '14.28%',
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    marginVertical: 2,
-  },
-  calCellPast: {
-    opacity: 0.3,
-  },
-  calCellAvail: {
-    backgroundColor: '#E6F7F5',
-  },
-  calCellToday: {
-    borderWidth: 1.5,
-    borderColor: theme.colors.primary,
-  },
-  calCellSelected: {
-    backgroundColor: theme.colors.primary,
-  },
-  calCellText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#0F172A',
-  },
-  calCellTextPast: {
-    color: '#94A3B8',
-  },
-  calCellTextAvail: {
-    color: theme.colors.primary,
-    fontWeight: '700',
-  },
-  calCellTextToday: {
-    color: theme.colors.primary,
-    fontWeight: '800',
-  },
-  calCellTextSelected: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  calLegend: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginTop: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F1F5F9',
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  legendText: {
+  summaryTitle: {
     fontSize: 12,
-    color: '#64748B',
+    color: theme.colors.primaryDark,
+    letterSpacing: 0.8,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 12,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+    letterSpacing: 0.5,
+    fontWeight: '500',
+  },
+  summaryValue: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    color: theme.colors.textPrimary,
+    textAlign: 'right',
+  },
+  footer: {
+    backgroundColor: theme.colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.surfaceBorder,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 20,
+  },
+  proceedBtn: {
+    backgroundColor: theme.colors.primaryDark,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  proceedBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.surface,
   },
 });
 

@@ -8,7 +8,7 @@ import {
 } from '../../../typescripts/interfaces/appointments.interfaces';
 import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
 import { ICreateAppointmentPayload } from '../auth/payload.interfaces';
-import { IMyApptQueryParams } from './payload.interafce';
+import { IMyApptQueryParams, IRescheduleAppointment } from './payload.interafce';
 
 export const getMyAppointments = async (params: IMyApptQueryParams) => {
   const res = await axiosInstance.get<TMyAppointmentRoot>(`${endpoints.appointments.get}`, {
@@ -93,8 +93,8 @@ export const getMyAppointmentInfo = async (id: number | string) => {
   return res.data;
 };
 
-export const rescheduleAppointment = async (id: number | string, body: any) => {
-  const res = await axiosInstance.patch(endpoints.appointments.reschedule(id), body);
+export const rescheduleAppointment = async (id: number | string, body: IRescheduleAppointment) => {
+  const res = await axiosInstance.patch<ICommonRoot>(endpoints.appointments.reschedule(id), body);
   return res.data;
 };
 

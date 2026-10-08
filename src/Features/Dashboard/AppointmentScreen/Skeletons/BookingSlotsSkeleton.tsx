@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 
-export const BookingSlotsSkeleton: React.FC = () => {
+export interface BookingSlotsSkeletonProps {
+  datesOnly?: boolean;
+}
+
+export const BookingSlotsSkeleton: React.FC<BookingSlotsSkeletonProps> = ({ datesOnly }) => {
   const pulseAnim = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
@@ -22,6 +26,17 @@ export const BookingSlotsSkeleton: React.FC = () => {
     animation.start();
     return () => animation.stop();
   }, [pulseAnim]);
+
+  if (datesOnly) {
+    return (
+      <View style={styles.datesRow}>
+        {[1, 2, 3].map(key => (
+          <Animated.View key={key} style={[styles.dateChip, { opacity: pulseAnim }]} />
+        ))}
+        <Animated.View style={[styles.calendarIcon, { opacity: pulseAnim }]} />
+      </View>
+    );
+  }
 
   return (
     <Animated.View style={[styles.container, { opacity: pulseAnim }]}>
@@ -96,6 +111,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     borderWidth: 1,
     borderColor: '#E2E8F0',
+  },
+  datesRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  dateChip: {
+    width: 78,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: '#E2E8F0',
+  },
+  calendarIcon: {
+    width: 48,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: '#E2E8F0',
   },
 });
 

@@ -66,6 +66,7 @@ export const endpoints = {
     fullAvailability: '/doctor/availability/full-overview',
     doctorAvailDates: '/doctor-availabilities/available-dates',
     getSlotsByDate: '/doctor-availabilities/slots-by-date',
+    rescheduleAvailDates: '/doctor-availabilities/reschedule/available-dates',
   },
   commons: {
     country: '/common/countries',

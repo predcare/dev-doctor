@@ -68,6 +68,7 @@ export enum DoctorAvailabilityQueryKeys {
   ById = 'DoctorAvailabilityById',
   GET_AVAIL_DATES = 'GET_AVAIL_DATES',
   GET_SLOTS_BY_DATE = 'GET_SLOTS_BY_DATE',
+  GET_RESCHEDULED_AVAIL_DATES = 'GET_RESCHEDULED_AVAIL_DATES',
 }
 
 export enum AppointmentsQueryKeys {

@@ -408,7 +408,10 @@ export const AppointmentsScreen: React.FC = () => {
                                     });
                                 }}
                                 onReschedule={() => {
-                                    showInfoToast('Appointment reschedule feature will be available soon');
+                                    navigation.navigate(AppRoute.RESCHEDULE_APPOINTMENT, {
+                                        appointmentId: Number(item.id),
+                                        patientId: item.patientInfo?.patientId,
+                                    });
                                 }}
                                 onStartConsultation={() => {
                                     handleStartConsulation(

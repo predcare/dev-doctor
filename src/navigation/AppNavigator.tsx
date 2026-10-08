@@ -7,6 +7,7 @@ import ComingSoonScreen from '../Features/ComingSoonScreen';
 import AppointmentDetailsScreen from '../Features/Dashboard/AppointmentScreen/AppointmentDetailsScreen';
 import AppointmentsScreen from '../Features/Dashboard/AppointmentScreen/AppointmentScreen';
 import BookAppointmentScreen from '../Features/Dashboard/AppointmentScreen/BookAppointmentScreen';
+import RescheduleAppointmentScreen from '../Features/Dashboard/AppointmentScreen/RescheduleAppointmentScreen';
 import AvailabilityScreen from '../Features/Dashboard/Availability/AvailabilityScreen';
 import HomeScreen from '../Features/Dashboard/HomeScreen/HomeScreen';
 import NotificationScreen from '../Features/Dashboard/NotificationScreen/NotificationScreen';
@@ -63,6 +64,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Appointments" component={AppointmentsScreen} />
         <Stack.Screen name="AppointmentDetails" component={AppointmentDetailsScreen} />
         <Stack.Screen name="BookAppointment" component={BookAppointmentScreen} />
+        <Stack.Screen name="RescheduleAppointment" component={RescheduleAppointmentScreen} />
         <Stack.Screen name="Prescription" component={PrescritionScreen} />
         <Stack.Screen name="ViewPrescription" component={ViewPrescriptionScreen} />
         <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />

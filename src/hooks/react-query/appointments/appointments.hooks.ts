@@ -7,11 +7,13 @@ import {
   getMyAppointmentInfo,
   getMyAppointments,
   getMyAppointmentStats,
+  ISaveCallPayload,
   rescheduleAppointment,
   saveCall,
   sendHeartBeat,
 } from './appointments.func';
-import { IMyApptQueryParams } from './payload.interafce';
+import { IMyApptQueryParams, IRescheduleAppointment } from './payload.interafce';
+
 
 export const useMyAppointments = (params: IMyApptQueryParams) =>
   useQuery({
@@ -84,11 +86,10 @@ export const useMyAppointmentInfo = (params?: { id?: number | string }) =>
 
 export const useRescheduleAppointment = () =>
   useMutation({
-    mutationFn: (params?: { id?: number | string; body?: any }) =>
-      rescheduleAppointment(params?.id!, params?.body!),
+    mutationFn: (params: { id: number | string; body: IRescheduleAppointment }) =>
+      rescheduleAppointment(params.id, params.body),
   });
 
-import { ISaveCallPayload } from './appointments.func';
 
 export const useSaveCall = () =>
   useMutation({
