@@ -180,7 +180,7 @@ public class PiPManager: RCTEventEmitter, AVPictureInPictureControllerDelegate {
         }
 
         let pipVC = AVPictureInPictureVideoCallViewController()
-        pipVC.preferredContentSize = CGSize(width: 120, height: 160)
+        pipVC.preferredContentSize = CGSize(width: 90, height: 120)
 
         let container = PiPContainerView.shared
         container.removeFromSuperview()
