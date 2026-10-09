@@ -12,6 +12,13 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A82DC1D99BCD0E1263A2DA11 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		PIPDOC0000000000000001 /* PiPManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000011 /* PiPManager.swift */; };
+		PIPDOC0000000000000002 /* PiPManagerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000012 /* PiPManagerBridge.m */; };
+		PIPDOC0000000000000003 /* PiPContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000013 /* PiPContainerView.swift */; };
+		PIPDOC0000000000000004 /* PiPVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000014 /* PiPVideoView.swift */; };
+		PIPDOC0000000000000005 /* PiPFrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000015 /* PiPFrameProcessor.swift */; };
+		PIPDOC0000000000000006 /* PiPTrackRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000016 /* PiPTrackRenderer.m */; };
+		PIPDOC0000000000000007 /* PiPCameraMultitasking.m in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000017 /* PiPCameraMultitasking.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +32,16 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = predcaredoctor/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = predcaredoctor/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		PIPDOC0000000000000010 /* predcaredoctor-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "predcaredoctor-Bridging-Header.h"; path = "predcaredoctor/predcaredoctor-Bridging-Header.h"; sourceTree = "<group>"; };
+		PIPDOC0000000000000011 /* PiPManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PiPManager.swift; path = predcaredoctor/pipmode/PiPManager.swift; sourceTree = "<group>"; };
+		PIPDOC0000000000000012 /* PiPManagerBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PiPManagerBridge.m; path = predcaredoctor/pipmode/PiPManagerBridge.m; sourceTree = "<group>"; };
+		PIPDOC0000000000000013 /* PiPContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PiPContainerView.swift; path = predcaredoctor/pipmode/PiPContainerView.swift; sourceTree = "<group>"; };
+		PIPDOC0000000000000014 /* PiPVideoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PiPVideoView.swift; path = predcaredoctor/pipmode/PiPVideoView.swift; sourceTree = "<group>"; };
+		PIPDOC0000000000000015 /* PiPFrameProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PiPFrameProcessor.swift; path = predcaredoctor/pipmode/PiPFrameProcessor.swift; sourceTree = "<group>"; };
+		PIPDOC0000000000000016 /* PiPTrackRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PiPTrackRenderer.m; path = predcaredoctor/pipmode/PiPTrackRenderer.m; sourceTree = "<group>"; };
+		PIPDOC0000000000000017 /* PiPCameraMultitasking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PiPCameraMultitasking.m; path = predcaredoctor/pipmode/PiPCameraMultitasking.m; sourceTree = "<group>"; };
+		PIPDOC0000000000000018 /* PiPTrackRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PiPTrackRenderer.h; path = predcaredoctor/pipmode/PiPTrackRenderer.h; sourceTree = "<group>"; };
+		PIPDOC0000000000000019 /* PiPCameraMultitasking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PiPCameraMultitasking.h; path = predcaredoctor/pipmode/PiPCameraMultitasking.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +61,8 @@
 			children = (
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
+				PIPDOC0000000000000010 /* predcaredoctor-Bridging-Header.h */,
+				PIPDOC0000000000000020 /* pipmode */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
@@ -96,6 +115,22 @@
 				5709B34CF0A7D63546082F79 /* Pods-predcaredoctor.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		PIPDOC0000000000000020 /* pipmode */ = {
+			isa = PBXGroup;
+			children = (
+				PIPDOC0000000000000019 /* PiPCameraMultitasking.h */,
+				PIPDOC0000000000000017 /* PiPCameraMultitasking.m */,
+				PIPDOC0000000000000013 /* PiPContainerView.swift */,
+				PIPDOC0000000000000015 /* PiPFrameProcessor.swift */,
+				PIPDOC0000000000000011 /* PiPManager.swift */,
+				PIPDOC0000000000000012 /* PiPManagerBridge.m */,
+				PIPDOC0000000000000018 /* PiPTrackRenderer.h */,
+				PIPDOC0000000000000016 /* PiPTrackRenderer.m */,
+				PIPDOC0000000000000014 /* PiPVideoView.swift */,
+			);
+			name = pipmode;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -191,13 +226,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-predcaredoctor/Pods-predcaredoctor-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-predcaredoctor/Pods-predcaredoctor-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -234,13 +265,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-predcaredoctor/Pods-predcaredoctor-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-predcaredoctor/Pods-predcaredoctor-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -255,6 +282,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				PIPDOC0000000000000001 /* PiPManager.swift in Sources */,
+				PIPDOC0000000000000002 /* PiPManagerBridge.m in Sources */,
+				PIPDOC0000000000000003 /* PiPContainerView.swift in Sources */,
+				PIPDOC0000000000000004 /* PiPVideoView.swift in Sources */,
+				PIPDOC0000000000000005 /* PiPFrameProcessor.swift in Sources */,
+				PIPDOC0000000000000006 /* PiPTrackRenderer.m in Sources */,
+				PIPDOC0000000000000007 /* PiPCameraMultitasking.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,6 +321,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.predcaredoctor;
 				PRODUCT_NAME = predcaredoctor;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_OBJC_BRIDGING_HEADER = "predcaredoctor/predcaredoctor-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -319,6 +354,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.predcaredoctor;
 				PRODUCT_NAME = predcaredoctor;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_OBJC_BRIDGING_HEADER = "predcaredoctor/predcaredoctor-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";

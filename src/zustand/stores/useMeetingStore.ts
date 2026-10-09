@@ -2,6 +2,8 @@ import { create } from 'zustand';
 
 export type TCallState = 'IDLE' | 'CONNECTING' | 'CONNECTED' | 'ENDED' | 'ERROR';
 
+export type MeetingPipMode = 'NORMAL' | 'IN_APP_PIP' | 'NATIVE_PIP';
+
 interface IMeetingStoreState {
   // Session details
   token: string | null;
@@ -16,6 +18,7 @@ interface IMeetingStoreState {
   startTime: string | null;
   endTime: string | null;
   callDurationSeconds: number;
+  remainingSeconds: number;
 
   // Connection & Media States
   callState: TCallState;
@@ -25,9 +28,11 @@ interface IMeetingStoreState {
   facingMode: 'front' | 'back';
   remoteParticipantId: string | null;
   // PiP & Camera Interruption States
+  pipMode: MeetingPipMode;
   isInAppPip: boolean;
   isNativePip: boolean;
   isCameraPausedForCapture: boolean;
+  cameraSessionEpoch: number;
 
   // in Person consulatation
   apptIdforInPerson?: string | null;
@@ -54,9 +59,12 @@ interface IMeetingStoreState {
   setCameraState: (isCameraOn: boolean) => void;
   setFacingMode: (mode: 'front' | 'back') => void;
   setRemoteParticipantId: (id: string | null) => void;
+  setRemainingSeconds: (seconds: number | ((prev: number) => number)) => void;
+  setPipMode: (pipMode: MeetingPipMode) => void;
   setIsInAppPip: (isInAppPip: boolean) => void;
   setIsNativePip: (isNativePip: boolean) => void;
   setIsCameraPausedForCapture: (paused: boolean) => void;
+  bumpCameraSessionEpoch: () => void;
   resetMeetingStore: () => void;
   clearInPersonAppointment: () => void;
   setInPersonAppointment: (params: {
@@ -78,15 +86,18 @@ const initialState = {
   startTime: null,
   endTime: null,
   callDurationSeconds: 0,
+  remainingSeconds: 0,
   callState: 'IDLE' as TCallState,
   errorMessage: null as string | null,
   isMicOn: true,
   isCameraOn: true,
   facingMode: 'front' as const,
   remoteParticipantId: null,
+  pipMode: 'NORMAL' as MeetingPipMode,
   isInAppPip: false,
   isNativePip: false,
   isCameraPausedForCapture: false,
+  cameraSessionEpoch: 0,
   apptIdforInPerson: null,
   patientIdforInPerson: null,
   patientNameforInPerson: null,
@@ -119,11 +130,14 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
       startTime: startTime ?? null,
       endTime: endTime ?? null,
       callDurationSeconds: callDurationSeconds ?? 0,
+      remainingSeconds: Math.max(0, callDurationSeconds ?? 0),
       callState: 'CONNECTING',
       errorMessage: null,
+      pipMode: 'NORMAL',
       isInAppPip: false,
       isNativePip: false,
       isCameraPausedForCapture: false,
+      cameraSessionEpoch: 0,
     }),
 
   setCallState: callState => set({ callState }),
@@ -140,6 +154,11 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
 
   setFacingMode: facingMode => set({ facingMode }),
 
+  setRemainingSeconds: update =>
+    set(state => ({
+      remainingSeconds: typeof update === 'function' ? update(state.remainingSeconds) : update,
+    })),
+
   setRemoteParticipantId: remoteParticipantId =>
     set(state => ({
       remoteParticipantId,
@@ -153,11 +172,30 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
           : 'CONNECTING',
     })),
 
-  setIsInAppPip: isInAppPip => set({ isInAppPip }),
+  setPipMode: pipMode =>
+    set({
+      pipMode,
+      isInAppPip: pipMode === 'IN_APP_PIP',
+      isNativePip: pipMode === 'NATIVE_PIP',
+    }),
 
-  setIsNativePip: isNativePip => set({ isNativePip }),
+  setIsInAppPip: isInAppPip =>
+    set(state => ({
+      isInAppPip,
+      pipMode: isInAppPip ? 'IN_APP_PIP' : state.isNativePip ? 'NATIVE_PIP' : 'NORMAL',
+    })),
+
+  setIsNativePip: isNativePip =>
+    set(state => ({
+      isNativePip,
+      isInAppPip: isNativePip ? false : state.isInAppPip,
+      pipMode: isNativePip ? 'NATIVE_PIP' : state.isInAppPip ? 'IN_APP_PIP' : 'NORMAL',
+    })),
 
   setIsCameraPausedForCapture: isCameraPausedForCapture => set({ isCameraPausedForCapture }),
+
+  bumpCameraSessionEpoch: () =>
+    set(state => ({ cameraSessionEpoch: state.cameraSessionEpoch + 1 })),
 
   resetMeetingStore: () => set({ ...initialState }),
 
@@ -183,3 +221,5 @@ export const useMeetingStore = create<IMeetingStoreState>(set => ({
       statusforInPerson: statusforInPerson ?? null,
     }),
 }));
+
+export default useMeetingStore;

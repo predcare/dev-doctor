@@ -195,6 +195,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
         Boolean(meetingStoreState.token && meetingStoreState.meetingId);
 
     const isCurrentApptInCall =
+        isOnline &&
         isCallActive &&
         (String(meetingStoreState.appointmentId) === String(apptInfo?.id) ||
             (Boolean(apptInfo?.appointment_id) &&
@@ -516,11 +517,11 @@ export const AppointmentDetailsScreen: React.FC = () => {
                                 <TouchableOpacity
                                     style={[
                                         appointmentDetailsStyles.joinButton,
-                                        isCurrentApptInCall && { backgroundColor: theme.colors.primary },
-                                        isJoinedOnce && { backgroundColor: theme.colors.primaryDark },
+                                        isOnline && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
+                                        isOnline && isJoinedOnce && { backgroundColor: theme.colors.primaryDark },
                                     ]}
                                     onPress={() =>
-                                        isOnline || isCurrentApptInCall
+                                        isOnline
                                             ? handleJoinVideoCall(apptInfo)
                                             : handleStartConsulation(
                                                 apptInfo.id,
@@ -533,13 +534,13 @@ export const AppointmentDetailsScreen: React.FC = () => {
                                 >
                                     <PlayCircleIcon size={20} color="#FFFFFF" />
                                     <Text style={appointmentDetailsStyles.joinButtonText}>
-                                        {isCurrentApptInCall
-                                            ? 'Already in Call'
-                                            : isJoinedOnce
-                                                ? 'Re-join Call'
-                                                : isOnline
-                                                    ? 'Join Call'
-                                                    : 'Start Consultation'}
+                                        {isOnline
+                                            ? isCurrentApptInCall
+                                                ? 'Already in Call'
+                                                : isJoinedOnce
+                                                    ? 'Re-join Call'
+                                                    : 'Join Call'
+                                            : 'Start Consultation'}
                                     </Text>
                                 </TouchableOpacity>
                             )}

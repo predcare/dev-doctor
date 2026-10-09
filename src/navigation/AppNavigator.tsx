@@ -24,6 +24,7 @@ import PrescritionScreen from '../Features/Dashboard/PrescriptionScreen/Prescrit
 import ViewPrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/ViewPrescriptionScreen';
 import CreatePrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/CreatePrescriptionScreen';
 import InvoicesScreen from '../Features/Dashboard/InvoicesScreen/InvoicesScreen';
+import DoctorMeetingScreen from '../Features/Dashboard/MeetingScreen/DoctorMeetingScreen';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -69,6 +70,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="ViewPrescription" component={ViewPrescriptionScreen} />
         <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />
         <Stack.Screen name="Invoices" component={InvoicesScreen} />
+        <Stack.Screen name="DoctorMeeting" component={DoctorMeetingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

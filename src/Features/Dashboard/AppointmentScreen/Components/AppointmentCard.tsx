@@ -110,13 +110,15 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       (activeCallState === 'CONNECTED' || activeCallState === 'CONNECTING') &&
       Boolean(activeToken && activeMeetingId);
 
+    const isVideo = consultation_type?.toLowerCase() === 'video';
+
     const isCurrentApptInCall =
+      isVideo &&
       isCallActive &&
       (String(activeApptId) === String(appointmentId) ||
         (Boolean(appointmentGeneratedId) && activeApptGeneratedId === appointmentGeneratedId));
 
     const {
-      isVideo,
       isCompleted,
       isCancelled,
       isInProgress,
@@ -130,7 +132,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         appointmentStatus === 'inprogress';
 
       return {
-        isVideo: consultation_type?.toLowerCase() === 'video',
         isCompleted: appointmentStatus === 'completed',
         isCancelled: appointmentStatus === 'cancelled',
         isConfirmed: appointmentStatus === 'confirmed',
@@ -139,7 +140,16 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         statusBg: getStatusBackground(appointmentStatus),
         formattedTime: formatTimeSlot(startTime, endTime),
       };
-    }, [consultation_type, appointmentStatus, startTime, endTime]);
+    }, [appointmentStatus, startTime, endTime]);
+
+    const buttonText = useMemo(() => {
+      if (isVideo) {
+        if (isCurrentApptInCall) return 'Already in Call';
+        if (isJoinedOnce) return 'Re-join Call';
+        return 'Join Call';
+      }
+      return 'Start Consultation';
+    }, [isVideo, isCurrentApptInCall, isJoinedOnce]);
 
     const menuItems = useMemo(() => {
       if (appointmentStatus === 'completed') {
@@ -327,24 +337,14 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
               style={[
                 S.joinButton,
                 isInProgress && { flex: 1 },
-                isCurrentApptInCall && { backgroundColor: theme.colors.primary },
-                isJoinedOnce && { backgroundColor: theme.colors.brandBlueDark },
+                isVideo && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
+                isVideo && isJoinedOnce && { backgroundColor: theme.colors.brandBlueDark },
               ]}
-              onPress={() =>
-                isVideo || isCurrentApptInCall ? onVideoCall?.() : onStartConsultation?.()
-              }
+              onPress={() => (isVideo ? onVideoCall?.() : onStartConsultation?.())}
               activeOpacity={0.85}
             >
               <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-              <Text style={S.joinButtonText}>
-                {isCurrentApptInCall
-                  ? 'Already in Call'
-                  : isJoinedOnce
-                    ? 'Re-join Call'
-                    : isVideo
-                      ? 'Join Call'
-                      : 'Start Consultation'}
-              </Text>
+              <Text style={S.joinButtonText}>{buttonText}</Text>
             </TouchableOpacity>
             {isInProgress && (
               <TouchableOpacity

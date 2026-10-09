@@ -28,6 +28,8 @@ end
 target 'predcaredoctor' do
   config = use_native_modules!
 
+  pod 'react-native-webrtc', :path => '../node_modules/@videosdk.live/react-native-webrtc'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
@@ -49,6 +51,12 @@ target 'predcaredoctor' do
         end
         if config.name == 'Release'
           config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf-with-dsym'
+        end
+
+        config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited) '
+        incall_path = '"$(SRCROOT)/../node_modules/@videosdk.live/react-native-incallmanager/ios/RNInCallManager"'
+        unless config.build_settings['HEADER_SEARCH_PATHS'].include?(incall_path)
+          config.build_settings['HEADER_SEARCH_PATHS'] = "#{config.build_settings['HEADER_SEARCH_PATHS']} #{incall_path}"
         end
       end
     end

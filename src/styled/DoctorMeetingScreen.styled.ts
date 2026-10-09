@@ -47,6 +47,52 @@ export const doctorMeetingStyles = StyleSheet.create({
   headerRight: {
     alignItems: 'flex-end',
   },
+  timersCol: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  leftBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  leftLbl: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+  },
+  leftValue: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  networkRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  signalBars: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 2,
+    height: 14,
+  },
+  signalBar: {
+    width: 3,
+    borderRadius: 1,
+  },
+  networkLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
   headerTopRightRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -154,12 +200,13 @@ export const doctorMeetingStyles = StyleSheet.create({
 
   // Main Stage Area (Full Screen Background)
   stageContainerFull: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
     backgroundColor: '#000000',
+    position: 'relative',
     zIndex: 1,
   },
   stageContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
