@@ -9,6 +9,7 @@ export const AppRoute = {
   LOGIN: 'Login',
   POLICY_ACCEPTANCE: 'PolicyAcceptance',
   NOTIFICATIONS: 'Notifications',
+  EMAIL_VERIFY: 'EmailVerify',
   ACCOUNT: 'Account',
   PROFILE: 'Profile',
   PRESCRIPTION_SETTINGS: 'PrescriptionSettings',
@@ -48,6 +49,7 @@ export type RootStackParamList = {
   Login: { refetchOnMount?: boolean } | undefined;
   PolicyAcceptance: undefined;
   MainTabs: undefined;
+  EmailVerify: { email?: string; phone?: string } | undefined;
   Home: undefined;
   Patients: undefined;
   Schedule: { refresh?: boolean } | undefined;
@@ -277,3 +279,13 @@ export interface HomeScreenProps {
 }
 
 export type RecordsTabRouteProp = RouteProp<RootStackParamList, 'PatientDetails'>;
+
+export type EmailVerifyScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'EmailVerify'
+>;
+export type EmailVerifyScreenRouteProp = RouteProp<RootStackParamList, 'EmailVerify'>;
+export interface EmailVerifyScreenProps {
+  navigation?: EmailVerifyScreenNavigationProp;
+  route?: EmailVerifyScreenRouteProp;
+}

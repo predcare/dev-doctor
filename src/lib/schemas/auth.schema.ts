@@ -17,7 +17,7 @@ export const LoginFormSchema = yup.object().shape({
           .test(
             'is-valid-phone',
             'Phone number must be 10 digits',
-            val => !!val && /^\d{10}$/.test(val.replace(/[\s\-()]/g, '')),
+            val => !!val && /^\d{10}$/.test(val.replace(/[\s\-()]/g, ''))
           ),
       otherwise: schema =>
         schema.required('Email is required').email('Enter a valid email address'),
@@ -29,3 +29,10 @@ export const LoginFormSchema = yup.object().shape({
 });
 
 export type TLoginFormSchemaType = yup.InferType<typeof LoginFormSchema>;
+
+export const VerifyEmailSchema = yup.object().shape({
+  email: yup.string().trim().email('Enter a valid email address').required('Email is required'),
+  otp: yup.string().trim().required('OTP is required').length(6, 'OTP must be 6 digits'),
+});
+
+export type TVerifyEmailSchemaType = yup.InferType<typeof VerifyEmailSchema>;

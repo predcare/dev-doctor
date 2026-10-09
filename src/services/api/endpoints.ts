@@ -24,6 +24,8 @@ export const endpoints = {
     resendOtp: '/auth/resend-otp',
     users: '/doctor/auth/users',
     logout: '/auth/logout',
+    verifyEmail: '/users/verify-email',
+    resendEmailOtp: '/users/resend-email-otp',
   },
   profile: {
     get: '/users/profile',

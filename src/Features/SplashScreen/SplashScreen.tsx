@@ -1,15 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, Text, View } from 'react-native';
-import { queryClient } from '../../components/providers/ReactQueryProvider';
-import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
-import { ProfileQueryKeys } from '../../hooks/react-query/query.keys';
+import { APP_BUILD, APP_VERSION } from '../../config/constants';
+import { fetchProfileQuery } from '../../hooks/react-query/profile/profile.hooks';
 import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
 import { getItem, STORAGE_KEYS } from '../../lib/commons/asyncStorage';
 import { consumeTargetRoute, resetAndNavigate, resetToLogin, resetToMainTabs } from '../../lib/commons/navigation.utils';
 import { AppRoute, SplashScreenNavigationProp, SplashScreenRouteProp } from '../../route';
 import { Splashstyles } from '../../styled/SplashScreen.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
-import { APP_BUILD, APP_VERSION } from '../../config/constants';
 
 export interface SplashScreenProps {
   navigation?: SplashScreenNavigationProp;
@@ -70,10 +68,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
           return null;
         }
 
-        const res = await queryClient.fetchQuery({
-          queryKey: [ProfileQueryKeys.Profile],
-          queryFn: getProfile,
-        });
+        const res = await fetchProfileQuery(true);
 
         if (res?.data) {
           setUserData(res.data);
@@ -97,7 +92,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
         onFinish();
       } else if (navigation) {
         if (doctorData) {
-          if (doctorData.has_accepted_policies) {
+          if (!doctorData?.email_verified_at) {
+            resetAndNavigate(navigation, AppRoute.EMAIL_VERIFY, { email: doctorData?.email });
+          } else if (!doctorData.has_accepted_policies) {
+            resetAndNavigate(navigation, AppRoute.POLICY_ACCEPTANCE);
+          } else if (doctorData.has_accepted_policies) {
             const target = consumeTargetRoute();
             if (target && target.name !== AppRoute.HOME) {
               navigation?.reset({ index: 0, routes: [target as any] });

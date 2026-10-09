@@ -32,3 +32,13 @@ export const userLogout = async (body: { all_devices: boolean; device_id?: strin
   const res = await axiosInstance.post<ICommonRoot>(endpoints.auth.logout, body);
   return res.data;
 };
+
+export const verifyEmail = async (body: { email: string; otp: string }) => {
+  const res = await axiosInstance.post<ICommonRoot>(endpoints.auth.verifyEmail, body);
+  return res.data;
+};
+
+export const resendEmailOtp = async (body: { email: string }) => {
+  const res = await axiosInstance.post<ICommonRoot>(endpoints.auth.resendEmailOtp, body);
+  return res.data;
+};

@@ -20,11 +20,11 @@ import { queryClient } from '../../components/providers/ReactQueryProvider';
 import { MailIcon, PhoneIcon } from '../../components/ui/icons';
 import { useReSendOtp, useSendOtp, useVerifyOTP } from '../../hooks/react-query/auth/auth.hooks';
 import { ILoginVerifyOtpPayload } from '../../hooks/react-query/auth/payload.interfaces';
-import { getProfile } from '../../hooks/react-query/profile/profile.funcs';
+import { fetchProfileQuery } from '../../hooks/react-query/profile/profile.hooks';
 import { ProfileQueryKeys } from '../../hooks/react-query/query.keys';
 import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
 import { setItem, STORAGE_KEYS } from '../../lib/commons/asyncStorage';
-import { resetToHome } from '../../lib/commons/navigation.utils';
+import { resetAndNavigate, resetToHome } from '../../lib/commons/navigation.utils';
 import { showErrorToast } from '../../lib/commons/toast.utils';
 import { LoginFormSchema, TLoginFormSchemaType } from '../../lib/schemas/auth.schema';
 import { Assets } from '../../resources/assets';
@@ -169,7 +169,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
             await setItem(STORAGE_KEYS.AUTH_TOKEN, token);
             let doctorData: any = null;
             try {
-              const profileRes = await getProfile();
+              const profileRes = await fetchProfileQuery(true);
               if (profileRes?.data) {
                 doctorData = profileRes?.data;
                 setUserData(profileRes?.data);
@@ -181,7 +181,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
               queryKey: [ProfileQueryKeys.Profile],
             });
             hideLoader();
-            if (doctorData?.has_accepted_policies) {
+            if (!doctorData?.email_verified_at) {
+              resetAndNavigate(navigation, AppRoute.EMAIL_VERIFY, { email: doctorData?.email });
+            } else if (doctorData?.has_accepted_policies) {
               resetToHome(navigation);
             } else {
               if (navigation && navigation.replace) {

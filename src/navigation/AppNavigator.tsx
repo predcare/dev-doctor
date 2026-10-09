@@ -10,21 +10,22 @@ import BookAppointmentScreen from '../Features/Dashboard/AppointmentScreen/BookA
 import RescheduleAppointmentScreen from '../Features/Dashboard/AppointmentScreen/RescheduleAppointmentScreen';
 import AvailabilityScreen from '../Features/Dashboard/Availability/AvailabilityScreen';
 import HomeScreen from '../Features/Dashboard/HomeScreen/HomeScreen';
+import InvoicesScreen from '../Features/Dashboard/InvoicesScreen/InvoicesScreen';
+import DoctorMeetingScreen from '../Features/Dashboard/MeetingScreen/DoctorMeetingScreen';
 import NotificationScreen from '../Features/Dashboard/NotificationScreen/NotificationScreen';
 import AddPatientScreen from '../Features/Dashboard/PatientScreen/AddPatientScreen';
 import EditPatientScreen from '../Features/Dashboard/PatientScreen/EditPatientScreen';
 import PatientDetailsScreen from '../Features/Dashboard/PatientScreen/PatientDetailsScreen';
 import PatinetScreen from '../Features/Dashboard/PatientScreen/PatientScreen';
+import CreatePrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/CreatePrescriptionScreen';
+import PrescritionScreen from '../Features/Dashboard/PrescriptionScreen/PrescritionScreen';
+import ViewPrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/ViewPrescriptionScreen';
 import { ProfileScreen } from '../Features/Dashboard/ProfileScreen/ProfileScreen';
 import SettingScreen from '../Features/Dashboard/SettingScreen/SettingScreen';
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import { navigationRef } from './navigationRef';
-import PrescritionScreen from '../Features/Dashboard/PrescriptionScreen/PrescritionScreen';
-import ViewPrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/ViewPrescriptionScreen';
-import CreatePrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/CreatePrescriptionScreen';
-import InvoicesScreen from '../Features/Dashboard/InvoicesScreen/InvoicesScreen';
-import DoctorMeetingScreen from '../Features/Dashboard/MeetingScreen/DoctorMeetingScreen';
+import EmailVerifyScreen from '../Features/Auth/EmailVerifyScreen';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -53,6 +54,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="PolicyAcceptance" component={PolicyAcceptanceScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="EmailVerify" component={EmailVerifyScreen} />
         <Stack.Screen name="Account" component={SettingScreen} />
         <Stack.Screen name="Patients" component={PatinetScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />

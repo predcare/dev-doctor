@@ -4,6 +4,8 @@ export enum AuthQueryKey {
   GET_USERS = 'GET_USERS',
   RESEND_OTP = 'RESEND_OTP',
   USER_LOGOUT = 'USER_LOGOUT',
+  VERIFY_EMAIL = 'VERIFY_EMAIL',
+  RESEND_EMAIL_OTP = 'RESEND_EMAIL_OTP',
 }
 
 export enum ProfileQueryKeys {
