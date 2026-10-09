@@ -70,7 +70,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
                 routes: [{ name: AppRoute.HOME }],
             });
         } else {
-            navigation.goBack();
+            navigation.navigate(AppRoute.APPOINTMENTS);
         }
     }, [isComingFromNotification, navigation]);
 
