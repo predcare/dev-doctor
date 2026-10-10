@@ -11,6 +11,7 @@ import { useMeetingCountdownTicker } from '../../hooks/commons/meeting/useMeetin
 import useMeetingParticipants from '../../hooks/commons/meeting/useMeetingParticipants';
 import usePipRemoteTrack from '../../hooks/commons/meeting/usePipRemoteTrack';
 import NativePip from '../../native/NativePip';
+import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import useMeetingStore from '../../zustand/stores/useMeetingStore';
 import AndroidPipStage from './AndroidPipStage';
 import InAppPipWindow from './InAppPipWindow';
@@ -49,6 +50,14 @@ export const MeetingSessionHost: React.FC = () => {
   const facingMode = useMeetingStore(state => state.facingMode);
   const setCallState = useMeetingStore(state => state.setCallState);
   const resetMeetingStore = useMeetingStore(state => state.resetMeetingStore);
+  const userData = useAuthStore((state) => state.userData)
+  const participantId = userData?.doctor_id
+    ? `doctor_${userData.doctor_id}`
+    : userData?.id
+      ? `doctor_${userData.id}`
+      : 'doctor_guest';
+  const doctorDisplayName = userData?.name || 'Doctor';
+  const sessionKey = `${meetingId}_${participantId}`;
 
   useEffect(() => {
     if (meetingId) {
@@ -67,11 +76,13 @@ export const MeetingSessionHost: React.FC = () => {
 
   return (
     <MeetingProvider
+      key={sessionKey}
       config={{
         meetingId,
         micEnabled: isMicOn,
         webcamEnabled: isCameraOn,
-        name: 'Doctor',
+        participantId: participantId,
+        name: doctorDisplayName,
         defaultCamera: facingMode,
         maxResolution: 'hd',
         mode: 'SEND_AND_RECV',
@@ -80,6 +91,7 @@ export const MeetingSessionHost: React.FC = () => {
           title: 'PRED Care Consultation',
           message: 'Video consultation in progress',
         },
+        codecSwitchEnabled: true
       }}
       token={token}
       joinWithoutUserInteraction={true}
