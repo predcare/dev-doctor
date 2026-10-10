@@ -14,7 +14,6 @@ import {
 } from './appointments.func';
 import { IMyApptQueryParams, IRescheduleAppointment } from './payload.interafce';
 
-
 export const useMyAppointments = (params: IMyApptQueryParams) =>
   useQuery({
     queryKey: [MyAppointmentsQueryKeys.MyAppointments, params],
@@ -90,7 +89,6 @@ export const useRescheduleAppointment = () =>
       rescheduleAppointment(params.id, params.body),
   });
 
-
 export const useSaveCall = () =>
   useMutation({
     mutationFn: (body: ISaveCallPayload) => saveCall(body),
@@ -100,3 +98,11 @@ export const useSaveCalled = () =>
   useMutation({
     mutationFn: (params?: { body?: ISaveCallPayload }) => saveCall(params?.body!),
   });
+
+// get Token
+export const useGetToken = () => {
+  return useMutation({
+    mutationFn: ({ appointmentId }: { appointmentId: string }) => getApptToken(appointmentId),
+    mutationKey: [MyAppointmentsQueryKeys.Token],
+  });
+};
