@@ -27,12 +27,12 @@ export const InAppPipWindow: React.FC = () => {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const pipMode = useMeetingStore(state => state.pipMode);
-  const meetingId = useMeetingStore(state => state.meetingId);
-  const remoteParticipantId = useMeetingStore(state => state.remoteParticipantId);
-  const patientName = useMeetingStore(state => state.patientName);
+  const meetingId = useMeetingStore(state => state.callInfo?.meetingId);
+  const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
+  const patientName = useMeetingStore(state => state.patientInfo?.name);
   const { restoreToMeeting } = useMeetingPip();
   const { endCall } = useMeetingConnection();
-  const { webcamStream, webcamOn } = usePatientStream(remoteParticipantId);
+  const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
 
   const name = patientName || 'Patient';
   const initial = name.charAt(0).toUpperCase() || 'P';

@@ -33,7 +33,7 @@ export const GlobalNoInternetBlocker: React.FC = () => {
   const isOffline = useNetworkStore(state => state.isOffline);
   const setNetworkState = useNetworkStore(state => state.setNetworkState);
   const meetingCallState = useMeetingStore(state => state.callState);
-  const resetMeetingStore = useMeetingStore(state => state.resetMeetingStore);
+  const resetCallInfo = useMeetingStore(state => state.resetCallInfo);
 
   const [isRetrying, setIsRetrying] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
@@ -56,7 +56,7 @@ export const GlobalNoInternetBlocker: React.FC = () => {
   const isInsideMeeting = meetingCallState !== 'IDLE' && meetingCallState !== 'ENDED';
 
   const handleEmergencyLeaveMeeting = () => {
-    resetMeetingStore();
+    resetCallInfo();
     navigate(AppRoute.HOME);
   };
 

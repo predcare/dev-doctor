@@ -1,205 +1,113 @@
 import { create } from 'zustand';
+import {
+  ICallInfo,
+  IMeetingStoreState,
+  MeetingCallState,
+  MeetingPipMode,
+} from '../interfaces/meeting.interfaces';
 
-export type TCallState = 'IDLE' | 'CONNECTING' | 'CONNECTED' | 'ENDED' | 'ERROR';
-
-export type MeetingPipMode = 'NORMAL' | 'IN_APP_PIP' | 'NATIVE_PIP';
-
-interface IMeetingStoreState {
-  // Session details
-  token: string | null;
-  meetingId: string | null;
-  appointmentId: number | string | null;
-
-  // Appointment context (for header display & timer)
-  patientName: string | null;
-  patientUserId: string | null;
-  patientAlphanumericId: string | null;
-  appointmentGeneratedId: string | null;
-  startTime: string | null;
-  endTime: string | null;
-  callDurationSeconds: number;
-  remainingSeconds: number;
-
-  // Connection & Media States
-  callState: TCallState;
-  errorMessage: string | null;
-  isMicOn: boolean;
-  isCameraOn: boolean;
-  facingMode: 'front' | 'back';
-  remoteParticipantId: string | null;
-  // PiP & Camera Interruption States
-  pipMode: MeetingPipMode;
-  isInAppPip: boolean;
-  isNativePip: boolean;
-  isCameraPausedForCapture: boolean;
-  cameraSessionEpoch: number;
-
-  // in Person consulatation
-  apptIdforInPerson?: string | null;
-  patientIdforInPerson?: string | null;
-  patientNameforInPerson?: string | null;
-  statusforInPerson?: string | null;
-
-  // Actions
-  setMeetingSession: (params: {
-    token: string;
-    meetingId: string;
-    appointmentId?: number | string;
-    patientName?: string;
-    patientUserId?: string;
-    patientAlphanumericId?: string;
-    appointmentGeneratedId?: string;
-    startTime?: string;
-    endTime?: string;
-    callDurationSeconds?: number;
-  }) => void;
-  setCallState: (callState: TCallState) => void;
-  setErrorState: (message?: string) => void;
-  setMicState: (isMicOn: boolean) => void;
-  setCameraState: (isCameraOn: boolean) => void;
-  setFacingMode: (mode: 'front' | 'back') => void;
-  setRemoteParticipantId: (id: string | null) => void;
-  setRemainingSeconds: (seconds: number | ((prev: number) => number)) => void;
-  setPipMode: (pipMode: MeetingPipMode) => void;
-  setIsInAppPip: (isInAppPip: boolean) => void;
-  setIsNativePip: (isNativePip: boolean) => void;
-  setIsCameraPausedForCapture: (paused: boolean) => void;
-  bumpCameraSessionEpoch: () => void;
-  resetMeetingStore: () => void;
-  clearInPersonAppointment: () => void;
-  setInPersonAppointment: (params: {
-    apptIdforInPerson?: string | null;
-    patientIdforInPerson?: string | null;
-    patientNameforInPerson?: string | null;
-    statusforInPerson?: string | null;
-  }) => void;
-}
-
-const initialState = {
+const initialCallInfo: ICallInfo = {
   token: null,
   meetingId: null,
-  appointmentId: null,
-  patientName: null,
-  patientUserId: null,
-  patientAlphanumericId: null,
-  appointmentGeneratedId: null,
-  startTime: null,
-  endTime: null,
-  callDurationSeconds: 0,
-  remainingSeconds: 0,
-  callState: 'IDLE' as TCallState,
-  errorMessage: null as string | null,
-  isMicOn: true,
-  isCameraOn: true,
-  facingMode: 'front' as const,
-  remoteParticipantId: null,
-  pipMode: 'NORMAL' as MeetingPipMode,
-  isInAppPip: false,
-  isNativePip: false,
-  isCameraPausedForCapture: false,
-  cameraSessionEpoch: 0,
-  apptIdforInPerson: null,
-  patientIdforInPerson: null,
-  patientNameforInPerson: null,
-  statusforInPerson: null,
+  appointment: null,
 };
 
-export const useMeetingStore = create<IMeetingStoreState>(set => ({
-  ...initialState,
+const initialVideoState = {
+  callInfo: initialCallInfo,
+  appointmentId: null as string | number | null,
+  callState: 'IDLE' as MeetingCallState,
+  pipMode: 'NORMAL' as MeetingPipMode,
+  isMuted: false,
+  isCamOn: true,
+  isFrontCamera: true,
+  patientInfo: null,
+  remainingSeconds: 0,
+  patientParticipantId: null as string | null,
+  patientWebcamOn: false,
+  patientMicOn: true,
+  isCameraPausedForCapture: false,
+  cameraSessionEpoch: 0,
+};
 
-  setMeetingSession: ({
-    token,
-    meetingId,
-    appointmentId,
-    patientName,
-    patientUserId,
-    patientAlphanumericId,
-    appointmentGeneratedId,
-    startTime,
-    endTime,
-    callDurationSeconds,
-  }) =>
+const initialInPersonState = {
+  apptIdforInPerson: null as string | null,
+  patientIdforInPerson: null as string | null,
+  patientNameforInPerson: null as string | null,
+  statusforInPerson: null as string | null,
+};
+
+export const useMeetingStore = create<IMeetingStoreState>((set, get) => ({
+  ...initialVideoState,
+  ...initialInPersonState,
+
+  setCallInfo: ({ token, meeting_id, appointment, patientInfo }) => {
+    const durationMinutes = Number(
+      appointment.appointment_duration || appointment.slot_duration || 0
+    );
+    const elapsedSeconds = Math.max(0, Number(appointment.call_elapsed_seconds || 0));
+    const totalSeconds = durationMinutes > 0 ? Math.floor(durationMinutes * 60) : 0;
+    const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
+
     set({
-      token,
-      meetingId,
-      appointmentId: appointmentId ?? null,
-      patientName: patientName ?? null,
-      patientUserId: patientUserId ?? null,
-      patientAlphanumericId: patientAlphanumericId ?? null,
-      appointmentGeneratedId: appointmentGeneratedId ?? null,
-      startTime: startTime ?? null,
-      endTime: endTime ?? null,
-      callDurationSeconds: callDurationSeconds ?? 0,
-      remainingSeconds: Math.max(0, callDurationSeconds ?? 0),
-      callState: 'CONNECTING',
-      errorMessage: null,
+      callInfo: {
+        token,
+        meetingId: meeting_id,
+        appointment: {
+          id: appointment.id,
+          appointmentId: appointment.appointment_id,
+          appointmentDate: appointment.appointment_date,
+          startTime: appointment.start_time,
+          endTime: appointment.end_time,
+          slotDuration: appointment.slot_duration ?? null,
+          appointmentDuration: durationMinutes || null,
+          callElapsedSeconds: elapsedSeconds,
+        },
+      },
+      appointmentId: appointment.id,
+      patientInfo: patientInfo || get().patientInfo,
+      remainingSeconds,
+      callState: 'INITIALIZING',
       pipMode: 'NORMAL',
-      isInAppPip: false,
-      isNativePip: false,
-      isCameraPausedForCapture: false,
-      cameraSessionEpoch: 0,
-    }),
+    });
+  },
 
-  setCallState: callState => set({ callState }),
+  setCallState: (callState: MeetingCallState) => set({ callState }),
 
-  setErrorState: message =>
-    set({
-      callState: 'ERROR',
-      errorMessage: message || "'token' is empty or invalid or might have expired.",
-    }),
+  setPipMode: (pipMode: MeetingPipMode) => set({ pipMode }),
 
-  setMicState: isMicOn => set({ isMicOn }),
+  setIsMuted: (isMuted: boolean) => set({ isMuted }),
 
-  setCameraState: isCameraOn => set({ isCameraOn }),
+  setIsCamOn: (isCamOn: boolean) => set({ isCamOn }),
 
-  setFacingMode: facingMode => set({ facingMode }),
+  setIsFrontCamera: (isFrontCamera: boolean) => set({ isFrontCamera }),
 
   setRemainingSeconds: update =>
     set(state => ({
       remainingSeconds: typeof update === 'function' ? update(state.remainingSeconds) : update,
     })),
 
-  setRemoteParticipantId: remoteParticipantId =>
+  setPatientParticipant: ({ id, webcamOn, micOn }) =>
     set(state => ({
-      remoteParticipantId,
-      // Don't overwrite terminal states (ERROR/ENDED) — a participant leaving
-      // during an error flow shouldn't flip us back to CONNECTING.
-      callState:
-        state.callState === 'ERROR' || state.callState === 'ENDED'
-          ? state.callState
-          : remoteParticipantId
-          ? 'CONNECTED'
-          : 'CONNECTING',
+      patientParticipantId: id,
+      patientWebcamOn: webcamOn !== undefined ? webcamOn : state.patientWebcamOn,
+      patientMicOn: micOn !== undefined ? micOn : state.patientMicOn,
     })),
 
-  setPipMode: pipMode =>
-    set({
-      pipMode,
-      isInAppPip: pipMode === 'IN_APP_PIP',
-      isNativePip: pipMode === 'NATIVE_PIP',
-    }),
-
-  setIsInAppPip: isInAppPip =>
-    set(state => ({
-      isInAppPip,
-      pipMode: isInAppPip ? 'IN_APP_PIP' : state.isNativePip ? 'NATIVE_PIP' : 'NORMAL',
-    })),
-
-  setIsNativePip: isNativePip =>
-    set(state => ({
-      isNativePip,
-      isInAppPip: isNativePip ? false : state.isInAppPip,
-      pipMode: isNativePip ? 'NATIVE_PIP' : state.isInAppPip ? 'IN_APP_PIP' : 'NORMAL',
-    })),
-
-  setIsCameraPausedForCapture: isCameraPausedForCapture => set({ isCameraPausedForCapture }),
+  setIsCameraPausedForCapture: paused => set({ isCameraPausedForCapture: paused }),
 
   bumpCameraSessionEpoch: () =>
     set(state => ({ cameraSessionEpoch: state.cameraSessionEpoch + 1 })),
 
-  resetMeetingStore: () => set({ ...initialState }),
+  resetCallInfo: () =>
+    set({
+      ...initialVideoState,
+    }),
 
-  // In Person
+  resetMeetingStore: () =>
+    set({
+      ...initialVideoState,
+    }),
+
   clearInPersonAppointment: () =>
     set({
       apptIdforInPerson: null,

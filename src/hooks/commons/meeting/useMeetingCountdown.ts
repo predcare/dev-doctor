@@ -5,14 +5,14 @@ import useMeetingStore from '../../../zustand/stores/useMeetingStore';
 const TWO_MINUTES_SECONDS = 120;
 
 export const useMeetingCountdownTicker = (onTimeUp?: () => void) => {
-  const remoteParticipantId = useMeetingStore(state => state.remoteParticipantId);
+  const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
   const setRemainingSeconds = useMeetingStore(state => state.setRemainingSeconds);
 
   const onTimeUpRef = useRef(onTimeUp);
   onTimeUpRef.current = onTimeUp;
   const twoMinToastShown = useRef(false);
 
-  const bothConnected = Boolean(remoteParticipantId);
+  const bothConnected = Boolean(patientParticipantId);
 
   useEffect(() => {
     if (!bothConnected) {

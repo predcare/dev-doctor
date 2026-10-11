@@ -6,19 +6,19 @@ import useMeetingStore from '../../../zustand/stores/useMeetingStore';
 
 export const useMeetingAppState = () => {
   const { disableWebcam, enableWebcam } = useMeeting({});
-  const isCameraOn = useMeetingStore(state => state.isCameraOn);
+  const isCamOn = useMeetingStore(state => state.isCamOn);
   const callState = useMeetingStore(state => state.callState);
 
   const appStateRef = useRef<AppStateStatus>((AppState.currentState as AppStateStatus) || 'active');
-  const wasCamOnRef = useRef<boolean>(isCameraOn);
+  const wasCamOnRef = useRef<boolean>(isCamOn);
   const pausedByUsRef = useRef<boolean>(false);
 
   useEffect(() => {
-    wasCamOnRef.current = isCameraOn;
-  }, [isCameraOn]);
+    wasCamOnRef.current = isCamOn;
+  }, [isCamOn]);
 
   useEffect(() => {
-    if (callState === 'IDLE' || callState === 'ENDED' || callState === 'ERROR') return;
+    if (callState === 'IDLE' || callState === 'ENDED' || callState === 'FAILED') return;
 
     const subscription = AppState.addEventListener('change', async (nextState: AppStateStatus) => {
       const prev = appStateRef.current;

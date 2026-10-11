@@ -17,9 +17,9 @@ import { CircleXIcon, FilterIcon, SearchIcon } from '../../../components/ui/icon
 import useMeetingPip from '../../../hooks/commons/meeting/useMeetingPip';
 import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
-import { getApptToken } from '../../../hooks/react-query/appointments/appointments.func';
 import {
     useChangeAppointmentStatus,
+    useGetToken,
     useMyAppointmentStats,
     useMyInfiniteAppointments,
 } from '../../../hooks/react-query/appointments/appointments.hooks';
@@ -61,9 +61,11 @@ export const AppointmentsScreen: React.FC = () => {
     const { showConfirm } = useAlertStore(state => state);
 
     const { showLoader, hideLoader } = useLoadingStore(state => state);
-    const { setInPersonAppointment, setMeetingSession } = useMeetingStore(state => state);
-    const activeMeetingId = useMeetingStore(state => state.meetingId);
-    const activeAppointmentId = useMeetingStore(state => state.appointmentId);
+    const { mutate: getToken } = useGetToken();
+    const setCallInfo = useMeetingStore(state => state.setCallInfo);
+    const { setInPersonAppointment } = useMeetingStore(state => state);
+    const activeMeetingId = useMeetingStore(state => state.callInfo?.meetingId);
+    const activeCallAppointmentId = useMeetingStore(state => state.callInfo?.appointment?.id);
     const { restoreToMeeting } = useMeetingPip();
     const { requestAudioVideoPermissions } = useDevicePermissions();
 
@@ -129,7 +131,7 @@ export const AppointmentsScreen: React.FC = () => {
         async (apt: IMyAppointmentDoc) => {
             if (!apt?.id) return;
 
-            if (activeMeetingId && String(activeAppointmentId) === String(apt.id)) {
+            if (activeMeetingId && String(activeCallAppointmentId) === String(apt.id)) {
                 restoreToMeeting();
                 return;
             }
@@ -143,43 +145,46 @@ export const AppointmentsScreen: React.FC = () => {
             }
 
             showLoader('Joining Video Call...');
-            try {
-                const res = await getApptToken(apt.id);
-                const videoCallData = res?.data;
-                if (res?.success && videoCallData?.token && videoCallData?.meeting_id) {
-                    const slotMinutes = Number(videoCallData.appointment?.slot_duration || 0);
-                    setMeetingSession({
-                        token: videoCallData.token,
-                        meetingId: videoCallData.meeting_id,
-                        appointmentId: videoCallData.appointment?.id ?? apt.id,
-                        patientName: apt.patientInfo?.name,
-                        patientUserId: apt.patientInfo?.patientId
-                            ? String(apt.patientInfo.patientId)
-                            : undefined,
-                        appointmentGeneratedId:
-                            videoCallData.appointment?.appointment_id ?? apt.appointment_id,
-                        startTime: videoCallData.appointment?.start_time ?? apt.start_time,
-                        endTime: videoCallData.appointment?.end_time ?? apt.end_time,
-                        callDurationSeconds: slotMinutes > 0 ? Math.floor(slotMinutes * 60) : undefined,
-                    });
-                    navigation.navigate(AppRoute.DOCTOR_MEETING);
-                    return;
+            getToken(
+                { appointmentId: String(apt.id) },
+                {
+                    onSuccess: res => {
+                        const videoCallData = res?.data;
+                        if (res?.success && videoCallData) {
+                            setCallInfo({
+                                token: videoCallData.token,
+                                meeting_id: videoCallData.meeting_id,
+                                appointment: videoCallData.appointment,
+                                patientInfo: {
+                                    name: videoCallData.patient?.name ?? apt.patientInfo?.name,
+                                    patientId: videoCallData.patient?.id
+                                        ? String(videoCallData.patient.id)
+                                        : apt.patientInfo?.patientId
+                                          ? String(apt.patientInfo.patientId)
+                                          : undefined,
+                                },
+                            });
+                            navigation.navigate(AppRoute.DOCTOR_MEETING);
+                            return;
+                        }
+                        showErrorToast(res?.message || 'Unable to join the video consultation.');
+                    },
+                    onError: () => {
+                        showErrorToast('Unable to join the video consultation.');
+                    },
+                    onSettled: () => hideLoader(),
                 }
-                showErrorToast(res?.message || 'Unable to join the video consultation.');
-            } catch {
-                showErrorToast('Unable to join the video consultation.');
-            } finally {
-                hideLoader();
-            }
+            );
         },
         [
-            activeAppointmentId,
+            activeCallAppointmentId,
             activeMeetingId,
+            getToken,
             hideLoader,
             navigation,
             requestAudioVideoPermissions,
             restoreToMeeting,
-            setMeetingSession,
+            setCallInfo,
             showLoader,
         ]
     );

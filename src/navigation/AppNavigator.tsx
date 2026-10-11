@@ -12,6 +12,7 @@ import AvailabilityScreen from '../Features/Dashboard/Availability/AvailabilityS
 import HomeScreen from '../Features/Dashboard/HomeScreen/HomeScreen';
 import InvoicesScreen from '../Features/Dashboard/InvoicesScreen/InvoicesScreen';
 import DoctorMeetingScreen from '../Features/Dashboard/MeetingScreen/DoctorMeetingScreen';
+import MeetingStatusScreen from '../Features/Dashboard/MeetingScreen/MeetingStatusScreen';
 import NotificationScreen from '../Features/Dashboard/NotificationScreen/NotificationScreen';
 import AddPatientScreen from '../Features/Dashboard/PatientScreen/AddPatientScreen';
 import EditPatientScreen from '../Features/Dashboard/PatientScreen/EditPatientScreen';
@@ -73,6 +74,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="CreatePrescription" component={CreatePrescriptionScreen} />
         <Stack.Screen name="Invoices" component={InvoicesScreen} />
         <Stack.Screen name="DoctorMeeting" component={DoctorMeetingScreen} />
+        <Stack.Screen name="ConsultationCompleted" component={MeetingStatusScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

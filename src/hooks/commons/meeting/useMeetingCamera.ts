@@ -6,52 +6,52 @@ export const useMeetingCamera = () => {
   const { toggleMic: sdkToggleMic, toggleWebcam: sdkToggleWebcam, changeWebcam: sdkChangeWebcam } =
     useMeeting({});
 
-  const isMicOn = useMeetingStore(state => state.isMicOn);
-  const isCameraOn = useMeetingStore(state => state.isCameraOn);
-  const facingMode = useMeetingStore(state => state.facingMode);
-  const setMicState = useMeetingStore(state => state.setMicState);
-  const setCameraState = useMeetingStore(state => state.setCameraState);
-  const setFacingMode = useMeetingStore(state => state.setFacingMode);
+  const isMuted = useMeetingStore(state => state.isMuted);
+  const isCamOn = useMeetingStore(state => state.isCamOn);
+  const isFrontCamera = useMeetingStore(state => state.isFrontCamera);
+  const setIsMuted = useMeetingStore(state => state.setIsMuted);
+  const setIsCamOn = useMeetingStore(state => state.setIsCamOn);
+  const setIsFrontCamera = useMeetingStore(state => state.setIsFrontCamera);
 
   const toggleMic = useCallback(async () => {
     try {
-      setMicState(!isMicOn);
+      const nextMuted = !isMuted;
+      setIsMuted(nextMuted);
       if (sdkToggleMic) {
         await sdkToggleMic();
       }
     } catch (err) {
       console.error('[useMeetingCamera] toggleMic error:', err);
     }
-  }, [isMicOn, setMicState, sdkToggleMic]);
+  }, [isMuted, setIsMuted, sdkToggleMic]);
 
   const toggleCamera = useCallback(async () => {
     try {
-      setCameraState(!isCameraOn);
+      const nextCamOn = !isCamOn;
+      setIsCamOn(nextCamOn);
       if (sdkToggleWebcam) {
         await sdkToggleWebcam();
       }
     } catch (err) {
       console.error('[useMeetingCamera] toggleCamera error:', err);
     }
-  }, [isCameraOn, setCameraState, sdkToggleWebcam]);
+  }, [isCamOn, setIsCamOn, sdkToggleWebcam]);
 
   const flipCamera = useCallback(async () => {
     try {
-      setFacingMode(facingMode === 'front' ? 'back' : 'front');
+      setIsFrontCamera(!isFrontCamera);
       if (sdkChangeWebcam) {
         await sdkChangeWebcam();
       }
     } catch (err) {
       console.error('[useMeetingCamera] flipCamera error:', err);
     }
-  }, [facingMode, setFacingMode, sdkChangeWebcam]);
+  }, [isFrontCamera, setIsFrontCamera, sdkChangeWebcam]);
 
   return {
-    isMicOn,
-    isMuted: !isMicOn,
-    isCameraOn,
-    isCamOn: isCameraOn,
-    isFrontCamera: facingMode === 'front',
+    isMuted,
+    isCamOn,
+    isFrontCamera,
     toggleMic,
     toggleCamera,
     flipCamera,

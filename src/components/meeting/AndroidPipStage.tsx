@@ -9,13 +9,13 @@ import useMeetingStore from '../../zustand/stores/useMeetingStore';
 
 const LocalPipTile: React.FC = () => {
   const { localParticipant } = useMeeting({});
-  const isMicOn = useMeetingStore(state => state.isMicOn);
-  const isCameraOn = useMeetingStore(state => state.isCameraOn);
-  const facingMode = useMeetingStore(state => state.facingMode);
+  const isMuted = useMeetingStore(state => state.isMuted);
+  const isCamOn = useMeetingStore(state => state.isCamOn);
+  const isFrontCamera = useMeetingStore(state => state.isFrontCamera);
   const cameraSessionEpoch = useMeetingStore(state => state.cameraSessionEpoch);
   const { webcamStream, webcamOn } = useParticipant(localParticipant?.id || '');
 
-  const showVideo = isCameraOn && webcamOn && webcamStream;
+  const showVideo = isCamOn && webcamOn && webcamStream;
 
   return (
     <View style={androidPipStyles.selfTile}>
@@ -24,14 +24,14 @@ const LocalPipTile: React.FC = () => {
           key={cameraSessionEpoch}
           streamURL={new MediaStream([webcamStream.track]).toURL()}
           objectFit="cover"
-          mirror={facingMode === 'front'}
+          mirror={isFrontCamera}
           style={StyleSheet.absoluteFill}
           zOrder={1}
         />
       ) : (
         <ProfileIcon size={16} color="#E2E8F0" />
       )}
-      {!isMicOn && (
+      {isMuted && (
         <View style={androidPipStyles.muteBadge}>
           <MicOffIcon size={8} color="#FFFFFF" />
         </View>
@@ -43,9 +43,9 @@ const LocalPipTile: React.FC = () => {
 /** Content of the Android system PiP window: patient video only, no header or controls. */
 export const AndroidPipStage: React.FC = () => {
   const { width } = useWindowDimensions();
-  const remoteParticipantId = useMeetingStore(state => state.remoteParticipantId);
-  const patientName = useMeetingStore(state => state.patientName);
-  const { webcamStream, webcamOn } = usePatientStream(remoteParticipantId);
+  const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
+  const patientName = useMeetingStore(state => state.patientInfo?.name);
+  const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
 
   const name = patientName || 'Patient';
   const initial = name.charAt(0).toUpperCase() || 'P';
@@ -69,7 +69,7 @@ export const AndroidPipStage: React.FC = () => {
             <Text style={androidPipStyles.avatarTxt}>{initial}</Text>
           </View>
           <Text style={androidPipStyles.placeholderTxt} numberOfLines={1}>
-            {remoteParticipantId ? 'Camera off' : 'Waiting for patient'}
+            {patientParticipantId ? 'Camera off' : 'Waiting for patient'}
           </Text>
         </View>
       )}

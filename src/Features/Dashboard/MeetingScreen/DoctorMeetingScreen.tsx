@@ -13,7 +13,7 @@ export const DoctorMeetingScreen: React.FC = () => {
 
   const setPipMode = useMeetingStore(state => state.setPipMode);
   const callState = useMeetingStore(state => state.callState);
-  const hasToken = useMeetingStore(state => Boolean(state.token));
+  const hasToken = useMeetingStore(state => Boolean(state.callInfo?.token));
 
   useFocusEffect(
     useCallback(() => {
@@ -25,7 +25,7 @@ export const DoctorMeetingScreen: React.FC = () => {
 
   useEffect(() => {
     if (!isFocused) return;
-    if (!hasToken || callState === 'ENDED' || callState === 'ERROR') {
+    if (!hasToken || callState === 'ENDED' || callState === 'FAILED') {
       if (navigation.canGoBack()) {
         navigation.goBack();
       }
@@ -34,8 +34,13 @@ export const DoctorMeetingScreen: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
-      const { callState: currentState, token, pipMode } = useMeetingStore.getState();
-      if (currentState === 'ENDED' || currentState === 'IDLE' || currentState === 'ERROR' || !token) {
+      const { callState: currentState, callInfo, pipMode } = useMeetingStore.getState();
+      if (
+        currentState === 'ENDED' ||
+        currentState === 'IDLE' ||
+        currentState === 'FAILED' ||
+        !callInfo?.token
+      ) {
         return;
       }
 

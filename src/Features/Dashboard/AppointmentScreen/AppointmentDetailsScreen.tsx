@@ -14,7 +14,6 @@ import {
     ProfileIcon,
     VideoIcon,
 } from '../../../components/ui/icons';
-import useDevicePermissions from '../../../hooks/commons/useDevicePermissions';
 import {
     useChangeAppointmentStatus,
     useMyAppointmentInfo,
@@ -46,8 +45,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
     const { showConfirm } = useAlertStore(state => state);
     const { showLoader, hideLoader } = useLoadingStore(state => state);
-    const { setMeetingSession, setInPersonAppointment } = useMeetingStore(state => state);
-    const { requestAudioVideoPermissions } = useDevicePermissions();
+    const { setInPersonAppointment } = useMeetingStore(state => state);
     const { mutate: changeStatus } = useChangeAppointmentStatus();
 
     const {
@@ -80,7 +78,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
 
             showInfoToast('Video call will be available at the scheduled time.', 'Call yet to start');
         },
-        [navigation, setMeetingSession, requestAudioVideoPermissions]
+        [navigation]
     );
 
     const handleMarkCompleted = useCallback(
@@ -191,15 +189,19 @@ export const AppointmentDetailsScreen: React.FC = () => {
 
     const meetingStoreState = useMeetingStore(state => state);
     const isCallActive =
-        (meetingStoreState.callState === 'CONNECTED' || meetingStoreState.callState === 'CONNECTING') &&
-        Boolean(meetingStoreState.token && meetingStoreState.meetingId);
+        (meetingStoreState.callState === 'INITIALIZING' ||
+            meetingStoreState.callState === 'CONNECTING' ||
+            meetingStoreState.callState === 'WAITING_FOR_PATIENT' ||
+            meetingStoreState.callState === 'CONNECTED' ||
+            meetingStoreState.callState === 'RECONNECTING') &&
+        Boolean(meetingStoreState.callInfo?.token && meetingStoreState.callInfo?.meetingId);
 
     const isCurrentApptInCall =
         isOnline &&
         isCallActive &&
-        (String(meetingStoreState.appointmentId) === String(apptInfo?.id) ||
+        (String(meetingStoreState.callInfo?.appointment?.id) === String(apptInfo?.id) ||
             (Boolean(apptInfo?.appointment_id) &&
-                meetingStoreState.appointmentGeneratedId === apptInfo?.appointment_id));
+                meetingStoreState.callInfo?.appointment?.appointmentId === apptInfo?.appointment_id));
 
     return (
         <SafeAreaWrapper

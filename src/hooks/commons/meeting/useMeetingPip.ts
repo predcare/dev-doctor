@@ -38,7 +38,7 @@ export const useMeetingPip = () => {
   useEffect(() => {
     const subscription = NativePip.addPipChangeListener(active => {
       const state = useMeetingStore.getState();
-      if (!state.meetingId) return;
+      if (!state.callInfo?.meetingId) return;
 
       if (active) {
         state.setPipMode('NATIVE_PIP');
@@ -60,7 +60,7 @@ export const useMeetingPip = () => {
       if (state !== 'active') return;
 
       const meetingState = useMeetingStore.getState();
-      if (meetingState.pipMode !== 'NATIVE_PIP' || !meetingState.meetingId) return;
+      if (meetingState.pipMode !== 'NATIVE_PIP' || !meetingState.callInfo?.meetingId) return;
 
       meetingState.setPipMode('NORMAL');
       NativePip.exitPipMode();

@@ -7,15 +7,15 @@ import useMeetingStore from '../../../../zustand/stores/useMeetingStore';
 
 export const LocalPipCard: React.FC = () => {
   const { localParticipant } = useMeeting({});
-  const isMicOn = useMeetingStore(state => state.isMicOn);
-  const isCameraOn = useMeetingStore(state => state.isCameraOn);
-  const facingMode = useMeetingStore(state => state.facingMode);
+  const isMuted = useMeetingStore(state => state.isMuted);
+  const isCamOn = useMeetingStore(state => state.isCamOn);
+  const isFrontCamera = useMeetingStore(state => state.isFrontCamera);
   const cameraSessionEpoch = useMeetingStore(state => state.cameraSessionEpoch);
 
   const localId = localParticipant?.id || '';
   const { webcamStream, webcamOn } = useParticipant(localId);
 
-  const shouldRenderVideo = isCameraOn && webcamOn && webcamStream;
+  const shouldRenderVideo = isCamOn && webcamOn && webcamStream;
 
   return (
     <View style={doctorMeetingStyles.selfPipCard}>
@@ -24,7 +24,7 @@ export const LocalPipCard: React.FC = () => {
           key={Platform.OS === 'android' ? cameraSessionEpoch : undefined}
           streamURL={new MediaStream([webcamStream.track]).toURL()}
           objectFit="cover"
-          mirror={facingMode === 'front'}
+          mirror={isFrontCamera}
           style={StyleSheet.absoluteFill}
           zOrder={1}
         />
@@ -32,7 +32,7 @@ export const LocalPipCard: React.FC = () => {
         <Text style={doctorMeetingStyles.pipAvatarTxt}>You</Text>
       )}
 
-      {!isMicOn && (
+      {isMuted && (
         <View style={doctorMeetingStyles.pipMuteBadge}>
           <MicOffIcon size={12} color="#FFFFFF" />
         </View>

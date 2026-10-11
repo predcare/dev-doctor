@@ -1,13 +1,19 @@
 import notifee, { AndroidForegroundServiceType, AndroidImportance, AndroidVisibility } from '@notifee/react-native';
 import { useEffect, useRef } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
-import { TCallState } from '../../../zustand/stores/useMeetingStore';
+import { MeetingCallState } from '../../../zustand/interfaces/meeting.interfaces';
 import useMeetingStore from '../../../zustand/stores/useMeetingStore';
 
 const MEETING_NOTIFICATION_ID = 'meeting-ongoing';
 const MEETING_CHANNEL_ID = 'meeting-ongoing';
 
-const SERVICE_STATES: TCallState[] = ['CONNECTING', 'CONNECTED'];
+const SERVICE_STATES: MeetingCallState[] = [
+  'INITIALIZING',
+  'CONNECTING',
+  'WAITING_FOR_PATIENT',
+  'CONNECTED',
+  'RECONNECTING',
+];
 
 const createMeetingOngoingChannel = async (): Promise<string> => {
   return notifee.createChannel({
@@ -63,7 +69,7 @@ const stopMeetingService = async () => {
 
 export const useAndroidCallForegroundService = () => {
   const callState = useMeetingStore(state => state.callState);
-  const patientName = useMeetingStore(state => state.patientName);
+  const patientName = useMeetingStore(state => state.patientInfo?.name);
   const runningRef = useRef(false);
 
   const shouldRun = SERVICE_STATES.includes(callState);

@@ -25,6 +25,7 @@ export const AppRoute = {
   DOCTOR_APPOINTMENTS: 'DoctorAppointments',
   RESCHEDULE_APPOINTMENT: 'RescheduleAppointment',
   DOCTOR_MEETING: 'DoctorMeeting',
+  CONSULTATION_COMPLETED: 'ConsultationCompleted',
   PATIENT_DETAILS: 'PatientDetails',
   INVOICE_LIST: 'InvoiceList',
   CREATE_INVOICE: 'CreateInvoice',
@@ -89,6 +90,7 @@ export type RootStackParamList = {
   DoctorMeeting:
     | { appointmentId?: number | string; patientId?: string; token?: string; meetingId?: string }
     | undefined;
+  ConsultationCompleted: { appointmentId?: number | string } | undefined;
   PatientDetails:
     | { patientId?: string | number; patientName?: string; openUploadModal?: boolean }
     | undefined;
@@ -259,6 +261,19 @@ export type DoctorMeetingScreenRouteProp = RouteProp<RootStackParamList, 'Doctor
 export interface DoctorMeetingScreenProps {
   navigation?: DoctorMeetingScreenNavigationProp;
   route?: DoctorMeetingScreenRouteProp;
+}
+
+export type ConsultationCompletedScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ConsultationCompleted'
+>;
+export type ConsultationCompletedScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'ConsultationCompleted'
+>;
+export interface ConsultationCompletedScreenProps {
+  navigation?: ConsultationCompletedScreenNavigationProp;
+  route?: ConsultationCompletedScreenRouteProp;
 }
 
 export type CreatePrescriptionScreenNavigationProp = NativeStackNavigationProp<

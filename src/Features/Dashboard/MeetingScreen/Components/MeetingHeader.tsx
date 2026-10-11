@@ -26,7 +26,7 @@ const signalColor = (level: number) => {
 };
 
 export const MeetingHeader: React.FC = () => {
-  const patientName = useMeetingStore(state => state.patientName);
+  const patientName = useMeetingStore(state => state.patientInfo?.name);
   const callState = useMeetingStore(state => state.callState);
   const { enterInAppPip } = useMeetingPip();
   const { formattedTime, isWarning, isUrgent } = useMeetingCountdown();

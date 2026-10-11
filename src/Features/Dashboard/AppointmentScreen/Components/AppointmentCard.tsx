@@ -100,14 +100,18 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     onViewDetails,
     onVideoCall,
   }) => {
-    const activeApptId = useMeetingStore(state => state.appointmentId);
-    const activeApptGeneratedId = useMeetingStore(state => state.appointmentGeneratedId);
+    const activeApptId = useMeetingStore(state => state.callInfo?.appointment?.id);
+    const activeApptGeneratedId = useMeetingStore(state => state.callInfo?.appointment?.appointmentId);
     const activeCallState = useMeetingStore(state => state.callState);
-    const activeToken = useMeetingStore(state => state.token);
-    const activeMeetingId = useMeetingStore(state => state.meetingId);
+    const activeToken = useMeetingStore(state => state.callInfo?.token);
+    const activeMeetingId = useMeetingStore(state => state.callInfo?.meetingId);
 
     const isCallActive =
-      (activeCallState === 'CONNECTED' || activeCallState === 'CONNECTING') &&
+      (activeCallState === 'INITIALIZING' ||
+        activeCallState === 'CONNECTING' ||
+        activeCallState === 'WAITING_FOR_PATIENT' ||
+        activeCallState === 'CONNECTED' ||
+        activeCallState === 'RECONNECTING') &&
       Boolean(activeToken && activeMeetingId);
 
     const isVideo = consultation_type?.toLowerCase() === 'video';

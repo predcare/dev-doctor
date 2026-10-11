@@ -159,6 +159,10 @@ export interface IGetApptTokenDoc {
   token: string;
   meeting_id: string;
   appointment: ITokenAppt;
+  patient?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface ITokenAppt {
@@ -168,6 +172,8 @@ export interface ITokenAppt {
   start_time: string;
   end_time: string;
   slot_duration: number;
+  appointment_duration?: number;
+  call_elapsed_seconds?: number;
 }
 
 // Appointment Info

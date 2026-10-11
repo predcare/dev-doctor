@@ -6,11 +6,11 @@ import doctorMeetingStyles from '../../../../styled/DoctorMeetingScreen.styled';
 import useMeetingStore from '../../../../zustand/stores/useMeetingStore';
 
 export const PatientStageView: React.FC = () => {
-  const remoteParticipantId = useMeetingStore(state => state.remoteParticipantId);
-  const patientName = useMeetingStore(state => state.patientName);
+  const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
+  const patientName = useMeetingStore(state => state.patientInfo?.name);
   const callState = useMeetingStore(state => state.callState);
 
-  const { webcamStream, webcamOn } = usePatientStream(remoteParticipantId);
+  const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
 
   const name = patientName || 'Patient';
   const initial = name.charAt(0).toUpperCase() || 'P';

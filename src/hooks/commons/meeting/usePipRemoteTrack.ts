@@ -5,9 +5,9 @@ import useMeetingStore from '../../../zustand/stores/useMeetingStore';
 import { usePatientStream } from './useMeetingParticipants';
 
 export const usePipRemoteTrack = () => {
-  const remoteParticipantId = useMeetingStore(state => state.remoteParticipantId);
-  const patientName = useMeetingStore(state => state.patientName);
-  const { webcamStream, webcamOn } = usePatientStream(remoteParticipantId);
+  const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
+  const patientName = useMeetingStore(state => state.patientInfo?.name);
+  const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
 
   const trackId = webcamOn && webcamStream?.track ? webcamStream.track.id : null;
 
@@ -26,9 +26,9 @@ export const usePipRemoteTrack = () => {
 
     const name = patientName || 'Patient';
     NativePip.setPlaceholderText(
-      remoteParticipantId ? `${name}\ncamera off` : 'Waiting for patient...'
+      patientParticipantId ? `${name}\ncamera off` : 'Waiting for patient...'
     );
-  }, [remoteParticipantId, patientName]);
+  }, [patientParticipantId, patientName]);
 
   useEffect(() => {
     return () => {

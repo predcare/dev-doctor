@@ -48,8 +48,8 @@ export const useMeetingCaptureHandoff = () => {
     }
 
     const restoreWebcam = async () => {
-      const { isCameraOn, isCameraPausedForCapture } = useMeetingStore.getState();
-      if (!isCameraOn || isCameraPausedForCapture || !enableWebcamRef.current) {
+      const { isCamOn, isCameraPausedForCapture } = useMeetingStore.getState();
+      if (!isCamOn || isCameraPausedForCapture || !enableWebcamRef.current) {
         return;
       }
 
@@ -80,8 +80,8 @@ export const useMeetingCaptureHandoff = () => {
     registerMeetingCaptureHandoff({
       restoreWebcam,
       pauseForCapture: async () => {
-        const { isCameraOn } = useMeetingStore.getState();
-        if (!isCameraOn || !disableWebcamRef.current) {
+        const { isCamOn } = useMeetingStore.getState();
+        if (!isCamOn || !disableWebcamRef.current) {
           await delay(CAMERA_RELEASE_MS);
           return;
         }
@@ -94,8 +94,8 @@ export const useMeetingCaptureHandoff = () => {
         await delay(CAMERA_RELEASE_MS);
       },
       resumeAfterCapture: async () => {
-        const { isCameraOn } = useMeetingStore.getState();
-        if (!isCameraOn || !enableWebcamRef.current) {
+        const { isCamOn } = useMeetingStore.getState();
+        if (!isCamOn || !enableWebcamRef.current) {
           return;
         }
 

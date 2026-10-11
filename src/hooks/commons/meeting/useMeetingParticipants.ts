@@ -4,7 +4,9 @@ import useMeetingStore from '../../../zustand/stores/useMeetingStore';
 
 export const useMeetingParticipants = () => {
   const { participants, localParticipant } = useMeeting({});
-  const setRemoteParticipantId = useMeetingStore(state => state.setRemoteParticipantId);
+  const setPatientParticipant = useMeetingStore(state => state.setPatientParticipant);
+  const setCallState = useMeetingStore(state => state.setCallState);
+  const currentCallState = useMeetingStore(state => state.callState);
 
   const patientId = useMemo(() => {
     if (!participants) return null;
@@ -17,8 +19,18 @@ export const useMeetingParticipants = () => {
   }, [participants, localParticipant?.id]);
 
   useEffect(() => {
-    setRemoteParticipantId(patientId);
-  }, [patientId, setRemoteParticipantId]);
+    if (patientId) {
+      setPatientParticipant({ id: patientId });
+      if (currentCallState === 'WAITING_FOR_PATIENT' || currentCallState === 'CONNECTING') {
+        setCallState('CONNECTED');
+      }
+    } else {
+      setPatientParticipant({ id: null, webcamOn: false });
+      if (currentCallState === 'CONNECTED') {
+        setCallState('WAITING_FOR_PATIENT');
+      }
+    }
+  }, [patientId, currentCallState, setPatientParticipant, setCallState]);
 
   return {
     localParticipant,
@@ -27,12 +39,35 @@ export const useMeetingParticipants = () => {
 };
 
 export const usePatientStream = (patientId: string | null) => {
-  const participantData = useParticipant(patientId || '', {});
+  const setPatientParticipant = useMeetingStore(state => state.setPatientParticipant);
+
+  const participantData = useParticipant(patientId || '', {
+    onStreamEnabled: stream => {
+      if (stream.kind === 'video') {
+        setPatientParticipant({ id: patientId, webcamOn: true });
+      }
+    },
+    onStreamDisabled: stream => {
+      if (stream.kind === 'video') {
+        setPatientParticipant({ id: patientId, webcamOn: false });
+      }
+    },
+  });
 
   const webcamStream = patientId ? participantData?.webcamStream : null;
   const webcamOn = patientId ? Boolean(participantData?.webcamOn) : false;
   const micOn = patientId ? Boolean(participantData?.micOn) : true;
   const displayName = patientId ? participantData?.displayName : '';
+
+  useEffect(() => {
+    if (patientId) {
+      setPatientParticipant({
+        id: patientId,
+        webcamOn,
+        micOn,
+      });
+    }
+  }, [patientId, webcamOn, micOn, setPatientParticipant]);
 
   return {
     webcamStream,

@@ -3,11 +3,17 @@ import { Platform } from 'react-native';
 import NativePip from '../../../native/NativePip';
 import { navigationRef } from '../../../navigation/navigationRef';
 import { AppRoute } from '../../../route';
-import { TCallState } from '../../../zustand/stores/useMeetingStore';
+import { MeetingCallState } from '../../../zustand/interfaces/meeting.interfaces';
 import useMeetingStore from '../../../zustand/stores/useMeetingStore';
 import useMeetingConnection from './useMeetingConnection';
 
-const PIP_ELIGIBLE_STATES: TCallState[] = ['CONNECTING', 'CONNECTED'];
+const PIP_ELIGIBLE_STATES: MeetingCallState[] = [
+  'INITIALIZING',
+  'CONNECTING',
+  'WAITING_FOR_PATIENT',
+  'CONNECTED',
+  'RECONNECTING',
+];
 
 const goToMeetingScreen = () => {
   if (!navigationRef.isReady()) return;
@@ -35,7 +41,7 @@ export const useAndroidPipLifecycle = () => {
 
     const willEnterSub = NativePip.addAndroidPipWillEnterListener(() => {
       const state = useMeetingStore.getState();
-      if (!state.meetingId) return;
+      if (!state.callInfo?.meetingId) return;
       if (state.isCameraPausedForCapture) return;
       state.setPipMode('NATIVE_PIP');
       goToMeetingScreen();
@@ -43,7 +49,7 @@ export const useAndroidPipLifecycle = () => {
 
     const changeSub = NativePip.addAndroidPipListener(active => {
       const state = useMeetingStore.getState();
-      if (!state.meetingId) return;
+      if (!state.callInfo?.meetingId) return;
       if (state.isCameraPausedForCapture) return;
 
       if (active) {
@@ -58,7 +64,7 @@ export const useAndroidPipLifecycle = () => {
     });
 
     const dismissSub = NativePip.addAndroidPipDismissListener(() => {
-      if (!useMeetingStore.getState().meetingId) return;
+      if (!useMeetingStore.getState().callInfo?.meetingId) return;
       endCallRef.current();
     });
 

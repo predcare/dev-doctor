@@ -11,16 +11,16 @@ const canRestoreWebcam = () => {
   if (Platform.OS !== 'android') {
     return false;
   }
-  if (!state.meetingId) {
+  if (!state.callInfo?.meetingId) {
     return false;
   }
-  if (!state.isCameraOn) {
+  if (!state.isCamOn) {
     return false;
   }
   if (state.isCameraPausedForCapture) {
     return false;
   }
-  if (state.callState === 'IDLE' || state.callState === 'ENDED' || state.callState === 'ERROR') {
+  if (state.callState === 'IDLE' || state.callState === 'ENDED' || state.callState === 'FAILED') {
     return false;
   }
   return true;
@@ -50,7 +50,7 @@ export const useAndroidPipCameraRestore = () => {
         return;
       }
       if (!canRestoreWebcam()) {
-        if (!useMeetingStore.getState().isCameraOn) {
+        if (!useMeetingStore.getState().isCamOn) {
           interruptedRef.current = false;
         }
         return;
@@ -73,10 +73,10 @@ export const useAndroidPipCameraRestore = () => {
         return;
       }
       const state = useMeetingStore.getState();
-      if (!state.meetingId || !state.isCameraOn || state.isCameraPausedForCapture) {
+      if (!state.callInfo?.meetingId || !state.isCamOn || state.isCameraPausedForCapture) {
         return;
       }
-      if (state.callState === 'IDLE' || state.callState === 'ENDED' || state.callState === 'ERROR') {
+      if (state.callState === 'IDLE' || state.callState === 'ENDED' || state.callState === 'FAILED') {
         return;
       }
       if (state.pipMode !== 'NATIVE_PIP') {

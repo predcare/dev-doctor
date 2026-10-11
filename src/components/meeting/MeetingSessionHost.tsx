@@ -8,6 +8,7 @@ import useAndroidPipLifecycle from '../../hooks/commons/meeting/useAndroidPipLif
 import useMeetingAppState from '../../hooks/commons/meeting/useMeetingAppState';
 import useMeetingCaptureHandoff from '../../hooks/commons/meeting/useMeetingCaptureHandoff';
 import { useMeetingCountdownTicker } from '../../hooks/commons/meeting/useMeetingCountdown';
+import { useRegisterMeetingLeave } from '../../hooks/commons/meeting/meetingSessionLeave';
 import useMeetingParticipants from '../../hooks/commons/meeting/useMeetingParticipants';
 import usePipRemoteTrack from '../../hooks/commons/meeting/usePipRemoteTrack';
 import NativePip from '../../native/NativePip';
@@ -17,6 +18,7 @@ import AndroidPipStage from './AndroidPipStage';
 import InAppPipWindow from './InAppPipWindow';
 
 const MeetingSessionController: React.FC = () => {
+  useRegisterMeetingLeave();
   useMeetingAppState();
   useMeetingParticipants();
   usePipRemoteTrack();
@@ -43,14 +45,16 @@ const MeetingSessionController: React.FC = () => {
 };
 
 export const MeetingSessionHost: React.FC = () => {
-  const token = useMeetingStore(state => state.token);
-  const meetingId = useMeetingStore(state => state.meetingId);
-  const isMicOn = useMeetingStore(state => state.isMicOn);
-  const isCameraOn = useMeetingStore(state => state.isCameraOn);
-  const facingMode = useMeetingStore(state => state.facingMode);
+  const callInfo = useMeetingStore(state => state.callInfo);
+  const isMuted = useMeetingStore(state => state.isMuted);
+  const isCamOn = useMeetingStore(state => state.isCamOn);
+  const isFrontCamera = useMeetingStore(state => state.isFrontCamera);
   const setCallState = useMeetingStore(state => state.setCallState);
-  const resetMeetingStore = useMeetingStore(state => state.resetMeetingStore);
+  const resetCallInfo = useMeetingStore(state => state.resetCallInfo);
   const userData = useAuthStore((state) => state.userData)
+
+  const token = callInfo?.token;
+  const meetingId = callInfo?.meetingId;
   const participantId = userData?.doctor_id
     ? `doctor_${userData.doctor_id}`
     : userData?.id
@@ -79,11 +83,11 @@ export const MeetingSessionHost: React.FC = () => {
       key={sessionKey}
       config={{
         meetingId,
-        micEnabled: isMicOn,
-        webcamEnabled: isCameraOn,
+        micEnabled: !isMuted,
+        webcamEnabled: isCamOn,
         participantId: participantId,
         name: doctorDisplayName,
-        defaultCamera: facingMode,
+        defaultCamera: isFrontCamera ? 'front' : 'back',
         maxResolution: 'hd',
         mode: 'SEND_AND_RECV',
         debugMode: false,
@@ -104,20 +108,16 @@ export const MeetingSessionHost: React.FC = () => {
           }
         }}
         onMeetingLeft={() => {
-          resetMeetingStore();
+          resetCallInfo();
         }}
         onError={({ code, message }) => {
           console.warn(`[VideoSDK] Meeting error (${code}): ${message}`);
         }}
         onMeetingStateChanged={({ state }) => {
-          const current = useMeetingStore.getState();
-          if (current.callState === 'ERROR' || current.callState === 'ENDED') {
-            return;
-          }
           if (state === 'CONNECTING') {
             setCallState('CONNECTING');
           } else if (state === 'CONNECTED') {
-            setCallState(current.remoteParticipantId ? 'CONNECTED' : 'CONNECTING');
+            setCallState('CONNECTED');
           } else if (state === 'FAILED' || state === 'CLOSED' || state === 'DISCONNECTED') {
             setCallState('ENDED');
           }

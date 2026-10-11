@@ -22,7 +22,7 @@ interface IMeetingControllerProps {
 }
 
 export const MeetingController: React.FC<IMeetingControllerProps> = ({ handleEndCall }) => {
-  const { isMicOn, isCameraOn, toggleMic, toggleCamera, flipCamera } = useMeetingCamera();
+  const { isMuted, isCamOn, toggleMic, toggleCamera, flipCamera } = useMeetingCamera();
   const { enterInAppPip } = useMeetingPip();
 
   const openBesideCall = (go: () => void) => {
@@ -55,17 +55,17 @@ export const MeetingController: React.FC<IMeetingControllerProps> = ({ handleEnd
     <View style={doctorMeetingStyles.controlBarContainer}>
       <View style={[doctorMeetingStyles.controlRow, doctorMeetingStyles.controlRowSpacing]}>
         <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={toggleMic}>
-          {isMicOn ? <MicOnIcon size={22} color="#FFFFFF" /> : <MicOffIcon size={22} color="#FFFFFF" />}
-          <Text style={doctorMeetingStyles.controlBtnTxt}>{isMicOn ? 'MUTE' : 'UNMUTE'}</Text>
+          {isMuted ? <MicOffIcon size={22} color="#FFFFFF" /> : <MicOnIcon size={22} color="#FFFFFF" />}
+          <Text style={doctorMeetingStyles.controlBtnTxt}>{isMuted ? 'UNMUTE' : 'MUTE'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={toggleCamera}>
-          {isCameraOn ? (
+          {isCamOn ? (
             <CameraOnIcon size={22} color="#FFFFFF" />
           ) : (
             <CameraOffIcon size={22} color="#FFFFFF" />
           )}
-          <Text style={doctorMeetingStyles.controlBtnTxt}>{isCameraOn ? 'CAM ON' : 'CAM OFF'}</Text>
+          <Text style={doctorMeetingStyles.controlBtnTxt}>{isCamOn ? 'CAM ON' : 'CAM OFF'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={flipCamera}>
