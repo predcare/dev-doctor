@@ -36,6 +36,7 @@ import { AppRoute, CreatePrescriptionScreenProps } from '../../../route';
 import createPrescriptionStyles from '../../../styled/CreatePrescriptionScreen.styled';
 import theme from '../../../styled/theme.styled';
 import { UserRoles } from '../../../typescripts/enums';
+import { useAlertStore } from '../../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
@@ -128,6 +129,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
     const isInitialLoadRef = useRef<boolean>(true);
 
     const { showLoader, hideLoader } = useLoadingStore(state => state);
+    const { showConfirm } = useAlertStore(state => state);
     const { appointmentId, apptIdforInPerson, clearInPersonAppointment } = useMeetingStore(
         state => state
     );
@@ -358,73 +360,81 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             return;
         }
 
-        if (autoSaveTimerRef.current) {
-            clearTimeout(autoSaveTimerRef.current);
-        }
-
-        const payload = buildPrescriptionPayload(_data, 'completed');
-        const activeId =
-            currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
-
-        if (activeId) {
-            showLoader('Updating prescription...');
-            updatePrescription(
-                {
-                    id: activeId,
-                    payload: payload as unknown as IUpdatePrescriptionPayload,
-                },
-                {
-                    onSuccess: async () => {
-                        await queryClient.invalidateQueries({
-                            queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
-                        });
-                        await queryClient.invalidateQueries({
-                            queryKey: [PatientsQueryKeys.Prescriptions],
-                        });
-                        clearInPersonAppointment();
-                        showSuccessToast('Prescription updated successfully');
-                        hideLoader();
-                        (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
-                            rxId: String(activeId),
-                            patientId: patientId || prescriptionInfo?.data?.patient_id,
-                            patientName: patientInfo?.name || route?.params?.patientName || '',
-                            fromScreen: route?.params?.fromScreen,
-                        });
-                    },
-                    onError: () => {
-                        hideLoader();
-                    },
+        showConfirm({
+            title: 'Complete Prescription',
+            message: 'Are you sure you want to complete this prescription?',
+            buttonText: 'Yes, Complete',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+                if (autoSaveTimerRef.current) {
+                    clearTimeout(autoSaveTimerRef.current);
                 }
-            );
-        } else {
-            showLoader('Creating new prescription...');
-            createPrescription(payload, {
-                onSuccess: async response => {
-                    const createId = response?.data?.id;
-                    if (createId) {
-                        currentPrescriptionId.current = Number(createId);
-                    }
-                    await queryClient.invalidateQueries({
-                        queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+
+                const payload = buildPrescriptionPayload(_data, 'completed');
+                const activeId =
+                    currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
+
+                if (activeId) {
+                    showLoader('Updating prescription...');
+                    updatePrescription(
+                        {
+                            id: activeId,
+                            payload: payload as unknown as IUpdatePrescriptionPayload,
+                        },
+                        {
+                            onSuccess: async () => {
+                                await queryClient.invalidateQueries({
+                                    queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                                });
+                                await queryClient.invalidateQueries({
+                                    queryKey: [PatientsQueryKeys.Prescriptions],
+                                });
+                                clearInPersonAppointment();
+                                showSuccessToast('Prescription updated successfully');
+                                hideLoader();
+                                (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                                    rxId: String(activeId),
+                                    patientId: patientId || prescriptionInfo?.data?.patient_id,
+                                    patientName: patientInfo?.name || route?.params?.patientName || '',
+                                    fromScreen: route?.params?.fromScreen,
+                                });
+                            },
+                            onError: () => {
+                                hideLoader();
+                            },
+                        }
+                    );
+                } else {
+                    showLoader('Creating new prescription...');
+                    createPrescription(payload, {
+                        onSuccess: async response => {
+                            const createId = response?.data?.id;
+                            if (createId) {
+                                currentPrescriptionId.current = Number(createId);
+                            }
+                            await queryClient.invalidateQueries({
+                                queryKey: [PrescriptionQueryKeys.GetPresciptionInfo],
+                            });
+                            await queryClient.invalidateQueries({
+                                queryKey: [PatientsQueryKeys.Prescriptions],
+                            });
+                            clearInPersonAppointment();
+                            showSuccessToast('Prescription created successfully');
+                            hideLoader();
+                            (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                                rxId: String(createId || currentPrescriptionId.current),
+                                patientId: patientId || prescriptionInfo?.data?.patient_id,
+                                patientName: patientInfo?.name || route?.params?.patientName || '',
+                                fromScreen: route?.params?.fromScreen,
+                            });
+                        },
+                        onError: () => {
+                            hideLoader();
+                        },
                     });
-                    await queryClient.invalidateQueries({
-                        queryKey: [PatientsQueryKeys.Prescriptions],
-                    });
-                    clearInPersonAppointment();
-                    showSuccessToast('Prescription created successfully');
-                    hideLoader();
-                    (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
-                        rxId: String(createId || currentPrescriptionId.current),
-                        patientId: patientId || prescriptionInfo?.data?.patient_id,
-                        patientName: patientInfo?.name || route?.params?.patientName || '',
-                        fromScreen: route?.params?.fromScreen,
-                    });
-                },
-                onError: () => {
-                    hideLoader();
-                },
-            });
-        }
+                }
+            },
+        });
     };
 
     const handleSendAndComplete = (_data: TCreatePrescriptionFormValues) => {
@@ -824,7 +834,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                                         onPress={handleNextStep}
                                         activeOpacity={0.85}
                                     >
-                                        <Text style={createPrescriptionStyles.btnNextText}>Next ›</Text>
+                                        <Text style={createPrescriptionStyles.btnNextText}>Next</Text>
                                     </TouchableOpacity>
                                 )}
                             </View>

@@ -12,6 +12,7 @@ import {
     WalletIcon,
 } from '../../../components/ui/icons';
 import EmptyIcon from '../../../components/ui/icons/EmptyIcon';
+import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import { useHomeUpcomingAppts } from '../../../hooks/react-query/home/home.hooks';
 import { useDoctorStats } from '../../../hooks/react-query/stats/stats.hooks';
 import Header from '../../../Layout/Header';
@@ -22,6 +23,7 @@ import { AppRoute } from '../../../route';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import theme from '../../../styled/theme.styled';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import AssistanceBanner from './components/AssistanceBanner';
 import HomeStatsCard from './components/HomeStatsCard';
 import QuickAccessCard from './components/QuickAccessCard';
@@ -75,6 +77,19 @@ export const HomeScreen: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
 
     const { userData } = useAuthStore(state => state);
+    const { joinVideoCall } = useJoinVideoCall();
+    const activeApptId = useMeetingStore(state => state.callInfo?.appointment?.id);
+    const activeApptGeneratedId = useMeetingStore(state => state.callInfo?.appointment?.appointmentId);
+    const activeCallState = useMeetingStore(state => state.callState);
+    const activeToken = useMeetingStore(state => state.callInfo?.token);
+    const activeMeetingId = useMeetingStore(state => state.callInfo?.meetingId);
+    const isCallActive =
+        (activeCallState === 'INITIALIZING' ||
+            activeCallState === 'CONNECTING' ||
+            activeCallState === 'WAITING_FOR_PATIENT' ||
+            activeCallState === 'CONNECTED' ||
+            activeCallState === 'RECONNECTING') &&
+        Boolean(activeToken && activeMeetingId);
 
     const {
         data: statsInfo,
@@ -248,10 +263,20 @@ export const HomeScreen: React.FC = () => {
                                         apt?.appointment_status === 'in_progress' ||
                                         apt?.appointment_status === 'in-progress'
                                     }
-                                    isCurrentApptInCall={false}
+                                    isCurrentApptInCall={
+                                        apt.consultation_type?.toLowerCase() === 'video' &&
+                                        isCallActive &&
+                                        (String(activeApptId) === String(apt.id) ||
+                                            (Boolean(apt.appointment_id) &&
+                                                activeApptGeneratedId === apt.appointment_id))
+                                    }
                                     appointmentStatus={apt.appointment_status}
                                     onVideoCall={() => {
-                                        showInfoToast('Video call will be available soon');
+                                        joinVideoCall({
+                                            appointmentId: apt.id,
+                                            patientName: apt.patientInfo?.name,
+                                            patientId: apt.patientInfo?.patientId,
+                                        });
                                     }}
                                     onStartConsultation={() => {
                                         showInfoToast('Consultation will be started soon');

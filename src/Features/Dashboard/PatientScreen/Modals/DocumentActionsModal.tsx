@@ -131,7 +131,6 @@ export const DocumentActionsModal: React.FC<DocumentActionsModalProps> = ({
                     <Text style={styles.optionTitle}>{openTitle}</Text>
                     <Text style={styles.optionDesc}>{openSubtitle}</Text>
                   </View>
-                  <Text style={styles.arrowIcon}>›</Text>
                 </TouchableOpacity>
 
                 {/* Download Option */}
@@ -154,7 +153,6 @@ export const DocumentActionsModal: React.FC<DocumentActionsModalProps> = ({
                       Download file directly to your device storage
                     </Text>
                   </View>
-                  <Text style={styles.arrowIcon}>›</Text>
                 </TouchableOpacity>
               </View>
 

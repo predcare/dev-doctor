@@ -81,8 +81,6 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
             {!!created_at && <Text style={patientDetailsStyles.recordMeta}>{formatDate(created_at)}</Text>}
           </View>
         </View>
-
-        <Text style={patientDetailsStyles.chevronText}>›</Text>
       </TouchableOpacity>
       {isDoctorUploaded && (
         <View

@@ -14,12 +14,10 @@ import CommonEmptyCard from '../../../components/commons/CommonEmptyCard/CommonE
 import CommonErrorCard from '../../../components/commons/CommonErrorCard/CommonErrorCard';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import { CircleXIcon, FilterIcon, SearchIcon } from '../../../components/ui/icons';
-import useMeetingPip from '../../../hooks/commons/meeting/useMeetingPip';
-import { useDevicePermissions } from '../../../hooks/commons/useDevicePermissions';
+import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
 import {
     useChangeAppointmentStatus,
-    useGetToken,
     useMyAppointmentStats,
     useMyInfiniteAppointments,
 } from '../../../hooks/react-query/appointments/appointments.hooks';
@@ -28,7 +26,6 @@ import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import { formatDate, formatDateToYYYYMMDD } from '../../../lib/commons/common.utils';
-import { showErrorToast } from '../../../lib/commons/toast.utils';
 import { AppRoute } from '../../../route';
 import doctorAppointmentsStyles from '../../../styled/DoctorAppointmentsScreen.styled';
 import theme from '../../../styled/theme.styled';
@@ -61,13 +58,8 @@ export const AppointmentsScreen: React.FC = () => {
     const { showConfirm } = useAlertStore(state => state);
 
     const { showLoader, hideLoader } = useLoadingStore(state => state);
-    const { mutate: getToken } = useGetToken();
-    const setCallInfo = useMeetingStore(state => state.setCallInfo);
     const { setInPersonAppointment } = useMeetingStore(state => state);
-    const activeMeetingId = useMeetingStore(state => state.callInfo?.meetingId);
-    const activeCallAppointmentId = useMeetingStore(state => state.callInfo?.appointment?.id);
-    const { restoreToMeeting } = useMeetingPip();
-    const { requestAudioVideoPermissions } = useDevicePermissions();
+    const { joinVideoCall } = useJoinVideoCall();
 
     const queryParams: IMyApptQueryParams = useMemo(() => {
         const params: IMyApptQueryParams = {
@@ -128,65 +120,14 @@ export const AppointmentsScreen: React.FC = () => {
     }, [myAppointmentsData?.pages, appointmentsList.length]);
 
     const handleJoinVideoCall = useCallback(
-        async (apt: IMyAppointmentDoc) => {
-            if (!apt?.id) return;
-
-            if (activeMeetingId && String(activeCallAppointmentId) === String(apt.id)) {
-                restoreToMeeting();
-                return;
-            }
-
-            const hasPermissions = await requestAudioVideoPermissions();
-            if (!hasPermissions) {
-                showErrorToast(
-                    'Camera and microphone permissions are required to join the video consultation.'
-                );
-                return;
-            }
-
-            showLoader('Joining Video Call...');
-            getToken(
-                { appointmentId: String(apt.id) },
-                {
-                    onSuccess: res => {
-                        const videoCallData = res?.data;
-                        if (res?.success && videoCallData) {
-                            setCallInfo({
-                                token: videoCallData.token,
-                                meeting_id: videoCallData.meeting_id,
-                                appointment: videoCallData.appointment,
-                                patientInfo: {
-                                    name: videoCallData.patient?.name ?? apt.patientInfo?.name,
-                                    patientId: videoCallData.patient?.id
-                                        ? String(videoCallData.patient.id)
-                                        : apt.patientInfo?.patientId
-                                          ? String(apt.patientInfo.patientId)
-                                          : undefined,
-                                },
-                            });
-                            navigation.navigate(AppRoute.DOCTOR_MEETING);
-                            return;
-                        }
-                        showErrorToast(res?.message || 'Unable to join the video consultation.');
-                    },
-                    onError: () => {
-                        showErrorToast('Unable to join the video consultation.');
-                    },
-                    onSettled: () => hideLoader(),
-                }
-            );
+        (apt: IMyAppointmentDoc) => {
+            joinVideoCall({
+                appointmentId: apt.id,
+                patientName: apt.patientInfo?.name,
+                patientId: apt.patientInfo?.patientId,
+            });
         },
-        [
-            activeCallAppointmentId,
-            activeMeetingId,
-            getToken,
-            hideLoader,
-            navigation,
-            requestAudioVideoPermissions,
-            restoreToMeeting,
-            setCallInfo,
-            showLoader,
-        ]
+        [joinVideoCall]
     );
 
     const handleLoadMore = useCallback(() => {

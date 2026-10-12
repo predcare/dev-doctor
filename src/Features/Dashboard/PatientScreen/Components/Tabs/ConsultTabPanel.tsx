@@ -5,10 +5,10 @@ import CommonEmptyCard from '../../../../../components/commons/CommonEmptyCard/C
 import CommonErrorCard from '../../../../../components/commons/CommonErrorCard/CommonErrorCard';
 import { queryClient } from '../../../../../components/providers/ReactQueryProvider';
 import { ClockIcon } from '../../../../../components/ui/icons';
+import useJoinVideoCall from '../../../../../hooks/commons/meeting/useJoinVideoCall';
 import { useChangeAppointmentStatus } from '../../../../../hooks/react-query/appointments/appointments.hooks';
 import { useMyPatientInfiniteConsults } from '../../../../../hooks/react-query/patients/patients.hooks';
 import { MyAppointmentsQueryKeys } from '../../../../../hooks/react-query/query.keys';
-import { showInfoToast } from '../../../../../lib/commons/toast.utils';
 import { AppRoute } from '../../../../../route';
 import { consultTabStyles } from '../../../../../styled/ConsultTabPanel.styled';
 import theme from '../../../../../styled/theme.styled';
@@ -25,6 +25,7 @@ export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const { setInPersonAppointment } = useMeetingStore(state => state);
+  const { joinVideoCall } = useJoinVideoCall();
   const { showLoader, hideLoader } = useLoadingStore(state => state);
   const { showConfirm } = useAlertStore(state => state);
 
@@ -178,7 +179,11 @@ export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
                   });
                 }}
                 onVideoCall={() => {
-                  showInfoToast('Video call feature is not yet implemented');
+                  joinVideoCall({
+                    appointmentId: item.id,
+                    patientName: item.patientInfo?.name,
+                    patientId: item.patientInfo?.patientId,
+                  });
                 }}
                 isJoinedOnce={
                   item?.appointment_status === 'in_progress' ||

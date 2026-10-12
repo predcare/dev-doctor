@@ -184,7 +184,6 @@ export const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
                           : 'Take a photo of your clinic logo'}
                     </Text>
                   </View>
-                  <Text style={styles.arrowIcon}>›</Text>
                 </TouchableOpacity>
 
                 {/* Gallery Option */}
@@ -207,7 +206,6 @@ export const UploadOptionsModal: React.FC<UploadOptionsModalProps> = ({
                       Select a PNG or JPG file stored on your device
                     </Text>
                   </View>
-                  <Text style={styles.arrowIcon}>›</Text>
                 </TouchableOpacity>
               </View>
 

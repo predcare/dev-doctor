@@ -14,6 +14,7 @@ import {
     ProfileIcon,
     VideoIcon,
 } from '../../../components/ui/icons';
+import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import {
     useChangeAppointmentStatus,
     useMyAppointmentInfo,
@@ -27,7 +28,6 @@ import {
     formatDate,
     formatTimeSlot,
 } from '../../../lib/commons/common.utils';
-import { showInfoToast } from '../../../lib/commons/toast.utils';
 import { canGoBack } from '../../../navigation/navigationRef';
 import { AppRoute } from '../../../route';
 import { appointmentDetailsStyles } from '../../../styled/DoctorAppointmentsScreen.styled';
@@ -46,6 +46,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
     const { showConfirm } = useAlertStore(state => state);
     const { showLoader, hideLoader } = useLoadingStore(state => state);
     const { setInPersonAppointment } = useMeetingStore(state => state);
+    const { joinVideoCall } = useJoinVideoCall();
     const { mutate: changeStatus } = useChangeAppointmentStatus();
 
     const {
@@ -72,14 +73,15 @@ export const AppointmentDetailsScreen: React.FC = () => {
         }
     }, [isComingFromNotification, navigation]);
 
-    const handleJoinVideoCall = useCallback(
-        async (appointment: any) => {
-            if (!appointment) return;
+    const handleJoinVideoCall = useCallback(() => {
+        if (!apptInfo?.id) return;
 
-            showInfoToast('Video call will be available at the scheduled time.', 'Call yet to start');
-        },
-        [navigation]
-    );
+        joinVideoCall({
+            appointmentId: apptInfo.id,
+            patientName: apptInfo.patient?.name,
+            patientId: apptInfo.patient?.id ?? apptInfo.patient_id,
+        });
+    }, [apptInfo, joinVideoCall]);
 
     const handleMarkCompleted = useCallback(
         (appointmentId: number | string) => {
@@ -524,7 +526,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
                                     ]}
                                     onPress={() =>
                                         isOnline
-                                            ? handleJoinVideoCall(apptInfo)
+                                            ? handleJoinVideoCall()
                                             : handleStartConsulation(
                                                 apptInfo.id,
                                                 apptInfo.patient?.patient_id || apptInfo.patient_id,
