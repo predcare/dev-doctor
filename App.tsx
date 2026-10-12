@@ -7,6 +7,7 @@ import EventListener from './src/components/commons/EventListener/EventListener'
 import GlobalNoInternetBlocker from './src/components/commons/Network/GlobalNoInternetBlocker';
 import GlobalOfflineBanner from './src/components/commons/Network/GlobalOfflineBanner';
 import NetworkEventListener from './src/components/commons/Network/NetworkEventListener';
+import GlobalIncomingCallBanner from './src/components/commons/IncomingCallBanner/GlobalIncomingCallBanner';
 import GlobalPopupAlert from './src/components/commons/PopupAlert/GlobalPopupAlert';
 import SocketListeners from './src/components/commons/Sockets/SocketListeners';
 import SocketProvider from './src/components/commons/Sockets/SocketProvider';
@@ -30,6 +31,7 @@ function App() {
         <MeetingSessionHost />
         <EventListener />
         <HideDuringAndroidPip>
+          <GlobalIncomingCallBanner />
           <GlobalOfflineBanner />
           <GlobalToast />
           <GlobalPopupAlert />

@@ -19,6 +19,7 @@
 		PIPDOC0000000000000005 /* PiPFrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000015 /* PiPFrameProcessor.swift */; };
 		PIPDOC0000000000000006 /* PiPTrackRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000016 /* PiPTrackRenderer.m */; };
 		PIPDOC0000000000000007 /* PiPCameraMultitasking.m in Sources */ = {isa = PBXBuildFile; fileRef = PIPDOC0000000000000017 /* PiPCameraMultitasking.m */; };
+		SNDDOC0000000000000002 /* ringtone.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = SNDDOC0000000000000001 /* ringtone.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		PIPDOC0000000000000017 /* PiPCameraMultitasking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PiPCameraMultitasking.m; path = predcaredoctor/pipmode/PiPCameraMultitasking.m; sourceTree = "<group>"; };
 		PIPDOC0000000000000018 /* PiPTrackRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PiPTrackRenderer.h; path = predcaredoctor/pipmode/PiPTrackRenderer.h; sourceTree = "<group>"; };
 		PIPDOC0000000000000019 /* PiPCameraMultitasking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PiPCameraMultitasking.h; path = predcaredoctor/pipmode/PiPCameraMultitasking.h; sourceTree = "<group>"; };
+		SNDDOC0000000000000001 /* ringtone.mp3 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = audio.mp3; name = ringtone.mp3; path = predcaredoctor/ringtone.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				SNDDOC0000000000000001 /* ringtone.mp3 */,
 			);
 			name = predcaredoctor;
 			sourceTree = "<group>";
@@ -196,6 +199,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				A82DC1D99BCD0E1263A2DA11 /* PrivacyInfo.xcprivacy in Resources */,
+				SNDDOC0000000000000002 /* ringtone.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

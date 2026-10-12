@@ -1,7 +1,7 @@
-import { useNavigation } from '@react-navigation/native';
 import { useCallback } from 'react';
 import { useGetToken } from '../../react-query/appointments/appointments.hooks';
 import { showErrorToast } from '../../../lib/commons/toast.utils';
+import { navigate } from '../../../navigation/navigationRef';
 import { AppRoute } from '../../../route';
 import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
@@ -15,7 +15,6 @@ export interface IJoinVideoCallInput {
 }
 
 export const useJoinVideoCall = () => {
-  const navigation = useNavigation();
   const { mutate: getToken } = useGetToken();
   const { showLoader, hideLoader } = useLoadingStore(state => state);
   const setCallInfo = useMeetingStore(state => state.setCallInfo);
@@ -61,7 +60,7 @@ export const useJoinVideoCall = () => {
                       : undefined,
                 },
               });
-              navigation.navigate(AppRoute.DOCTOR_MEETING as never);
+              navigate(AppRoute.DOCTOR_MEETING);
               return;
             }
             showErrorToast(res?.message || 'Unable to join the video consultation.');
@@ -78,7 +77,6 @@ export const useJoinVideoCall = () => {
       activeMeetingId,
       getToken,
       hideLoader,
-      navigation,
       requestAudioVideoPermissions,
       restoreToMeeting,
       setCallInfo,

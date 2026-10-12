@@ -227,7 +227,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             <Text style={ContactInfoStyles.lbl}>STATE</Text>
             <TouchableOpacity
               style={ContactInfoStyles.inpRow}
-              onPress={() => setShowStateModal(true)}
+              onPress={() => country && setShowStateModal(true)}
               activeOpacity={0.7}
             >
               <Text style={stateName ? ContactInfoStyles.inpTxt : ContactInfoStyles.inpPh}>
@@ -244,7 +244,7 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
             <Text style={ContactInfoStyles.lbl}>CITY</Text>
             <TouchableOpacity
               style={ContactInfoStyles.inpRow}
-              onPress={() => setShowCityModal(true)}
+              onPress={() => stateName && setShowCityModal(true)}
               activeOpacity={0.7}
             >
               <Text style={cityName ? ContactInfoStyles.inpTxt : ContactInfoStyles.inpPh}>
@@ -271,6 +271,9 @@ export const ContactInfoForm: React.FC<ContactInfoFormProps> = React.memo(
                 />
               )}
             />
+            {errors.postal_code?.message && (
+              <Text style={ContactInfoStyles.errTxt}>{String(errors.postal_code.message)}</Text>
+            )}
           </View>
         </View>
 

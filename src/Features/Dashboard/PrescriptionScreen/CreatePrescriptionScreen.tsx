@@ -360,9 +360,21 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             return;
         }
 
+        const meetingState = useMeetingStore.getState();
+        const isCallRunning =
+            Boolean(meetingState.callInfo?.meetingId && meetingState.callInfo?.token)
+
+        if (isCallRunning) {
+            showErrorToast(
+                'Your call is still running. You cannot complete this appointment right now.',
+                'Call in progress'
+            );
+            return;
+        }
+
         showConfirm({
             title: 'Complete Prescription',
-            message: 'Are you sure you want to complete this prescription?',
+            message: 'Are you sure you want to mark this appointment as completed?',
             buttonText: 'Yes, Complete',
             cancelText: 'Cancel',
             onConfirm: () => {

@@ -321,7 +321,7 @@ export const AddPatientScreen: React.FC = () => {
                                 onPress={handleBack}
                                 activeOpacity={0.8}
                             >
-                                <Text style={AddPatientStyles.backSecTxt}>← Back</Text>
+                                <Text style={AddPatientStyles.backSecTxt}>Back</Text>
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity
@@ -338,7 +338,7 @@ export const AddPatientScreen: React.FC = () => {
                                         ? 'Add to My Clinic'
                                         : step === 3
                                             ? 'Submit Patient'
-                                            : 'Next Step →'}
+                                            : 'Next Step'}
                                 </Text>
                             )}
                         </TouchableOpacity>
