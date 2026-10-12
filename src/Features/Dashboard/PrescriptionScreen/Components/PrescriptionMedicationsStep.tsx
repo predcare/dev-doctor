@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import { Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Controller, FieldPath, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { TrashIcon } from '../../../../components/ui/icons';
 import { TCreatePrescriptionFormValues } from '../../../../lib/schemas/createPrescription.schema';
 import { patientDetailsStyles } from '../../../../styled/PatientDetailsScreen.styled';
 import theme from '../../../../styled/theme.styled';
+import OptionPickerModal from '../Modals/OptionPickerModal';
 
-const DOSAGE_OPTIONS = ['1-0-1', '1-1-1', '0-1-0', '0-0-1', '1-0-0', '1-1-0', '0-1-1'];
+const DOSAGE_OPTIONS = ['1-0-1', '1-1-1', '0-1-0', '0-0-1', '1-0-0', 'Custom'];
 const TIMING_OPTIONS = [
   'Before food',
   'After food',
   'With food',
   'Empty stomach',
-  'At bedtime',
-  'In morning',
-  'As needed',
+  'Custom',
 ];
-const STRENGTH_UNITS = ['mg', 'mcg', 'g', 'ml', 'IU', '%'];
+const STRENGTH_UNITS = ['mg', 'ml', 'g', 'mcg', 'IU', '%', 'Custom'];
 const DURATION_UNITS = ['days', 'weeks', 'months'];
 
+type TMedicationPickerField = 'dosage' | 'timing' | 'strengthUnit' | 'durationUnit';
+
 export const PrescriptionMedicationsStep: React.FC = () => {
-  const { control, setValue, getValues } = useFormContext<TCreatePrescriptionFormValues>();
+  const { control, setValue } = useFormContext<TCreatePrescriptionFormValues>();
+  const medications = useWatch({ control, name: 'medications' }) ?? [];
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -31,7 +34,7 @@ export const PrescriptionMedicationsStep: React.FC = () => {
     title: string;
     options: string[];
     index: number;
-    field: 'dosage' | 'timing' | 'strengthUnit' | 'durationUnit';
+    field: TMedicationPickerField;
   }>({
     visible: false,
     title: '',
@@ -42,7 +45,7 @@ export const PrescriptionMedicationsStep: React.FC = () => {
 
   const openPicker = (
     index: number,
-    field: 'dosage' | 'timing' | 'strengthUnit' | 'durationUnit',
+    field: TMedicationPickerField,
     title: string,
     options: string[]
   ) => {
@@ -57,26 +60,30 @@ export const PrescriptionMedicationsStep: React.FC = () => {
 
   const selectOption = (val: string) => {
     const { index, field } = pickerModal;
-    setValue(`medications.${index}.${field}` as any, val);
-    setPickerModal(prev => ({ ...prev, visible: false }));
+    setValue(`medications.${index}.${field}` as FieldPath<TCreatePrescriptionFormValues>, val, {
+      shouldDirty: true,
+    });
   };
 
   return (
     <View style={{ gap: 14 }}>
       {fields.map((fieldItem, index) => (
         <View key={fieldItem.id} style={patientDetailsStyles.consultSectionCard}>
-          {/* Card Header */}
           <View style={patientDetailsStyles.medCardHead}>
             <View style={patientDetailsStyles.medNumBadge}>
               <Text style={patientDetailsStyles.medNumText}>{index + 1}</Text>
             </View>
-            <Text style={patientDetailsStyles.medCardTitle}>Medication {index + 1}</Text>
-            <TouchableOpacity onPress={() => remove(index)} activeOpacity={0.7}>
-              <Text style={patientDetailsStyles.removeText}>✕ Remove</Text>
+            <Text style={patientDetailsStyles.medCardTitle}>Medication</Text>
+            <TouchableOpacity
+              onPress={() => remove(index)}
+              activeOpacity={0.7}
+              style={patientDetailsStyles.medRemoveBtn}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <TrashIcon size={13} color={theme.colors.danger} />
+              <Text style={patientDetailsStyles.medRemoveBtnText}>Remove</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Medicine Name */}
           <View style={{ marginBottom: 12 }}>
             <Text style={patientDetailsStyles.vitalLabel}>
               Medicine Name <Text style={{ color: theme.colors.danger }}>*</Text>
@@ -122,7 +129,7 @@ export const PrescriptionMedicationsStep: React.FC = () => {
                   onPress={() => openPicker(index, 'strengthUnit', 'Select Unit', STRENGTH_UNITS)}
                 >
                   <Text style={patientDetailsStyles.unitSelectText}>
-                    {getValues(`medications.${index}.strengthUnit`) || 'mg'} ▾
+                    {medications[index]?.strengthUnit || 'mg'} ▾
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -137,14 +144,13 @@ export const PrescriptionMedicationsStep: React.FC = () => {
                 onPress={() => openPicker(index, 'dosage', 'Select Dosage', DOSAGE_OPTIONS)}
               >
                 <Text style={patientDetailsStyles.pickerSelectText}>
-                  {getValues(`medications.${index}.dosage`) || 'Select'}
+                  {medications[index]?.dosage || 'Select'}
                 </Text>
                 <Text style={{ color: theme.colors.primary, fontSize: 12 }}>▾</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Duration & Timing Row */}
           <View style={patientDetailsStyles.vitalsRow}>
             <View style={{ flex: 1, marginRight: 10 }}>
               <Text style={patientDetailsStyles.vitalLabel}>Duration</Text>
@@ -173,7 +179,7 @@ export const PrescriptionMedicationsStep: React.FC = () => {
                   }
                 >
                   <Text style={patientDetailsStyles.unitSelectText}>
-                    {getValues(`medications.${index}.durationUnit`) || 'days'} ▾
+                    {medications[index]?.durationUnit || 'days'} ▾
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -186,14 +192,13 @@ export const PrescriptionMedicationsStep: React.FC = () => {
                 onPress={() => openPicker(index, 'timing', 'Select Timing', TIMING_OPTIONS)}
               >
                 <Text style={patientDetailsStyles.pickerSelectText}>
-                  {getValues(`medications.${index}.timing`) || 'Select'}
+                  {medications[index]?.timing || 'Select'}
                 </Text>
                 <Text style={{ color: theme.colors.primary, fontSize: 12 }}>▾</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Instructions */}
           <View>
             <Text style={patientDetailsStyles.vitalLabel}>Instructions</Text>
             <Controller
@@ -212,8 +217,6 @@ export const PrescriptionMedicationsStep: React.FC = () => {
           </View>
         </View>
       ))}
-
-      {/* Add Medication Button */}
       <TouchableOpacity
         onPress={() =>
           append({
@@ -233,60 +236,14 @@ export const PrescriptionMedicationsStep: React.FC = () => {
         <Text style={patientDetailsStyles.addPrimaryBtnText}>+ Add Medication</Text>
       </TouchableOpacity>
 
-      {/* Picker Modal */}
-      <Modal
+      <OptionPickerModal
         visible={pickerModal.visible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setPickerModal(p => ({ ...p, visible: false }))}
-      >
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-          }}
-          activeOpacity={1}
-          onPress={() => setPickerModal(p => ({ ...p, visible: false }))}
-        >
-          <View
-            style={{
-              backgroundColor: theme.colors.surface,
-              borderRadius: 16,
-              width: '85%',
-              padding: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: theme.colors.textPrimary,
-                marginBottom: 14,
-              }}
-            >
-              {pickerModal.title}
-            </Text>
-            {pickerModal.options.map(opt => (
-              <TouchableOpacity
-                key={opt}
-                onPress={() => selectOption(opt)}
-                style={{
-                  paddingVertical: 12,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.colors.surfaceSecondary,
-                }}
-              >
-                <Text style={{ fontSize: 14, fontWeight: '600', color: theme.colors.textPrimary }}>
-                  {opt}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+        title={pickerModal.title}
+        options={pickerModal.options}
+        selected={medications[pickerModal.index]?.[pickerModal.field]}
+        onSelect={selectOption}
+        onClose={() => setPickerModal(p => ({ ...p, visible: false }))}
+      />
     </View>
   );
 };

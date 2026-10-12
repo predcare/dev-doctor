@@ -33,6 +33,7 @@ import { mediaPaths } from '../../../services/api/endpoints';
 import rescheduleAppointmentStyles from '../../../styled/RescheduleAppointmentScreen.styled';
 import theme from '../../../styled/theme.styled';
 import { ITimeSlotsDoc } from '../../../typescripts/interfaces/availability.interfaces';
+import { useAlertStore } from '../../../zustand/stores/useAlertStore';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import BookingSlotsSkeleton from './Skeletons/BookingSlotsSkeleton';
@@ -92,6 +93,7 @@ export const RescheduleAppointmentScreen: React.FC = () => {
     const { userData } = useAuthStore(state => state);
     const { showLoader, hideLoader } = useLoadingStore(state => state);
     const { mutate: rescheduleAppt, isPending: isRescheduling } = useRescheduleAppointment();
+    const showConfirm = useAlertStore(state => state.showConfirm);
 
     const {
         data: apptInfo,
@@ -170,6 +172,12 @@ export const RescheduleAppointmentScreen: React.FC = () => {
         setIsRefreshing(true);
         await refetchApptInfo();
         await refetchAvailableDates();
+        setFormStates({
+            selectedDate: '',
+            selectedSlot: null,
+            reason: '',
+            showCalendarModal: false,
+        });
         setIsRefreshing(false);
     }, [refetchApptInfo, refetchAvailableDates]);
 
@@ -206,32 +214,38 @@ export const RescheduleAppointmentScreen: React.FC = () => {
             ],
         };
 
-        showLoader('Rescheduling appointment...');
-        rescheduleAppt(
-            { id: appointmentId, body: payload },
-            {
-                onSuccess: async res => {
-                    if (res?.success) {
-                        showSuccessToast(res?.message || 'Appointment rescheduled successfully');
-                        await queryClient.invalidateQueries({
-                            queryKey: [MyAppointmentsQueryKeys.MyAppointments],
-                        });
-                        await queryClient.invalidateQueries({
-                            queryKey: [MyAppointmentsQueryKeys.MyAppointmentsInfo],
-                        });
-                        await queryClient.invalidateQueries({
-                            queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats],
-                        });
-                        navigation.goBack();
-                    } else {
-                        showErrorToast(res?.message || 'Unable to reschedule appointment');
+        showConfirm({
+            title: 'Confirm Reschedule',
+            message: 'Are you sure you want to reschedule this appointment?',
+            onConfirm: () => {
+                showLoader('Rescheduling appointment...');
+                rescheduleAppt(
+                    { id: appointmentId, body: payload },
+                    {
+                        onSuccess: async res => {
+                            if (res?.success) {
+                                showSuccessToast(res?.message || 'Appointment rescheduled successfully');
+                                await queryClient.invalidateQueries({
+                                    queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+                                });
+                                await queryClient.invalidateQueries({
+                                    queryKey: [MyAppointmentsQueryKeys.MyAppointmentsInfo],
+                                });
+                                await queryClient.invalidateQueries({
+                                    queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats],
+                                });
+                                navigation.goBack();
+                            } else {
+                                showErrorToast(res?.message || 'Unable to reschedule appointment');
+                            }
+                        },
+                        onSettled: () => {
+                            hideLoader();
+                        },
                     }
-                },
-                onSettled: () => {
-                    hideLoader();
-                },
-            }
-        );
+                );
+            },
+        });
     };
 
     useEffect(() => {

@@ -98,6 +98,17 @@ export const rescheduleAppointment = async (id: number | string, body: IReschedu
   return res.data;
 };
 
+export const cancelMyAppt = async (body: {
+  appointment_id: number | string;
+  call_end_reason: string;
+}) => {
+  const res = await axiosInstance.patch<ICommonRoot>(
+    endpoints.appointments.cancelAppt(body.appointment_id),
+    { call_end_reason: body.call_end_reason }
+  );
+  return res.data;
+};
+
 export interface ISaveCallPayload {
   appointment_id: string | number;
   call_start_time: string;

@@ -17,6 +17,7 @@ import { CircleXIcon, FilterIcon, SearchIcon } from '../../../components/ui/icon
 import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
 import {
+    useCancelMyAppt,
     useChangeAppointmentStatus,
     useMyAppointmentStats,
     useMyInfiniteAppointments,
@@ -25,13 +26,14 @@ import { IMyApptQueryParams } from '../../../hooks/react-query/appointments/payl
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
-import { formatDate, formatDateToYYYYMMDD } from '../../../lib/commons/common.utils';
+import { formatDate, formatDateToYYYYMMDD, formatTimeSlot } from '../../../lib/commons/common.utils';
+import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import { AppRoute } from '../../../route';
 import doctorAppointmentsStyles from '../../../styled/DoctorAppointmentsScreen.styled';
 import theme from '../../../styled/theme.styled';
+import { IMyAppointmentDoc } from '../../../typescripts/interfaces/appointments.interfaces';
 import { useAlertStore } from '../../../zustand/stores/useAlertStore';
 import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
-import { IMyAppointmentDoc } from '../../../typescripts/interfaces/appointments.interfaces';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import AppointmentCard from './Components/AppointmentCard';
 import AppointmentStatsCard from './Components/AppointmentStatsCard';
@@ -136,9 +138,10 @@ export const AppointmentsScreen: React.FC = () => {
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    const { data: apptStats, isFetching: apptStatsPending, refetch: refetchStats } = useMyAppointmentStats();
+    const { data: apptStats, isPending: apptStatsPending, refetch: refetchStats } = useMyAppointmentStats();
 
     const { mutate: changeStatus } = useChangeAppointmentStatus();
+    const { mutate: cancelAppt } = useCancelMyAppt();
 
     const isCustomFilterApplied = useMemo(() => {
         const isDefaultDate = filterStates.dateRange === 'today';
@@ -183,6 +186,57 @@ export const AppointmentsScreen: React.FC = () => {
         setShowFilterPanel(true);
     }, []);
 
+
+    const handleCancelAppointment = useCallback(
+        (item: IMyAppointmentDoc) => {
+            if (item.appointment_status?.toLowerCase() !== 'confirmed') return;
+            if (!item?.id) {
+                showErrorToast('No valid appointment ID found');
+                return;
+            }
+            const patientName = item.patientInfo?.name || 'this patient';
+            const formattedDate = formatDate(item.appointment_date) || 'the scheduled date';
+            const formattedTime = item.start_time
+                ? formatTimeSlot(item.start_time, item.end_time)
+                : '';
+            const timeText = formattedTime && formattedTime !== 'Flexible' ? ` at ${formattedTime}` : '';
+
+            showConfirm({
+                title: 'Cancel Appointment',
+                message: `Are you sure you want to cancel the appointment with ${patientName} on ${formattedDate}${timeText}?`,
+                buttonText: 'Yes, Cancel',
+                cancelText: 'No, Keep',
+                onConfirm: () => {
+                    showLoader('Cancelling appointment...');
+                    cancelAppt(
+                        {
+                            appointment_id: String(item.id),
+                            call_end_reason: 'Cancelled by doctor',
+                        },
+                        {
+                            onSuccess: async res => {
+                                if (res?.success) {
+                                    showSuccessToast(res?.message || 'Appointment cancelled successfully');
+                                    await Promise.all([
+                                        queryClient.invalidateQueries({
+                                            queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+                                        }),
+                                        queryClient.invalidateQueries({
+                                            queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats],
+                                        }),
+                                    ]);
+                                }
+                            },
+                            onSettled: () => {
+                                hideLoader();
+                            },
+                        }
+                    );
+                },
+            });
+        },
+        [cancelAppt, showConfirm, showLoader, hideLoader, queryClient]
+    );
 
     const handleMarkCompleted = useCallback(
         (appointmentId: number | string) => {
@@ -437,6 +491,7 @@ export const AppointmentsScreen: React.FC = () => {
                                 onViewDetails={() => {
                                     navigation.navigate(AppRoute.APPOINTMENT_DETAILS, { appointmentId: item.id });
                                 }}
+                                onCancel={() => handleCancelAppointment(item)}
                             />
                         );
                     }}

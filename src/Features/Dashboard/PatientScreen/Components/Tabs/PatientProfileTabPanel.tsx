@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useMyPatientFamilyMembers } from '../../../../../hooks/react-query/patients/patients.hooks';
-import { capitalize } from '../../../../../lib/commons/common.utils';
+import { capitalize, formatDate } from '../../../../../lib/commons/common.utils';
 import { showErrorToast } from '../../../../../lib/commons/toast.utils';
 import { AppRoute } from '../../../../../route';
 import { patientProfileTabStyles } from '../../../../../styled/PatientProfileTabPanel.styled';
@@ -41,7 +41,7 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
       phone: patientInfo?.phone_number,
       alternate_number: patientInfo?.alternate_phone,
       address: patientInfo?.address,
-      date_of_birth: patientInfo?.date_of_birth,
+      date_of_birth: formatDate(patientInfo?.date_of_birth),
       age: patientInfo?.age_display || '',
       gender: capitalize(patientInfo?.gender || ''),
       blood_group: patientInfo?.blood_type || '',

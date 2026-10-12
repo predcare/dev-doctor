@@ -497,6 +497,20 @@ export const patientDetailsStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.danger,
   },
+  medRemoveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: theme.colors.dangerLight,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  medRemoveBtnText: {
+    fontSize: 11,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.danger,
+  },
   unitSelectBtn: {
     backgroundColor: theme.colors.surfaceSecondary,
     paddingHorizontal: 10,

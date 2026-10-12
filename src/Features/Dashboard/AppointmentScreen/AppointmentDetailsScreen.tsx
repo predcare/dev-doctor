@@ -6,6 +6,7 @@ import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import {
     CalendarIcon,
     CheckIcon,
+    CircleXIcon,
     ClinicIcon,
     ClockIcon,
     InfoCircleIcon,
@@ -16,6 +17,7 @@ import {
 } from '../../../components/ui/icons';
 import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import {
+    useCancelMyAppt,
     useChangeAppointmentStatus,
     useMyAppointmentInfo,
 } from '../../../hooks/react-query/appointments/appointments.hooks';
@@ -28,6 +30,7 @@ import {
     formatDate,
     formatTimeSlot,
 } from '../../../lib/commons/common.utils';
+import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import { canGoBack } from '../../../navigation/navigationRef';
 import { AppRoute } from '../../../route';
 import { appointmentDetailsStyles } from '../../../styled/DoctorAppointmentsScreen.styled';
@@ -48,6 +51,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
     const { setInPersonAppointment } = useMeetingStore(state => state);
     const { joinVideoCall } = useJoinVideoCall();
     const { mutate: changeStatus } = useChangeAppointmentStatus();
+    const { mutate: cancelAppt } = useCancelMyAppt();
 
     const {
         data: apptInfo,
@@ -82,6 +86,59 @@ export const AppointmentDetailsScreen: React.FC = () => {
             patientId: apptInfo.patient?.id ?? apptInfo.patient_id,
         });
     }, [apptInfo, joinVideoCall]);
+
+    const handleCancelAppointment = useCallback(() => {
+        if (!apptInfo?.id) {
+            showErrorToast('No valid appointment ID found');
+            return;
+        }
+        if ((apptInfo.appointment_status || '').toLowerCase() !== 'confirmed') return;
+
+        const patientName = apptInfo.patient?.name || 'this patient';
+        const formattedDate = formatDate(apptInfo.appointment_date) || 'the scheduled date';
+        const formattedTime = apptInfo.start_time
+            ? formatTimeSlot(apptInfo.start_time, apptInfo.end_time)
+            : '';
+        const timeText = formattedTime && formattedTime !== 'Flexible' ? ` at ${formattedTime}` : '';
+
+        showConfirm({
+            title: 'Cancel Appointment',
+            message: `Are you sure you want to cancel the appointment with ${patientName} on ${formattedDate}${timeText}?`,
+            buttonText: 'Yes, Cancel',
+            cancelText: 'No, Keep',
+            onConfirm: () => {
+                showLoader('Cancelling appointment...');
+                cancelAppt(
+                    {
+                        appointment_id: String(apptInfo.id),
+                        call_end_reason: 'Cancelled by doctor',
+                    },
+                    {
+                        onSuccess: async res => {
+                            if (res?.success) {
+                                showSuccessToast(res?.message || 'Appointment cancelled successfully');
+                                await Promise.all([
+                                    queryClient.invalidateQueries({
+                                        queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+                                    }),
+                                    queryClient.invalidateQueries({
+                                        queryKey: [MyAppointmentsQueryKeys.MyAppointmentsInfo],
+                                    }),
+                                    queryClient.invalidateQueries({
+                                        queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats],
+                                    }),
+                                ]);
+                                refetchApptInfo();
+                            }
+                        },
+                        onSettled: () => {
+                            hideLoader();
+                        },
+                    }
+                );
+            },
+        });
+    }, [apptInfo, cancelAppt, showConfirm, showLoader, hideLoader, queryClient, refetchApptInfo]);
 
     const handleMarkCompleted = useCallback(
         (appointmentId: number | string) => {
@@ -518,35 +575,49 @@ export const AppointmentDetailsScreen: React.FC = () => {
                             ]}
                         >
                             {isConfirmed && (
-                                <TouchableOpacity
-                                    style={[
-                                        appointmentDetailsStyles.joinButton,
-                                        isOnline && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
-                                        isOnline && isJoinedOnce && { backgroundColor: theme.colors.primaryDark },
-                                    ]}
-                                    onPress={() =>
-                                        isOnline
-                                            ? handleJoinVideoCall()
-                                            : handleStartConsulation(
-                                                apptInfo.id,
-                                                apptInfo.patient?.patient_id || apptInfo.patient_id,
-                                                apptInfo.patient?.name || '',
-                                                apptInfo.appointment_status
-                                            )
-                                    }
-                                    activeOpacity={0.85}
-                                >
-                                    <PlayCircleIcon size={20} color="#FFFFFF" />
-                                    <Text style={appointmentDetailsStyles.joinButtonText}>
-                                        {isOnline
-                                            ? isCurrentApptInCall
-                                                ? 'Already in Call'
-                                                : isJoinedOnce
-                                                    ? 'Re-join Call'
-                                                    : 'Join Call'
-                                            : 'Start Consultation'}
-                                    </Text>
-                                </TouchableOpacity>
+                                <>
+                                    <TouchableOpacity
+                                        style={[
+                                            appointmentDetailsStyles.joinButton,
+                                            isOnline && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
+                                            isOnline && isJoinedOnce && { backgroundColor: theme.colors.primaryDark },
+                                        ]}
+                                        onPress={() =>
+                                            isOnline
+                                                ? handleJoinVideoCall()
+                                                : handleStartConsulation(
+                                                    apptInfo.id,
+                                                    apptInfo.patient?.patient_id || apptInfo.patient_id,
+                                                    apptInfo.patient?.name || '',
+                                                    apptInfo.appointment_status
+                                                )
+                                        }
+                                        activeOpacity={0.85}
+                                    >
+                                        <PlayCircleIcon size={20} color="#FFFFFF" />
+                                        <Text style={appointmentDetailsStyles.joinButtonText}>
+                                            {isOnline
+                                                ? isCurrentApptInCall
+                                                    ? 'Already in Call'
+                                                    : isJoinedOnce
+                                                        ? 'Re-join Call'
+                                                        : 'Join Call'
+                                                : 'Start Consultation'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    {!isCurrentApptInCall && (
+                                        <TouchableOpacity
+                                            style={appointmentDetailsStyles.cancelButton}
+                                            onPress={handleCancelAppointment}
+                                            activeOpacity={0.85}
+                                        >
+                                            <CircleXIcon size={18} color={theme.colors.danger} />
+                                            <Text style={appointmentDetailsStyles.cancelButtonText}>
+                                                Cancel Appointment
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </>
                             )}
 
                             {isInProgress && (

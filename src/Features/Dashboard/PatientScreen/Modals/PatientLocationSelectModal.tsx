@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { editPatientStyles } from '../../../../styled/EditPatientScreen.styled';
 
 interface IModalProps {
@@ -20,10 +21,28 @@ const PatientLocationSelectModal = ({
   selected,
   onPick,
 }: IModalProps) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <TouchableOpacity style={editPatientStyles.modalOverlay} activeOpacity={1} onPress={onClose}>
-        <View style={editPatientStyles.modalSheet}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
+      <TouchableOpacity
+        style={[editPatientStyles.modalOverlay, { paddingTop: insets.top }]}
+        activeOpacity={1}
+        onPress={onClose}
+      >
+        <View
+          style={[
+            editPatientStyles.modalSheet,
+            { paddingBottom: Math.max(16, insets.bottom + 12) },
+          ]}
+          onStartShouldSetResponder={() => true}
+        >
           <View style={editPatientStyles.modalHead}>
             <Text style={editPatientStyles.modalTitle}>{title}</Text>
             <TouchableOpacity onPress={onClose}>

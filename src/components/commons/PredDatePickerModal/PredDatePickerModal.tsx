@@ -53,28 +53,55 @@ interface WheelColumnProps<T> {
 }
 
 function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelColumnProps<T>) {
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<React.ComponentRef<typeof FlatList<T>>>(null);
+  const skipNextSync = useRef(false);
+  const [highlightIndex, setHighlightIndex] = useState(selectedIndex);
+
+  const indexFromOffset = (offsetY: number) => {
+    const index = Math.round(offsetY / ITEM_HEIGHT);
+    return Math.max(0, Math.min(index, data.length - 1));
+  };
 
   useEffect(() => {
-    if (flatListRef.current && selectedIndex >= 0 && selectedIndex < data.length) {
-      flatListRef.current.scrollToOffset({
-        offset: selectedIndex * ITEM_HEIGHT,
-        animated: true,
-      });
+    setHighlightIndex(selectedIndex);
+    if (selectedIndex < 0 || selectedIndex >= data.length) return;
+    if (skipNextSync.current) {
+      skipNextSync.current = false;
+      return;
     }
+    flatListRef.current?.scrollToOffset({
+      offset: selectedIndex * ITEM_HEIGHT,
+      animated: false,
+    });
   }, [selectedIndex, data.length]);
 
-  const handleMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetY = e.nativeEvent.contentOffset.y;
-    const index = Math.round(offsetY / ITEM_HEIGHT);
-    const clampedIndex = Math.max(0, Math.min(index, data.length - 1));
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const nextIndex = indexFromOffset(e.nativeEvent.contentOffset.y);
+    setHighlightIndex(prev => (prev === nextIndex ? prev : nextIndex));
+  };
+
+  const settle = (offsetY: number) => {
+    const clampedIndex = indexFromOffset(offsetY);
+    setHighlightIndex(clampedIndex);
     if (clampedIndex !== selectedIndex) {
+      skipNextSync.current = true;
       onSelect(clampedIndex);
     }
   };
 
+  const handleScrollEndDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const velocityY = e.nativeEvent.velocity?.y ?? 0;
+    if (Math.abs(velocityY) > 0) return;
+    settle(e.nativeEvent.contentOffset.y);
+  };
+
+  const handleMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    settle(e.nativeEvent.contentOffset.y);
+  };
+
   const handleItemPress = (index: number) => {
     if (index !== selectedIndex) {
+      skipNextSync.current = true;
       onSelect(index);
       flatListRef.current?.scrollToOffset({
         offset: index * ITEM_HEIGHT,
@@ -93,6 +120,11 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
         showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
         decelerationRate="fast"
+        disableIntervalMomentum
+        removeClippedSubviews={false}
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
+        onScrollEndDrag={handleScrollEndDrag}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         getItemLayout={(_, index) => ({
           length: ITEM_HEIGHT,
@@ -103,7 +135,7 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
           paddingVertical: ITEM_HEIGHT, // Center single active item in middle row
         }}
         renderItem={({ item, index }) => {
-          const isSelected = index === selectedIndex;
+          const isSelected = index === highlightIndex;
           return (
             <TouchableOpacity
               activeOpacity={0.7}

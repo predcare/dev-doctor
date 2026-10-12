@@ -1075,6 +1075,22 @@ export const appointmentDetailsStyles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
+  cancelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.dangerLight,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  cancelButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.danger,
+    marginLeft: 6,
+  },
   prescriptionButton: {
     flex: 1,
     flexDirection: 'row',

@@ -147,28 +147,6 @@ export const PrescriptionAdviceStep: React.FC = () => {
         </View>
       </View>
 
-      {/* Additional Notes */}
-      <View style={patientDetailsStyles.consultSectionCard}>
-        <Text style={patientDetailsStyles.consultSectionTitle}>General Note</Text>
-        <Controller
-          control={control}
-          name="notes"
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={patientDetailsStyles.consultTextArea}
-              placeholder="Any additional internal clinical notes..."
-              placeholderTextColor={theme.colors.textMuted}
-              value={value || ''}
-              onChangeText={onChange}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-            />
-          )}
-        />
-      </View>
-
-      {/* Follow-up Date Modal Picker */}
       <PredDatePickerModal
         visible={showDatePicker}
         value={

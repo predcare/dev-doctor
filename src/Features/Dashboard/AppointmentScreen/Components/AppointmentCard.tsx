@@ -9,9 +9,8 @@ import {
   ClockIcon,
   InfoCircleIcon,
   PlayCircleIcon,
-  PrescriptionIcon,
   RescheduleIcon,
-  VideoIcon,
+  VideoIcon
 } from '../../../../components/ui/icons';
 import { capitalize, formatTimeSlot, getAge, getInitials } from '../../../../lib/commons/common.utils';
 import {
@@ -165,13 +164,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             color: '#64748B',
             onPress: () => onViewDetails?.(),
           },
-          {
-            id: 'prescription',
-            label: 'Prescription',
-            icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
-            color: theme.colors.primary,
-            onPress: () => onCreatePrescription?.(),
-          },
         ];
       }
 
@@ -196,17 +188,10 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             color: '#64748B',
             onPress: () => onViewDetails?.(),
           },
-          {
-            id: 'prescription',
-            label: 'Prescription',
-            icon: <PrescriptionIcon size={18} color={theme.colors.primary} />,
-            color: theme.colors.primary,
-            onPress: () => onCreatePrescription?.(),
-          },
         ];
       }
 
-      return [
+      const items = [
         {
           id: 'details',
           label: 'View Details',
@@ -221,14 +206,19 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           color: '#64748B',
           onPress: () => onReschedule?.(),
         },
-        {
+      ];
+
+      if (appointmentStatus?.toLowerCase() === 'confirmed') {
+        items.push({
           id: 'cancel',
           label: 'Cancel',
           icon: <CircleXIcon size={18} color="#EF4444" />,
           color: '#EF4444',
           onPress: () => onCancel?.(),
-        },
-      ];
+        });
+      }
+
+      return items;
     }, [
       appointmentStatus,
       isInProgress,
@@ -357,7 +347,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
                 activeOpacity={0.85}
               >
                 <CheckIcon size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-                <Text style={S.joinButtonText}>Completed</Text>
+                <Text style={S.joinButtonText}>Complete</Text>
               </TouchableOpacity>
             )}
           </View>

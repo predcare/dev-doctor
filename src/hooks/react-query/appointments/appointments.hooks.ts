@@ -2,6 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { MyAppointmentsQueryKeys } from '../query.keys';
 import {
   bookAppointments,
+  cancelMyAppt,
   changeAppointmentStatus,
   getApptToken,
   getMyAppointmentInfo,
@@ -55,6 +56,11 @@ export const useApptToken = (params?: { appointmentId?: number | string }) =>
 export const useSendHeartBeat = () =>
   useMutation({
     mutationFn: sendHeartBeat,
+  });
+
+export const useCancelMyAppt = () =>
+  useMutation({
+    mutationFn: cancelMyAppt,
   });
 
 export const useChangeAppointmentStatus = () => {

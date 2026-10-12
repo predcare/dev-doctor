@@ -1,8 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
     ActivityIndicator,
+    Keyboard,
+    Platform,
     RefreshControl,
     ScrollView,
     Text,
@@ -10,6 +12,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import {
     CalendarIcon,
@@ -50,6 +53,9 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>();
     const [selectedStateId, setSelectedStateId] = useState<number | undefined>();
     const [refreshing, setRefreshing] = useState(false);
+    const [keyboardOverlap, setKeyboardOverlap] = useState(0);
+    const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
+    const insets = useSafeAreaInsets();
 
     const { hideLoader, showLoader } = useLoadingStore(state => state);
 
@@ -210,6 +216,20 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     }, [countryName, countries]);
 
     useEffect(() => {
+        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+        const showSub = Keyboard.addListener(showEvent, event => {
+            const overlap = event.endCoordinates.height - insets.bottom;
+            setKeyboardOverlap(Math.max(0, overlap));
+        });
+        const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardOverlap(0));
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, [insets.bottom]);
+
+    useEffect(() => {
         if (stateName && states.length > 0) {
             const found = states.find((s: any) => s.name.toLowerCase() === stateName.toLowerCase());
             if (found) {
@@ -245,8 +265,11 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
             {fetchingPatientInfo ? (
                 <EditPatientSkeleton />
             ) : (
-                <ScrollView
-                    contentContainerStyle={{ paddingBottom: 30 }}
+                <View style={{ flex: 1, paddingBottom: keyboardOverlap }}>
+                    <ScrollView
+                    ref={scrollRef}
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{ paddingBottom: 16 }}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                     refreshControl={
@@ -475,6 +498,11 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                                         numberOfLines={4}
                                         placeholderTextColor="#9CA3AF"
                                         textAlignVertical="top"
+                                        onFocus={() => {
+                                            setTimeout(() => {
+                                                scrollRef.current?.scrollToEnd({ animated: true });
+                                            }, 150);
+                                        }}
                                     />
                                 )}
                             />
@@ -485,8 +513,8 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                             )}
                         </View>
                     </View>
-
-                    <View style={editPatientStyles.btnRow}>
+                    </ScrollView>
+                    <View style={[editPatientStyles.btnRow, { marginTop: 12, marginBottom: 12 }]}>
                         <TouchableOpacity
                             style={editPatientStyles.cancelBtn}
                             onPress={() => navigation?.goBack()}
@@ -507,7 +535,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                             )}
                         </TouchableOpacity>
                     </View>
-                </ScrollView>
+                </View>
             )}
             <PatientLocationSelectModal
                 visible={showCountryModal}
