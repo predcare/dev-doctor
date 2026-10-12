@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, Text, View } from 'react-native';
-import { APP_BUILD, APP_VERSION } from '../../config/constants';
+import { APP_VERSION } from '../../config/constants';
 import { fetchProfileQuery } from '../../hooks/react-query/profile/profile.hooks';
 import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
 import { getItem, STORAGE_KEYS } from '../../lib/commons/asyncStorage';
@@ -169,7 +169,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
 
         <View style={Splashstyles.footer}>
           <Text style={Splashstyles.footerText}>Powered by PRED Care</Text>
-          <Text style={Splashstyles.versionText}>v{APP_VERSION} (Build {APP_BUILD})</Text>
+          <Text style={Splashstyles.versionText}>v{APP_VERSION}</Text>
         </View>
       </View>
     </SafeAreaWrapper>

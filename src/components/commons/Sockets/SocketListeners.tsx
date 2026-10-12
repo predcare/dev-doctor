@@ -12,7 +12,7 @@ import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import { useSocketStore } from '../../../zustand/stores/useSocketStore';
 
 const SocketListeners = () => {
-  const { socketConnection } = useSocketStore();
+  const socketConnection = useSocketStore(state => state.socketConnection);
 
   useEffect(() => {
     if (!socketConnection) return;
@@ -39,10 +39,10 @@ const SocketListeners = () => {
 
       showInfoToast('Consultation time has ended. The call has ended.', 'Time Up');
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: [MyAppointmentsQueryKeys.MyAppointments],
       });
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: [MyAppointmentsQueryKeys.MyAppointmentsInfo],
       });
 

@@ -1,21 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    Dimensions,
-    Modal,
-    Pressable,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
-    type ViewInstance,
-} from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import CustomMenu from '../../../components/ui/CustomDropdown/CustomMenu';
 import {
     CalendarIcon,
-    CheckIcon,
-    ChevronDownIcon,
-    ChevronUpIcon,
     ClockIcon,
     InvoiceIcon,
     PatientsIcon,
@@ -48,6 +36,11 @@ const PERIOD_LABELS: Record<PeriodKey, string> = {
     last_30_days: 'Last 30 Days',
 };
 
+const periodItems = (Object.entries(PERIOD_LABELS) as [PeriodKey, string][]).map(([id, label]) => ({
+    id,
+    label,
+}));
+
 const quickAccessItems = [
     {
         id: 'q1',
@@ -79,17 +72,18 @@ export const HomeScreen: React.FC = () => {
     const appNavigation = useNavigation();
     const [period, setPeriod] = useState<PeriodKey>('today');
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
-    const [menuPos, setMenuPos] = useState({ top: 155, right: 16 });
-    const pillRef = useRef<ViewInstance>(null);
     const [refreshing, setRefreshing] = useState(false);
 
-    const { userData } = useAuthStore((state) => state)
+    const { userData } = useAuthStore(state => state);
 
-    const { data: statsInfo, isPending: statsPending, refetch: refetchStats } = useDoctorStats({
+    const {
+        data: statsInfo,
+        isPending: statsPending,
+        refetch: refetchStats,
+    } = useDoctorStats({
         date_filter: period,
         clinic_id: Number(userData?.clinic?.id) || 0,
-    })
-
+    });
 
     const {
         data: upcomingAppts,
@@ -101,21 +95,6 @@ export const HomeScreen: React.FC = () => {
         status: 'upcoming,pending',
         date_range: 'today',
     });
-
-    const togglePeriodMenu = useCallback(() => {
-        if (showPeriodMenu) {
-            setShowPeriodMenu(false);
-        } else {
-            pillRef.current?.measureInWindow((x, y, width, height) => {
-                const screenWidth = Dimensions.get('window').width;
-                setMenuPos({
-                    top: y + height + 6,
-                    right: Math.max(16, screenWidth - (x + width)),
-                });
-                setShowPeriodMenu(true);
-            });
-        }
-    }, [showPeriodMenu]);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -170,7 +149,14 @@ export const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaWrapper showBottomBar={true} activeBottomTab="Home" header={<Header isHome />}>
-            <View style={{ flex: 1, position: 'relative' }}>
+            <View
+                style={{ flex: 1 }}
+                onTouchStart={() => {
+                    if (showPeriodMenu) {
+                        setShowPeriodMenu(false);
+                    }
+                }}
+            >
                 <ScrollView
                     style={homeStyles.container}
                     contentContainerStyle={homeStyles.scrollContent}
@@ -189,67 +175,21 @@ export const HomeScreen: React.FC = () => {
                     <View style={homeStyles.insightsSection}>
                         <View style={homeStyles.insightsHeader}>
                             <Text style={homeStyles.insightsTitle}>Highlights & Insights</Text>
-                            <View style={{ position: 'relative', zIndex: 100 }} ref={pillRef}>
-                                <TouchableOpacity
-                                    style={homeStyles.periodPill}
-                                    onPress={togglePeriodMenu}
-                                    activeOpacity={0.8}
-                                >
-                                    <Text style={homeStyles.periodPillText}>{PERIOD_LABELS[period]}</Text>
-                                    {showPeriodMenu ? (
-                                        <ChevronUpIcon size={12} color={theme.colors.primary} />
-                                    ) : (
-                                        <ChevronDownIcon size={12} color={theme.colors.primary} />
-                                    )}
-                                </TouchableOpacity>
-
-                                {showPeriodMenu && (
-                                    <Modal
-                                        transparent
-                                        visible={showPeriodMenu}
-                                        animationType="fade"
-                                        onRequestClose={() => setShowPeriodMenu(false)}
-                                    >
-                                        <Pressable
-                                            style={homeStyles.screenBackdrop}
-                                            onPress={() => setShowPeriodMenu(false)}
-                                        >
-                                            <View
-                                                style={[
-                                                    homeStyles.periodDropdownMenu,
-                                                    { top: menuPos.top, right: menuPos.right },
-                                                ]}
-                                            >
-                                                {(Object.entries(PERIOD_LABELS) as [PeriodKey, string][]).map(
-                                                    ([key, label]) => (
-                                                        <TouchableOpacity
-                                                            key={key}
-                                                            onPress={() => {
-                                                                setPeriod(key);
-                                                                setShowPeriodMenu(false);
-                                                            }}
-                                                            activeOpacity={0.75}
-                                                            style={homeStyles.periodMenuItem}
-                                                        >
-                                                            <Text
-                                                                style={[
-                                                                    homeStyles.periodMenuItemText,
-                                                                    period === key && homeStyles.periodMenuItemTextActive,
-                                                                ]}
-                                                            >
-                                                                {label}
-                                                            </Text>
-                                                            {period === key && (
-                                                                <CheckIcon size={14} color={theme.colors.primary} />
-                                                            )}
-                                                        </TouchableOpacity>
-                                                    )
-                                                )}
-                                            </View>
-                                        </Pressable>
-                                    </Modal>
-                                )}
-                            </View>
+                            <CustomMenu
+                                items={periodItems}
+                                selectedId={period}
+                                onSelect={id => setPeriod(id as PeriodKey)}
+                                open={showPeriodMenu}
+                                onOpenChange={setShowPeriodMenu}
+                                triggerLabel={PERIOD_LABELS[period]}
+                                align="right"
+                                triggerStyle={homeStyles.periodPill}
+                                triggerTextStyle={homeStyles.periodPillText}
+                                menuStyle={homeStyles.periodDropdownMenu}
+                                itemStyle={homeStyles.periodMenuItem}
+                                itemTextStyle={homeStyles.periodMenuItemText}
+                                activeItemTextStyle={homeStyles.periodMenuItemTextActive}
+                            />
                         </View>
 
                         <ScrollView
@@ -317,8 +257,8 @@ export const HomeScreen: React.FC = () => {
                                         showInfoToast('Consultation will be started soon');
                                     }}
                                     onCardPress={() => {
-                                        if (!apt.id) return showErrorToast("Appointment not found")
-                                        appNavigation.navigate(AppRoute.APPOINTMENT_DETAILS, { appointmentId: apt.id })
+                                        if (!apt.id) return showErrorToast('Appointment not found');
+                                        appNavigation.navigate(AppRoute.APPOINTMENT_DETAILS, { appointmentId: apt.id });
                                     }}
                                 />
                             );

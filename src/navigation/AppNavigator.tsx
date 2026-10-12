@@ -1,6 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import EmailVerifyScreen from '../Features/Auth/EmailVerifyScreen';
 import LoginScreen from '../Features/Auth/LoginScreen';
 import PolicyAcceptanceScreen from '../Features/Auth/PolicyAcceptanceScreen';
 import ComingSoonScreen from '../Features/ComingSoonScreen';
@@ -26,7 +27,6 @@ import SettingScreen from '../Features/Dashboard/SettingScreen/SettingScreen';
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import { navigationRef } from './navigationRef';
-import EmailVerifyScreen from '../Features/Auth/EmailVerifyScreen';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -48,7 +48,8 @@ export const AppNavigator: React.FC = () => {
         initialRouteName="Splash"
         screenOptions={{
           headerShown: false,
-          animation: 'fade',
+          animation: 'none',
+          freezeOnBlur: true,
         }}
       >
         <Stack.Screen name="Splash" component={SplashScreen} />

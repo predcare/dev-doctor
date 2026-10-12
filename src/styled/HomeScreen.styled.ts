@@ -37,12 +37,16 @@ export const homeStyles = StyleSheet.create({
   // Highlights & Insights Section
   insightsSection: {
     marginBottom: theme.spacing.xl,
+    zIndex: 20,
+    overflow: 'visible',
   },
   insightsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: theme.spacing.md,
+    zIndex: 30,
+    overflow: 'visible',
   },
   insightsTitle: {
     fontSize: 15,
@@ -64,10 +68,6 @@ export const homeStyles = StyleSheet.create({
     fontSize: 11,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
-  },
-  screenBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
   },
   periodDropdownMenu: {
     ...globalShadows.card,
