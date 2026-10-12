@@ -1,5 +1,5 @@
 import { MediaStream, RTCView, useMeeting, useParticipant } from '@videosdk.live/react-native-sdk';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { MicOffIcon, ProfileIcon } from '../ui/icons';
 import { usePatientStream } from '../../hooks/commons/meeting/useMeetingParticipants';
@@ -46,6 +46,11 @@ export const AndroidPipStage: React.FC = () => {
   const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
   const patientName = useMeetingStore(state => state.patientInfo?.name);
   const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
+  const remoteTrack = webcamOn && webcamStream ? webcamStream.track : null;
+  const remoteStreamURL = useMemo(
+    () => (remoteTrack ? new MediaStream([remoteTrack]).toURL() : null),
+    [remoteTrack],
+  );
 
   const name = patientName || 'Patient';
   const initial = name.charAt(0).toUpperCase() || 'P';
@@ -56,9 +61,9 @@ export const AndroidPipStage: React.FC = () => {
 
   return (
     <View style={androidPipStyles.container} pointerEvents="none" onLayout={handleLayout}>
-      {webcamOn && webcamStream ? (
+      {remoteStreamURL ? (
         <RTCView
-          streamURL={new MediaStream([webcamStream.track]).toURL()}
+          streamURL={remoteStreamURL}
           objectFit="cover"
           style={StyleSheet.absoluteFill}
           zOrder={0}

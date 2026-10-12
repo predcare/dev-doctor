@@ -9,7 +9,9 @@ import useMeetingAppState from '../../hooks/commons/meeting/useMeetingAppState';
 import useMeetingCaptureHandoff from '../../hooks/commons/meeting/useMeetingCaptureHandoff';
 import { useMeetingCountdownTicker } from '../../hooks/commons/meeting/useMeetingCountdown';
 import { useRegisterMeetingLeave } from '../../hooks/commons/meeting/meetingSessionLeave';
-import useMeetingParticipants from '../../hooks/commons/meeting/useMeetingParticipants';
+import useMeetingParticipants, {
+  usePatientVideoQuality,
+} from '../../hooks/commons/meeting/useMeetingParticipants';
 import usePipRemoteTrack from '../../hooks/commons/meeting/usePipRemoteTrack';
 import NativePip from '../../native/NativePip';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
@@ -21,6 +23,8 @@ const MeetingSessionController: React.FC = () => {
   useRegisterMeetingLeave();
   useMeetingAppState();
   useMeetingParticipants();
+  const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
+  usePatientVideoQuality(patientParticipantId);
   usePipRemoteTrack();
   useAndroidPipLifecycle();
   useAndroidCallForegroundService();
