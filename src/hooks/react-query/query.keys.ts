@@ -110,3 +110,11 @@ export enum HomeApiQuery {
 export enum DoctorStatsQueryKeys {
   DOCTOR_STATS = 'DOCTOR_STATS',
 }
+
+export enum SupportTicketQueryKeys {
+  GET_MY_TICKETS = 'GET_MY_TICKETS',
+  GET_CATEGORIES = 'GET_CATEGORIES',
+  GET_TICKET_DETAILS = 'GET_TICKET_DETAILS',
+  CREATE_TICKET = 'CREATE_TICKET',
+  DELETE_TICKET = 'DELETE_TICKET',
+}

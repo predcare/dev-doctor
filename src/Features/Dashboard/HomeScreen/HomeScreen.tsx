@@ -303,7 +303,7 @@ export const HomeScreen: React.FC = () => {
                         </View>
                     )}
 
-                    <AssistanceBanner onContactSupport={() => appNavigation?.navigate(AppRoute.ACCOUNT)} />
+                    <AssistanceBanner onContactSupport={() => appNavigation?.navigate(AppRoute.SUPPORT)} />
 
                     <View style={homeStyles.sectionHeader}>
                         <Text style={homeStyles.sectionTitle}>Quick Access</Text>

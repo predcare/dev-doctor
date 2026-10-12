@@ -38,6 +38,9 @@ export const AppRoute = {
   REPORTS: 'Reports',
   APPOINTMENTS: 'Appointments',
   APPOINTMENT_DETAILS: 'AppointmentDetails',
+  SUPPORT: 'Support',
+  NEW_SUPPORT_TICKET: 'NewSupportTicket',
+  SUPPORT_TICKET_DETAILS: 'SupportTicketDetails',
 } as const;
 
 export type RouteNames = (typeof AppRoute)[keyof typeof AppRoute];
@@ -113,6 +116,9 @@ export type RootStackParamList = {
         fromScreen?: string;
       }
     | undefined;
+  Support: undefined;
+  NewSupportTicket: undefined;
+  SupportTicketDetails: { ticketId: string } | undefined;
 };
 
 /**

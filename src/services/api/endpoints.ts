@@ -109,6 +109,13 @@ export const endpoints = {
   stats: {
     get: '/stats/doctor',
   },
+  supportTickets: {
+    create: '/support-tickets',
+    myTickets: '/support-tickets/my-tickets',
+    categories: '/support-tickets/categories',
+    details: (id: string | number) => `/support-tickets/${id}`,
+    delete: (id: string | number) => `/support-tickets/${id}`,
+  },
 };
 
 export const successEndpoints = [
@@ -118,6 +125,7 @@ export const successEndpoints = [
   endpoints?.patients?.patientUpdate,
   endpoints?.patients?.linkExisting,
   endpoints?.patients?.newCreate,
+  endpoints.supportTickets.create,
 ];
 
 export const exclude401Routes = [

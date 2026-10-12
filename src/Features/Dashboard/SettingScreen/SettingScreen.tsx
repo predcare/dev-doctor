@@ -85,7 +85,7 @@ const SettingScreen: React.FC = () => {
                     onThemePress={() => showComingSoon('Theme customization feature is coming soon.')}
                 />
                 <SupportSection
-                    onContactSupport={() => showComingSoon('Contact Support is coming soon.')}
+                    onContactSupport={() => navigation.navigate(AppRoute.SUPPORT)}
                     onHelpCenter={() => showComingSoon('Help Center feature is coming soon.')}
                     onPrivacyPolicy={() => showComingSoon('Privacy Policy feature is coming soon.')}
                     onTermsOfService={() => showComingSoon('Terms of Service feature is coming soon.')}

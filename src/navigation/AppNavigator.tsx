@@ -24,6 +24,9 @@ import PrescritionScreen from '../Features/Dashboard/PrescriptionScreen/Prescrit
 import ViewPrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/ViewPrescriptionScreen';
 import { ProfileScreen } from '../Features/Dashboard/ProfileScreen/ProfileScreen';
 import SettingScreen from '../Features/Dashboard/SettingScreen/SettingScreen';
+import NewSupportTicketScreen from '../Features/Dashboard/SupportScreen/NewSupportTicketScreen';
+import SupportScreen from '../Features/Dashboard/SupportScreen/SupportScreen';
+import SupportTicketDetailsScreen from '../Features/Dashboard/SupportScreen/SupportTicketDetailsScreen';
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import { navigationRef } from './navigationRef';
@@ -76,6 +79,9 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Invoices" component={InvoicesScreen} />
         <Stack.Screen name="DoctorMeeting" component={DoctorMeetingScreen} />
         <Stack.Screen name="ConsultationCompleted" component={MeetingStatusScreen} />
+        <Stack.Screen name="Support" component={SupportScreen} />
+        <Stack.Screen name="NewSupportTicket" component={NewSupportTicketScreen} />
+        <Stack.Screen name="SupportTicketDetails" component={SupportTicketDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
