@@ -32,6 +32,7 @@ import {
     createPrescriptionSchema,
     TCreatePrescriptionFormValues,
 } from '../../../lib/schemas/createPrescription.schema';
+import { replace } from '../../../navigation/navigationRef';
 import { AppRoute, CreatePrescriptionScreenProps } from '../../../route';
 import createPrescriptionStyles from '../../../styled/CreatePrescriptionScreen.styled';
 import theme from '../../../styled/theme.styled';
@@ -404,7 +405,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                                 clearInPersonAppointment();
                                 showSuccessToast('Prescription updated successfully');
                                 hideLoader();
-                                (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                                replace(AppRoute.PRESCRIPTION_VIEW, {
                                     rxId: String(activeId),
                                     patientId: patientId || prescriptionInfo?.data?.patient_id,
                                     patientName: patientInfo?.name || route?.params?.patientName || '',
@@ -433,7 +434,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                             clearInPersonAppointment();
                             showSuccessToast('Prescription created successfully');
                             hideLoader();
-                            (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                            replace(AppRoute.PRESCRIPTION_VIEW, {
                                 rxId: String(createId || currentPrescriptionId.current),
                                 patientId: patientId || prescriptionInfo?.data?.patient_id,
                                 patientName: patientInfo?.name || route?.params?.patientName || '',
@@ -480,7 +481,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                     clearInPersonAppointment();
                     showSuccessToast(res?.message || "Prescription completed & sent to patient's email.");
                     hideLoader();
-                    (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                    replace(AppRoute.PRESCRIPTION_VIEW, {
                         rxId: String(rxId),
                         patientId: patientId || prescriptionInfo?.data?.patient_id,
                         patientName: patientInfo?.name || route?.params?.patientName || '',
@@ -499,7 +500,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                         e?.response?.data?.message || 'Prescription completed, but failed to send email.';
                     showErrorToast(msg, 'Email Error');
                     hideLoader();
-                    (navigation as any).replace(AppRoute.PRESCRIPTION_VIEW, {
+                    replace(AppRoute.PRESCRIPTION_VIEW, {
                         rxId: String(rxId),
                         patientId: patientId || prescriptionInfo?.data?.patient_id,
                         patientName: patientInfo?.name || route?.params?.patientName || '',
