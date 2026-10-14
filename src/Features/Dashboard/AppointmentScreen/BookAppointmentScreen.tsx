@@ -296,7 +296,7 @@ export const BookAppointmentScreen: React.FC = () => {
             start_time: normalizeApiTime(firstSlot.start),
             end_time: normalizeApiTime(lastSlot.end),
             consultation_type: 'in-person',
-            appointment_type: 'first_visit',
+            appointment_type: 'regular_checkup',
             reason: formStates.reason.trim() || null,
             symptoms: null,
             medications: null,
