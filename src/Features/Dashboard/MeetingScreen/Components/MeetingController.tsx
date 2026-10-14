@@ -16,6 +16,7 @@ import useMeetingPip from '../../../../hooks/commons/meeting/useMeetingPip';
 import { canGoBack, goBack, navigate } from '../../../../navigation/navigationRef';
 import { AppRoute } from '../../../../route';
 import doctorMeetingStyles from '../../../../styled/DoctorMeetingScreen.styled';
+import useMeetingStore from '../../../../zustand/stores/useMeetingStore';
 
 interface IMeetingControllerProps {
   handleEndCall: () => void;
@@ -31,14 +32,29 @@ export const MeetingController: React.FC<IMeetingControllerProps> = ({ handleEnd
   };
 
   const handleRxPress = () => {
+    const { appointmentId, patientInfo } = useMeetingStore.getState();
+    if (!patientInfo?.patientId) return;
+
     openBesideCall(() => {
-      navigate(AppRoute.PATIENTS);
+      navigate(AppRoute.CREATE_PRESCRIPTION, {
+        patientId: patientInfo.patientId,
+        patientName: patientInfo.name,
+        appointmentId: appointmentId ?? undefined,
+        fromScreen: AppRoute.DOCTOR_MEETING,
+      });
     });
   };
 
   const handleUploadPress = () => {
+    const { patientInfo } = useMeetingStore.getState();
+    if (!patientInfo?.patientId) return;
+
     openBesideCall(() => {
-      navigate(AppRoute.PATIENTS);
+      navigate(AppRoute.PATIENT_DETAILS, {
+        patientId: patientInfo.patientId,
+        patientName: patientInfo.name,
+        openUploadModal: true,
+      });
     });
   };
 

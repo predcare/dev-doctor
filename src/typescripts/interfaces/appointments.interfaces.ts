@@ -112,6 +112,8 @@ export interface IMyAppointmentDoc {
   meeting_id?: string;
   token?: string;
   call_duration_seconds?: number;
+  appointment_duration?: number;
+  slot_duration_minutes?: number;
   doctorInfo: IDoctorInfo;
   clinicInfo: IClinicInfo;
   patientInfo: IPatientInfo;
@@ -194,6 +196,7 @@ export interface IApptInfoDoc {
   start_time: string;
   end_time: string;
   slot_duration_minutes: number;
+  appointment_duration: number;
   appointment_fee: number;
   fee_type: string;
   appointment_type: string;

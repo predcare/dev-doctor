@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { CalendarIcon, CheckIcon, ClinicIcon, ClockIcon, VideoIcon } from '../../../../components/ui/icons';
-import { formatDate, formatTimeSlot, getInitials } from '../../../../lib/commons/common.utils';
+import { formatDate, formatTimeSlot, getInitials, shouldHideJoinForCallDuration } from '../../../../lib/commons/common.utils';
 import { consultTabStyles } from '../../../../styled/ConsultTabPanel.styled';
 import { theme } from '../../../../styled/theme.styled';
 import { ConsultType } from '../../../../typescripts/enums';
@@ -16,6 +16,8 @@ interface ConsultCardProps {
   isJoinedOnce?: boolean;
   appointmentStatus?: string;
   appointmentType?: string;
+  appointmentDurationMinutes?: number | null;
+  callDurationSeconds?: number | null;
   loading?: boolean;
   onVideoCall?: () => void;
   onStartConsultation?: () => void;
@@ -27,6 +29,8 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
   appointmentGeneratedId,
   appointmentStatus,
   appointmentType,
+  appointmentDurationMinutes,
+  callDurationSeconds,
   endTime,
   patientId,
   patientName,
@@ -37,14 +41,23 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
   onCompleted,
   loading,
 }) => {
-  const { isVideo, isCompleted, isInProgress } = useMemo(() => {
+  const { isVideo, isCompleted, isInProgress, isCancelled, hideVideoJoin } = useMemo(() => {
     const rawStatus = (appointmentStatus || '').toLowerCase();
+    const video = (appointmentType || '').toLowerCase() === ConsultType.VIDEO;
     return {
-      isVideo: (appointmentType || '').toLowerCase() === ConsultType.VIDEO,
+      isVideo: video,
       isCompleted: rawStatus === 'completed',
+      isCancelled: rawStatus === 'cancelled',
       isInProgress: rawStatus === 'in_progress' || rawStatus === 'in-progress' || rawStatus === '',
+      hideVideoJoin:
+        video &&
+        shouldHideJoinForCallDuration({
+          status: appointmentStatus,
+          appointmentDurationMinutes,
+          callDurationSeconds,
+        }),
     };
-  }, [appointmentType, appointmentStatus]);
+  }, [appointmentType, appointmentStatus, appointmentDurationMinutes, callDurationSeconds]);
 
   const statusText = useMemo(() => {
     if (!appointmentStatus) return '';
@@ -120,19 +133,21 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
           <Text style={consultTabStyles.dateTimeText}>{formatTimeSlot(startTime, endTime)}</Text>
         </View>
       </View>
-      {isVideo && !isCompleted && (
+      {isVideo && !isCompleted && !isCancelled && (!hideVideoJoin || isInProgress) && (
         <View style={consultTabStyles.actionRow}>
-          <TouchableOpacity
-            style={consultTabStyles.btnJoinCall}
-            activeOpacity={0.8}
-            onPress={onVideoCall}
-            disabled={loading}
-          >
-            <VideoIcon size={16} color="#FFFFFF" />
-            <Text style={consultTabStyles.btnJoinCallText}>
-              {isJoinedOnce ? 'Rejoin Call' : 'Join Call'}
-            </Text>
-          </TouchableOpacity>
+          {!hideVideoJoin && (
+            <TouchableOpacity
+              style={consultTabStyles.btnJoinCall}
+              activeOpacity={0.8}
+              onPress={onVideoCall}
+              disabled={loading}
+            >
+              <VideoIcon size={16} color="#FFFFFF" />
+              <Text style={consultTabStyles.btnJoinCallText}>
+                {isJoinedOnce ? 'Rejoin Call' : 'Join Call'}
+              </Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={consultTabStyles.btnJoinCall}
             activeOpacity={0.8}
@@ -144,7 +159,7 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
           </TouchableOpacity>
         </View>
       )}
-      {!isVideo && isInProgress && (
+      {!isVideo && !isCompleted && !isCancelled && (
         <View style={consultTabStyles.actionRow}>
           <TouchableOpacity
             style={consultTabStyles.btnJoinCall}
@@ -155,15 +170,17 @@ const ConsultCard: React.FC<ConsultCardProps> = ({
             <ClinicIcon size={16} color="#FFFFFF" />
             <Text style={consultTabStyles.btnJoinCallText}>Start Consultation</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={consultTabStyles.btnJoinCall}
-            activeOpacity={0.8}
-            onPress={onCompleted}
-            disabled={loading}
-          >
-            <CheckIcon size={16} color="#FFFFFF" />
-            <Text style={consultTabStyles.btnJoinCallText}>Completed</Text>
-          </TouchableOpacity>
+          {isInProgress && (
+            <TouchableOpacity
+              style={consultTabStyles.btnJoinCall}
+              activeOpacity={0.8}
+              onPress={onCompleted}
+              disabled={loading}
+            >
+              <CheckIcon size={16} color="#FFFFFF" />
+              <Text style={consultTabStyles.btnJoinCallText}>Completed</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>

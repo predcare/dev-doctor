@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import UploadOptionsModal from '../../../../components/commons/UploadOptionsModal/UploadOptionsModal';
 import { ChevronDownIcon, CloseIcon, FileIcon } from '../../../../components/ui/icons';
 import { EMR_Record_Category } from '../../../../config/constants';
@@ -39,6 +40,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
   patientId,
   doctorId,
 }) => {
+  const insets = useSafeAreaInsets();
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const { mutate, isPending } = useUploadEmr();
@@ -202,7 +204,13 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleCloseModal}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      statusBarTranslucent
+      onRequestClose={handleCloseModal}
+    >
       <TouchableWithoutFeedback
         onPress={() => {
           if (showCategoryDropdown) {
@@ -212,7 +220,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
           }
         }}
       >
-        <View style={emrUploadModalStyles.modalOverlay}>
+        <View style={[emrUploadModalStyles.modalOverlay, { paddingTop: insets.top }]}>
           <TouchableWithoutFeedback
             onPress={() => {
               if (showCategoryDropdown) {
@@ -222,7 +230,10 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
           >
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-              style={emrUploadModalStyles.sheetContainer}
+              style={[
+                emrUploadModalStyles.sheetContainer,
+                { paddingBottom: Math.max(28, insets.bottom + 16) },
+              ]}
             >
               <View style={emrUploadModalStyles.headerRow}>
                 <View style={{ flex: 1 }}>

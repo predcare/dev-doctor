@@ -29,6 +29,8 @@ import {
     capitalize,
     formatDate,
     formatTimeSlot,
+    resolveAppointmentDurationMinutes,
+    shouldHideJoinForCallDuration,
 } from '../../../lib/commons/common.utils';
 import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import { canGoBack } from '../../../navigation/navigationRef';
@@ -261,6 +263,21 @@ export const AppointmentDetailsScreen: React.FC = () => {
         (String(meetingStoreState.callInfo?.appointment?.id) === String(apptInfo?.id) ||
             (Boolean(apptInfo?.appointment_id) &&
                 meetingStoreState.callInfo?.appointment?.appointmentId === apptInfo?.appointment_id));
+
+    const hideVideoJoin =
+        isOnline &&
+        shouldHideJoinForCallDuration({
+            status: apptInfo?.appointment_status,
+            appointmentDurationMinutes: resolveAppointmentDurationMinutes(
+                undefined,
+                apptInfo?.slot_duration_minutes,
+                apptInfo?.start_time,
+                apptInfo?.end_time
+            ),
+            callDurationSeconds: Number(
+                apptInfo?.call_duration_seconds || apptInfo?.call_elapsed_seconds || 0
+            ),
+        });
 
     return (
         <SafeAreaWrapper
@@ -574,7 +591,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
                                 !isInProgress && { flexDirection: 'column' },
                             ]}
                         >
-                            {isConfirmed && (
+                            {isConfirmed && !hideVideoJoin && (
                                 <>
                                     <TouchableOpacity
                                         style={[
@@ -622,8 +639,24 @@ export const AppointmentDetailsScreen: React.FC = () => {
 
                             {isInProgress && (
                                 <View style={{ flexDirection: 'row', gap: 10 }}>
+                                    {isOnline && !hideVideoJoin && (
+                                        <TouchableOpacity
+                                            style={[
+                                                appointmentDetailsStyles.joinButton,
+                                                { flex: 1 },
+                                                isCurrentApptInCall && { backgroundColor: theme.colors.primary },
+                                            ]}
+                                            onPress={handleJoinVideoCall}
+                                            activeOpacity={0.85}
+                                        >
+                                            <PlayCircleIcon size={20} color="#FFFFFF" />
+                                            <Text style={appointmentDetailsStyles.joinButtonText}>
+                                                {isCurrentApptInCall ? 'Already in Call' : 'Re-join Call'}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
                                     <TouchableOpacity
-                                        style={appointmentDetailsStyles.completeButton}
+                                        style={[appointmentDetailsStyles.completeButton, { flex: 1 }]}
                                         onPress={() => {
                                             showConfirm({
                                                 title: 'Complete Appointment',

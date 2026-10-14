@@ -45,9 +45,8 @@ const dateRangeOptions = [
 
 const statusOptions = [
   { label: 'All', value: 'all' },
-  { label: 'Draft', value: 'draft' },
   { label: 'Sent', value: 'sent' },
-  { label: 'Completed', value: 'completed' },
+  { label: 'Not Sent', value: 'not_sent' },
 ];
 
 export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = ({
@@ -300,4 +299,3 @@ export const PrescriptionFilterModal: React.FC<PrescriptionFilterModalProps> = (
 };
 
 export default PrescriptionFilterModal;
-

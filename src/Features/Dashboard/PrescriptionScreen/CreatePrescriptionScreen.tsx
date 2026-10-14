@@ -462,7 +462,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
             clearTimeout(autoSaveTimerRef.current);
         }
 
-        const payload = buildPrescriptionPayload(_data, 'completed');
+        const payload = buildPrescriptionPayload(_data, 'draft');
         const activeId =
             currentPrescriptionId.current || (prescriptionId ? Number(prescriptionId) : null);
 

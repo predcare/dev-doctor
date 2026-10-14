@@ -7,7 +7,7 @@ import {
   PlayCircleIcon,
   VideoIcon,
 } from '../../../../components/ui/icons';
-import { capitalize, getAge, getInitials } from '../../../../lib/commons/common.utils';
+import { capitalize, getAge, getInitials, shouldHideJoinForCallDuration } from '../../../../lib/commons/common.utils';
 import { homeStyles } from '../../../../styled/HomeScreen.styled';
 import theme from '../../../../styled/theme.styled';
 
@@ -22,6 +22,8 @@ export interface AppointmentCardProps {
   consultType?: 'ONLINE' | 'IN-PERSON' | string;
   chiefComplaint?: string;
   appointmentStatus?: string;
+  appointmentDurationMinutes?: number | null;
+  callDurationSeconds?: number | null;
   isJoinedOnce?: boolean;
   isCurrentApptInCall?: boolean;
   onStartConsultation?: () => void;
@@ -39,6 +41,8 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
   consultType = 'ONLINE',
   chiefComplaint,
   appointmentStatus,
+  appointmentDurationMinutes,
+  callDurationSeconds,
   isExpired,
   isJoinedOnce,
   isCurrentApptInCall,
@@ -54,6 +58,14 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
     const type = consultType?.toLowerCase() || '';
     return type === 'video' || type === 'online';
   }, [consultType]);
+
+  const hideVideoJoin =
+    isVideo &&
+    shouldHideJoinForCallDuration({
+      status: appointmentStatus,
+      appointmentDurationMinutes,
+      callDurationSeconds,
+    });
 
   const isInProgress = useMemo(() => {
     const status = appointmentStatus?.toLowerCase();
@@ -199,30 +211,32 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
           ) : null}
         </View>
 
-        <TouchableOpacity
-          style={[
-            homeStyles.joinBtn,
-            isExpired && homeStyles.joinBtnDisabled,
-          ]}
-          onPress={handlePress}
-          activeOpacity={0.85}
-          disabled={isExpired}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          {isVideo ? (
-            <VideoIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
-          ) : (
-            <PlayCircleIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
-          )}
-          <Text
+        {!hideVideoJoin && (
+          <TouchableOpacity
             style={[
-              homeStyles.joinBtnText,
-              isExpired && homeStyles.joinBtnTextDisabled,
+              homeStyles.joinBtn,
+              isExpired && homeStyles.joinBtnDisabled,
             ]}
+            onPress={handlePress}
+            activeOpacity={0.85}
+            disabled={isExpired}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            {buttonText}
-          </Text>
-        </TouchableOpacity>
+            {isVideo ? (
+              <VideoIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
+            ) : (
+              <PlayCircleIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
+            )}
+            <Text
+              style={[
+                homeStyles.joinBtnText,
+                isExpired && homeStyles.joinBtnTextDisabled,
+              ]}
+            >
+              {buttonText}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableOpacity>
   );

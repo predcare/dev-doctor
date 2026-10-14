@@ -9,6 +9,7 @@ import useJoinVideoCall from '../../../../../hooks/commons/meeting/useJoinVideoC
 import { useChangeAppointmentStatus } from '../../../../../hooks/react-query/appointments/appointments.hooks';
 import { useMyPatientInfiniteConsults } from '../../../../../hooks/react-query/patients/patients.hooks';
 import { MyAppointmentsQueryKeys } from '../../../../../hooks/react-query/query.keys';
+import { resolveAppointmentDurationMinutes } from '../../../../../lib/commons/common.utils';
 import { AppRoute } from '../../../../../route';
 import { consultTabStyles } from '../../../../../styled/ConsultTabPanel.styled';
 import theme from '../../../../../styled/theme.styled';
@@ -165,6 +166,13 @@ export const ConsultTabPanel: React.FC<ConsultPageProps> = ({ patientId }) => {
                 appointmentGeneratedId={item.appointment_id}
                 appointmentStatus={item.appointment_status}
                 appointmentType={item.consultation_type}
+                appointmentDurationMinutes={resolveAppointmentDurationMinutes(
+                  item.appointment_duration,
+                  item.slot_duration_minutes,
+                  item.start_time,
+                  item.end_time
+                )}
+                callDurationSeconds={item.call_duration_seconds}
                 patientName={item.patientInfo?.name}
                 patientId={item?.patientInfo?.patientId || ''}
                 startTime={item.start_time}

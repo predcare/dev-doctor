@@ -28,7 +28,12 @@ import { IMyApptQueryParams } from '../../../hooks/react-query/appointments/payl
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
-import { formatDate, formatDateToYYYYMMDD, formatTimeSlot } from '../../../lib/commons/common.utils';
+import {
+    formatDate,
+    formatDateToYYYYMMDD,
+    formatTimeSlot,
+    resolveAppointmentDurationMinutes,
+} from '../../../lib/commons/common.utils';
 import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import { AppRoute } from '../../../route';
 import doctorAppointmentsStyles from '../../../styled/DoctorAppointmentsScreen.styled';
@@ -221,10 +226,10 @@ export const AppointmentsScreen: React.FC = () => {
                                 if (res?.success) {
                                     showSuccessToast(res?.message || 'Appointment cancelled successfully');
                                     await Promise.all([
-                                        queryClient.invalidateQueries({
+                                       await queryClient.invalidateQueries({
                                             queryKey: [MyAppointmentsQueryKeys.MyAppointments],
                                         }),
-                                        queryClient.invalidateQueries({
+                                        await queryClient.invalidateQueries({
                                             queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats],
                                         }),
                                     ]);
@@ -461,6 +466,13 @@ export const AppointmentsScreen: React.FC = () => {
                                 consultation_type={item.consultation_type}
                                 startTime={item.start_time}
                                 endTime={item.end_time}
+                                appointmentDurationMinutes={resolveAppointmentDurationMinutes(
+                                    item.appointment_duration,
+                                    item.slot_duration_minutes || item.appointment_duration,
+                                    item.start_time,
+                                    item.end_time
+                                )}
+                                callDurationSeconds={item.call_duration_seconds}
                                 isJoinedOnce={
                                     item?.appointment_status === 'in_progress' ||
                                     item?.appointment_status === 'in-progress'

@@ -12,7 +12,13 @@ import {
   RescheduleIcon,
   VideoIcon
 } from '../../../../components/ui/icons';
-import { capitalize, formatTimeSlot, getAge, getInitials } from '../../../../lib/commons/common.utils';
+import {
+  capitalize,
+  formatTimeSlot,
+  getAge,
+  getInitials,
+  shouldHideJoinForCallDuration,
+} from '../../../../lib/commons/common.utils';
 import {
   doctorAppointmentsStyles as S,
   TEAL,
@@ -33,6 +39,8 @@ interface AppointmentCardProps {
   isJoinedOnce?: boolean;
   startTime?: string;
   endTime?: string;
+  appointmentDurationMinutes?: number | null;
+  callDurationSeconds?: number | null;
   isExpired?: boolean;
   onStartConsultation?: () => void;
   onReschedule?: () => void;
@@ -88,6 +96,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     appointmentGeneratedId,
     startTime,
     endTime,
+    appointmentDurationMinutes,
+    callDurationSeconds,
     patientDateOfBirth,
     patientGender,
     isJoinedOnce,
@@ -114,6 +124,13 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       Boolean(activeToken && activeMeetingId);
 
     const isVideo = consultation_type?.toLowerCase() === 'video';
+    const hideVideoJoin =
+      isVideo &&
+      shouldHideJoinForCallDuration({
+        status: appointmentStatus,
+        appointmentDurationMinutes,
+        callDurationSeconds,
+      });
 
     const isCurrentApptInCall =
       isVideo &&
@@ -325,21 +342,23 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           </View>
         )}
 
-        {!isCompleted && !isCancelled && (
+        {!isCompleted && !isCancelled && (!hideVideoJoin || isInProgress) && (
           <View style={[S.cardFooterActions, isInProgress && { flexDirection: 'row', gap: 10 }]}>
-            <TouchableOpacity
-              style={[
-                S.joinButton,
-                isInProgress && { flex: 1 },
-                isVideo && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
-                isVideo && isJoinedOnce && { backgroundColor: theme.colors.brandBlueDark },
-              ]}
-              onPress={() => (isVideo ? onVideoCall?.() : onStartConsultation?.())}
-              activeOpacity={0.85}
-            >
-              <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
-              <Text style={S.joinButtonText}>{buttonText}</Text>
-            </TouchableOpacity>
+            {!hideVideoJoin && (
+              <TouchableOpacity
+                style={[
+                  S.joinButton,
+                  isInProgress && { flex: 1 },
+                  isVideo && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
+                  isVideo && isJoinedOnce && { backgroundColor: theme.colors.brandBlueDark },
+                ]}
+                onPress={() => (isVideo ? onVideoCall?.() : onStartConsultation?.())}
+                activeOpacity={0.85}
+              >
+                <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                <Text style={S.joinButtonText}>{buttonText}</Text>
+              </TouchableOpacity>
+            )}
             {isInProgress && (
               <TouchableOpacity
                 style={[S.completeButton, { flex: 1 }]}

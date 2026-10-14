@@ -12,13 +12,18 @@ import {
     WalletIcon,
 } from '../../../components/ui/icons';
 import EmptyIcon from '../../../components/ui/icons/EmptyIcon';
+import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
+import { useChangeAppointmentStatus } from '../../../hooks/react-query/appointments/appointments.hooks';
 import { useHomeUpcomingAppts } from '../../../hooks/react-query/home/home.hooks';
+import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import { useDoctorStats } from '../../../hooks/react-query/stats/stats.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import { formatTime12h } from '../../../lib/commons/availability.utils';
-import { showErrorToast, showInfoToast } from '../../../lib/commons/toast.utils';
+import { resolveAppointmentDurationMinutes } from '../../../lib/commons/common.utils';
+import { showErrorToast } from '../../../lib/commons/toast.utils';
+import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import { AppRoute } from '../../../route';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import theme from '../../../styled/theme.styled';
@@ -78,6 +83,9 @@ export const HomeScreen: React.FC = () => {
 
     const { userData } = useAuthStore(state => state);
     const { joinVideoCall } = useJoinVideoCall();
+    const setInPersonAppointment = useMeetingStore(state => state.setInPersonAppointment);
+    const { showLoader, hideLoader } = useLoadingStore(state => state);
+    const { mutate: changeStatus } = useChangeAppointmentStatus();
     const activeApptId = useMeetingStore(state => state.callInfo?.appointment?.id);
     const activeApptGeneratedId = useMeetingStore(state => state.callInfo?.appointment?.appointmentId);
     const activeCallState = useMeetingStore(state => state.callState);
@@ -111,6 +119,50 @@ export const HomeScreen: React.FC = () => {
         date_range: 'today',
         consultation_type: 'video,in-person'
     });
+
+    const handleStartConsulation = useCallback(
+        (appointmentId: number | string, patientId: number, patientName: string, status: string) => {
+            if (status?.toLowerCase() === 'confirmed') {
+                showLoader('Loading...');
+                changeStatus(
+                    { appointmentId, status: 'in_progress' },
+                    {
+                        onSuccess: async () => {
+                            await queryClient.invalidateQueries({
+                                queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+                            });
+                            hideLoader();
+                            setInPersonAppointment({
+                                apptIdforInPerson: String(appointmentId),
+                                patientIdforInPerson: String(patientId),
+                                patientNameforInPerson: String(patientName),
+                                statusforInPerson: String(status),
+                            });
+                            appNavigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                                patientId: patientId,
+                                patientName: patientName,
+                            });
+                        },
+                        onSettled: () => {
+                            hideLoader();
+                        },
+                    }
+                );
+            } else {
+                setInPersonAppointment({
+                    apptIdforInPerson: String(appointmentId),
+                    patientIdforInPerson: String(patientId),
+                    patientNameforInPerson: String(patientName),
+                    statusforInPerson: String(status),
+                });
+                appNavigation.navigate(AppRoute.CREATE_PRESCRIPTION, {
+                    patientId: patientId,
+                    patientName: patientName,
+                });
+            }
+        },
+        [changeStatus, queryClient, showLoader, hideLoader, setInPersonAppointment, appNavigation]
+    );
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -272,6 +324,13 @@ export const HomeScreen: React.FC = () => {
                                                 activeApptGeneratedId === apt.appointment_id))
                                     }
                                     appointmentStatus={apt.appointment_status}
+                                    appointmentDurationMinutes={resolveAppointmentDurationMinutes(
+                                        apt.appointment_duration,
+                                        apt.slot_duration_minutes,
+                                        apt.start_time,
+                                        apt.end_time
+                                    )}
+                                    callDurationSeconds={apt.call_duration_seconds}
                                     onVideoCall={() => {
                                         joinVideoCall({
                                             appointmentId: apt.id,
@@ -280,7 +339,12 @@ export const HomeScreen: React.FC = () => {
                                         });
                                     }}
                                     onStartConsultation={() => {
-                                        showInfoToast('Consultation will be started soon');
+                                        handleStartConsulation(
+                                            apt.id,
+                                            Number(apt.patientInfo?.patientId),
+                                            apt.patientInfo?.name || '',
+                                            apt.appointment_status
+                                        );
                                     }}
                                     onCardPress={() => {
                                         if (!apt.id) return showErrorToast('Appointment not found');

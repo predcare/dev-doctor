@@ -150,9 +150,8 @@ export const PrescriptionScreen: React.FC = () => {
             <View style={prescriptionListStyles.chipRow}>
                 {[
                     { label: 'All', value: 'all' },
-                    { label: 'Draft', value: 'draft' },
                     { label: 'Sent', value: 'sent' },
-                    { label: 'Completed', value: 'completed' },
+                    { label: 'Not Sent', value: 'not_sent' },
                 ].map(f => (
                     <TouchableOpacity
                         key={f.value}

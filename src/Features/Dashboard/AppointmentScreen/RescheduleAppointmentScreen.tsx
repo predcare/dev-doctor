@@ -104,7 +104,7 @@ export const RescheduleAppointmentScreen: React.FC = () => {
 
     const doctorId = Number(apptInfo?.doctor_id || userData?.doctor_id || userData?.id || 0);
     const clinicId = Number(apptInfo?.clinic_id || userData?.clinic_id || userData?.clinic?.id || 0);
-    const slotDuration = Number(apptInfo?.slot_duration_minutes || 0);
+    const slotDuration = Number(apptInfo?.slot_duration_minutes || apptInfo?.appointment_duration || 0);
     const consultationType = apptInfo?.consultation_type === 'video' ? 'video' : 'in-person';
 
     const [formStates, setFormStates] = useState<IFormStates>({
