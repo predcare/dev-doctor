@@ -212,6 +212,24 @@ export const doctorAppointmentsStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
   },
 
+  fab: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 999,
+  },
+
   // List & Cards
   listContent: {
     paddingHorizontal: 12,

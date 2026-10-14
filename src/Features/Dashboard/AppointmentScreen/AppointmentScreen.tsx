@@ -10,10 +10,12 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CommonEmptyCard from '../../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../../components/commons/CommonErrorCard/CommonErrorCard';
+import { getBottomBarHeight } from '../../../components/commons/CustomBottomBar/CustomBottomBar';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
-import { CircleXIcon, FilterIcon, SearchIcon } from '../../../components/ui/icons';
+import { CircleXIcon, FilterIcon, PlusIcon, SearchIcon } from '../../../components/ui/icons';
 import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
 import {
@@ -44,6 +46,7 @@ type TabType = 'both' | 'inperson' | 'video';
 
 export const AppointmentsScreen: React.FC = () => {
     const navigation = useNavigation();
+    const insets = useSafeAreaInsets();
     const [activeTab, setActiveTab] = useState<TabType>('both');
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilterPanel, setShowFilterPanel] = useState(false);
@@ -512,6 +515,23 @@ export const AppointmentsScreen: React.FC = () => {
                     setShowFilterPanel(false);
                 }}
             />
+
+            <TouchableOpacity
+                style={[
+                    doctorAppointmentsStyles.fab,
+                    {
+                        bottom: getBottomBarHeight(insets.bottom) + 16,
+                        right: 20,
+                        zIndex: 999,
+                    },
+                ]}
+                onPress={() => navigation.navigate(AppRoute.BOOK_APPOINTMENT)}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel="Book appointment"
+            >
+                <PlusIcon size={24} color={theme.colors.surface} />
+            </TouchableOpacity>
         </SafeAreaWrapper>
     );
 };

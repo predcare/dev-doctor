@@ -52,6 +52,9 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
       bmi: patientInfo?.bmi || '',
       drug_allergies: patientInfo?.drug_allergies || '',
       medical_history: patientInfo?.medical_history || '',
+      city: patientInfo?.city || '',
+      state: patientInfo?.state || '',
+      country: patientInfo?.country || '',
     }),
     [patientInfo]
   );
@@ -63,6 +66,9 @@ export const PatientProfileTabPanel: React.FC<ProfileTabProps> = ({ patientInfo 
         { label: 'Phone', value: patient.phone },
         { label: 'Alternate Phone', value: patient.alternate_number || "-" },
         { label: 'Address', value: patient.address || "-" },
+        { label: 'City', value: patient.city || "-" },
+        { label: 'State', value: patient.state || "-" },
+        { label: 'Country', value: patient.country || "-" },
       ].filter(r => r.value),
     [patient]
   );

@@ -106,9 +106,10 @@ export const HomeScreen: React.FC = () => {
         refetch: refetchAppointments,
     } = useHomeUpcomingAppts({
         page: 1,
-        limit: 2,
-        status: 'upcoming,pending',
+        limit: 3,
+        status: 'upcoming,pending,confirmed',
         date_range: 'today',
+        consultation_type: 'video,in-person'
     });
 
     const onRefresh = useCallback(async () => {

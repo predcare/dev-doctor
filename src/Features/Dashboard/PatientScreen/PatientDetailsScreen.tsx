@@ -112,8 +112,8 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
                         <View style={{ flex: 1 }}>
                             {activeMainTab === 'records' && <RecordsTabPanel patientId={patientId} />}
                             {activeMainTab === 'prescriptions' && <PrescriptionsTabPanel patientId={patientId} />}
-                            {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
                             {activeMainTab === 'consultation' && <ConsultTabPanel patientId={patientId} />}
+                            {activeMainTab === 'profile' && <PatientProfileTabPanel patientInfo={patientInfo} />}
                         </View>
                     </>
                 )}

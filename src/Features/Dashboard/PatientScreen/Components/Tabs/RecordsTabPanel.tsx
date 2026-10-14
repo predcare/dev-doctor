@@ -1,18 +1,20 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Linking, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
+import RNFS from 'react-native-fs';
 import CommonEmptyCard from '../../../../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../../../../components/commons/CommonErrorCard/CommonErrorCard';
 import { PlusIcon } from '../../../../../components/ui/icons';
 import { useMyPatientEmrs, useShareEmrDocument } from '../../../../../hooks/react-query/patients/patients.hooks';
-import { showInfoToast, showSuccessToast } from '../../../../../lib/commons/toast.utils';
+import { sanitizeFilename } from '../../../../../lib/commons/file.utils';
+import { showErrorToast, showInfoToast, showSuccessToast } from '../../../../../lib/commons/toast.utils';
 import { RecordsTabRouteProp } from '../../../../../route';
 import { recordTabstyles } from '../../../../../styled/PatientDetailsScreen.styled';
 import theme from '../../../../../styled/theme.styled';
 import { IPatientEMRDoc } from '../../../../../typescripts/interfaces/profile.interfaces';
 import { useAuthStore } from '../../../../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../../../../zustand/stores/useLoadingStore';
-import DocumentActionsModal from '../../Modals/DocumentActionsModal';
+import EmrDetailsModal from '../../Modals/EmrDetailsModal';
 import EMRUploadModal from '../../Modals/EMRUploadModal';
 import MedicalRecordsSkeleton from '../../Skeletons/MedicalRecordsSkeleton';
 import MedicalDocumentCard from '../MedicalDocumentCard';
@@ -104,6 +106,56 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
     }
   };
 
+  const handleDownloadDocument = async (doc: IPatientEMRDoc) => {
+    const url = doc.document_url;
+    if (!url) {
+      showErrorToast('Document file is not available', 'Download Document');
+      return;
+    }
+
+    const cleanPath = url.split('?')[0] || '';
+    const ext = (cleanPath.split('.').pop() || 'jpg').toLowerCase();
+    const baseName = (doc.title || doc.document_type || 'Document').replace(/[^A-Za-z0-9_-]/g, '_');
+    const filename = sanitizeFilename(`${baseName}.${ext}`, `Document.${ext}`);
+    const folders = [RNFS.DownloadDirectoryPath, RNFS.DocumentDirectoryPath].filter(Boolean);
+
+    showLoader('Downloading document');
+    try {
+      let savedPath = '';
+      let lastError: unknown = null;
+
+      for (const dir of folders) {
+        try {
+          if (!(await RNFS.exists(dir))) {
+            await RNFS.mkdir(dir);
+          }
+          const destPath = `${dir}/${filename}`;
+          if (await RNFS.exists(destPath)) {
+            await RNFS.unlink(destPath);
+          }
+          const result = await RNFS.downloadFile({ fromUrl: url, toFile: destPath }).promise;
+          if (result.statusCode >= 200 && result.statusCode < 300) {
+            savedPath = destPath;
+            break;
+          }
+          lastError = new Error('Could not download document');
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      if (!savedPath) {
+        const message = lastError instanceof Error ? lastError.message : 'Could not download document';
+        showErrorToast(message, 'Download Document');
+        return;
+      }
+
+      showSuccessToast(`${filename} saved to Downloads`, 'Download Document');
+    } finally {
+      hideLoader();
+    }
+  };
+
   useEffect(() => {
     if (route.params?.openUploadModal) {
       setShowUploadModal(true);
@@ -186,11 +238,12 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
         />
       )}
 
-      <DocumentActionsModal
+      <EmrDetailsModal
         visible={showActionsModal}
         document={selectedDocForAction}
         onOpenDocument={handleOpenDocument}
         onSaveToDevice={handleSaveToDevice}
+        onDownload={handleDownloadDocument}
         onClose={() => {
           setShowActionsModal(false);
           setSelectedDocForAction(null);

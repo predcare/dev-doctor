@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {userData?.name || "Doctor"}
+                Dr.{userData?.name || "Doctor"}
               </Text>
             </View>
           </TouchableOpacity>

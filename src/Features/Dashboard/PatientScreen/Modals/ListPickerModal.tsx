@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../../../styled/theme.styled';
 
 export interface ListPickerProps {
@@ -29,61 +30,65 @@ export const ListPickerModal: React.FC<ListPickerProps> = React.memo(
     selected,
     onPick,
     isLoading = false,
-  }) => (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <TouchableOpacity style={s.overlay} activeOpacity={1} onPress={onClose}>
-        <View style={s.sheet}>
-          <View style={s.sheetHead}>
-            <Text style={s.sheetTitle}>{title}</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Text style={s.sheetX}>✕</Text>
-            </TouchableOpacity>
-          </View>
-          {isLoading ? (
-            <View style={{ padding: 32, alignItems: 'center' }}>
-              <ActivityIndicator color={theme.colors.primary} size="large" />
+  }) => {
+    const insets = useSafeAreaInsets();
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        statusBarTranslucent
+        animationType="slide"
+        onRequestClose={onClose}
+      >
+        <TouchableOpacity style={s.overlay} activeOpacity={1} onPress={onClose}>
+          <View style={[s.sheet, { paddingBottom: insets.bottom }]}>
+            <View style={s.sheetHead}>
+              <Text style={s.sheetTitle}>{title}</Text>
+              <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Text style={s.sheetX}>✕</Text>
+              </TouchableOpacity>
             </View>
-          ) : (
-            <FlatList
-              data={items}
-              keyExtractor={it => it.id.toString()}
-              style={{ maxHeight: 420 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              ListEmptyComponent={
-                <View style={{ padding: 32, alignItems: 'center' }}>
-                  <Text style={s.emptyTxt}>No options available</Text>
-                </View>
-              }
-              renderItem={({ item: it }) => {
-                const sel = it.name === selected;
-                return (
-                  <TouchableOpacity
-                    style={[s.opt, sel && s.optSel]}
-                    onPress={() => {
-                      onPick(it);
-                      onClose();
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[s.optTxt, sel && s.optTxtSel]}>
-                      {it.name}
-                    </Text>
-                    {sel && <Text style={s.tick}>✓</Text>}
-                  </TouchableOpacity>
-                );
-              }}
-            />
-          )}
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  )
+            {isLoading ? (
+              <View style={{ padding: 32, alignItems: 'center' }}>
+                <ActivityIndicator color={theme.colors.primary} size="large" />
+              </View>
+            ) : (
+              <FlatList
+                data={items}
+                keyExtractor={it => it.id.toString()}
+                style={{ maxHeight: 420 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                  <View style={{ padding: 32, alignItems: 'center' }}>
+                    <Text style={s.emptyTxt}>No options available</Text>
+                  </View>
+                }
+                renderItem={({ item: it }) => {
+                  const sel = it.name === selected;
+                  return (
+                    <TouchableOpacity
+                      style={[s.opt, sel && s.optSel]}
+                      onPress={() => {
+                        onPick(it);
+                        onClose();
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[s.optTxt, sel && s.optTxtSel]}>
+                        {it.name}
+                      </Text>
+                      {sel && <Text style={s.tick}>✓</Text>}
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  }
 );
 
 const s = StyleSheet.create({
