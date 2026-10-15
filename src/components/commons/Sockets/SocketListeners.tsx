@@ -4,8 +4,7 @@ import { SocketEvents } from '../../../config/socket.constants';
 import { leaveActiveMeeting } from '../../../hooks/commons/meeting/meetingSessionLeave';
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import { showInfoToast } from '../../../lib/commons/toast.utils';
-import NativePip from '../../../native/NativePip';
-import { navigationRef, resetRoot } from '../../../navigation/navigationRef';
+import { navigationRef } from '../../../navigation/navigationRef';
 import { AppRoute } from '../../../route';
 import { useAlertStore } from '../../../zustand/stores/useAlertStore';
 import useIncomingCallStore from '../../../zustand/stores/useIncomingCallStore';
@@ -78,10 +77,6 @@ const SocketListeners = () => {
       if (!isCallActiveForThisAppt) return;
 
       await leaveActiveMeeting();
-      NativePip.exitPipMode();
-      NativePip.setMeetingScreenState(false);
-
-      useMeetingStore.getState().resetCallInfo();
       useLoadingStore.getState().hideLoader();
 
       await queryClient.invalidateQueries({
@@ -100,12 +95,6 @@ const SocketListeners = () => {
       }
 
       showInfoToast('Consultation time has ended. The call has ended.', 'Time Up');
-
-      if (navigationRef.isReady()) {
-        resetRoot(AppRoute.CONSULTATION_COMPLETED, {
-          appointmentId: incomingApptId,
-        });
-      }
     };
 
     socketConnection.on(SocketEvents.HEARTBEAT, handleHeartbeat);

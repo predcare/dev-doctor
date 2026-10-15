@@ -9,6 +9,10 @@ import useMeetingAppState from '../../hooks/commons/meeting/useMeetingAppState';
 import useMeetingCaptureHandoff from '../../hooks/commons/meeting/useMeetingCaptureHandoff';
 import { useMeetingCountdownTicker } from '../../hooks/commons/meeting/useMeetingCountdown';
 import { useRegisterMeetingLeave } from '../../hooks/commons/meeting/meetingSessionLeave';
+import {
+  openMeetingStatusOnce,
+  resetMeetingStatusGuard,
+} from '../../hooks/commons/meeting/openMeetingStatus';
 import useMeetingParticipants, {
   usePatientVideoQuality,
 } from '../../hooks/commons/meeting/useMeetingParticipants';
@@ -54,7 +58,6 @@ export const MeetingSessionHost: React.FC = () => {
   const isCamOn = useMeetingStore(state => state.isCamOn);
   const isFrontCamera = useMeetingStore(state => state.isFrontCamera);
   const setCallState = useMeetingStore(state => state.setCallState);
-  const resetCallInfo = useMeetingStore(state => state.resetCallInfo);
   const userData = useAuthStore((state) => state.userData)
 
   const token = callInfo?.token;
@@ -106,13 +109,14 @@ export const MeetingSessionHost: React.FC = () => {
     >
       <MeetingConsumer
         onMeetingJoined={() => {
+          resetMeetingStatusGuard();
           const state = useMeetingStore.getState();
           if (state.callState === 'IDLE') {
             setCallState('CONNECTING');
           }
         }}
         onMeetingLeft={() => {
-          resetCallInfo();
+          openMeetingStatusOnce();
         }}
         onError={({ code, message }) => {
           console.warn(`[VideoSDK] Meeting error (${code}): ${message}`);
