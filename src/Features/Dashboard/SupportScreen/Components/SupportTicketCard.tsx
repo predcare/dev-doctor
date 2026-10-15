@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { CheckIcon, TrashIcon } from '../../../../components/ui/icons';
-import { formatDate, getInitials } from '../../../../lib/commons/common.utils';
+import { _toTitleCase, formatDate, getInitials } from '../../../../lib/commons/common.utils';
 import supportStyles from '../../../../styled/SupportScreen.styled';
 import theme from '../../../../styled/theme.styled';
 
@@ -37,7 +37,7 @@ export const SupportTicketCard: React.FC<SupportTicketCardProps> = ({
   style,
   disabled = false,
 }) => {
-  const isOpenStatus = status?.toLowerCase() === 'open';
+  const isOpenStatus = status?.toLowerCase() === 'open' || status?.toLowerCase() === 'in_progress';
   const translateX = useRef(new Animated.Value(0)).current;
   const currentOffset = useRef(0);
   const isOpenSwipe = useRef(false);
@@ -175,7 +175,7 @@ export const SupportTicketCard: React.FC<SupportTicketCardProps> = ({
                 isOpenStatus ? supportStyles.statusTxtOpen : supportStyles.statusTxtClosed,
               ]}
             >
-              {isOpenStatus ? 'Open' : 'Closed'}
+              {_toTitleCase(status)}
             </Text>
           </View>
         </TouchableOpacity>

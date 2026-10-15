@@ -10,7 +10,7 @@ import {
 } from '../../../hooks/react-query/support-tickets/support-tickets.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
-import { formatDate, getInitials } from '../../../lib/commons/common.utils';
+import { _toTitleCase, formatDate, getInitials } from '../../../lib/commons/common.utils';
 import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import supportStyles, { SupportTicketDetailsStyled } from '../../../styled/SupportScreen.styled';
 import { theme } from '../../../styled/theme.styled';
@@ -64,9 +64,8 @@ export const SupportTicketDetailsScreen: React.FC = () => {
 
     showConfirm({
       title: 'Delete Ticket',
-      message: `Are you sure you want to delete ticket #${
-        ticketInfo.ticket_no || ticketInfo.id
-      }? This action cannot be undone.`,
+      message: `Are you sure you want to delete ticket #${ticketInfo.ticket_no || ticketInfo.id
+        }? This action cannot be undone.`,
       buttonText: 'Yes, Delete',
       cancelText: 'Cancel',
       onConfirm: () => {
@@ -218,7 +217,7 @@ export const SupportTicketDetailsScreen: React.FC = () => {
                   !isClosed ? supportStyles.statusTxtOpen : supportStyles.statusTxtClosed,
                 ]}
               >
-                {!isClosed ? 'Open' : 'Closed'}
+                {_toTitleCase(ticketInfo.status)}
               </Text>
             </View>
           </View>
