@@ -76,10 +76,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const nameFontSize = useMemo(() => {
     const len = (userData?.name || "Dr").length;
-    if (len > 30) return 13;
-    if (len > 22) return 13;
-    if (len > 16) return 14;
-    return 15;
+    if (len > 30) return 16;
+    if (len > 22) return 16;
+    if (len > 16) return 16;
+    return 16;
   }, [userData?.name]);
 
   const nameLineHeight = useMemo(() => {
@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                Dr.{userData?.name || "Doctor"}
+                Dr. {userData?.name || "Doctor"}
               </Text>
             </View>
           </TouchableOpacity>

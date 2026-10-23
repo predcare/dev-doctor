@@ -40,7 +40,7 @@ export const BOTTOM_BAR_TABS: TabConfig[] = [
   {
     key: 'Patients',
     label: 'Patients',
-    icon: ({ color, size }) => <PatientsIcon size={size} color={color} />,
+    icon: ({ color }) => <PatientsIcon color={color} />,
   },
   {
     key: 'Appointments',
@@ -200,7 +200,7 @@ export const CustomBottomBar: React.FC<CustomBottomBarProps> = ({
       <View style={customBarStyles.tabsRow}>
         {renderedTabs.map(tab => {
           const isFocused = currentTabKey === tab.key;
-          const color = isFocused ? theme.colors.primary : theme.colors.textSlate;
+          const color = isFocused ? theme.colors.blueFocusedColor : theme.colors.textSlate;
 
           return (
             <TouchableOpacity
@@ -227,14 +227,14 @@ export const CustomBottomBar: React.FC<CustomBottomBarProps> = ({
                       : navigationStyles.inactiveIconContainer
                   }
                 >
-                  {tab.icon({ color, size: 20 })}
+                  {tab.icon({ color, size: 22 })}
                 </View>
                 <Text
                   style={[
                     navigationStyles.tabLabel,
                     {
                       color,
-                      fontWeight: isFocused ? '700' : '500',
+                      fontWeight: isFocused ? '600' : '500',
                     },
                   ]}
                   numberOfLines={1}

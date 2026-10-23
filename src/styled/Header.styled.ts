@@ -8,7 +8,7 @@ export const headerStyles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 8 : 10,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(226, 232, 240, 0.8)',
+    borderBottomColor: theme.colors.border,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -87,7 +87,7 @@ export const headerStyles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.primary,
     borderWidth: 1.5,
     borderColor: theme.colors.primary,
     justifyContent: 'center',
@@ -99,9 +99,9 @@ export const headerStyles = StyleSheet.create({
     elevation: 2,
   },
   avatarText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary,
+    color: theme.colors.white,
     letterSpacing: 0.5,
   },
   onlineBadge: {
@@ -121,8 +121,8 @@ export const headerStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   welcomeText: {
-    fontSize: 11,
-    color: theme.colors.textMuted,
+    fontSize: 13,
+    color: theme.colors.textSlate,
     fontWeight: theme.fontWeight.medium,
     letterSpacing: 0.4,
     marginBottom: 1,
@@ -131,7 +131,7 @@ export const headerStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     letterSpacing: -0.2,
-    fontSize: 13,
+    fontSize: 20,
   },
   specialtyBadgeRow: {
     flexDirection: 'row',
@@ -169,7 +169,7 @@ export const headerStyles = StyleSheet.create({
   iconButton: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: 50,
     backgroundColor: theme.colors.surfaceSecondary,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,

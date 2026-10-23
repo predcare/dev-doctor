@@ -7,6 +7,8 @@ export const theme = {
     primaryDark: '#0D9488', // Darker Teal
     primaryLight: '#14B8A6', // Bright Mint Teal
     primarySoft: '#F0FDFA', // Soft Mint Light Background
+    inPersonBg: '#EFF6FF',
+    videoCallBtnBg: '#22C55E',
 
     // Mint Accents & Badges
     mint: '#2DD4BF', // Vibrant Mint
@@ -15,6 +17,7 @@ export const theme = {
 
     accent: '#1D4ED8', // Sky Blue Accent
     accentLight: '#E0F2FE', // Light Sky Blue
+    blueFocusedColor: '#0EA5E9',
 
     // Status colors
     success: '#22C55E',
@@ -31,7 +34,7 @@ export const theme = {
     infoSoft: '#DBEAFE',
 
     // Neutral & Surface Colors
-    background: '#F1F5F9',
+    background: '#F5F8F8',
     surface: '#FFFFFF',
     surfaceSecondary: '#F1F5F9',
     surfaceBorder: '#E2E8F0',
@@ -42,6 +45,8 @@ export const theme = {
     textMuted: '#94A3B8',
     textSlate: '#64748B',
     textInverted: '#FFFFFF',
+    textGreen: '#00897B',
+    textInPerson: '#3B82F6',
 
     // Compatibility Tokens
     teal: '#0F766E',
@@ -53,7 +58,7 @@ export const theme = {
     slate: '#64748B',
     bg: '#F1F5F9',
     white: '#FFFFFF',
-    border: '#E2E8F0',
+    border: '#E2E7EE',
     green: '#22C55E',
     greenBg: '#DCFCE7',
     red: '#EF4444',

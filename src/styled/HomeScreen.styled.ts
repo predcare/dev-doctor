@@ -49,24 +49,24 @@ export const homeStyles = StyleSheet.create({
     overflow: 'visible',
   },
   insightsTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   periodPill: {
-    backgroundColor: theme.colors.primarySoft,
+    // backgroundColor: theme.colors.primarySoft,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    // borderWidth: 1,
+    // borderColor: theme.colors.mintBdr,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
   periodPillText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.medium,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary,
   },
   periodDropdownMenu: {
@@ -91,7 +91,7 @@ export const homeStyles = StyleSheet.create({
     borderBottomColor: theme.colors.surfaceSecondary,
   },
   periodMenuItemText: {
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.textPrimary,
   },
   periodMenuItemTextActive: {
@@ -124,13 +124,14 @@ export const homeStyles = StyleSheet.create({
     alignItems: 'center',
   },
   statTileValue: {
-    fontSize: 22,
+    fontSize: 23,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginBottom: 3,
+    paddingRight: 1,
   },
   statTileLabel: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
@@ -142,14 +143,14 @@ export const homeStyles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
   },
   sectionLink: {
     fontSize: 12,
-    color: theme.colors.primary,
-    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.textGreen,
+    fontWeight: theme.fontWeight.bold,
   },
 
   appointmentCard: {
@@ -184,8 +185,8 @@ export const homeStyles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    // borderWidth: 1,
+    // borderColor: '#E2E8F0',
   },
   apptTime: {
     fontSize: 11.5,
@@ -196,12 +197,11 @@ export const homeStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#DCFCE7',
+    backgroundColor: theme.colors.primarySoft,
     paddingHorizontal: 8,
+    color: theme.colors.textGreen,
     paddingVertical: 4,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#86EFAC',
   },
   liveStatusDot: {
     width: 6,
@@ -210,7 +210,7 @@ export const homeStyles = StyleSheet.create({
     backgroundColor: '#16A34A',
   },
   liveStatusText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: theme.fontWeight.semibold,
     color: '#15803D',
   },
@@ -232,20 +232,20 @@ export const homeStyles = StyleSheet.create({
     paddingVertical: 4.5,
     borderRadius: 20,
     gap: 5,
-    borderWidth: 1,
+    // borderWidth: 1,
     flexShrink: 0,
   },
   consultBadgeVideo: {
-    backgroundColor: theme.colors.primarySoft,
-    borderColor: theme.colors.mintBdr,
+    backgroundColor: theme.colors.inPersonBg,
+    // borderColor: theme.colors.mintBdr,
   },
   consultBadgeClinic: {
-    backgroundColor: '#FFF7ED',
-    borderColor: '#FED7AA',
+    backgroundColor: theme.colors.inPersonBg,
+    // borderColor: '#FED7AA',
   },
   consultBadgeText: {
     fontSize: 10.5,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.bold,
     letterSpacing: 0.2,
   },
   apptPatientRow: {
@@ -260,8 +260,6 @@ export const homeStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.primary,
-    borderWidth: 2,
-    borderColor: '#CCFBF1',
     marginRight: 12,
     flexShrink: 0,
   },
@@ -299,11 +297,10 @@ export const homeStyles = StyleSheet.create({
   },
   apptIdBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 6,
+    paddingHorizontal: 0,
     paddingVertical: 2,
     borderRadius: 4,
-    marginTop: 4,
+    marginTop: 2,
   },
   aptIdText: {
     fontSize: 10,
@@ -317,14 +314,9 @@ export const homeStyles = StyleSheet.create({
     paddingLeft: 8,
   },
   symptomsContainer: {
-    backgroundColor: '#F8FAFC',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderLeftWidth: 3.5,
-    borderLeftColor: theme.colors.primary,
     marginBottom: 12,
   },
   symptomsText: {
@@ -357,9 +349,9 @@ export const homeStyles = StyleSheet.create({
     paddingRight: 8,
   },
   viewDetailsText: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.primary,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.textGreen,
   },
   detailsBtn: {
     backgroundColor: theme.colors.primary,
@@ -383,7 +375,7 @@ export const homeStyles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -408,6 +400,9 @@ export const homeStyles = StyleSheet.create({
   },
   joinBtnTextDisabled: {
     color: theme.colors.grayText,
+  },
+  videoBg: {
+    backgroundColor: theme.colors.videoCallBtnBg,
   },
 
   // Need Assistance Banner
@@ -484,7 +479,7 @@ export const homeStyles = StyleSheet.create({
     ...globalShadows.card,
   },
   quickAccessLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSecondary,
     letterSpacing: 0.4,

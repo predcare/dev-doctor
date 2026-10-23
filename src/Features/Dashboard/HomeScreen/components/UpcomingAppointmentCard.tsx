@@ -4,8 +4,7 @@ import {
   ChevronRightIcon,
   ClinicIcon,
   ClockIcon,
-  PlayCircleIcon,
-  VideoIcon,
+  VideoIcon
 } from '../../../../components/ui/icons';
 import { capitalize, getAge, getInitials, shouldHideJoinForCallDuration } from '../../../../lib/commons/common.utils';
 import { homeStyles } from '../../../../styled/HomeScreen.styled';
@@ -143,14 +142,14 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
           ]}
         >
           {isVideo ? (
-            <VideoIcon size={12} color={theme.colors.primary} />
+            <VideoIcon size={12} color={theme.colors.textInPerson} />
           ) : (
-            <ClinicIcon size={12} color="#EA580C" />
+            <ClinicIcon size={12} color={theme.colors.textInPerson} />
           )}
           <Text
             style={[
               homeStyles.consultBadgeText,
-              { color: isVideo ? theme.colors.primary : '#EA580C' },
+              { color: isVideo ? theme.colors.textInPerson : theme.colors.textInPerson },
             ]}
           >
             {isVideo ? 'Video Call' : 'In-Clinic'}
@@ -216,16 +215,15 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
             style={[
               homeStyles.joinBtn,
               isExpired && homeStyles.joinBtnDisabled,
+              isVideo && homeStyles.videoBg
             ]}
             onPress={handlePress}
             activeOpacity={0.85}
             disabled={isExpired}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            {isVideo ? (
-              <VideoIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
-            ) : (
-              <PlayCircleIcon size={13} color={isExpired ? theme.colors.grayText : '#FFFFFF'} />
+            {isVideo && (
+              <VideoIcon size={13} color={'#FFFFFF'} />
             )}
             <Text
               style={[

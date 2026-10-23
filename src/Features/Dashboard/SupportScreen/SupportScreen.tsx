@@ -132,7 +132,6 @@ export const SupportScreen: React.FC = () => {
       style={supportStyles.screen}
       headerBackgroundColor={theme.colors.surface}
       showBottomBar={true}
-      activeBottomTab="Account"
       header={
         <Header
           isBackBtn={true}

@@ -1,18 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import CustomMenu from '../../../components/ui/CustomDropdown/CustomMenu';
 import {
     CalendarIcon,
-    ClockIcon,
     InvoiceIcon,
-    PatientsIcon,
     PrescriptionIcon,
-    ScheduleIcon,
-    WalletIcon,
+    ScheduleIcon
 } from '../../../components/ui/icons';
+import CalendarCheckIcon from '../../../components/ui/icons/CalendarCheckIcon';
+import EarningIcon from '../../../components/ui/icons/EarningIcon';
 import EmptyIcon from '../../../components/ui/icons/EmptyIcon';
-import { queryClient } from '../../../components/providers/ReactQueryProvider';
+import PatientWalkIcon from '../../../components/ui/icons/PatientWalkIcon';
 import useJoinVideoCall from '../../../hooks/commons/meeting/useJoinVideoCall';
 import { useChangeAppointmentStatus } from '../../../hooks/react-query/appointments/appointments.hooks';
 import { useHomeUpcomingAppts } from '../../../hooks/react-query/home/home.hooks';
@@ -21,13 +21,13 @@ import { useDoctorStats } from '../../../hooks/react-query/stats/stats.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import { formatTime12h } from '../../../lib/commons/availability.utils';
-import { resolveAppointmentDurationMinutes } from '../../../lib/commons/common.utils';
+import { _formatShortNumber, resolveAppointmentDurationMinutes } from '../../../lib/commons/common.utils';
 import { showErrorToast } from '../../../lib/commons/toast.utils';
-import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import { AppRoute } from '../../../route';
 import { homeStyles } from '../../../styled/HomeScreen.styled';
 import theme from '../../../styled/theme.styled';
 import { useAuthStore } from '../../../zustand/stores/useAuthStore';
+import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import { useMeetingStore } from '../../../zustand/stores/useMeetingStore';
 import AssistanceBanner from './components/AssistanceBanner';
 import HomeStatsCard from './components/HomeStatsCard';
@@ -53,25 +53,25 @@ const quickAccessItems = [
         id: 'q1',
         label: 'BOOK APPT',
         screen: 'BookAppointment' as const,
-        icon: <CalendarIcon size={30} color={theme.colors.primary} />,
+        icon: <CalendarIcon size={30} color={theme.colors.textInPerson} />,
     },
     {
         id: 'q2',
         label: 'WRITE RX',
         screen: 'Prescription' as const,
-        icon: <PrescriptionIcon size={30} color={theme.colors.primary} />,
+        icon: <PrescriptionIcon size={30} color={theme.colors.textInPerson} />,
     },
     {
         id: 'q3',
         label: 'AVAILABILITY',
         screen: 'Availability' as const,
-        icon: <ScheduleIcon size={30} color={theme.colors.primary} />,
+        icon: <ScheduleIcon size={30} color={theme.colors.textInPerson} />,
     },
     {
         id: 'q4',
         label: 'BILLING',
         screen: 'Invoices' as const,
-        icon: <InvoiceIcon size={30} color={theme.colors.primary} />,
+        icon: <InvoiceIcon size={30} color={theme.colors.textInPerson} />,
     },
 ];
 
@@ -172,13 +172,13 @@ export const HomeScreen: React.FC = () => {
 
     const homeStats = useMemo(() => {
         return [
-            {
-                id: '1',
-                label: 'Upcoming Appts',
-                value: statsInfo?.upcoming_appointments || 0,
-                icon: <ClockIcon size={20} color="#8B5CF6" />,
-                iconBg: '#F3E8FF',
-            },
+            // {
+            //     id: '1',
+            //     label: 'Upcoming Appts',
+            //     value: statsInfo?.upcoming_appointments || 0,
+            //     icon: <CalendarCheckIcon size={32} color="#9333EA" />,
+            //     iconBg: '#F3E8FF',
+            // },
             {
                 id: '2',
                 label:
@@ -188,22 +188,20 @@ export const HomeScreen: React.FC = () => {
                             ? '7 Days Appts'
                             : '30 Days Appts',
                 value: statsInfo?.week_appointments || 0,
-                icon: <CalendarIcon size={20} color="#0EA5E9" />,
-                iconBg: '#E0F2FE',
+                icon: <CalendarCheckIcon size={32} color="#9333EA" />,
             },
             {
                 id: '3',
                 label: 'Earnings',
-                value: `₹${statsInfo?.earnings || 0}`,
-                icon: <WalletIcon size={20} color="#10B981" />,
-                iconBg: '#D1FAE5',
+                value: `₹${_formatShortNumber(Number(statsInfo?.earnings))}`,
+                icon: <EarningIcon size={32} color="#10B981" />,
             },
             {
                 id: '4',
                 label: 'Total Patients',
                 value: statsInfo?.total_patients || 0,
-                icon: <PatientsIcon size={20} color="#F59E0B" />,
-                iconBg: '#FEF3C7',
+                icon: <PatientWalkIcon size={23} color="#3B82F6" />,
+                iconBg: '#f5f7f7ff',
             },
         ];
     }, [period]);
@@ -310,7 +308,7 @@ export const HomeScreen: React.FC = () => {
                                     dateOfBirth={apt?.patientInfo?.dateOfBirth}
                                     time={formatTime12h(apt.start_time)}
                                     consultType={apt.consultation_type || 'ONLINE'}
-                                    chiefComplaint={apt.reason || ''}
+                                    chiefComplaint={apt.reason || 'Dummy Symtoms'}
                                     isExpired={false}
                                     isJoinedOnce={
                                         apt?.appointment_status === 'in_progress' ||

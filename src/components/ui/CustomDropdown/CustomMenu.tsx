@@ -152,17 +152,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: theme.colors.primarySoft,
+        // backgroundColor: theme.colors.primarySoft,
         borderRadius: 20,
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderWidth: 1,
-        borderColor: theme.colors.mintBdr,
+        // borderWidth: 1,
+        // borderColor: theme.colors.mintBdr,
     },
     triggerText: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: theme.fontWeight.medium,
-        color: theme.colors.primary,
+        color: theme.colors.textGreen,
+        lineHeight: 16
     },
     menu: {
         position: 'absolute',
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
     },
     itemText: {
         flex: 1,
-        fontSize: 11,
+        fontSize: 12,
         color: theme.colors.textPrimary,
     },
     itemTextActive: {

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Text, View } from 'react-native';
 import { homeStyles } from '../../../../styled/HomeScreen.styled';
-import theme from '../../../../styled/theme.styled';
 
 export interface StatTileProps {
   label: string;
@@ -15,7 +14,7 @@ export const HomeStatsCard: React.FC<StatTileProps> = ({
   label,
   value,
   icon,
-  iconBg = theme.colors.surfaceSecondary,
+  iconBg,
   loading = false,
 }) => {
   const pulseAnim = useRef(new Animated.Value(0.3)).current;
