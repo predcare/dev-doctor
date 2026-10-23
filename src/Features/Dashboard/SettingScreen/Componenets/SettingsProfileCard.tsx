@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { getInitials } from '../../../../lib/commons/common.utils';
+import { _toTitleCase, getInitials } from '../../../../lib/commons/common.utils';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
 
@@ -12,9 +12,7 @@ export const SettingsProfileCard = React.memo<SettingsProfileCardProps>(({ onEdi
   const { userData } = useAuthStore(state => state);
 
   const doctorName = userData?.name ? `Dr. ${userData?.name}` : 'Dr.';
-  const degreeDetails = [userData?.specialization, userData?.qualifications]
-    .filter(Boolean)
-    .join(' • ');
+  const degreeDetails = _toTitleCase(userData?.qualifications ?? '');
 
   return (
     <View style={profileStyles.profileCard}>

@@ -35,7 +35,7 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
       <SettingsSectionLabel title="ACCOUNT SETTINGS" />
       <View style={profileStyles.menuGroup}>
         <SettingsRowItem
-          icon={<ProfessionalDetailsIcon size={18} color={theme.colors.primary} />}
+          icon={<ProfessionalDetailsIcon size={18} color={theme.colors.primaryDark} />}
           label="Professional Details"
           onPress={onNavigateProfile}
         />

@@ -75,3 +75,8 @@ export interface IPaginateMeta {
   total_pages: number;
   limit: number;
 }
+
+export interface ISpecializationData {
+  specialization?: string | string[];
+  sub_specializations?: Record<string, string[]>;
+}

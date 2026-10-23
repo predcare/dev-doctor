@@ -31,7 +31,7 @@ export const headerStyles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: theme.colors.surfaceSecondary,
+    backgroundColor: theme.colors.inPersonBg,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
     justifyContent: 'center',

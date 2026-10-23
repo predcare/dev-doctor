@@ -47,6 +47,8 @@ export const theme = {
     textInverted: '#FFFFFF',
     textGreen: '#00897B',
     textInPerson: '#3B82F6',
+    text0F766E: '#0F766E', // dark black color
+    text334155: '#2E333A', // dark gray color
 
     // Compatibility Tokens
     teal: '#0F766E',

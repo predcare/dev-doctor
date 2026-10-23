@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { ClockIcon } from '../../../../components/ui/icons';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import theme from '../../../../styled/theme.styled';
 
@@ -43,14 +42,13 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
       <View style={profileStyles.currentPlanCard}>
         <Text style={profileStyles.expandedMeta}>CURRENT PLAN</Text>
         <View style={profileStyles.planHeaderRow}>
-          <Text style={profileStyles.planName}>Trial Plan</Text>
+          <Text style={profileStyles.planName}>PLAN: TRIAL</Text>
           <View style={profileStyles.activeBadge}>
             <Text style={profileStyles.activeBadgeTxt}>ACTIVE</Text>
           </View>
         </View>
 
         <View style={profileStyles.renewalRow}>
-          <ClockIcon size={14} color={theme.colors.textMuted} />
           <Text style={profileStyles.renewalText}>Renews on {dayjs().format('MMM DD, YYYY')}</Text>
         </View>
 

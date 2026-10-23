@@ -26,6 +26,7 @@ import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import {
     capitalize,
     formatDate,
+    formatSpecialization,
     getInitials,
     openLocationOnMap,
 } from '../../../lib/commons/common.utils';
@@ -124,13 +125,10 @@ export const ProfileScreen: React.FC = () => {
                                     </Text>
                                 </View>
                             </View>
-                            <View style={doctorProfileStyles.verifiedBadge}>
-                                <CheckBadgeIcon color={theme.colors.surface} size={10} />
-                            </View>
                         </View>
                         <View style={doctorProfileStyles.heroInfo}>
                             <Text style={doctorProfileStyles.drName}>
-                                {`${doctorProfile.salutation || 'DR.'} ${doctorProfile.name}`.toUpperCase()}
+                                {`${doctorProfile.salutation || 'DR.'} ${doctorProfile.name}`}
                             </Text>
                             <View style={doctorProfileStyles.idRow}>
                                 <Text style={doctorProfileStyles.drId}>ID: {doctorProfile.doctor_id}</Text>
@@ -140,26 +138,18 @@ export const ProfileScreen: React.FC = () => {
                                         doctorProfileStyles.activeBadge,
                                         {
                                             backgroundColor: isActive
-                                                ? theme.colors.successLight
+                                                ? theme.colors.inPersonBg
                                                 : theme.colors.dangerLight,
                                         },
                                     ]}
                                 >
-                                    <View
-                                        style={[
-                                            doctorProfileStyles.activeDot,
-                                            {
-                                                backgroundColor: isActive ? theme.colors.success : theme.colors.danger,
-                                            },
-                                        ]}
-                                    />
                                     <Text
                                         style={[
                                             doctorProfileStyles.activeTxt,
-                                            { color: isActive ? theme.colors.success : theme.colors.danger },
+                                            { color: isActive ? theme.colors.primaryDark : theme.colors.danger },
                                         ]}
                                     >
-                                        {isActive ? 'ACTIVE' : 'INACTIVE'}
+                                        {isActive ? 'ACTIVE' : 'Inactive'}
                                     </Text>
                                 </View>
                             </View>
@@ -198,7 +188,9 @@ export const ProfileScreen: React.FC = () => {
                         {doctorProfile.specialization && (
                             <ProfileInfoCard
                                 label="SPECIALIZATION"
-                                value={doctorProfile.specialization}
+                                value={formatSpecialization({
+                                    specialization: doctorProfile.specialization,
+                                })}
                                 iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
                             />
                         )}
@@ -271,7 +263,7 @@ export const ProfileScreen: React.FC = () => {
                             <ProfileInfoCard
                                 label="ADDRESS"
                                 value={doctorProfile.address}
-                                iconPath={<LocationIcon size={18} color={theme.colors.primary} />}
+                                iconPath={<LocationIcon size={18} color={theme.colors.primary} outline={true} />}
                             />
                         )}
                         {doctorProfile.alternate_number && (

@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { Linking, Platform } from 'react-native';
+import { ISpecializationData } from '../../typescripts/interfaces/common.interfaces';
 import { showErrorToast } from './toast.utils';
 
 export interface OpenMapParams {
@@ -360,4 +361,25 @@ export const _formatShortNumber = (num: number): string => {
   } else {
     return num1.toString();
   }
+};
+
+export const formatSpecialization = ({
+  specialization,
+  sub_specializations = {},
+}: ISpecializationData): string => {
+  const specializations = Array.isArray(specialization)
+    ? specialization
+    : specialization?.split(',') ?? [];
+
+  return specializations
+    .map(item => {
+      const name = item.trim();
+      if (!name) return '';
+
+      const subSpecializations = sub_specializations[name] ?? [];
+
+      return subSpecializations.length ? `${name} (${subSpecializations.join(', ')})` : name;
+    })
+    .filter(Boolean)
+    .join(', ');
 };

@@ -43,7 +43,7 @@ export function CustomTabs<T extends string = string>({
   textStyle,
   activeTextStyle,
   activeColor = theme.colors.primary,
-  inactiveColor = theme.colors.textMuted,
+  inactiveColor = theme.colors.textSlate,
   fullWidth = true,
 }: CustomTabsProps<T>) {
   const activeItem = tabs.find(item => item.key === activeTab);
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.md,
     padding: 4,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: theme.colors.surfaceBorder,
     marginHorizontal: theme.spacing.lg,
     marginBottom: 10,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   },
   tabTxt: {
     fontSize: theme.fontSize.xs + 1,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textMuted,
   },
   tabTxtActive: {

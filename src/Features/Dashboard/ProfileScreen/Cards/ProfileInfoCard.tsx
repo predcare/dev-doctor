@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import theme from '../../../../styled/theme.styled';
+import theme, { globalShadows } from '../../../../styled/theme.styled';
 
 export interface ProfileInfoCardProps {
   iconPath: React.ReactNode;
@@ -44,24 +44,17 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 10,
     gap: 13,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-    borderWidth: 1,
-    borderColor: theme.colors.bg,
+    ...globalShadows.card,
   },
   tealCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
+    color: theme.colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
   },
   body: {
     flex: 1,
@@ -70,14 +63,15 @@ const styles = StyleSheet.create({
   lbl: {
     fontSize: 9,
     fontWeight: theme.fontWeight.medium,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSlate,
     textTransform: 'uppercase',
     letterSpacing: 0.9,
     marginBottom: 4,
   },
   val: {
-    fontSize: 13,
-    color: theme.colors.dark,
+    fontSize: 14,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.text334155,
     lineHeight: 18,
   },
   tagRow: {
@@ -87,15 +81,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   tag: {
-    backgroundColor: theme.colors.primarySoft,
+    // backgroundColor: theme.colors.inPersonBg,
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    borderColor: theme.colors.inPersonBg,
   },
   tagTxt: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
   },
