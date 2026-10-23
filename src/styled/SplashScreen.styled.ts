@@ -51,9 +51,9 @@ export const Splashstyles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+    width: 180,
+    height: 180,
+    borderRadius: 100,
     backgroundColor: '#E6F2FF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -65,8 +65,8 @@ export const Splashstyles = StyleSheet.create({
     elevation: 8,
   },
   logo: {
-    width: 110,
-    height: 110,
+    width: 150,
+    height: 150,
   },
   title: {
     fontSize: 42,

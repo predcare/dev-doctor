@@ -6,10 +6,9 @@ const { width } = Dimensions.get('window');
 export const homeStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    paddingTop: theme.spacing.lg,
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: 40,
   },
@@ -36,6 +35,7 @@ export const homeStyles = StyleSheet.create({
 
   // Highlights & Insights Section
   insightsSection: {
+    padding: 0,
     marginBottom: theme.spacing.xl,
     zIndex: 20,
     overflow: 'visible',
@@ -106,8 +106,6 @@ export const homeStyles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     marginRight: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: 'rgba(226, 232, 240, 0.8)',
     ...globalShadows.card,
   },
   statTileTop: {
@@ -124,7 +122,7 @@ export const homeStyles = StyleSheet.create({
     alignItems: 'center',
   },
   statTileValue: {
-    fontSize: 23,
+    fontSize: theme.fontSize.twentyThree,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textPrimary,
     marginBottom: 3,
@@ -140,6 +138,7 @@ export const homeStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.md,
   },
   sectionTitle: {
@@ -157,9 +156,7 @@ export const homeStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(226, 232, 240, 0.9)',
+    marginBottom: 20,
     ...globalShadows.card,
   },
   apptHeaderRow: {
@@ -290,7 +287,7 @@ export const homeStyles = StyleSheet.create({
     marginLeft: 6,
   },
   patientMetaText: {
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.textSlate,
     fontWeight: theme.fontWeight.regular,
     marginTop: 2,
@@ -303,7 +300,7 @@ export const homeStyles = StyleSheet.create({
     marginTop: 2,
   },
   aptIdText: {
-    fontSize: 10,
+    fontSize: 12,
     color: theme.colors.textSlate,
     fontWeight: theme.fontWeight.medium,
     letterSpacing: 0.2,
@@ -413,6 +410,7 @@ export const homeStyles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
     overflow: 'hidden',
     position: 'relative',
+    marginTop: 12,
     ...globalShadows.card,
   },
   supportCircle1: {

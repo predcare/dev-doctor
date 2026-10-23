@@ -37,13 +37,6 @@ export const PatientCard: React.FC<PatientCardProps> = React.memo(
             {capitalize(gender) || 'N/A'}
             {' / '}
             {age || 'N/A'}
-            {condition ? `  •  ${condition}` : ''}
-          </Text>
-          <Text style={styles.txSub} numberOfLines={1}>
-            Phone: +91-{phoneNumber || 'N/A'}
-          </Text>
-          <Text style={styles.txSub} numberOfLines={1}>
-            Email: {email || 'N/A'}
           </Text>
         </View>
         <ChevronRightIcon size={16} color={theme.colors.textMuted} />
@@ -62,13 +55,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
   },
   avatar: {
     width: 44,
@@ -95,7 +81,7 @@ const styles = StyleSheet.create({
     color: theme.colors.dark,
   },
   txSub: {
-    fontSize: 10,
+    fontSize: 11,
     color: theme.colors.textSlate,
     marginTop: 2,
   },

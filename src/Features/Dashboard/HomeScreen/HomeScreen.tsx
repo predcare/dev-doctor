@@ -308,7 +308,7 @@ export const HomeScreen: React.FC = () => {
                                     dateOfBirth={apt?.patientInfo?.dateOfBirth}
                                     time={formatTime12h(apt.start_time)}
                                     consultType={apt.consultation_type || 'ONLINE'}
-                                    chiefComplaint={apt.reason || 'Dummy Symtoms'}
+                                    chiefComplaint={apt.reason || ''}
                                     isExpired={false}
                                     isJoinedOnce={
                                         apt?.appointment_status === 'in_progress' ||

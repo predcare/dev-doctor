@@ -96,8 +96,8 @@ export const PatientsScreen: React.FC = () => {
                         <SearchIcon color={theme.colors.textMuted} size={16} />
                         <TextInput
                             style={PatientsStyles.searchInput}
-                            placeholder="Search by name, phone, email or ID..."
-                            placeholderTextColor={theme.colors.textMuted}
+                            placeholder="Search by Name, Phone, Email or ID..."
+                            placeholderTextColor={theme.colors.textSlate}
                             value={search}
                             onChangeText={(value: string) => {
                                 setSearch(value);
@@ -120,7 +120,7 @@ export const PatientsScreen: React.FC = () => {
                     <Text style={PatientsStyles.txCount}>
                         {myPatientPending
                             ? 'Loading Records...'
-                            : `${patientsList?.length || 0} OF ${totalCount || 0} RECORDS`}
+                            : `${patientsList?.length > 1 ? `${patientsList?.length} RECORDS` : `${patientsList?.length} RECORD`}`}
                     </Text>
                 </View>
                 {myPatientPending ? (

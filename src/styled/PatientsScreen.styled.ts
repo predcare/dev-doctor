@@ -4,7 +4,6 @@ import { theme } from './theme.styled';
 export const PatientsStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.bg,
   },
   header: {
     backgroundColor: theme.colors.surface,
@@ -36,26 +35,25 @@ export const PatientsStyles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
     paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
+    marginTop: 20,
+    marginBottom: 10,
   },
   searchPill: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
+    height: 46,
   },
   searchInput: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 13,
     color: theme.colors.dark,
     paddingVertical: 0,
     marginLeft: 8,

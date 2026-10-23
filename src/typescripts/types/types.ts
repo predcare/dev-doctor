@@ -6,5 +6,6 @@ export interface IconProps {
   size?: number;
   color?: string;
   strokeWidth?: number;
+  isOutline?: boolean;
   style?: StyleProp<ViewStyle>;
 }

@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import CustomKebabMenu from '../../../../components/ui/CustomMenu/CustomKebabMenu';
 import {
-  CalendarIcon,
   CheckIcon,
   CircleXIcon,
   ClinicIcon,
@@ -14,18 +13,15 @@ import {
 } from '../../../../components/ui/icons';
 import {
   capitalize,
+  formatDate,
   formatTimeSlot,
   getAge,
   getInitials,
   shouldHideJoinForCallDuration,
 } from '../../../../lib/commons/common.utils';
-import {
-  doctorAppointmentsStyles as S,
-  TEAL,
-} from '../../../../styled/DoctorAppointmentsScreen.styled';
+import { doctorAppointmentsStyles as S } from '../../../../styled/DoctorAppointmentsScreen.styled';
 import theme from '../../../../styled/theme.styled';
 import { useMeetingStore } from '../../../../zustand/stores/useMeetingStore';
-
 
 interface AppointmentCardProps {
   patientName: string;
@@ -110,7 +106,9 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
     onVideoCall,
   }) => {
     const activeApptId = useMeetingStore(state => state.callInfo?.appointment?.id);
-    const activeApptGeneratedId = useMeetingStore(state => state.callInfo?.appointment?.appointmentId);
+    const activeApptGeneratedId = useMeetingStore(
+      state => state.callInfo?.appointment?.appointmentId
+    );
     const activeCallState = useMeetingStore(state => state.callState);
     const activeToken = useMeetingStore(state => state.callInfo?.token);
     const activeMeetingId = useMeetingStore(state => state.callInfo?.meetingId);
@@ -138,29 +136,23 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
       (String(activeApptId) === String(appointmentId) ||
         (Boolean(appointmentGeneratedId) && activeApptGeneratedId === appointmentGeneratedId));
 
-    const {
-      isCompleted,
-      isCancelled,
-      isInProgress,
-      statusColor,
-      statusBg,
-      formattedTime,
-    } = useMemo(() => {
-      const inProgress =
-        appointmentStatus === 'in-progress' ||
-        appointmentStatus === 'in_progress' ||
-        appointmentStatus === 'inprogress';
+    const { isCompleted, isCancelled, isInProgress, statusColor, statusBg, formattedTime } =
+      useMemo(() => {
+        const inProgress =
+          appointmentStatus === 'in-progress' ||
+          appointmentStatus === 'in_progress' ||
+          appointmentStatus === 'inprogress';
 
-      return {
-        isCompleted: appointmentStatus === 'completed',
-        isCancelled: appointmentStatus === 'cancelled',
-        isConfirmed: appointmentStatus === 'confirmed',
-        isInProgress: inProgress,
-        statusColor: getStatusColor(appointmentStatus),
-        statusBg: getStatusBackground(appointmentStatus),
-        formattedTime: formatTimeSlot(startTime, endTime),
-      };
-    }, [appointmentStatus, startTime, endTime]);
+        return {
+          isCompleted: appointmentStatus === 'completed',
+          isCancelled: appointmentStatus === 'cancelled',
+          isConfirmed: appointmentStatus === 'confirmed',
+          isInProgress: inProgress,
+          statusColor: getStatusColor(appointmentStatus),
+          statusBg: getStatusBackground(appointmentStatus),
+          formattedTime: formatTimeSlot(startTime, ''),
+        };
+      }, [appointmentStatus, startTime, endTime]);
 
     const buttonText = useMemo(() => {
       if (isVideo) {
@@ -248,6 +240,26 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
 
     return (
       <View style={S.card}>
+        <View style={S.typeTimeRow}>
+          <View style={S.timePill}>
+            <ClockIcon size={13} color={theme.colors.primary} />
+            {formattedTime ? (
+              <Text style={S.timePillText} numberOfLines={1}>
+                {formattedTime} ({appointmentDurationMinutes}m),{' '}
+                {formatDate(appointment_date, 'MMM D, YYYY')}
+              </Text>
+            ) : null}
+          </View>
+          <View style={S.consultTypeBadge}>
+            {isVideo ? (
+              <VideoIcon size={12} color={theme.colors.textInPerson} isOutline={true} />
+            ) : (
+              <ClinicIcon size={12} color={theme.colors.textGreen} />
+            )}
+            <Text style={[S.consultTypeText, !isVideo && { color: theme.colors.textGreen }]}>{isVideo ? 'Video Call' : 'In-Clinic'}</Text>
+          </View>
+        </View>
+
         <View style={S.cardHeader}>
           <View style={S.patientRow}>
             <View style={[S.patientAvatar, { backgroundColor: theme.colors.primary }]}>
@@ -280,56 +292,6 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             )}
           </View>
         </View>
-
-        <View style={S.chipsRow}>
-          <View
-            style={[
-              S.chip,
-              {
-                backgroundColor: isVideo ? '#F0FDFA' : '#FFF7ED',
-                borderColor: isVideo ? '#99F6E4' : '#FED7AA',
-              },
-            ]}
-          >
-            {isVideo ? (
-              <VideoIcon size={11} color={TEAL} />
-            ) : (
-              <ClinicIcon size={11} color="#EA580C" />
-            )}
-            <Text
-              style={[S.chipText, { color: isVideo ? TEAL : '#EA580C' }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.7}
-            >
-              {isVideo ? 'Video Call' : 'In-Clinic'}
-            </Text>
-          </View>
-
-          <View style={[S.chip, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
-            <CalendarIcon size={11} color="#475569" />
-            <Text
-              style={[S.chipText, { color: '#475569' }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.7}
-            >
-              {appointment_date}
-            </Text>
-          </View>
-
-          <View style={[S.chip, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}>
-            <ClockIcon size={11} color="#475569" />
-            <Text
-              style={[S.chipText, { color: '#475569' }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.7}
-            >
-              {formattedTime}
-            </Text>
-          </View>
-        </View>
         {isCancelled && (
           <View style={S.cancelledBox}>
             <View style={S.cancelledIconCircle}>
@@ -349,13 +311,14 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
                 style={[
                   S.joinButton,
                   isInProgress && { flex: 1 },
-                  isVideo && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
-                  isVideo && isJoinedOnce && { backgroundColor: theme.colors.brandBlueDark },
+                  isVideo && { backgroundColor: theme.colors.videoCallBtnBg },
+                  isCurrentApptInCall && { backgroundColor: theme.colors.videoCallBtnBg },
+                  isVideo && isJoinedOnce && { backgroundColor: theme.colors.videoCallBtnBg },
                 ]}
                 onPress={() => (isVideo ? onVideoCall?.() : onStartConsultation?.())}
                 activeOpacity={0.85}
               >
-                <PlayCircleIcon size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                {isVideo ? <PlayCircleIcon size={18} color="#FFFFFF" style={{ marginRight: 6 }} /> : null}
                 <Text style={S.joinButtonText}>{buttonText}</Text>
               </TouchableOpacity>
             )}

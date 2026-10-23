@@ -142,14 +142,14 @@ export const UpcomingAppointmentCard: React.FC<AppointmentCardProps> = ({
           ]}
         >
           {isVideo ? (
-            <VideoIcon size={12} color={theme.colors.textInPerson} />
+            <VideoIcon size={12} color={theme.colors.textInPerson} isOutline={true} />
           ) : (
-            <ClinicIcon size={12} color={theme.colors.textInPerson} />
+            <ClinicIcon size={12} color={theme.colors.textGreen} />
           )}
           <Text
             style={[
               homeStyles.consultBadgeText,
-              { color: isVideo ? theme.colors.textInPerson : theme.colors.textInPerson },
+              { color: isVideo ? theme.colors.textInPerson : theme.colors.textGreen },
             ]}
           >
             {isVideo ? 'Video Call' : 'In-Clinic'}

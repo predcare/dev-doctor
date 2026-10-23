@@ -146,7 +146,11 @@ export const AppointmentsScreen: React.FC = () => {
         }
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    const { data: apptStats, isPending: apptStatsPending, refetch: refetchStats } = useMyAppointmentStats();
+    const {
+        data: apptStats,
+        isPending: apptStatsPending,
+        refetch: refetchStats,
+    } = useMyAppointmentStats();
 
     const { mutate: changeStatus } = useChangeAppointmentStatus();
     const { mutate: cancelAppt } = useCancelMyAppt();
@@ -194,7 +198,6 @@ export const AppointmentsScreen: React.FC = () => {
         setShowFilterPanel(true);
     }, []);
 
-
     const handleCancelAppointment = useCallback(
         (item: IMyAppointmentDoc) => {
             if (item.appointment_status?.toLowerCase() !== 'confirmed') return;
@@ -204,9 +207,7 @@ export const AppointmentsScreen: React.FC = () => {
             }
             const patientName = item.patientInfo?.name || 'this patient';
             const formattedDate = formatDate(item.appointment_date) || 'the scheduled date';
-            const formattedTime = item.start_time
-                ? formatTimeSlot(item.start_time, item.end_time)
-                : '';
+            const formattedTime = item.start_time ? formatTimeSlot(item.start_time, item.end_time) : '';
             const timeText = formattedTime && formattedTime !== 'Flexible' ? ` at ${formattedTime}` : '';
 
             showConfirm({
@@ -226,7 +227,7 @@ export const AppointmentsScreen: React.FC = () => {
                                 if (res?.success) {
                                     showSuccessToast(res?.message || 'Appointment cancelled successfully');
                                     await Promise.all([
-                                       await queryClient.invalidateQueries({
+                                        await queryClient.invalidateQueries({
                                             queryKey: [MyAppointmentsQueryKeys.MyAppointments],
                                         }),
                                         await queryClient.invalidateQueries({
@@ -329,11 +330,11 @@ export const AppointmentsScreen: React.FC = () => {
 
             <View style={doctorAppointmentsStyles.searchRow}>
                 <View style={doctorAppointmentsStyles.searchBox}>
-                    <SearchIcon size={18} color="#94A3B8" />
+                    <SearchIcon size={18} color={theme.colors.textSlate} />
                     <TextInput
                         style={doctorAppointmentsStyles.searchInput}
-                        placeholder="Search by Appointment Id"
-                        placeholderTextColor="#94A3B8"
+                        placeholder="Search by Appointment"
+                        placeholderTextColor={theme.colors.textSlate}
                         value={searchQuery}
                         onChangeText={setSearchQuery}
                     />
@@ -352,7 +353,11 @@ export const AppointmentsScreen: React.FC = () => {
                     onPress={handleOpenFilterModal}
                     activeOpacity={0.7}
                 >
-                    <FilterIcon size={20} color={isCustomFilterApplied ? theme.colors.primary : '#64748B'} />
+                    <FilterIcon
+                        size={20}
+                        color={isCustomFilterApplied ? theme.colors.textInverted : theme.colors.white}
+                        bgColor={theme.colors.textGreen}
+                    />
                 </TouchableOpacity>
             </View>
 

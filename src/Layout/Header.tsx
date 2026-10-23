@@ -21,18 +21,18 @@ import { useAuthStore } from '../zustand/stores/useAuthStore';
 const getDefaultHeaderIcon = (title?: string) => {
   if (!title) return <SettingsIcon size={20} color={theme.colors.primary} />;
   const lower = title.toLowerCase();
-  if (lower.includes('setting')) return <SettingsIcon size={20} color={theme.colors.primary} />;
-  if (lower.includes('patient')) return <PatientsIcon size={20} color={theme.colors.primary} />;
+  if (lower.includes('setting')) return <SettingsIcon size={20} color={theme.colors.white} />;
+  if (lower.includes('patient')) return <PatientsIcon size={20} color={theme.colors.white} />;
   if (lower.includes('appoint') || lower.includes('schedul') || lower.includes('calendar')) {
-    return <CalendarIcon size={20} color={theme.colors.primary} />;
+    return <CalendarIcon size={20} color={theme.colors.white} strokeWidth={2} />;
   }
   if (lower.includes('invoic') || lower.includes('bill')) {
-    return <InvoiceIcon size={20} color={theme.colors.primary} />;
+    return <InvoiceIcon size={20} color={theme.colors.white} />;
   }
   if (lower.includes('prescrip') || lower.includes('rx')) {
-    return <PrescriptionIcon size={20} color={theme.colors.primary} />;
+    return <PrescriptionIcon size={20} color={theme.colors.white} />;
   }
-  return <InfoCircleIcon size={20} color={theme.colors.primary} />;
+  return <InfoCircleIcon size={20} color={theme.colors.white} />;
 };
 
 interface HeaderProps {
@@ -76,10 +76,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const nameFontSize = useMemo(() => {
     const len = (userData?.name || "Dr").length;
-    if (len > 30) return 16;
-    if (len > 22) return 16;
-    if (len > 16) return 16;
-    return 16;
+    if (len > 30) return 18;
+    if (len > 22) return 18;
+    if (len > 16) return 18;
+    return 18;
   }, [userData?.name]);
 
   const nameLineHeight = useMemo(() => {
@@ -90,9 +90,9 @@ export const Header: React.FC<HeaderProps> = ({
 
   const titleFontSize = useMemo(() => {
     const len = (title || '').length;
-    if (len > 30) return 15;
-    if (len > 20) return 16;
-    return 18;
+    if (len > 30) return 17;
+    if (len > 17) return 17;
+    return 16;
   }, [title]);
 
   const titleLineHeight = useMemo(() => {

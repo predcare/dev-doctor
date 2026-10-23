@@ -27,6 +27,10 @@ export const AppointmentSkeleton: React.FC = () => {
     <View style={styles.container}>
       {[1].map(key => (
         <Animated.View key={key} style={[styles.card, { opacity: pulseAnim }]}>
+          <View style={styles.typeTimeRow}>
+            <View style={styles.timePillSkeleton} />
+            <View style={styles.typeBadgeSkeleton} />
+          </View>
           <View style={styles.cardHeader}>
             <View style={styles.patientRow}>
               <View style={styles.avatarSkeleton} />
@@ -42,9 +46,7 @@ export const AppointmentSkeleton: React.FC = () => {
             </View>
           </View>
           <View style={styles.chipsRow}>
-            <View style={[styles.chipSkeleton, { width: 84 }]} />
             <View style={[styles.chipSkeleton, { width: 96 }]} />
-            <View style={[styles.chipSkeleton, { width: 88 }]} />
           </View>
           {key % 2 !== 0 && <View style={styles.footerActionSkeleton} />}
         </Animated.View>
@@ -71,6 +73,27 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
+  },
+  typeTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 12,
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  timePillSkeleton: {
+    width: 118,
+    height: 22,
+    borderRadius: 8,
+    backgroundColor: '#E2E8F0',
+  },
+  typeBadgeSkeleton: {
+    width: 84,
+    height: 22,
+    borderRadius: 20,
+    backgroundColor: '#E2E8F0',
   },
   cardHeader: {
     flexDirection: 'row',

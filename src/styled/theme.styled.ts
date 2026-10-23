@@ -109,6 +109,7 @@ export const theme = {
     xl: 22,
     xxl: 28,
     hero: 34,
+    twentyThree: 23,
   },
 
   fontWeight: {
