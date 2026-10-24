@@ -15,7 +15,7 @@ export const AssistanceBanner: React.FC<AssistanceBannerProps> = ({
       <View style={homeStyles.supportCircle2} />
       <Text style={homeStyles.supportTitle}>Need Assistance?</Text>
       <Text style={homeStyles.supportSub}>
-        Our dedicated support team is{'\n'}here to help you 24/7.
+        Our dedicated support team is here to help you {'\n'}9:00 AM to 7:00 PM (All days).
       </Text>
       <TouchableOpacity
         style={homeStyles.supportBtn}

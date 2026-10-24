@@ -11,7 +11,7 @@ import {
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import PredDatePickerModal from '../../../../components/commons/PredDatePickerModal/PredDatePickerModal';
 import UploadOptionsModal from '../../../../components/commons/UploadOptionsModal/UploadOptionsModal';
-import { CalendarIcon } from '../../../../components/ui/icons';
+import { CalendarIcon, CameraIcon, PersonIcon } from '../../../../components/ui/icons';
 import { GenderOptions } from '../../../../config/constants';
 import useDevicePermissions from '../../../../hooks/commons/useDevicePermissions';
 import { formatDate } from '../../../../lib/commons/common.utils';
@@ -198,7 +198,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                 <Image source={{ uri: imageUri }} style={BasicInfoStyles.imgPreview} />
               ) : (
                 <View style={BasicInfoStyles.imgPlaceholder}>
-                  <Text style={BasicInfoStyles.imgPlaceholderTxt}>👤</Text>
+                  <PersonIcon size={38} color={theme.colors.primary} />
                 </View>
               )}
               <TouchableOpacity
@@ -206,7 +206,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = React.memo(
                 onPress={() => setShowUploadOptions(true)}
                 activeOpacity={0.8}
               >
-                <Text style={{ color: '#FFF', fontSize: 12 }}>📷</Text>
+                <CameraIcon size={14} color={theme.colors.surface} />
               </TouchableOpacity>
             </View>
             <Text style={BasicInfoStyles.imgHint}>Tap camera to upload</Text>

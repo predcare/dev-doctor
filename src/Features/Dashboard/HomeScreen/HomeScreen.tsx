@@ -115,7 +115,7 @@ export const HomeScreen: React.FC = () => {
     } = useHomeUpcomingAppts({
         page: 1,
         limit: 3,
-        status: 'upcoming,pending,confirmed',
+        status: 'upcoming,confirmed,in-progress,in_progress',
         date_range: 'today',
         consultation_type: 'video,in-person'
     });
@@ -278,7 +278,7 @@ export const HomeScreen: React.FC = () => {
                     </View>
 
                     <View style={homeStyles.sectionHeader}>
-                        <Text style={homeStyles.sectionTitle}>Upcoming Appointments</Text>
+                        <Text style={homeStyles.sectionTitle}>Today's Appointments</Text>
                         <TouchableOpacity
                             onPress={() => appNavigation?.navigate(AppRoute.APPOINTMENTS)}
                             activeOpacity={0.7}
@@ -355,14 +355,6 @@ export const HomeScreen: React.FC = () => {
                         <View style={homeStyles.emptyCard}>
                             <EmptyIcon color={theme.colors.primary} />
                             <Text style={homeStyles.emptyText}>No upcoming appointments for today</Text>
-                            <Text style={homeStyles.emptySub}>Tap below to add a new one</Text>
-                            <TouchableOpacity
-                                style={homeStyles.bookNowBtn}
-                                onPress={() => appNavigation?.navigate(AppRoute.BOOK_APPOINTMENT)}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={homeStyles.bookNowBtnText}>Book Now</Text>
-                            </TouchableOpacity>
                         </View>
                     )}
 

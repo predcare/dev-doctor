@@ -24,12 +24,12 @@ export const MedicalInfoForm: React.FC<MedicalInfoFormProps> = React.memo(
               <TextInput
                 style={[
                   MedicalInfoStyles.inp,
-                  { height: 160, textAlignVertical: 'top', paddingTop: 14 },
+                  { height: 200, textAlignVertical: 'top', paddingTop: 14, lineHeight: 30 },
                 ]}
                 placeholder={
-                  'Known medical conditions, allergies, past surgeries, current medications...'
+                  'Known Medical Conditions, Allergies, Past Surgeries, Current Medications...'
                 }
-                placeholderTextColor={theme.colors.textMuted}
+                placeholderTextColor={theme.colors.textSlate}
                 value={value || ''}
                 onChangeText={onChange}
                 onBlur={onBlur}
@@ -54,7 +54,6 @@ export const MedicalInfoForm: React.FC<MedicalInfoFormProps> = React.memo(
         )}
       </View>
       <View style={MedicalInfoStyles.infoBox}>
-        <Text style={{ fontSize: 15 }}>ℹ️</Text>
         <Text style={MedicalInfoStyles.infoTxt}>
           <Text style={{ fontWeight: '600' }}>Note:</Text> Medical history is optional but helps
           doctors provide better personalized clinical care.

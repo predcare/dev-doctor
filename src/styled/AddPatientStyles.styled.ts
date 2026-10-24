@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import theme from './theme.styled';
 
 export const AddPatientStyles = StyleSheet.create({
-  outer: { flex: 1, backgroundColor: theme.colors.bg },
+  outer: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -11,8 +11,6 @@ export const AddPatientStyles = StyleSheet.create({
     paddingBottom: 14,
     backgroundColor: theme.colors.surface,
     gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
     elevation: 2,
     shadowColor: theme.colors.dark,
     shadowOffset: { width: 0, height: 1 },
@@ -46,12 +44,6 @@ export const AddPatientStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
   },
   scroll: { flex: 1 },
   formContent: { paddingHorizontal: 16, paddingTop: 16 },
@@ -59,13 +51,6 @@ export const AddPatientStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 20,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
     marginBottom: 16,
   },
   btnRow: { flexDirection: 'row', gap: 12, marginTop: 4 },
@@ -156,7 +141,7 @@ export const BasicInfoStyles = StyleSheet.create({
   lbl: {
     fontSize: 10,
     fontWeight: theme.fontWeight.medium,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSlate,
     letterSpacing: 1.1,
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -226,8 +211,8 @@ export const BasicInfoStyles = StyleSheet.create({
     borderColor: theme.colors.primary,
   },
   imgPlaceholder: {
-    width: 90,
-    height: 90,
+    width: 80,
+    height: 80,
     borderRadius: 45,
     backgroundColor: theme.colors.background,
     alignItems: 'center',
@@ -238,8 +223,8 @@ export const BasicInfoStyles = StyleSheet.create({
   imgPlaceholderTxt: { fontSize: 36 },
   imgCameraBtn: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: 3,
+    right: 5,
     width: 30,
     height: 30,
     borderRadius: 15,
@@ -251,7 +236,7 @@ export const BasicInfoStyles = StyleSheet.create({
   },
   imgHint: { fontSize: 11, color: theme.colors.textMuted, fontWeight: theme.fontWeight.medium },
   lockedRow: {
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -259,7 +244,7 @@ export const BasicInfoStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    borderColor: theme.colors.textInPerson,
   },
   lockedTxt: {
     fontSize: 13,
@@ -276,7 +261,7 @@ export const ContactInfoStyles = StyleSheet.create({
   lbl: {
     fontSize: 10,
     fontWeight: theme.fontWeight.medium,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSlate,
     letterSpacing: 1.1,
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -323,8 +308,6 @@ export const ContactInfoStyles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     marginBottom: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.primary,
   },
   infoTxt: {
     flex: 1,
@@ -340,7 +323,7 @@ export const MedicalInfoStyles = StyleSheet.create({
   lbl: {
     fontSize: 10,
     fontWeight: theme.fontWeight.medium,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSlate,
     letterSpacing: 1.1,
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -355,6 +338,7 @@ export const MedicalInfoStyles = StyleSheet.create({
     color: theme.colors.dark,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
+    lineHeight: 40,
   },
   infoBox: {
     backgroundColor: theme.colors.primarySoft,
@@ -363,8 +347,6 @@ export const MedicalInfoStyles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     marginBottom: 8,
-    borderLeftWidth: 3,
-    borderLeftColor: theme.colors.primary,
   },
   infoTxt: {
     flex: 1,

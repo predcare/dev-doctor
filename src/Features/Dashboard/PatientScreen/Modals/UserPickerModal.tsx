@@ -50,7 +50,8 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
           <View
             style={[
               s.sheet,
-              { paddingBottom: Math.max(20, insets.bottom + 12) },
+              { paddingBottom: Math.max(20, insets.bottom + 12), marginBottom: 20 },
+              { marginBottom: 20 },
             ]}
             onStartShouldSetResponder={() => true}
           >
@@ -71,7 +72,7 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
                 <SearchIcon size={18} color={theme.colors.textMuted} />
                 <TextInput
                   style={s.userSearchInput}
-                  placeholder="Search by name, Patient-Id email, or phone..."
+                  placeholder="Search by Name, Patient ID, Email, or Phone..."
                   placeholderTextColor={theme.colors.textMuted}
                   value={searchText}
                   onChangeText={setSearchText}
@@ -218,13 +219,11 @@ const s = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
   },
   userSearchInputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     paddingHorizontal: 12,
     borderWidth: 1,

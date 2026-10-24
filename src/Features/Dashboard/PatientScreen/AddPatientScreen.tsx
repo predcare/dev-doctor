@@ -4,7 +4,10 @@ import React, { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
-import { useCreateNewPatient, useLinkExistingPatient } from '../../../hooks/react-query/patients/patients.hooks';
+import {
+    useCreateNewPatient,
+    useLinkExistingPatient,
+} from '../../../hooks/react-query/patients/patients.hooks';
 import { PatientsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
@@ -22,9 +25,8 @@ import BasicInfoForm from './Forms/BasicInfoForm';
 import ContactInfoForm from './Forms/ContactInfoForm';
 import MedicalInfoForm from './Forms/MedicalInfoForm';
 
-
 export const AddPatientScreen: React.FC = () => {
-    const navigation = useNavigation()
+    const navigation = useNavigation();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const { userData } = useAuthStore(state => state);
@@ -232,7 +234,7 @@ export const AddPatientScreen: React.FC = () => {
             header={
                 <Header
                     title="Add New Patient"
-                    description="PRED CARE • REGISTRATION"
+                    description="PATIENT REGISTRATION"
                     isBackBtn
                     onBackPress={handleBack}
                 />
@@ -294,9 +296,7 @@ export const AddPatientScreen: React.FC = () => {
                             {selectedUser?.phone_number ? (
                                 <View style={AddPatientStyles.confirmRow}>
                                     <Text style={AddPatientStyles.confirmLbl}>Phone</Text>
-                                    <Text style={AddPatientStyles.confirmVal}>
-                                        {selectedUser?.phone_number}
-                                    </Text>
+                                    <Text style={AddPatientStyles.confirmVal}>{selectedUser?.phone_number}</Text>
                                 </View>
                             ) : null}
                             {selectedUser?.gender ? (
@@ -337,7 +337,7 @@ export const AddPatientScreen: React.FC = () => {
                                     {selectionMode === 'existing_user'
                                         ? 'Add to My Clinic'
                                         : step === 3
-                                            ? 'Submit Patient'
+                                            ? 'Submit'
                                             : 'Next Step'}
                                 </Text>
                             )}

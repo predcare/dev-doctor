@@ -499,14 +499,14 @@ export const homeStyles = StyleSheet.create({
   emptyText: {
     fontSize: 13,
     fontWeight: theme.fontWeight.medium,
-    color: '#94A3B8',
+    color: theme.colors.textSlate,
     marginBottom: 5,
     textAlign: 'center',
     fontFamily: 'Inter_500Medium',
   },
   emptySub: {
     fontSize: 11,
-    color: '#CBD5E1',
+    color: theme.colors.textSlate,
     textAlign: 'center',
     fontFamily: 'Inter_400Regular',
   },
