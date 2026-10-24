@@ -217,7 +217,7 @@ const PopupAlert: React.FC<PopupAlertProps> = ({
         >
           <Pressable style={styles.innerContent} onPress={event => event.stopPropagation()}>
             {/* Top Accent Strip */}
-            <View style={[styles.topBar, { backgroundColor: config.color }]} />
+            <View style={[styles.topBar, { backgroundColor: theme.colors.white }]} />
 
             {/* Dual Ring Icon Header */}
             <View style={styles.iconWrapper}>

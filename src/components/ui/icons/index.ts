@@ -32,6 +32,7 @@ export * from './HomeIcon';
 export * from './HospitalIcon';
 export * from './ImageIcon';
 export * from './InfoCircleIcon';
+export * from './InPersonIcon';
 export * from './InvoiceIcon';
 export * from './LabTestBoardIcon';
 export * from './LicenseIcon';

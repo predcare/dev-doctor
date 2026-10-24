@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CalendarIcon } from '../../../../components/ui/icons';
+import { formatDate } from '../../../../lib/commons/common.utils';
 import theme from '../../../../styled/theme.styled';
 
 export interface RecurringDaysPickerProps {
@@ -105,8 +107,8 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
               }}
               activeOpacity={0.7}
             >
-              <Text style={startDate ? s.dateTxt : s.phTxt}>{startDate || 'Start Date'}</Text>
-              <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>📅</Text>
+              <Text style={startDate ? s.dateTxt : s.phTxt}>{formatDate(startDate, "DD-MMM-YYYY") || 'Start Date'}</Text>
+              <CalendarIcon size={12} color={theme.colors.textSlate} />
             </TouchableOpacity>
             {Boolean(startDateError) && <Text style={s.cellErrorTxt}>{startDateError}</Text>}
           </View>
@@ -121,8 +123,8 @@ export const RecurringDaysPicker: React.FC<RecurringDaysPickerProps> = React.mem
               }}
               activeOpacity={0.7}
             >
-              <Text style={endDate ? s.dateTxt : s.phTxt}>{endDate || 'End Date'}</Text>
-              <Text style={{ fontSize: 12, color: theme.colors.textMuted }}>📅</Text>
+              <Text style={endDate ? s.dateTxt : s.phTxt}>{formatDate(endDate, "DD-MMM-YYYY") || 'End Date'}</Text>
+              <CalendarIcon size={12} color={theme.colors.textSlate} />
             </TouchableOpacity>
             {Boolean(endDateError) && <Text style={s.cellErrorTxt}>{endDateError}</Text>}
           </View>
@@ -293,7 +295,7 @@ const s = StyleSheet.create({
   dayPill: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 10,
     borderWidth: 1.5,
     borderColor: theme.colors.surfaceBorder,
     backgroundColor: theme.colors.surface,
@@ -303,7 +305,7 @@ const s = StyleSheet.create({
   dayPillSel: {
     backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
-    borderRadius: 20,
+    borderRadius: 10,
   },
   dayPillTxt: {
     fontSize: 11,
@@ -360,7 +362,7 @@ const s = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
     alignItems: 'center',
     justifyContent: 'center',
   },

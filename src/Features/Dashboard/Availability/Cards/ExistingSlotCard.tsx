@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { CalendarIcon, CircleXIcon, ClockIcon, CreditCardIcon, EditIcon, FileTextIcon, InfoCircleIcon, PatientAvatarIcon, ScheduleIcon, TrashIcon, VideoIcon } from '../../../../components/ui/icons';
+import { CalendarIcon, CircleXIcon, ClockIcon, CreditCardIcon, EditIcon, FileTextIcon, InfoCircleIcon, InPersonIcon, ScheduleIcon, TrashIcon, VideoIcon } from '../../../../components/ui/icons';
 import { capitalize } from '../../../../lib/commons/common.utils';
 import { ExitingSlotsStyled } from '../../../../styled/DoctorAvailabilityScreen.styled';
 import theme from '../../../../styled/theme.styled';
@@ -65,11 +65,31 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
     onEdit,
     onDelete,
   }) => {
-    const [expandedDates, setExpandedDates] = useState(false);
     const [expandedLeaves, setExpandedLeaves] = useState(true);
     const [expandedRecurringDates, setExpandedRecurringDates] = useState(true);
 
     const safeSelectedDates = useMemo(() => selected_dates || [], [selected_dates]);
+    const groupedSelectedDates = useMemo(() => {
+      const groups = new Map<string, { label: string; days: number[] }>();
+      safeSelectedDates.forEach(dateStr => {
+        const ds = dateStr?.includes('T') ? dateStr.split('T')[0] : dateStr;
+        const parsed = dayjs(ds);
+        if (!parsed.isValid()) return;
+        const key = parsed.format('YYYY-MM');
+        const existing = groups.get(key);
+        if (existing) {
+          existing.days.push(parsed.date());
+        } else {
+          groups.set(key, { label: parsed.format('MMM, YYYY'), days: [parsed.date()] });
+        }
+      });
+      return Array.from(groups.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([, group]) => ({
+          label: group.label,
+          days: [...new Set(group.days)].sort((a, b) => a - b),
+        }));
+    }, [safeSelectedDates]);
     const safeRecurringDays = useMemo(() => recurring_days || [], [recurring_days]);
     const safeRecurringDates = useMemo(() => recurring_dates || [], [recurring_dates]);
     const safeLeaveDates = useMemo(() => leave_dates || [], [leave_dates]);
@@ -112,7 +132,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                 onPress={() => onEdit(id)}
                 activeOpacity={0.7}
               >
-                <EditIcon size={14} color={theme.colors.primary} />
+                <EditIcon size={17} color={theme.colors.primary} />
               </TouchableOpacity>
             )}
             {onDelete && (
@@ -121,7 +141,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                 onPress={() => onDelete(id)}
                 activeOpacity={0.7}
               >
-                <TrashIcon size={14} color={theme.colors.danger} />
+                <TrashIcon size={17} color={theme.colors.danger} />
               </TouchableOpacity>
             )}
           </View>
@@ -139,7 +159,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
               consultation_type === 'in_person' ||
               consultation_type === 'both') && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                  <PatientAvatarIcon size={13} color={theme.colors.primary} />
+                  <InPersonIcon size={13} color={theme.colors.primary} />
                   <Text style={ExitingSlotsStyled.consultationChip}>In-Person</Text>
                 </View>
               )}
@@ -192,7 +212,7 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
                   <View
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}
                   >
-                    <PatientAvatarIcon size={10} color={theme.colors.textMuted} />
+                    <InPersonIcon size={10} color={theme.colors.textMuted} />
                     <Text style={ExitingSlotsStyled.slotFeeTypeLabel}>IN-PERSON</Text>
                   </View>
                   <Text style={ExitingSlotsStyled.slotFeeValue}>₹{in_person_fee}</Text>
@@ -218,22 +238,12 @@ export const ExistingSlotCard: React.FC<ExistingSlotCardProps> = React.memo(
               <CalendarIcon size={11} color={theme.colors.textMuted} />
               <Text style={ExitingSlotsStyled.slotDatesLabel}>AVAILABLE DATES</Text>
             </View>
-            <Text style={ExitingSlotsStyled.slotDatesValue}>
-              {expandedDates
-                ? safeSelectedDates.map(d => formatDisplayDate(d)).join(', ')
-                : safeSelectedDates
-                  .slice(0, 3)
-                  .map(d => formatDisplayDate(d))
-                  .join(', ')}
-              {safeSelectedDates.length > 3 && (
-                <Text
-                  style={ExitingSlotsStyled.moreDatesLink}
-                  onPress={() => setExpandedDates(!expandedDates)}
-                >
-                  {expandedDates ? '  show less' : `  +${safeSelectedDates.length - 3} more`}
-                </Text>
-              )}
-            </Text>
+            {groupedSelectedDates.map(group => (
+              <View key={group.label} style={{ marginTop: 2 }}>
+                <Text style={ExitingSlotsStyled.slotDatesMonth}>{group.label}</Text>
+                <Text style={ExitingSlotsStyled.slotDatesValue}>{group.days.join(', ')}</Text>
+              </View>
+            ))}
           </View>
         )}
 

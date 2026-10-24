@@ -37,7 +37,6 @@ export const TimeRangePicker: React.FC<TimeRangePickerProps> = React.memo(
       <View style={s.container}>
         {/* Section Header */}
         <View style={s.sectionHeader}>
-          <Text style={{ fontSize: 14, marginRight: 6 }}>⏰</Text>
           <Text style={s.sectionTitle}>Time Range</Text>
         </View>
 
@@ -184,7 +183,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: theme.colors.surfaceBorder,
@@ -207,7 +206,7 @@ const s = StyleSheet.create({
   },
   ampmGroup: {
     flexDirection: 'row',
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 10,
     padding: 3,
     borderWidth: 1.5,
@@ -224,7 +223,7 @@ const s = StyleSheet.create({
   ampmBtnText: {
     fontSize: 11,
     fontWeight: theme.fontWeight.medium,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSlate,
   },
   ampmBtnTextActive: {
     color: theme.colors.surface,

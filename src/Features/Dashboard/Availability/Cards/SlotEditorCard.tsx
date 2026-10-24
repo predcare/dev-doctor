@@ -287,15 +287,8 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
       <View style={SlotEditCardStyles.card}>
         <View style={SlotEditCardStyles.cardHeader}>
           <Text style={SlotEditCardStyles.slotTitle}>
-            {editingSlot ? `Edit Slot #${editingSlot.id}` : `Slot Configuration #${slotIndex + 1}`}
+            {editingSlot ? `Edit Slot: ${editingSlot.id}` : `Slot Configuration: ${slotIndex + 1}`}
           </Text>
-          <TouchableOpacity
-            onPress={onCancel}
-            style={SlotEditCardStyles.removeBtn}
-            activeOpacity={0.7}
-          >
-            <Text style={SlotEditCardStyles.removeTxt}>✕ Remove</Text>
-          </TouchableOpacity>
         </View>
         <View style={SlotEditCardStyles.tabRow}>
           {(['specific', 'recurring', 'leave'] as const).map(tab => {
@@ -428,7 +421,7 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
               <ActivityIndicator color={theme.colors.surface} />
             ) : (
               <Text style={SlotEditCardStyles.saveBtnTxt}>
-                {editingSlot?.id ? '💾 Update Availability' : '💾 Add Availability'}
+                {editingSlot?.id ? 'Update Availability' : 'Add Availability'}
               </Text>
             )}
           </TouchableOpacity>

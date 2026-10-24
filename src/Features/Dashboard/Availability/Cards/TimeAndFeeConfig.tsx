@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { InPersonIcon, VideoIcon } from '../../../../components/ui/icons';
 import theme from '../../../../styled/theme.styled';
 import TimeRangePicker, { TimeValue } from './TimeRangePicker';
 
@@ -68,7 +69,6 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
         />
 
         <View style={[s.sectionHeader, { marginTop: 14 }]}>
-          <Text style={{ fontSize: 14, marginRight: 6 }}>💼</Text>
           <Text style={s.sectionTitle}>Consultation Type</Text>
         </View>
         <View style={s.radioGroup}>
@@ -82,7 +82,10 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                 <Text style={s.consultationCheckText}>✓</Text>
               </View>
             )}
-            <Text style={s.radioOptionIcon}>🏥</Text>
+            <InPersonIcon
+              size={20}
+              color={consultationType === 'in-person' ? theme.colors.primary : theme.colors.textSlate}
+            />
             <Text style={[s.radioLabel, consultationType === 'in-person' && s.radioLabelSelected]}>
               In-Person
             </Text>
@@ -97,7 +100,10 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                 <Text style={s.consultationCheckText}>✓</Text>
               </View>
             )}
-            <Text style={s.radioOptionIcon}>📹</Text>
+            <VideoIcon
+              size={20}
+              color={consultationType === 'video' ? theme.colors.primary : theme.colors.textSlate}
+            />
             <Text style={[s.radioLabel, consultationType === 'video' && s.radioLabelSelected]}>
               Video Call
             </Text>
@@ -112,14 +118,22 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                 <Text style={s.consultationCheckText}>✓</Text>
               </View>
             )}
-            <Text style={s.radioOptionIcon}>🏥📹</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+              <InPersonIcon
+                size={20}
+                color={consultationType === 'both' ? theme.colors.primary : theme.colors.textSlate}
+              />
+              <VideoIcon
+                size={20}
+                color={consultationType === 'both' ? theme.colors.primary : theme.colors.textSlate}
+              />
+            </View>
             <Text style={[s.radioLabel, consultationType === 'both' && s.radioLabelSelected]}>
               Both
             </Text>
           </TouchableOpacity>
         </View>
         <View style={[s.sectionHeader, { marginTop: 18 }]}>
-          <Text style={{ fontSize: 14, marginRight: 6 }}>⏱️</Text>
           <Text style={s.sectionTitle}>Slot Duration</Text>
         </View>
         <TouchableOpacity
@@ -153,7 +167,6 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
         )}
 
         <View style={[s.sectionHeader, { marginTop: 18 }]}>
-          <Text style={{ fontSize: 14, marginRight: 6 }}>💳</Text>
           <Text style={s.sectionTitle}>Consultation Fee & Options</Text>
         </View>
 
@@ -162,7 +175,6 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
             <View style={s.feeCard}>
               <View style={s.feeCardHeader}>
                 <View style={s.feeCardTitleRow}>
-                  <Text style={s.feeCardIcon}>🏥</Text>
                   <Text style={s.feeCardTitle}>In-Person Consultation</Text>
                 </View>
                 <View style={s.inPersonBadge}>
@@ -180,7 +192,7 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                   value={inPersonFee}
                   onChangeText={onChangeInPersonFee}
                   keyboardType="numeric"
-                  placeholder={requirePayment ? 'Enter in-person fee' : 'Enter in-person fee'}
+                  placeholder={requirePayment ? 'Enter In Person Fee' : 'Enter In Person Fee'}
                   placeholderTextColor={theme.colors.textMuted}
                 />
                 {Boolean(inPersonFeeError) && <Text style={s.errorText}>{inPersonFeeError}</Text>}
@@ -238,7 +250,6 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
             <View style={s.feeCard}>
               <View style={s.feeCardHeader}>
                 <View style={s.feeCardTitleRow}>
-                  <Text style={s.feeCardIcon}>📹</Text>
                   <Text style={s.feeCardTitle}>Video Consultation</Text>
                 </View>
               </View>
@@ -253,7 +264,7 @@ export const TimeAndFeeConfig: React.FC<TimeAndFeeConfigProps> = React.memo(
                   value={videoFee}
                   onChangeText={onChangeVideoFee}
                   keyboardType="numeric"
-                  placeholder="Enter video consultation fee"
+                  placeholder="Enter Video Consultation Fee"
                   placeholderTextColor={theme.colors.textMuted}
                 />
                 {Boolean(videoFeeError) && <Text style={s.errorText}>{videoFeeError}</Text>}
@@ -302,11 +313,8 @@ const s = StyleSheet.create({
     gap: 4,
   },
   radioOptionSelected: {
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.white,
     borderColor: theme.colors.primary,
-  },
-  radioOptionIcon: {
-    fontSize: 20,
   },
   radioLabel: {
     fontSize: 10,
@@ -334,7 +342,7 @@ const s = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
   },
   durationBtn: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: theme.colors.surfaceBorder,
@@ -364,7 +372,7 @@ const s = StyleSheet.create({
     borderBottomColor: theme.colors.bg,
   },
   durationItemSel: {
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
   },
   durationItemTxt: {
     fontSize: 12,
@@ -378,7 +386,7 @@ const s = StyleSheet.create({
     gap: 12,
   },
   feeCard: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
@@ -404,12 +412,10 @@ const s = StyleSheet.create({
     color: theme.colors.dark,
   },
   inPersonBadge: {
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.tealBdr,
   },
   inPersonBadgeTxt: {
     fontSize: 9,
@@ -486,7 +492,7 @@ const s = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
   },
   checkboxHint: {
-    fontSize: 10,
+    fontSize: 11,
     color: theme.colors.textMuted,
     marginTop: 1,
   },

@@ -485,9 +485,10 @@ export const homeStyles = StyleSheet.create({
     textAlign: 'center',
   },
   emptyCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 36,
+    height: 200,
     alignItems: 'center',
     shadowColor: '#1E293B',
     shadowOffset: { width: 0, height: 1 },
@@ -495,6 +496,8 @@ export const homeStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     marginBottom: 20,
+    display: 'flex',
+    justifyContent: 'center',
   },
   emptyText: {
     fontSize: 13,

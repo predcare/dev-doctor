@@ -146,7 +146,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             ) : icon ? (
               icon
             ) : (
-              <CalendarIcon color={theme.colors.primary} size={22} />
+              <CalendarIcon color={theme.colors.inPersonBg} size={22} />
             )}
           </View>
 
@@ -166,42 +166,42 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 {!!metadata.patient_name && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      👤 {metadata.patient_name}
+                      {metadata.patient_name}
                     </Text>
                   </View>
                 )}
                 {!!metadata.doctor_name && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      🩺 Dr. {metadata.doctor_name.replace(/^Dr\.\s*/i, '')}
+                      Dr. {metadata.doctor_name.replace(/^Dr\.\s*/i, '')}
                     </Text>
                   </View>
                 )}
                 {!!metadata.clinic_name && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      🏥 {metadata.clinic_name}
+                      {metadata.clinic_name}
                     </Text>
                   </View>
                 )}
                 {!!metadata.appointment_id && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      🔖 {metadata.appointment_id}
+                      {metadata.appointment_id}
                     </Text>
                   </View>
                 )}
                 {!!metadata.appointment_date && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      📅 {formatDate(metadata.appointment_date)}
+                      {formatDate(metadata.appointment_date)}
                     </Text>
                   </View>
                 )}
                 {!!metadata.appointment_slot_time && metadata.appointment_slot_time !== 'N/A' && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      ⏰ {metadata.appointment_slot_time}
+                      {metadata.appointment_slot_time}
                     </Text>
                   </View>
                 )}
@@ -213,14 +213,14 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                 {!!metadata.new_date && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      📅 {formatDate(metadata.new_date)}
+                      {formatDate(metadata.new_date)}
                     </Text>
                   </View>
                 )}
                 {!!metadata.medications_count && (
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
-                      💊 {metadata.medications_count} meds
+                      {metadata.medications_count} meds
                     </Text>
                   </View>
                 )}
@@ -228,8 +228,8 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
                   <View style={notificationCardStyles.metadataChip}>
                     <Text style={notificationCardStyles.metadataChipText}>
                       {metadata.consultation_type.toLowerCase() === 'video'
-                        ? '📹 Video'
-                        : '🏥 In-person'}
+                        ? 'Video'
+                        : 'In-Person'}
                     </Text>
                   </View>
                 )}

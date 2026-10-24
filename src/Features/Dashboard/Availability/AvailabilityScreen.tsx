@@ -10,7 +10,7 @@ import {
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import { showSuccessToast } from '../../../lib/commons/toast.utils';
-import availabilityStyles from '../../../styled/DoctorAvailabilityScreen.styled';
+import availabilityStyles, { SlotEditCardStyles } from '../../../styled/DoctorAvailabilityScreen.styled';
 import theme from '../../../styled/theme.styled';
 import { IMyAvailabilityDoc } from '../../../typescripts/interfaces/availability.interfaces';
 import { useAlertStore } from '../../../zustand/stores/useAlertStore';
@@ -31,7 +31,7 @@ export const AvailabilityScreen: React.FC = () => {
 
   const {
     data: availablityList,
-    isFetching: isLoadingAvailablityList,
+    isPending: isLoadingAvailablityList,
     refetch: avialRefetch,
   } = useAvailablityList();
 
@@ -107,17 +107,42 @@ export const AvailabilityScreen: React.FC = () => {
             />
           }
         >
-          <TouchableOpacity
-            style={availabilityStyles.sectionHeader}
-            onPress={() => {
-              if ((availablityList?.length || 0) > 0) setShowExistingSlots(!showExistingSlots);
-            }}
-            activeOpacity={0.75}
-          >
-            <Text style={availabilityStyles.sectionHeaderText}>
-              Your Current Availability ({availablityList?.length || 0})
-            </Text>
-          </TouchableOpacity>
+          <View style={availabilityStyles.sectionHeader}>
+            <TouchableOpacity
+              style={{ flex: 1 }}
+              onPress={() => {
+                if (!showNewSlotForm && (availablityList?.length || 0) > 0) {
+                  setShowExistingSlots(!showExistingSlots);
+                }
+              }}
+              activeOpacity={0.75}
+            >
+              <Text style={availabilityStyles.sectionHeaderText}>
+                Your Current Availability ({availablityList?.length || 0})
+              </Text>
+            </TouchableOpacity>
+            {showNewSlotForm && (
+              <TouchableOpacity
+                onPress={() => {
+                  showConfirm({
+                    title: 'Remove Availability',
+                    message: 'Are you sure you want to remove this availability?',
+                    buttonText: 'Remove',
+                    cancelText: 'Cancel',
+                    onConfirm: () => {
+                      setEditingSlot(null);
+                      setShowNewSlotForm(false);
+                      setShowExistingSlots(true);
+                    },
+                  });
+                }}
+                style={SlotEditCardStyles.removeBtn}
+                activeOpacity={0.7}
+              >
+                <Text style={SlotEditCardStyles.removeTxt}>✕ Remove</Text>
+              </TouchableOpacity>
+            )}
+          </View>
           {showExistingSlots && (
             <View>
               {isLoadingAvailablityList ? (
@@ -169,9 +194,17 @@ export const AvailabilityScreen: React.FC = () => {
                 setShowExistingSlots(true);
               }}
               onCancel={() => {
-                setEditingSlot(null);
-                setShowNewSlotForm(false);
-                setShowExistingSlots(true);
+                showConfirm({
+                  title: 'Remove Availability',
+                  message: 'Are you sure you want to remove this availability?',
+                  buttonText: 'Remove',
+                  cancelText: 'Cancel',
+                  onConfirm: () => {
+                    setEditingSlot(null);
+                    setShowNewSlotForm(false);
+                    setShowExistingSlots(true);
+                  },
+                });
               }}
             />
           )}

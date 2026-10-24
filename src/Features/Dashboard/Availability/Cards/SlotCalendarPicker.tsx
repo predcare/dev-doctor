@@ -205,7 +205,7 @@ const s = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
     alignItems: 'center',
     justifyContent: 'center',
   },

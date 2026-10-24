@@ -43,10 +43,10 @@ const getNotificationIcon = (category?: string, action?: string): React.ReactNod
     const act = (action || '').toLowerCase();
 
     if (act.includes('meeting') || act.includes('video') || act.includes('call')) {
-        return <VideoIcon size={20} color={theme.colors.primary} />;
+        return <VideoIcon size={20} color={theme.colors.blueFocusedColor} />;
     }
     if (act.includes('cancel')) {
-        return <ClockIcon size={20} color="#EF4444" />;
+        return <ClockIcon size={20} color={theme.colors.errorBg} />;
     }
     if (cat.includes('patient') || cat.includes('user')) {
         return <ProfileIcon size={20} color={theme.colors.primary} />;
@@ -63,10 +63,10 @@ const getNotificationIcon = (category?: string, action?: string): React.ReactNod
         return <FileTextIcon size={20} color="#0284C7" />;
     }
     if (cat.includes('appointment') || act.includes('appointment') || act.includes('book')) {
-        return <CalendarIcon size={20} color={theme.colors.primary} />;
+        return <CalendarIcon size={20} color={theme.colors.blueFocusedColor} />;
     }
     if (cat.includes('availability') || act.includes('resched')) {
-        return <ClockIcon size={20} color="#F59E0B" />;
+        return <ClockIcon size={20} color={theme.colors.blueFocusedColor} />;
     }
     return <BellIcon size={20} color={theme.colors.primary} />;
 };

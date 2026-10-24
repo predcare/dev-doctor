@@ -66,9 +66,7 @@ export const notificationsStyles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: '#F0FDFA',
-    borderWidth: 1,
-    borderColor: '#CCFBF1',
+    backgroundColor: theme.colors.inPersonBg,
     gap: 4,
   },
   markReadText: {
@@ -157,14 +155,15 @@ export const notificationCardStyles = StyleSheet.create({
     marginRight: 8,
   },
   cardTime: {
-    fontSize: 10,
-    fontWeight: '400',
-    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.regular,
+    color: theme.colors.textSlate,
     flexShrink: 0,
   },
   cardDesc: {
-    fontSize: 11,
-    color: '#64748B',
+    fontSize: 12,
+    fontWeight: theme.fontWeight.regular,
+    color: theme.colors.textSlate,
     lineHeight: 16,
   },
   metadataContainer: {
@@ -181,7 +180,7 @@ export const notificationCardStyles = StyleSheet.create({
   },
   metadataChipText: {
     fontSize: 10,
-    color: '#475569',
+    color: theme.colors.textSlate,
     fontWeight: '400',
   },
 });
