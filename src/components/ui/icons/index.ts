@@ -39,6 +39,7 @@ export * from './LightbulbInstructionsIcon';
 export * from './LogoutIcon';
 export * from './MailIcon';
 export * from './MapIcon';
+export * from './MealIcon';
 export * from './MicOffIcon';
 export * from './MicOnIcon';
 export * from './PatientAgeCalendarIcon';

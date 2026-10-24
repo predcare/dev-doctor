@@ -4,7 +4,6 @@ import { globalShadows, theme } from './theme.styled';
 export const patientDetailsStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
   },
 
   // Top Header Bar
@@ -54,8 +53,6 @@ export const patientDetailsStyles = StyleSheet.create({
     marginBottom: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
     ...globalShadows.card,
   },
   profileCardInner: {
@@ -74,23 +71,30 @@ export const patientDetailsStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.textInverted,
-    fontFamily: 'Inter_600SemiBold',
   },
   profileInfoGroup: {
     flex: 1,
     marginLeft: theme.spacing.lg,
   },
   profileName: {
-    fontSize: 15,
-    fontWeight: theme.fontWeight.semibold,
+    fontSize: 16,
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textPrimary,
-    fontFamily: 'Inter_600SemiBold',
   },
   profileIdText: {
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.textSlate,
     marginTop: 2,
-    fontFamily: 'Inter_500Medium',
+  },
+  profileEmailText: {
+    fontSize: 12,
+    color: theme.colors.textSlate,
+    marginTop: 2,
+  },
+  profilePhoneText: {
+    fontSize: 12,
+    color: theme.colors.textSlate,
+    marginTop: 2,
   },
   profileChips: {
     flexDirection: 'row',
@@ -102,12 +106,10 @@ export const patientDetailsStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 12,
-    backgroundColor: theme.colors.primarySoft,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    backgroundColor: theme.colors.inPersonBg,
   },
   profileChipText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
     fontFamily: 'Inter_500Medium',
@@ -128,15 +130,13 @@ export const patientDetailsStyles = StyleSheet.create({
     position: 'relative',
   },
   mainTabLabel: {
-    fontSize: 11,
-    fontWeight: theme.fontWeight.medium,
+    fontSize: 12,
+    fontWeight: theme.fontWeight.regular,
     color: theme.colors.textSlate,
-    fontFamily: 'Inter_500Medium',
   },
   mainTabLabelActive: {
     color: theme.colors.primary,
-    fontWeight: theme.fontWeight.semibold,
-    fontFamily: 'Inter_600SemiBold',
+    fontWeight: theme.fontWeight.medium,
   },
   mainTabIndicator: {
     position: 'absolute',
@@ -265,14 +265,14 @@ export const patientDetailsStyles = StyleSheet.create({
   },
   recordMeta: {
     fontSize: 11,
-    color: theme.colors.textMuted,
+    color: theme.colors.textSlate,
     marginTop: 4,
   },
   pill: {
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
   },
   pillText: {
     fontSize: 10,
@@ -284,8 +284,6 @@ export const patientDetailsStyles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.surfaceSecondary,
   },
   shareLabel: {
     fontSize: 11,
@@ -369,8 +367,6 @@ export const patientDetailsStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.md,
     padding: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
     ...globalShadows.card,
   },
   consultSectionTitle: {
@@ -381,7 +377,7 @@ export const patientDetailsStyles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
   },
   consultTextArea: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.sm,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
@@ -389,10 +385,10 @@ export const patientDetailsStyles = StyleSheet.create({
     color: theme.colors.textPrimary,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
-    minHeight: 80,
+    minHeight: 140,
   },
   consultInput: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.sm,
     paddingHorizontal: theme.spacing.md,
     height: 44,
@@ -417,7 +413,7 @@ export const patientDetailsStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
     borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
     height: 44,
   },
@@ -447,22 +443,22 @@ export const patientDetailsStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
     borderRadius: theme.borderRadius.sm,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.inPersonBg,
     height: 44,
     paddingHorizontal: 12,
   },
   bmiAutoTag: {
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    borderColor: theme.colors.textGreen,
   },
   bmiAutoText: {
     fontSize: 9,
     fontWeight: theme.fontWeight.medium,
-    color: theme.colors.primary,
+    color: theme.colors.textGreen,
   },
 
   // Medication Card Elements
@@ -527,7 +523,7 @@ export const patientDetailsStyles = StyleSheet.create({
     color: theme.colors.primary,
   },
   pickerSelectBtn: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
@@ -551,6 +547,7 @@ export const patientDetailsStyles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 10,
   },
   addOutlineBtnText: {
     fontSize: 13,
@@ -559,9 +556,7 @@ export const patientDetailsStyles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
   },
   addPrimaryBtn: {
-    backgroundColor: theme.colors.primarySoft,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    backgroundColor: theme.colors.blueFocusedColor,
     borderRadius: theme.borderRadius.sm,
     paddingVertical: 12,
     alignItems: 'center',
@@ -570,7 +565,7 @@ export const patientDetailsStyles = StyleSheet.create({
   addPrimaryBtnText: {
     fontSize: 13,
     fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.primary,
+    color: theme.colors.white,
     fontFamily: 'Inter_600SemiBold',
   },
   draftBtn: {
@@ -590,7 +585,7 @@ export const patientDetailsStyles = StyleSheet.create({
   },
 
   consultDateBtn: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
@@ -698,18 +693,15 @@ export const prescriptionTabstyles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
   },
   countBadge: {
-    backgroundColor: theme.colors.primarySoft,
-    borderColor: theme.colors.mintBdr,
-    borderWidth: 1,
+    backgroundColor: theme.colors.inPersonBg,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
   },
   countBadgeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
-    fontFamily: 'Inter_500Medium',
   },
   addBtn: {
     width: 36,
@@ -748,15 +740,13 @@ export const recordTabstyles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
   },
   countBadge: {
-    backgroundColor: theme.colors.primarySoft,
-    borderColor: theme.colors.mintBdr,
-    borderWidth: 1,
+    backgroundColor: theme.colors.inPersonBg,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
   },
   countBadgeText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.primary,
     fontFamily: 'Inter_500Medium',
@@ -782,13 +772,6 @@ export const prescriptionCardstyles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     marginHorizontal: theme.spacing.lg,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
     overflow: 'hidden',
   },
   touchable: {
@@ -800,9 +783,7 @@ export const prescriptionCardstyles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: theme.colors.primarySoft,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
+    backgroundColor: theme.colors.inPersonBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -829,7 +810,7 @@ export const prescriptionCardstyles = StyleSheet.create({
   idText: {
     fontSize: 10,
     fontWeight: theme.fontWeight.medium,
-    color: '#2563EB',
+    color: theme.colors.primary,
     fontFamily: 'Inter_500Medium',
   },
   statusBadge: {
@@ -838,15 +819,13 @@ export const prescriptionCardstyles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
-    borderWidth: 1,
     gap: 4,
   },
   statusBadgeSuccess: {
-    backgroundColor: '#DCFCE7',
-    borderColor: '#86EFAC',
+    backgroundColor: theme.colors.inPersonBg,
   },
   statusBadgeWarning: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#E0F2FE',
     borderColor: '#FDE68A',
   },
   statusDot: {
@@ -855,29 +834,28 @@ export const prescriptionCardstyles = StyleSheet.create({
     borderRadius: 3,
   },
   statusDotSuccess: {
-    backgroundColor: '#16A34A',
+    backgroundColor: theme.colors.white,
   },
   statusDotWarning: {
-    backgroundColor: '#D97706',
+    backgroundColor: "#0284C7",
   },
   statusText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: theme.fontWeight.medium,
     fontFamily: 'Inter_500Medium',
   },
   statusTextSuccess: {
-    color: '#15803D',
+    color: theme.colors.primary,
   },
   statusTextWarning: {
-    color: '#B45309',
+    color: theme.colors.textInPerson,
   },
   diagnosisTitle: {
     fontSize: 13,
-    fontWeight: theme.fontWeight.semibold,
+    fontWeight: theme.fontWeight.regular,
     color: theme.colors.textPrimary,
     lineHeight: 18,
     marginBottom: 2,
-    fontFamily: 'Inter_600SemiBold',
   },
   patientName: {
     fontSize: 11,

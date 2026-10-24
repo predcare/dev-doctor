@@ -237,7 +237,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
             >
               <View style={emrUploadModalStyles.headerRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={emrUploadModalStyles.headerTitle}>Upload EMR</Text>
+                  <Text style={emrUploadModalStyles.headerTitle}>Upload Record</Text>
                   <Text style={emrUploadModalStyles.headerSubtitle}>Add to patient’s record</Text>
                 </View>
                 <TouchableOpacity
@@ -286,7 +286,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
                         nestedScrollEnabled
                         persistentScrollbar={true}
                         showsVerticalScrollIndicator={true}
-                        style={{ maxHeight: 180 }}
+                        style={{ maxHeight: 220 }}
                       >
                         {EMR_Record_Category.map((cat, index) => {
                           const isSelected = cat === selectedCategory;
@@ -442,7 +442,7 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
               <View style={{ zIndex: 999 }}>
                 <UploadOptionsModal
                   visible={showUploadOptions}
-                  title="Upload EMR Document"
+                  title="Upload Record"
                   subtitle="Choose a source to attach your medical file"
                   onClose={() => setShowUploadOptions(false)}
                   onSelectCamera={handleCamera}

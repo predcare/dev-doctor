@@ -6,7 +6,7 @@ export const TEAL_DARK = theme.colors.primaryDark;
 export const TEAL_LIGHT_BG = theme.colors.primarySoft;
 
 export const prescriptionViewStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
+  container: { flex: 1 },
 
   // Header
   header: {
@@ -39,21 +39,26 @@ export const prescriptionViewStyles = StyleSheet.create({
   editPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: theme.colors.surfaceSecondary,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
+    height: 28,
+    borderRadius: 14,
     marginRight: 8,
   },
-  editPillTxt: { fontSize: 13, fontWeight: '600', color: theme.colors.primary, marginLeft: 4 },
+  editPillTxt: { fontSize: 12, fontWeight: '600', color: theme.colors.primary, marginLeft: 4 },
   rxIdBadge: {
-    fontSize: 10,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surfaceSecondary,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+  },
+  rxIdBadgeTxt: {
+    fontSize: 12,
     fontWeight: '700',
     color: theme.colors.textSlate,
-    backgroundColor: theme.colors.surfaceSecondary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
   },
 
   // Clinic card
@@ -64,17 +69,38 @@ export const prescriptionViewStyles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 12,
     padding: 16,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
+  clinicTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
+    marginBottom: 4,
   },
-  clinicName: { fontSize: 16, fontWeight: '700', color: theme.colors.textPrimary, marginBottom: 3 },
-  clinicSub: { fontSize: 13, color: theme.colors.textSlate },
+  clinicBottomRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+  },
+  clinicName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    flex: 1,
+    marginRight: 8,
+  },
+  clinicSub: {
+    fontSize: 13,
+    color: theme.colors.textSlate,
+    lineHeight: 18,
+    flex: 1,
+    marginRight: 8,
+    maxWidth: '70%',
+  },
   clinicDate: { fontSize: 14, fontWeight: '700', color: theme.colors.primary },
-  statusChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  statusChipTxt: { fontSize: 10, fontWeight: '700' },
+  statusChip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, width: 80 },
+  statusChipTxt: { fontSize: 10, fontWeight: '700', textAlign: 'center' },
 
   // Patient card
   patientCard: {
@@ -85,14 +111,12 @@ export const prescriptionViewStyles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
   },
   patientAvatarBox: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -149,8 +173,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
   },
 
   // Vitals
@@ -163,8 +185,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
     marginRight: 6,
   },
   vitalLbl: {
@@ -189,8 +209,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceSecondary,
     borderRadius: 8,
     padding: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
   },
   textBoxTxt: { fontSize: 14, color: theme.colors.textSecondary, lineHeight: 22 },
 
@@ -207,8 +225,8 @@ export const prescriptionViewStyles = StyleSheet.create({
   medDosage: { fontSize: 14, fontWeight: '700', color: theme.colors.textSecondary },
   medDosageGreen: { color: theme.colors.primary },
   medBotRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
-  medMetaItem: { flexDirection: 'row', alignItems: 'center', marginRight: 10 },
-  medMetaTxt: { fontSize: 12, color: theme.colors.textSlate },
+  medMetaItem: { flexDirection: 'row', alignItems: 'center', marginRight: 10, marginTop: 4 },
+  medMetaTxt: { fontSize: 12, color: theme.colors.textSlate, marginLeft: 4 },
   medFreqRight: { fontSize: 11, color: theme.colors.textMuted },
   sosBadge: {
     backgroundColor: theme.colors.warningLight,
@@ -298,8 +316,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.surfaceBorder,
   },
   completeBtn: {
     backgroundColor: theme.colors.primary,
@@ -328,12 +344,18 @@ export const prescriptionViewStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shareBtnTxt: { fontSize: 16, fontWeight: '700', color: theme.colors.textInverted, marginLeft: 8 },
+  shareBtnTxt: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textInverted,
+    textAlign: 'center',
+  },
   shareBtnDocBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+    flex: 1,
     backgroundColor: theme.colors.surfaceSecondary,
+    borderRadius: 14,
+    paddingVertical: 15,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -361,8 +383,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
   },
   medicalBadgeTitle: {
     fontSize: 11,
@@ -378,6 +398,21 @@ export const prescriptionViewStyles = StyleSheet.create({
     color: theme.colors.textPrimary,
     lineHeight: 20,
   },
+  vitalGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 6,
+  },
+  vitalGridBox: {
+    width: '31%',
+    backgroundColor: theme.colors.surfaceSecondary,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
   // Custom Vitals
   customVitalBox: {
@@ -388,8 +423,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
     marginBottom: 6,
   },
   customVitalLbl: {
@@ -408,8 +441,6 @@ export const prescriptionViewStyles = StyleSheet.create({
     backgroundColor: theme.colors.accentLight,
     borderRadius: 12,
     padding: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.infoLight,
     gap: 6,
   },
   referralTitle: {

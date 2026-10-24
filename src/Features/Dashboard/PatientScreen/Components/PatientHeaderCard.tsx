@@ -11,6 +11,8 @@ export interface PatientHeaderCardProps {
   age?: string | number;
   bloodGroup?: string;
   profileImg?: string;
+  email?: string;
+  phone?: string;
 }
 
 export const PatientHeaderCard: React.FC<PatientHeaderCardProps> = ({
@@ -20,6 +22,8 @@ export const PatientHeaderCard: React.FC<PatientHeaderCardProps> = ({
   age = '-',
   bloodGroup = '-',
   profileImg,
+  email = '-',
+  phone = '-',
 }) => {
   return (
     <View style={patientDetailsStyles.profileCard}>
@@ -36,6 +40,8 @@ export const PatientHeaderCard: React.FC<PatientHeaderCardProps> = ({
         <View style={patientDetailsStyles.profileInfoGroup}>
           <Text style={patientDetailsStyles.profileName}>{name}</Text>
           <Text style={patientDetailsStyles.profileIdText}>ID: {patientId}</Text>
+          <Text style={patientDetailsStyles.profileEmailText}>Email: {email}</Text>
+          <Text style={patientDetailsStyles.profilePhoneText}>Phone: {phone}</Text>
 
           <View style={patientDetailsStyles.profileChips}>
             {!!gender && (

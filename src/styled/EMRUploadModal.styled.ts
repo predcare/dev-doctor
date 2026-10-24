@@ -4,7 +4,6 @@ import { theme } from './theme.styled';
 export const emrUploadModalStyles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.55)',
     justifyContent: 'flex-end',
   },
   sheetContainer: {
@@ -171,9 +170,7 @@ export const emrUploadModalStyles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
   },
   shareContainer: {
-    backgroundColor: '#ECFDF5',
-    borderWidth: 1,
-    borderColor: '#A7F3D0',
+    backgroundColor: theme.colors.inPersonBg,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,

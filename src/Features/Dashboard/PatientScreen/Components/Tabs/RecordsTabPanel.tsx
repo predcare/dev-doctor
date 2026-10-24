@@ -167,7 +167,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
     <View style={{ flex: 1 }}>
       <View style={recordTabstyles.headerRow}>
         <View style={recordTabstyles.titleGroup}>
-          <Text style={recordTabstyles.title}>Medical Documents</Text>
+          <Text style={recordTabstyles.title}>Medical Records</Text>
           {Array.isArray(emrData) && emrData.length > 0 && (
             <View style={recordTabstyles.countBadge}>
               <Text style={recordTabstyles.countBadgeText}>{emrData.length}</Text>
@@ -189,7 +189,7 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
       ) : isEMRCardError ? (
         <View style={{ flex: 1 }}>
           <CommonErrorCard
-            title="Failed to Load Medical Documents"
+            title="Failed to Load Medical Records"
             message="Something went wrong while fetching patient records."
             onRetry={refetchEmr}
           />
@@ -219,9 +219,9 @@ export const RecordsTabPanel: React.FC<RecordsTabPanelProps> = ({ patientId }) =
           }}
           ListEmptyComponent={
             <CommonEmptyCard
-              title="No Medical Documents"
-              message="No medical documents uploaded yet for this patient."
-              actionText="+ Add Document"
+              title="No Medical Records"
+              message="No medical records uploaded yet for this patient."
+              actionText="Add Document"
               onAction={() => setShowUploadModal(true)}
             />
           }

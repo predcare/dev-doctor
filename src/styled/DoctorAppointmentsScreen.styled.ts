@@ -292,7 +292,7 @@ export const doctorAppointmentsStyles = StyleSheet.create({
   },
   patientAvatarText: {
     color: theme.colors.textInverted,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: theme.fontWeight.semibold,
   },
   patientName: {

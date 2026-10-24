@@ -102,7 +102,7 @@ export const OptionPickerModal: React.FC<OptionPickerModalProps> = ({
                   <Text style={styles.hint}>Enter a value that is not in the list.</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter custom value"
+                    placeholder="Enter Custom Value"
                     placeholderTextColor={theme.colors.textMuted}
                     value={customValue}
                     onChangeText={setCustomValue}
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
   },
   input: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     paddingHorizontal: 14,
     height: 46,

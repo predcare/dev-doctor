@@ -93,10 +93,7 @@ export const createPrescriptionStyles = StyleSheet.create({
     gap: 6,
   },
   stepTabActive: {
-    backgroundColor: theme.colors.primarySoft,
-    borderColor: theme.colors.mintBdr,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 2 },
+    backgroundColor: theme.colors.inPersonBg,
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
@@ -122,7 +119,7 @@ export const createPrescriptionStyles = StyleSheet.create({
   },
   stepTabTitle: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: theme.fontWeight.medium,
     color: theme.colors.textSlate,
   },
   stepTabTitleActive: {

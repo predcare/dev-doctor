@@ -47,16 +47,12 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
   patient_name,
   created_at,
   isSent,
-  status,
   onPress,
 }) => {
   const isDelivered = Boolean(isSent);
-  const isSuccess = isDelivered || status?.toLowerCase() === 'completed';
   const badgeLabel = isDelivered
     ? 'Sent'
-    : status
-      ? status.charAt(0).toUpperCase() + status.slice(1)
-      : 'Not Sent';
+    : 'Not Sent';
 
   return (
     <View style={prescriptionCardstyles.card}>
@@ -84,19 +80,13 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
             <View
               style={[
                 prescriptionCardstyles.statusBadge,
-                isSuccess ? prescriptionCardstyles.statusBadgeSuccess : prescriptionCardstyles.statusBadgeWarning,
+                isDelivered ? prescriptionCardstyles.statusBadgeSuccess : prescriptionCardstyles.statusBadgeWarning,
               ]}
             >
-              <View
-                style={[
-                  prescriptionCardstyles.statusDot,
-                  isSuccess ? prescriptionCardstyles.statusDotSuccess : prescriptionCardstyles.statusDotWarning,
-                ]}
-              />
               <Text
                 style={[
                   prescriptionCardstyles.statusText,
-                  isSuccess ? prescriptionCardstyles.statusTextSuccess : prescriptionCardstyles.statusTextWarning,
+                  isDelivered ? prescriptionCardstyles.statusTextSuccess : prescriptionCardstyles.statusTextWarning,
                 ]}
               >
                 {badgeLabel}
@@ -106,12 +96,6 @@ export const PrescriptionCard: React.FC<PrescriptionCardProps> = ({
           <Text style={prescriptionCardstyles.diagnosisTitle} numberOfLines={2}>
             {diagnosis?.trim() || 'General Prescription'}
           </Text>
-
-          {!!patient_name && (
-            <Text style={prescriptionCardstyles.patientName} numberOfLines={1}>
-              Patient: {patient_name}
-            </Text>
-          )}
 
           {/* Bottom Row: Date & Metadata */}
           <View style={prescriptionCardstyles.bottomRow}>

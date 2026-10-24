@@ -30,30 +30,79 @@ export const PrescriptionVitalsStep: React.FC = () => {
     <View style={patientDetailsStyles.consultSectionCard}>
       <Text style={patientDetailsStyles.consultSectionTitle}>Patient Vitals</Text>
 
-      {/* Row 1: BP & Pulse */}
       <View style={patientDetailsStyles.vitalsRow}>
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <Text style={patientDetailsStyles.vitalLabel}>Blood Pressure</Text>
-          <View style={patientDetailsStyles.vitalInputContainer}>
-            <Controller
-              control={control}
-              name="blood_pressure"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={patientDetailsStyles.vitalInput}
-                  placeholder="120/80"
-                  placeholderTextColor={theme.colors.textMuted}
-                  value={value || ''}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-            <View style={patientDetailsStyles.vitalUnitTag}>
-              <Text style={patientDetailsStyles.vitalUnitText}>mmHg</Text>
-            </View>
-          </View>
-        </View>
+        <View style={{ flex: 1 }}>
+          <Controller
+            control={control}
+            name="blood_pressure"
+            render={({ field: { onChange, value } }) => {
+              const parts = (value || '').split('/');
+              const systolic = (parts[0] || '').replace(/[^\d]/g, '');
+              const diastolic = (parts[1] || '').replace(/[^\d]/g, '');
 
+              const updateBloodPressure = (nextSystolic: string, nextDiastolic: string) => {
+                const sys = nextSystolic.replace(/[^\d]/g, '');
+                const dia = nextDiastolic.replace(/[^\d]/g, '');
+                if (!sys && !dia) {
+                  onChange('');
+                  return;
+                }
+                onChange(`${sys}/${dia}`);
+              };
+
+              return (
+                <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={patientDetailsStyles.vitalLabel}>Systolic BP (mmHg)</Text>
+                      <View style={patientDetailsStyles.vitalInputContainer}>
+                        <TextInput
+                          style={patientDetailsStyles.vitalInput}
+                          placeholder="120"
+                          placeholderTextColor={theme.colors.textMuted}
+                          value={systolic}
+                          onChangeText={text => updateBloodPressure(text, diastolic)}
+                          keyboardType="number-pad"
+                          maxLength={3}
+                        />
+                      </View>
+                    </View>
+                    <Text
+                      style={{
+                        marginHorizontal: 8,
+                        marginBottom: 12,
+                        fontSize: 16,
+                        color: theme.colors.textMuted,
+                      }}
+                    >
+                      /
+                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={patientDetailsStyles.vitalLabel}>Diastolic BP (mmHg)</Text>
+                      <View style={patientDetailsStyles.vitalInputContainer}>
+                        <TextInput
+                          style={patientDetailsStyles.vitalInput}
+                          placeholder="80"
+                          placeholderTextColor={theme.colors.textMuted}
+                          value={diastolic}
+                          onChangeText={text => updateBloodPressure(systolic, text)}
+                          keyboardType="number-pad"
+                          maxLength={3}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                  <Text style={{ fontSize: 10, color: theme.colors.textMuted, marginTop: 4 }}>
+                    Example reading: 120/80 mmHg
+                  </Text>
+                </View>
+              );
+            }}
+          />
+        </View>
+      </View>
+
+      <View style={patientDetailsStyles.vitalsRow}>
         <View style={{ flex: 1 }}>
           <Text style={patientDetailsStyles.vitalLabel}>Heart Rate</Text>
           <View style={patientDetailsStyles.vitalInputContainer}>

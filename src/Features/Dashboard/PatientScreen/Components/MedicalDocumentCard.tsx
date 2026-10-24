@@ -49,7 +49,7 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
   return (
     <View style={patientDetailsStyles.recordCard}>
       <TouchableOpacity
-        style={patientDetailsStyles.recordItem}
+        style={[patientDetailsStyles.recordItem, { alignItems: 'flex-start' }]}
         onPress={onPress}
         activeOpacity={0.7}
       >
@@ -58,11 +58,16 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
         </View>
 
         <View style={{ flex: 1 }}>
-          <Text style={patientDetailsStyles.recordTitle} numberOfLines={1}>
-            {title || document_type || 'Medical Document'}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+            <Text style={[patientDetailsStyles.recordTitle, { flex: 1 }]} numberOfLines={1}>
+              {title || document_type || 'Medical Document'}
+            </Text>
+            {!!created_at && (
+              <Text style={[patientDetailsStyles.recordMeta, { marginTop: 1 }]}>{formatDate(created_at)}</Text>
+            )}
+          </View>
           <Text style={patientDetailsStyles.recordSub}>{document_type || 'Document'}</Text>
-          <View style={{ flexDirection: 'row', gap: 6, marginTop: 4, alignItems: 'center' }}>
+          <View style={{ alignItems: 'flex-end', marginTop: 6 }}>
             <View
               style={[
                 patientDetailsStyles.pill,
@@ -78,7 +83,6 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
                 {isDoctorUploaded ? 'Doctor' : 'Patient'}
               </Text>
             </View>
-            {!!created_at && <Text style={patientDetailsStyles.recordMeta}>{formatDate(created_at)}</Text>}
           </View>
         </View>
       </TouchableOpacity>
@@ -88,11 +92,8 @@ export const MedicalDocumentCard: React.FC<MedicalDocumentCardProps> = ({
             patientDetailsStyles.shareRow,
             {
               backgroundColor: visible_to_patient
-                ? theme.colors.primarySoft
+                ? theme.colors.inPersonBg
                 : theme.colors.background,
-              borderTopColor: visible_to_patient
-                ? theme.colors.mintBdr
-                : theme.colors.surfaceBorder,
             },
           ]}
         >

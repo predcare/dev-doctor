@@ -76,7 +76,7 @@ export const PrescriptionClinicalNotesStep: React.FC = () => {
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={patientDetailsStyles.consultTextArea}
-              placeholder="Describe symptoms and chief complaints..."
+              placeholder="Describe Symptoms and Chief Complaints..."
               placeholderTextColor={theme.colors.textMuted}
               value={value || ''}
               onChangeText={onChange}
@@ -97,7 +97,7 @@ export const PrescriptionClinicalNotesStep: React.FC = () => {
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={patientDetailsStyles.consultTextArea}
-              placeholder="Enter examination findings and clinical notes..."
+              placeholder="Enter Examination Findings and Clinical Notes..."
               placeholderTextColor={theme.colors.textMuted}
               value={value || ''}
               onChangeText={onChange}
@@ -115,7 +115,7 @@ export const PrescriptionClinicalNotesStep: React.FC = () => {
         <View style={localStyles.inputAddRow}>
           <TextInput
             style={[localStyles.inputField, { flex: 1 }]}
-            placeholder="Enter chronic condition (e.g. Hypertension)..."
+            placeholder="(e.g. Hypertension)..."
             placeholderTextColor={theme.colors.textMuted}
             value={chronicInput}
             onChangeText={setChronicInput}
@@ -124,7 +124,7 @@ export const PrescriptionClinicalNotesStep: React.FC = () => {
             returnKeyType="done"
           />
           <TouchableOpacity style={localStyles.addChipBtn} onPress={addChronicCondition}>
-            <Text style={localStyles.addChipBtnText}>+ Add</Text>
+            <Text style={localStyles.addChipBtnText}>Add</Text>
           </TouchableOpacity>
         </View>
         {Boolean(chronicConditionsValue) && (
@@ -154,7 +154,7 @@ export const PrescriptionClinicalNotesStep: React.FC = () => {
         <View style={localStyles.inputAddRow}>
           <TextInput
             style={[localStyles.inputField, { flex: 1 }]}
-            placeholder="Enter drug allergy (e.g. Penicillin)..."
+            placeholder="(e.g. Penicillin)..."
             placeholderTextColor={theme.colors.textMuted}
             value={allergyInput}
             onChangeText={setAllergyInput}
@@ -163,7 +163,7 @@ export const PrescriptionClinicalNotesStep: React.FC = () => {
             returnKeyType="done"
           />
           <TouchableOpacity style={localStyles.addChipBtn} onPress={addDrugAllergy}>
-            <Text style={localStyles.addChipBtnText}>+ Add</Text>
+            <Text style={localStyles.addChipBtnText}>Add</Text>
           </TouchableOpacity>
         </View>
         {Boolean(drugAllergiesValue) && (

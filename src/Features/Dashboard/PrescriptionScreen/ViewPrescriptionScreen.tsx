@@ -3,12 +3,12 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'rea
 import FileViewer from 'react-native-file-viewer';
 import CommonErrorCard from '../../../components/commons/CommonErrorCard/CommonErrorCard';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
-import { CalendarIcon, DiagnosisDocumentIcon, EditIcon, LabTestBoardIcon, LightbulbInstructionsIcon, PatientAgeCalendarIcon, PatientAvatarIcon, PatientGenderIcon, PillIcon, ReferralIcon, SymptomsWarningIcon, VitalsPulseIcon } from '../../../components/ui/icons';
+import { CalendarIcon, DiagnosisDocumentIcon, EditIcon, InfoCircleIcon, LightbulbInstructionsIcon, MealIcon, PatientAgeCalendarIcon, PatientAvatarIcon, PatientGenderIcon, ReferralIcon, SymptomsWarningIcon } from '../../../components/ui/icons';
 import { useDownloadPrescriptionPdf, useGetPrescriptionDetails, useResendPrescriptionEmail } from '../../../hooks/react-query/prescriptions/prescriptions.hooks';
 import { PatientsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
-import { formatDate } from '../../../lib/commons/common.utils';
+import { _toTitleCase, formatDate } from '../../../lib/commons/common.utils';
 import { showErrorToast, showInfoToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import { AppRoute, PrescriptionViewScreenProps } from '../../../route';
 import { TEAL, TEAL_DARK } from '../../../styled/BookAppointmentScreen.styled';
@@ -87,6 +87,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             patientAge: rxDoc.patient_age || 'N/A',
             patientGender: rxDoc.patient_gender || 'N/A',
             patientId: rxDoc.patient_id ? `#${rxDoc.patient_id}` : route?.params?.patientId || 'N/A',
+            patintDisplayId: rxDoc.patient_display_id ? `#${rxDoc.patient_display_id}` : route?.params?.patientId || 'N/A',
 
             // Medical background
             drugAllergies: sanitizeText(rxDoc.drug_allergies),
@@ -281,6 +282,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
             header={
                 <Header
                     title="Summary"
+                    description={displayData?.rxId?.toString() || ''}
                     isBackBtn
                     onBackPress={handleBack}
                     rightAction={
@@ -296,7 +298,9 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                                 </TouchableOpacity>
                             )}
                             {displayData.rxId ? (
-                                <Text style={prescriptionViewStyles.rxIdBadge}>{displayData.rxId}</Text>
+                                <View style={prescriptionViewStyles.rxIdBadge}>
+                                    <Text style={prescriptionViewStyles.rxIdBadgeTxt}>{displayData.rxId}</Text>
+                                </View>
                             ) : null}
                         </View>
                     }
@@ -309,17 +313,16 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                 contentContainerStyle={{ paddingBottom: 16 }}
             >
                 <View style={prescriptionViewStyles.clinicCard}>
-                    <View style={{ flex: 1 }}>
+                    <View style={prescriptionViewStyles.clinicTopRow}>
                         <Text style={prescriptionViewStyles.clinicName}>{displayData.clinicName}</Text>
+                        <Text style={prescriptionViewStyles.clinicDate}>{displayData.date}</Text>
+                    </View>
+                    <View style={prescriptionViewStyles.clinicBottomRow}>
                         {displayData.clinicAddress ? (
-                            <Text style={prescriptionViewStyles.clinicSub}>{displayData.clinicAddress}</Text>
+                            <Text style={prescriptionViewStyles.clinicSub} numberOfLines={1}>{displayData.clinicAddress}</Text>
                         ) : (
                             <Text style={prescriptionViewStyles.clinicSub}>Prescription Details</Text>
                         )}
-                    </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={prescriptionViewStyles.clinicDate}>{displayData.date}</Text>
-                        <View style={{ height: 4 }} />
                         <View
                             style={[
                                 prescriptionViewStyles.statusChip,
@@ -349,16 +352,16 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
 
                             <View style={prescriptionViewStyles.patientMetaItem}>
                                 <PatientGenderIcon size={14} color={TEAL_DARK} style={{ marginRight: 4 }} />
-                                <Text style={prescriptionViewStyles.patientMetaTxt}>{displayData.patientGender}</Text>
+                                <Text style={prescriptionViewStyles.patientMetaTxt}>{_toTitleCase(displayData.patientGender)}</Text>
                             </View>
                         </View>
                     </View>
 
                     <View style={prescriptionViewStyles.patientIdBadge}>
-                        <Text style={prescriptionViewStyles.patientIdBadgeTxt}>{displayData.patientId}</Text>
+                        <Text style={prescriptionViewStyles.patientIdBadgeTxt}>{displayData.patintDisplayId}</Text>
                     </View>
                 </View>
-                {(displayData.drugAllergies || displayData.chronicConditions) && (
+                {(displayData.drugAllergies || displayData.chronicConditions || displayData.standardVitals.length > 0 || displayData.customVitals.length > 0) && (
                     <View style={prescriptionViewStyles.outerSection}>
                         <View style={prescriptionViewStyles.medicalBadgesColumn}>
                             {displayData.drugAllergies && (
@@ -374,44 +377,23 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                                     <Text style={prescriptionViewStyles.medicalBadgeVal}>{displayData.chronicConditions}</Text>
                                 </View>
                             )}
-                        </View>
-                    </View>
-                )}
-                {/* Standard Vitals Section */}
-                {displayData.standardVitals.length > 0 && (
-                    <View style={prescriptionViewStyles.outerSection}>
-                        <View style={prescriptionViewStyles.outerSectionHd}>
-                            <VitalsPulseIcon size={18} color={TEAL} />
-                            <Text style={prescriptionViewStyles.outerSectionTitle}>Vitals</Text>
-                        </View>
 
-                        <View style={prescriptionViewStyles.contentCard}>
-                            <View style={[prescriptionViewStyles.vitalsRow, { flexWrap: 'wrap', gap: 6 }]}>
-                                {displayData.standardVitals.map((v, i) => (
-                                    <View key={i} style={[prescriptionViewStyles.vitalBox, { minWidth: '28%', flex: 0 }]}>
-                                        <Text style={prescriptionViewStyles.vitalLbl}>{v.label}</Text>
-                                        <Text style={prescriptionViewStyles.vitalVal}>{v.value}</Text>
+                            {(displayData.standardVitals.length > 0 || displayData.customVitals.length > 0) && (
+                                <View style={prescriptionViewStyles.medicalBadgeFull}>
+                                    <Text style={prescriptionViewStyles.medicalBadgeTitle}>Vitals</Text>
+                                    <View style={prescriptionViewStyles.vitalGrid}>
+                                        {[
+                                            ...displayData.standardVitals.map((v) => ({ label: v.label, value: v.value })),
+                                            ...displayData.customVitals.map((cv) => ({ label: cv.name, value: cv.value })),
+                                        ].map((item, i) => (
+                                            <View key={`${item.label}-${i}`} style={prescriptionViewStyles.vitalGridBox}>
+                                                <Text style={prescriptionViewStyles.vitalLbl}>{item.label}</Text>
+                                                <Text style={prescriptionViewStyles.vitalVal}>{item.value}</Text>
+                                            </View>
+                                        ))}
                                     </View>
-                                ))}
-                            </View>
-                        </View>
-                    </View>
-                )}
-                {/* Custom Vitals Section (Separated!) */}
-                {displayData.customVitals.length > 0 && (
-                    <View style={prescriptionViewStyles.outerSection}>
-                        <View style={prescriptionViewStyles.outerSectionHd}>
-                            <VitalsPulseIcon size={18} color={TEAL} />
-                            <Text style={prescriptionViewStyles.outerSectionTitle}>Custom Vitals</Text>
-                        </View>
-
-                        <View style={prescriptionViewStyles.contentCard}>
-                            {displayData.customVitals.map((cv, i) => (
-                                <View key={i} style={prescriptionViewStyles.customVitalBox}>
-                                    <Text style={prescriptionViewStyles.customVitalLbl}>{cv.name}</Text>
-                                    <Text style={prescriptionViewStyles.customVitalVal}>{cv.value}</Text>
                                 </View>
-                            ))}
+                            )}
                         </View>
                     </View>
                 )}
@@ -482,15 +464,13 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                 {/* Medications Section */}
                 {displayData.medications.length > 0 && (
                     <View style={prescriptionViewStyles.outerSection}>
-                        <View style={prescriptionViewStyles.outerSectionHd}>
-                            <PillIcon size={18} color={TEAL} />
-                            <Text style={prescriptionViewStyles.outerSectionTitle}>Medications</Text>
-                            <View style={{ flex: 1 }} />
-                            <Text style={prescriptionViewStyles.outerCountTxt}>{displayData.medications.length} ITEMS</Text>
-                        </View>
-
                         <View style={prescriptionViewStyles.contentCard}>
-                            {displayData.medications.map((med, i) => {
+                            <View style={prescriptionViewStyles.outerSectionHd}>
+                                <Text style={[prescriptionViewStyles.medicalBadgeTitle, { marginBottom: 0 }]}>Medications</Text>
+                                <View style={{ flex: 1 }} />
+                                <Text style={[prescriptionViewStyles.medicalBadgeTitle, { marginBottom: 0 }]}>{displayData.medications.length} ITEMS</Text>
+                            </View>
+                            {displayData?.medications?.map((med, i) => {
                                 const strengthStr = med.strength
                                     ? `${med.strength} ${med.strengthUnit || 'mg'}`
                                     : '';
@@ -504,26 +484,40 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                                         style={[prescriptionViewStyles.medItem, i < displayData.medications.length - 1 && prescriptionViewStyles.medBorder]}
                                     >
                                         <View style={prescriptionViewStyles.medTopRow}>
-                                            <Text style={prescriptionViewStyles.medName}>
+                                            <Text style={[prescriptionViewStyles.medicalBadgeVal, { flex: 1 }]}>
                                                 {med.name} {strengthStr ? `(${strengthStr})` : ''}
                                             </Text>
-                                            {med.dosage ? <Text style={prescriptionViewStyles.medDosage}>{med.dosage}</Text> : null}
                                         </View>
 
                                         <View style={prescriptionViewStyles.medBotRow}>
                                             {durationStr ? (
                                                 <View style={prescriptionViewStyles.medMetaItem}>
-                                                    <Text style={prescriptionViewStyles.medMetaTxt}>📅 {durationStr}</Text>
+                                                    <CalendarIcon size={14} color="#64748B" />
+                                                    <Text style={prescriptionViewStyles.medMetaTxt}>{durationStr}</Text>
                                                 </View>
                                             ) : null}
                                             {med.timing ? (
                                                 <View style={prescriptionViewStyles.medMetaItem}>
-                                                    <Text style={prescriptionViewStyles.medMetaTxt}>🍽 {med.timing}</Text>
+                                                    <MealIcon size={14} color="#64748B" />
+                                                    <Text style={prescriptionViewStyles.medMetaTxt}>{med.timing}</Text>
                                                 </View>
                                             ) : null}
                                             {med.instructions ? (
                                                 <View style={prescriptionViewStyles.medMetaItem}>
-                                                    <Text style={prescriptionViewStyles.medMetaTxt}>ℹ️ {med.instructions}</Text>
+                                                    <InfoCircleIcon size={14} color="#64748B" />
+                                                    <Text style={prescriptionViewStyles.medMetaTxt}>{med.instructions}</Text>
+                                                </View>
+                                            ) : null}
+                                            {med.instructions ? (
+                                                <View style={prescriptionViewStyles.medMetaItem}>
+                                                    <InfoCircleIcon size={14} color="#64748B" />
+                                                    <Text style={prescriptionViewStyles.medMetaTxt}>{med.instructions}</Text>
+                                                </View>
+                                            ) : null}
+                                            {med.dosage ? (
+                                                <View style={prescriptionViewStyles.medMetaItem}>
+                                                    <InfoCircleIcon size={14} color="#64748B" />
+                                                    <Text style={prescriptionViewStyles.medMetaTxt}>{med.dosage}</Text>
                                                 </View>
                                             ) : null}
                                         </View>
@@ -602,14 +596,12 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                 {/* Lab Tests Section */}
                 {displayData.labTests.length > 0 && (
                     <View style={prescriptionViewStyles.outerSection}>
-                        <View style={prescriptionViewStyles.outerSectionHd}>
-                            <LabTestBoardIcon size={18} color={TEAL} />
-                            <Text style={prescriptionViewStyles.outerSectionTitle}>Lab Tests</Text>
-                            <View style={{ flex: 1 }} />
-                            <Text style={prescriptionViewStyles.outerCountTxt}>{displayData.labTests.length} ITEMS</Text>
-                        </View>
-
                         <View style={prescriptionViewStyles.contentCard}>
+                            <View style={prescriptionViewStyles.outerSectionHd}>
+                                <Text style={[prescriptionViewStyles.medicalBadgeTitle, { marginBottom: 0 }]}>Lab Tests</Text>
+                                <View style={{ flex: 1 }} />
+                                <Text style={[prescriptionViewStyles.medicalBadgeTitle, { marginBottom: 0 }]}>{displayData.labTests.length} ITEMS</Text>
+                            </View>
                             {displayData.labTests.map((lab, i) => (
                                 <View
                                     key={i}
@@ -642,8 +634,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                                 <ActivityIndicator color="#FFFFFF" size="small" />
                             ) : (
                                 <>
-                                    <Text style={{ fontSize: 16, color: '#FFFFFF' }}>📧</Text>
-                                    <Text style={prescriptionViewStyles.shareBtnTxt}>Resend to Patient</Text>
+                                    <Text style={prescriptionViewStyles.shareBtnTxt}>{displayData?.isSent ? "Resend" : "Send"}</Text>
                                 </>
                             )}
                         </TouchableOpacity>
@@ -671,10 +662,7 @@ export const PrescriptionViewScreen: React.FC<PrescriptionViewScreenProps> = ({
                             </View>
                         ) : (
                             <>
-                                <Text style={{ fontSize: 22, color: TEAL }}>📥</Text>
-                                {!(rxDoc && rxDoc?.published_version_count < 2) && (
-                                    <Text style={prescriptionViewStyles.shareBtnDocBtnFullTxt}>Download PDF</Text>
-                                )}
+                                <Text style={prescriptionViewStyles.shareBtnDocBtnFullTxt}>Download PDF</Text>
                             </>
                         )}
                     </TouchableOpacity>

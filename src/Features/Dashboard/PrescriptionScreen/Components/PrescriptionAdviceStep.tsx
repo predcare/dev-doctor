@@ -6,6 +6,7 @@ import { formatDate } from '../../../../lib/commons/common.utils';
 import { TCreatePrescriptionFormValues } from '../../../../lib/schemas/createPrescription.schema';
 import { patientDetailsStyles } from '../../../../styled/PatientDetailsScreen.styled';
 import theme from '../../../../styled/theme.styled';
+import CalendarCheckIcon from '../../../../components/ui/icons/CalendarCheckIcon';
 
 export const PrescriptionAdviceStep: React.FC = () => {
   const { control, setValue, getValues } = useFormContext<TCreatePrescriptionFormValues>();
@@ -35,7 +36,7 @@ export const PrescriptionAdviceStep: React.FC = () => {
                 ? formatDate(getValues('follow_up_date'))
                 : 'Tap to select follow-up date'}
             </Text>
-            <Text style={{ fontSize: 16 }}>📅</Text>
+            <Text style={{ fontSize: 16 }}><CalendarCheckIcon/></Text>
           </TouchableOpacity>
         </View>
 
@@ -47,7 +48,7 @@ export const PrescriptionAdviceStep: React.FC = () => {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 style={patientDetailsStyles.consultTextArea}
-                placeholder="Advice for patient (diet, rest, precautions)..."
+                placeholder="Advice for Patient (Diet, Rest, Precautions)..."
                 placeholderTextColor={theme.colors.textMuted}
                 value={value || ''}
                 onChangeText={onChange}
@@ -101,7 +102,7 @@ export const PrescriptionAdviceStep: React.FC = () => {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 style={patientDetailsStyles.consultInput}
-                placeholder="Referred hospital name..."
+                placeholder="Referred Hospital Name..."
                 placeholderTextColor={theme.colors.textMuted}
                 value={value || ''}
                 onChangeText={onChange}
@@ -117,7 +118,7 @@ export const PrescriptionAdviceStep: React.FC = () => {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 style={patientDetailsStyles.consultInput}
-                placeholder="Referred doctor name..."
+                placeholder="Referred Doctor Name..."
                 placeholderTextColor={theme.colors.textMuted}
                 value={value || ''}
                 onChangeText={onChange}
@@ -134,7 +135,7 @@ export const PrescriptionAdviceStep: React.FC = () => {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 style={patientDetailsStyles.consultTextArea}
-                placeholder="Describe reason for referral..."
+                placeholder="Describe Reason for Referral..."
                 placeholderTextColor={theme.colors.textMuted}
                 value={value || ''}
                 onChangeText={onChange}

@@ -63,7 +63,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
             header={
                 <Header
                     title={displayName || 'Patient Details'}
-                    description="View and manage patient records"
+                    description="View and Manage Patient Records"
                     isBackBtn
                     onBackPress={() => {
                         if (navigation?.canGoBack()) {
@@ -103,6 +103,8 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
                             }
                             bloodGroup={patientInfo?.blood_type || ''}
                             profileImg={patientInfo?.profile_image}
+                            email={patientInfo?.email || ''}
+                            phone={patientInfo?.phone_number || ''}
                         />
                         <PatientTabBar
                             tabs={PatientMainTabs}

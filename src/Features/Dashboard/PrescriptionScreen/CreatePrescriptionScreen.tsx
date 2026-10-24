@@ -821,7 +821,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                                     disabled={isFirstStep}
                                     activeOpacity={0.7}
                                 >
-                                    <Text style={createPrescriptionStyles.btnPrevText}>‹ Previous</Text>
+                                    <Text style={createPrescriptionStyles.btnPrevText}>Previous</Text>
                                 </TouchableOpacity>
 
                                 {isLastStep ? (

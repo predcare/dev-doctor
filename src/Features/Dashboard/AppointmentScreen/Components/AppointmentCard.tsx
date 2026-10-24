@@ -2,13 +2,10 @@ import React, { useMemo } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import CustomKebabMenu from '../../../../components/ui/CustomMenu/CustomKebabMenu';
 import {
-  CheckIcon,
   CircleXIcon,
   ClinicIcon,
   ClockIcon,
-  InfoCircleIcon,
   PlayCircleIcon,
-  RescheduleIcon,
   VideoIcon
 } from '../../../../components/ui/icons';
 import {
@@ -160,6 +157,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         if (isJoinedOnce) return 'Re-join Call';
         return 'Join Call';
       }
+      if (isInProgress) return 'Continue';
       return 'Start Consultation';
     }, [isVideo, isCurrentApptInCall, isJoinedOnce]);
 
@@ -169,7 +167,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           {
             id: 'details',
             label: 'View Details',
-            icon: <InfoCircleIcon size={18} color="#64748B" />,
+            // icon: <InfoCircleIcon size={18} color="#64748B" />,
             color: '#64748B',
             onPress: () => onViewDetails?.(),
           },
@@ -181,7 +179,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           {
             id: 'details',
             label: 'View Details',
-            icon: <InfoCircleIcon size={18} color="#64748B" />,
+            // icon: <InfoCircleIcon size={18} color="#64748B" />,
             color: '#64748B',
             onPress: () => onViewDetails?.(),
           },
@@ -193,9 +191,16 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           {
             id: 'details',
             label: 'View Details',
-            icon: <InfoCircleIcon size={18} color="#64748B" />,
+            // icon: <InfoCircleIcon size={18} color="#64748B" />,
             color: '#64748B',
             onPress: () => onViewDetails?.(),
+          },
+          {
+            id: 'complete',
+            label: 'Mark as Completed',
+            // icon: <CheckIcon size={18} color="#16A34A" />,
+            color: '#16A34A',
+            onPress: () => onComplete?.(),
           },
         ];
       }
@@ -204,14 +209,14 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         {
           id: 'details',
           label: 'View Details',
-          icon: <InfoCircleIcon size={18} color="#64748B" />,
+          // icon: <InfoCircleIcon size={18} color="#64748B" />,
           color: '#64748B',
           onPress: () => onViewDetails?.(),
         },
         {
           id: 'reschedule',
           label: 'Reschedule',
-          icon: <RescheduleIcon size={18} color="#64748B" />,
+          // icon: <RescheduleIcon size={18} color="#64748B" />,
           color: '#64748B',
           onPress: () => onReschedule?.(),
         },
@@ -221,7 +226,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
         items.push({
           id: 'cancel',
           label: 'Cancel',
-          icon: <CircleXIcon size={18} color="#EF4444" />,
+          // icon: <CircleXIcon size={18} color="#EF4444" />,
           color: '#EF4444',
           onPress: () => onCancel?.(),
         });
@@ -262,8 +267,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
 
         <View style={S.cardHeader}>
           <View style={S.patientRow}>
-            <View style={[S.patientAvatar, { backgroundColor: theme.colors.primary }]}>
-              <Text style={S.patientAvatarText}>{getInitials(patientName)}</Text>
+            <View style={[S.patientAvatar, { backgroundColor: theme.colors.inPersonBg }]}>
+              <Text style={[S.patientAvatarText, { color: theme.colors.textGreen }]}>{getInitials(patientName)}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={S.patientName}>{patientName}</Text>
@@ -277,19 +282,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             </View>
           </View>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <View style={[S.statusBadge, { backgroundColor: statusBg }]}>
-              <View style={[S.statusDot, { backgroundColor: statusColor }]} />
-              <Text style={[S.statusText, { color: statusColor }]}>
-                {appointmentStatus?.replace(/[-_]/g, ' ').toUpperCase()}
-              </Text>
-            </View>
-            {menuItems.length > 0 && (
-              <CustomKebabMenu
-                items={menuItems}
-                triggerStyle={{ width: 32, height: 32, borderRadius: 8 }}
-              />
-            )}
+          <View style={[S.statusBadge, { backgroundColor: statusBg }]}>
+            <View style={[S.statusDot, { backgroundColor: statusColor }]} />
+            <Text style={[S.statusText, { color: statusColor }]}>
+              {appointmentStatus?.replace(/[-_]/g, ' ').toUpperCase()}
+            </Text>
           </View>
         </View>
         {isCancelled && (
@@ -304,13 +301,19 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           </View>
         )}
 
-        {!isCompleted && !isCancelled && (!hideVideoJoin || isInProgress) && (
-          <View style={[S.cardFooterActions, isInProgress && { flexDirection: 'row', gap: 10 }]}>
-            {!hideVideoJoin && (
+        {menuItems.length > 0 && (
+          <View style={[S.cardFooterActions, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
+            {!isCompleted && !isCancelled && !hideVideoJoin && (
               <TouchableOpacity
                 style={[
                   S.joinButton,
-                  isInProgress && { flex: 1 },
+                  { flex: 1 },
+                  !isVideo &&
+                  isInProgress && {
+                    backgroundColor: theme.colors.inPersonBg,
+                    // borderWidth: 1.5,
+                    // borderColor: theme.colors.primary,
+                  },
                   isVideo && { backgroundColor: theme.colors.videoCallBtnBg },
                   isCurrentApptInCall && { backgroundColor: theme.colors.videoCallBtnBg },
                   isVideo && isJoinedOnce && { backgroundColor: theme.colors.videoCallBtnBg },
@@ -319,19 +322,25 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
                 activeOpacity={0.85}
               >
                 {isVideo ? <PlayCircleIcon size={18} color="#FFFFFF" style={{ marginRight: 6 }} /> : null}
-                <Text style={S.joinButtonText}>{buttonText}</Text>
+                <Text
+                  style={[
+                    S.joinButtonText,
+                    !isVideo && isInProgress && { color: theme.colors.textSlate },
+                  ]}
+                >
+                  {buttonText}
+                </Text>
               </TouchableOpacity>
             )}
-            {isInProgress && (
-              <TouchableOpacity
-                style={[S.completeButton, { flex: 1 }]}
-                onPress={onComplete}
-                activeOpacity={0.85}
-              >
-                <CheckIcon size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
-                <Text style={S.joinButtonText}>Complete</Text>
-              </TouchableOpacity>
-            )}
+            <CustomKebabMenu
+              items={menuItems}
+              triggerStyle={{
+                width: 40,
+                height: 40,
+                borderRadius: 8,
+                marginLeft: !isCompleted && !isCancelled && !hideVideoJoin ? 0 : 'auto',
+              }}
+            />
           </View>
         )}
         {isCurrentApptInCall && (

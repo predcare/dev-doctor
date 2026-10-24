@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Controller, FieldPath, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { TrashIcon } from '../../../../components/ui/icons';
+import { CheckIcon, EditIcon, TrashIcon } from '../../../../components/ui/icons';
 import { TCreatePrescriptionFormValues } from '../../../../lib/schemas/createPrescription.schema';
 import { patientDetailsStyles } from '../../../../styled/PatientDetailsScreen.styled';
 import theme from '../../../../styled/theme.styled';
@@ -28,6 +28,8 @@ export const PrescriptionMedicationsStep: React.FC = () => {
     control,
     name: 'medications',
   });
+
+  const [cardState, setCardState] = useState<Record<string, 'locked' | 'editing'>>({});
 
   const [pickerModal, setPickerModal] = useState<{
     visible: boolean;
@@ -67,173 +69,266 @@ export const PrescriptionMedicationsStep: React.FC = () => {
 
   return (
     <View style={{ gap: 14 }}>
-      {fields.map((fieldItem, index) => (
-        <View key={fieldItem.id} style={patientDetailsStyles.consultSectionCard}>
-          <View style={patientDetailsStyles.medCardHead}>
-            <View style={patientDetailsStyles.medNumBadge}>
-              <Text style={patientDetailsStyles.medNumText}>{index + 1}</Text>
-            </View>
-            <Text style={patientDetailsStyles.medCardTitle}>Medication</Text>
-            <TouchableOpacity
-              onPress={() => remove(index)}
-              activeOpacity={0.7}
-              style={patientDetailsStyles.medRemoveBtn}
-              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-            >
-              <TrashIcon size={13} color={theme.colors.danger} />
-              <Text style={patientDetailsStyles.medRemoveBtnText}>Remove</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={patientDetailsStyles.vitalLabel}>
-              Medicine Name <Text style={{ color: theme.colors.danger }}>*</Text>
-            </Text>
-            <Controller
-              control={control}
-              name={`medications.${index}.name`}
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={patientDetailsStyles.consultInput}
-                  placeholder="Search or type medicine name..."
-                  placeholderTextColor={theme.colors.textMuted}
-                  value={value || ''}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-          </View>
+      {fields.map((fieldItem, index) => {
+        const state = cardState[fieldItem.id];
+        const isLocked = state === 'locked';
+        const isEditing = state === 'editing';
+        const lockedFieldStyle = isLocked ? { backgroundColor: theme.colors.inPersonBg, } : null;
 
-          <View style={patientDetailsStyles.vitalsRow}>
-            <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={patientDetailsStyles.vitalLabel}>Strength</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <Controller
-                  control={control}
-                  name={`medications.${index}.strength`}
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      style={[
-                        patientDetailsStyles.consultInput,
-                        { flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 },
-                      ]}
-                      placeholder="50"
-                      placeholderTextColor={theme.colors.textMuted}
-                      value={value || ''}
-                      onChangeText={onChange}
-                      keyboardType="decimal-pad"
-                    />
-                  )}
-                />
+        return (
+          <View
+            key={fieldItem.id}
+            style={[
+              patientDetailsStyles.consultSectionCard,
+              isLocked && {
+                backgroundColor: theme.colors.infoLight,
+                borderWidth: 1,
+                borderColor: theme.colors.surfaceBorder,
+              },
+              isEditing && {
+                backgroundColor: theme.colors.inPersonBg,
+                borderWidth: 1,
+                borderColor: theme.colors.primary,
+              },
+            ]}
+          >
+            <View style={patientDetailsStyles.medCardHead}>
+              <View style={patientDetailsStyles.medNumBadge}>
+                <Text style={patientDetailsStyles.medNumText}>{index + 1}</Text>
+              </View>
+              <Text style={patientDetailsStyles.medCardTitle}>Medication</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                {isLocked && (
+                  <TouchableOpacity
+                    onPress={() => setCardState(prev => ({ ...prev, [fieldItem.id]: 'editing' }))}
+                    activeOpacity={0.7}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor: theme.colors.primary,
+                      borderRadius: 999,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                    }}
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  >
+                    <EditIcon size={13} color={theme.colors.textInverted} />
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: theme.colors.textInverted }}>
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {isEditing && (
+                  <TouchableOpacity
+                    onPress={() => setCardState(prev => ({ ...prev, [fieldItem.id]: 'locked' }))}
+                    activeOpacity={0.7}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor: theme.colors.success,
+                      borderRadius: 999,
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                    }}
+                    hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                  >
+                    <CheckIcon size={13} color={theme.colors.textInverted} />
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: theme.colors.textInverted }}>
+                      Save
+                    </Text>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity
-                  style={patientDetailsStyles.unitSelectBtn}
-                  onPress={() => openPicker(index, 'strengthUnit', 'Select Unit', STRENGTH_UNITS)}
+                  onPress={() => {
+                    setCardState(prev => {
+                      const next = { ...prev };
+                      delete next[fieldItem.id];
+                      return next;
+                    });
+                    remove(index);
+                  }}
+                  activeOpacity={0.7}
+                  style={patientDetailsStyles.medRemoveBtn}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                 >
-                  <Text style={patientDetailsStyles.unitSelectText}>
-                    {medications[index]?.strengthUnit || 'mg'} ▾
-                  </Text>
+                  <TrashIcon size={13} color={theme.colors.danger} />
+                  <Text style={patientDetailsStyles.medRemoveBtnText}>Remove</Text>
                 </TouchableOpacity>
               </View>
             </View>
-
-            <View style={{ flex: 1 }}>
-              <Text style={patientDetailsStyles.vitalLabel}>
-                Dosage <Text style={{ color: theme.colors.danger }}>*</Text>
-              </Text>
-              <TouchableOpacity
-                style={patientDetailsStyles.pickerSelectBtn}
-                onPress={() => openPicker(index, 'dosage', 'Select Dosage', DOSAGE_OPTIONS)}
-              >
-                <Text style={patientDetailsStyles.pickerSelectText}>
-                  {medications[index]?.dosage || 'Select'}
+            <View pointerEvents={isLocked ? 'none' : 'auto'}>
+              <View style={{ marginBottom: 12 }}>
+                <Text style={patientDetailsStyles.vitalLabel}>
+                  Medicine Name <Text style={{ color: theme.colors.danger }}>*</Text>
                 </Text>
-                <Text style={{ color: theme.colors.primary, fontSize: 12 }}>▾</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={patientDetailsStyles.vitalsRow}>
-            <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={patientDetailsStyles.vitalLabel}>Duration</Text>
-              <View style={{ flexDirection: 'row' }}>
                 <Controller
                   control={control}
-                  name={`medications.${index}.durationNum`}
+                  name={`medications.${index}.name`}
                   render={({ field: { onChange, value } }) => (
                     <TextInput
-                      style={[
-                        patientDetailsStyles.consultInput,
-                        { flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 },
-                      ]}
-                      placeholder="30"
+                      style={[patientDetailsStyles.consultInput, lockedFieldStyle]}
+                      placeholder="Search or Type Medicine Name..."
                       placeholderTextColor={theme.colors.textMuted}
                       value={value || ''}
                       onChangeText={onChange}
-                      keyboardType="decimal-pad"
                     />
                   )}
                 />
-                <TouchableOpacity
-                  style={patientDetailsStyles.unitSelectBtn}
-                  onPress={() =>
-                    openPicker(index, 'durationUnit', 'Select Duration Unit', DURATION_UNITS)
-                  }
-                >
-                  <Text style={patientDetailsStyles.unitSelectText}>
-                    {medications[index]?.durationUnit || 'days'} ▾
+              </View>
+
+              <View style={patientDetailsStyles.vitalsRow}>
+                <View style={{ flex: 1, marginRight: 10 }}>
+                  <Text style={patientDetailsStyles.vitalLabel}>Strength</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Controller
+                      control={control}
+                      name={`medications.${index}.strength`}
+                      render={({ field: { onChange, value } }) => (
+                        <TextInput
+                          style={[
+                            patientDetailsStyles.consultInput,
+                            { flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 },
+                            lockedFieldStyle,
+                          ]}
+                          placeholder="50"
+                          placeholderTextColor={theme.colors.textMuted}
+                          value={value || ''}
+                          onChangeText={onChange}
+                          keyboardType="decimal-pad"
+                        />
+                      )}
+                    />
+                    <TouchableOpacity
+                      style={[patientDetailsStyles.unitSelectBtn, lockedFieldStyle]}
+                      onPress={() => openPicker(index, 'strengthUnit', 'Select Unit', STRENGTH_UNITS)}
+                    >
+                      <Text style={patientDetailsStyles.unitSelectText}>
+                        {medications[index]?.strengthUnit || 'mg'}
+                        {isLocked ? '' : ' ▾'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={patientDetailsStyles.vitalLabel}>
+                    Dosage <Text style={{ color: theme.colors.danger }}>*</Text>
                   </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[patientDetailsStyles.pickerSelectBtn, lockedFieldStyle]}
+                    onPress={() => openPicker(index, 'dosage', 'Select Dosage', DOSAGE_OPTIONS)}
+                  >
+                    <Text style={patientDetailsStyles.pickerSelectText}>
+                      {isLocked ? medications[index]?.dosage || '' : medications[index]?.dosage || 'Select'}
+                    </Text>
+                    {!isLocked && <Text style={{ color: theme.colors.primary, fontSize: 12 }}>▾</Text>}
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={patientDetailsStyles.vitalsRow}>
+                <View
+                  style={{
+                    flex: 1,
+                    marginRight: isLocked && !medications[index]?.timing ? 0 : 10,
+                  }}
+                >
+                  <Text style={patientDetailsStyles.vitalLabel}>Duration</Text>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Controller
+                      control={control}
+                      name={`medications.${index}.durationNum`}
+                      render={({ field: { onChange, value } }) => (
+                        <TextInput
+                          style={[
+                            patientDetailsStyles.consultInput,
+                            { flex: 1, borderTopRightRadius: 0, borderBottomRightRadius: 0 },
+                            lockedFieldStyle,
+                          ]}
+                          placeholder="30"
+                          placeholderTextColor={theme.colors.textMuted}
+                          value={value || ''}
+                          onChangeText={onChange}
+                          keyboardType="decimal-pad"
+                        />
+                      )}
+                    />
+                    <TouchableOpacity
+                      style={[patientDetailsStyles.unitSelectBtn, lockedFieldStyle]}
+                      onPress={() =>
+                        openPicker(index, 'durationUnit', 'Select Duration Unit', DURATION_UNITS)
+                      }
+                    >
+                      <Text style={patientDetailsStyles.unitSelectText}>
+                        {medications[index]?.durationUnit || 'days'}
+                        {isLocked ? '' : ' ▾'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {!(isLocked && !medications[index]?.timing) && (
+                  <View style={{ flex: 1 }}>
+                    <Text style={patientDetailsStyles.vitalLabel}>Timing</Text>
+                    <TouchableOpacity
+                      style={[patientDetailsStyles.pickerSelectBtn, lockedFieldStyle]}
+                      onPress={() => openPicker(index, 'timing', 'Select Timing', TIMING_OPTIONS)}
+                    >
+                      <Text style={patientDetailsStyles.pickerSelectText}>
+                        {isLocked ? medications[index]?.timing || '' : medications[index]?.timing || 'Select'}
+                      </Text>
+                      {!isLocked && <Text style={{ color: theme.colors.primary, fontSize: 12 }}>▾</Text>}
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
+              <View>
+                <Text style={patientDetailsStyles.vitalLabel}>Instructions</Text>
+                <Controller
+                  control={control}
+                  name={`medications.${index}.instructions`}
+                  render={({ field: { onChange, value } }) => (
+                    <TextInput
+                      style={[patientDetailsStyles.consultInput, lockedFieldStyle]}
+                      placeholder="e.g. Take Plenty of Water"
+                      placeholderTextColor={theme.colors.textMuted}
+                      value={value || ''}
+                      onChangeText={onChange}
+                    />
+                  )}
+                />
               </View>
             </View>
-
-            <View style={{ flex: 1 }}>
-              <Text style={patientDetailsStyles.vitalLabel}>Timing</Text>
-              <TouchableOpacity
-                style={patientDetailsStyles.pickerSelectBtn}
-                onPress={() => openPicker(index, 'timing', 'Select Timing', TIMING_OPTIONS)}
-              >
-                <Text style={patientDetailsStyles.pickerSelectText}>
-                  {medications[index]?.timing || 'Select'}
-                </Text>
-                <Text style={{ color: theme.colors.primary, fontSize: 12 }}>▾</Text>
-              </TouchableOpacity>
-            </View>
           </View>
-
-          <View>
-            <Text style={patientDetailsStyles.vitalLabel}>Instructions</Text>
-            <Controller
-              control={control}
-              name={`medications.${index}.instructions`}
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={patientDetailsStyles.consultInput}
-                  placeholder="e.g. Take with water after meal"
-                  placeholderTextColor={theme.colors.textMuted}
-                  value={value || ''}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-          </View>
-        </View>
-      ))}
+        );
+      })}
       <TouchableOpacity
-        onPress={() =>
+        onPress={() => {
+          setCardState(prev => {
+            const next = { ...prev };
+            fields.forEach(item => {
+              next[item.id] = 'locked';
+            });
+            return next;
+          });
           append({
             name: '',
             strength: '',
             strengthUnit: 'mg',
-            dosage: '1-0-1',
-            timing: 'After food',
-            durationNum: '7',
+            dosage: '',
+            timing: '',
+            durationNum: '',
             durationUnit: 'days',
             instructions: '',
-          })
-        }
+          });
+        }}
         activeOpacity={0.85}
         style={patientDetailsStyles.addPrimaryBtn}
       >
-        <Text style={patientDetailsStyles.addPrimaryBtnText}>+ Add Medication</Text>
+        <Text style={patientDetailsStyles.addPrimaryBtnText}>{fields?.length > 0 ? "Add More" : "Add Medication"}</Text>
       </TouchableOpacity>
 
       <OptionPickerModal

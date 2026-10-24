@@ -10,7 +10,7 @@ export const PrescriptionDiagnosisStep: React.FC = () => {
   const { control } = useFormContext<TCreatePrescriptionFormValues>();
 
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: 20 }}>
       {/* Diagnosis */}
       <View style={patientDetailsStyles.consultSectionCard}>
         <Text style={patientDetailsStyles.consultSectionTitle}>Diagnosis</Text>
@@ -20,12 +20,12 @@ export const PrescriptionDiagnosisStep: React.FC = () => {
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={patientDetailsStyles.consultTextArea}
-              placeholder="Enter clinical diagnosis..."
+              placeholder="Enter Clinical Diagnosis..."
               placeholderTextColor={theme.colors.textMuted}
               value={value || ''}
               onChangeText={onChange}
               multiline
-              numberOfLines={3}
+              numberOfLines={10}
               textAlignVertical="top"
             />
           )}
@@ -41,12 +41,12 @@ export const PrescriptionDiagnosisStep: React.FC = () => {
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={patientDetailsStyles.consultTextArea}
-              placeholder="Treatment plan and therapeutic approach..."
+              placeholder="Treatment Plan and Therapeutic Approach..."
               placeholderTextColor={theme.colors.textMuted}
               value={value || ''}
               onChangeText={onChange}
               multiline
-              numberOfLines={3}
+              numberOfLines={10}
               textAlignVertical="top"
             />
           )}

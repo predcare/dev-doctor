@@ -18,7 +18,7 @@ export const PrescriptionLabsStep: React.FC = () => {
       {fields.map((fieldItem, index) => (
         <View key={fieldItem.id} style={patientDetailsStyles.consultSectionCard}>
           <View style={patientDetailsStyles.medCardHead}>
-            <Text style={{ fontSize: 18 }}>🧪</Text>
+            {/* <Text style={{ fontSize: 18 }}>🧪</Text> */}
             <Text style={patientDetailsStyles.medCardTitle}>Lab Test {index + 1}</Text>
             <TouchableOpacity onPress={() => remove(index)} activeOpacity={0.7}>
               <Text style={patientDetailsStyles.removeText}>✕ Remove</Text>
@@ -73,7 +73,7 @@ export const PrescriptionLabsStep: React.FC = () => {
         ]}
       >
         <View style={patientDetailsStyles.medCardHead}>
-          <Text style={{ fontSize: 18 }}>🧪</Text>
+          {/* <Text style={{ fontSize: 18 }}>🧪</Text> */}
           <Text style={patientDetailsStyles.medCardTitle}>Add New Lab Test</Text>
         </View>
         <TouchableOpacity
@@ -81,7 +81,7 @@ export const PrescriptionLabsStep: React.FC = () => {
           activeOpacity={0.85}
           style={patientDetailsStyles.addPrimaryBtn}
         >
-          <Text style={patientDetailsStyles.addPrimaryBtnText}>+ Add Lab Test</Text>
+          <Text style={patientDetailsStyles.addPrimaryBtnText}>Add Lab Test</Text>
         </TouchableOpacity>
       </View>
     </View>

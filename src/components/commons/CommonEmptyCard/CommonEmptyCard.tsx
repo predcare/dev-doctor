@@ -9,7 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import theme from '../../../styled/theme.styled';
-import { DefaultEmptyIcon } from '../../ui/icons';
+import { FileDocumentIcon } from '../../ui/icons';
 
 export interface CommonEmptyCardProps {
   title?: string;
@@ -106,7 +106,7 @@ export default function CommonEmptyCard({
           },
         ]}
       >
-        <View style={styles.iconCircle}>{icon ? icon : <DefaultEmptyIcon />}</View>
+        <View style={styles.iconCircle}>{icon ? icon : <FileDocumentIcon size={30} color={theme.colors.primary} />}</View>
       </Animated.View>
 
       <Text style={styles.titleText}>{title}</Text>
@@ -131,24 +131,11 @@ const styles = StyleSheet.create({
     margin: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    shadowColor: theme.colors.textPrimary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
   },
   iconRingOuter: {
     padding: 6,
     borderRadius: 44,
-    backgroundColor: theme.colors.navBorder,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
   },
   iconCircle: {
     width: 72,
@@ -157,13 +144,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: theme.colors.mintBg,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
   },
   titleText: {
     fontSize: 18,
