@@ -9,6 +9,7 @@ import GlobalOfflineBanner from './src/components/commons/Network/GlobalOfflineB
 import NetworkEventListener from './src/components/commons/Network/NetworkEventListener';
 import GlobalIncomingCallBanner from './src/components/commons/IncomingCallBanner/GlobalIncomingCallBanner';
 import GlobalPopupAlert from './src/components/commons/PopupAlert/GlobalPopupAlert';
+import SwitchClinicModal from './src/components/commons/SwitchClinicModal/SwitchClinicModal';
 import SocketListeners from './src/components/commons/Sockets/SocketListeners';
 import SocketProvider from './src/components/commons/Sockets/SocketProvider';
 import GlobalToast from './src/components/commons/Toast/GlobalToast';
@@ -35,6 +36,7 @@ function App() {
           <GlobalOfflineBanner />
           <GlobalToast />
           <GlobalPopupAlert />
+          <SwitchClinicModal />
           <BackdropLoader />
           <GlobalNoInternetBlocker />
         </HideDuringAndroidPip>

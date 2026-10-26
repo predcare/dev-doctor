@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { _toTitleCase, getInitials } from '../../../../lib/commons/common.utils';
+import { _formatDoctorName, _toTitleCase, getInitials } from '../../../../lib/commons/common.utils';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
 
@@ -10,8 +10,6 @@ export interface SettingsProfileCardProps {
 
 export const SettingsProfileCard = React.memo<SettingsProfileCardProps>(({ onEditProfile }) => {
   const { userData } = useAuthStore(state => state);
-
-  const doctorName = userData?.name ? `Dr. ${userData?.name}` : 'Dr.';
   const degreeDetails = _toTitleCase(userData?.qualifications ?? '');
 
   return (
@@ -21,7 +19,7 @@ export const SettingsProfileCard = React.memo<SettingsProfileCardProps>(({ onEdi
       </View>
       <View style={profileStyles.profileInfo}>
         <Text style={profileStyles.doctorName} numberOfLines={2}>
-          {doctorName}
+          {_formatDoctorName(userData?.name || "Dr")}
         </Text>
         <Text style={profileStyles.medicalDegree} numberOfLines={2}>
           {degreeDetails || 'Unknown'}

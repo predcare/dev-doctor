@@ -12,7 +12,7 @@ import {
   SettingsIcon,
 } from '../components/ui/icons';
 import { useNotificationCount } from '../hooks/react-query/notifications/notifications.hooks';
-import { getInitials } from '../lib/commons/common.utils';
+import { _formatDoctorName, getInitials } from '../lib/commons/common.utils';
 import { AppRoute } from '../route';
 import { headerStyles } from '../styled/Header.styled';
 import { theme } from '../styled/theme.styled';
@@ -176,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                Dr. {userData?.name || "Doctor"}
+              {_formatDoctorName(userData?.name || "Dr")}
               </Text>
             </View>
           </TouchableOpacity>

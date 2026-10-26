@@ -31,6 +31,8 @@ export const endpoints = {
     get: '/users/profile',
     update: '/doctors/user/',
     allPatients: '/users/doctor-all-users',
+    doctorClinics: '/doctors/my-clinics',
+    switchClinic: '/users/doctor/switch-clinic',
   },
   patients: {
     get: '/doctors/my-patients',

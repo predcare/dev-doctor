@@ -15,6 +15,7 @@ import { useAuthStore } from '../../../zustand/stores/useAuthStore';
 import { useLoadingStore } from '../../../zustand/stores/useLoadingStore';
 import AccountSettingsSection from './Componenets/AccountSettingsSection';
 import AppSettingsSection from './Componenets/AppSettingsSection';
+import SettingsClinicCard from './Componenets/SettingsClinicCard';
 import SettingsProfileCard from './Componenets/SettingsProfileCard';
 import SupportSection from './Componenets/SupportSection';
 import WalletSection from './Componenets/WalletSection';
@@ -64,6 +65,7 @@ const SettingScreen: React.FC = () => {
                 showsVerticalScrollIndicator={false}
             >
                 <SettingsProfileCard onEditProfile={() => navigation?.navigate(AppRoute.PROFILE)} />
+                <SettingsClinicCard />
                 <AccountSettingsSection
                     onNavigateProfile={() => navigation?.navigate(AppRoute.PROFILE)}
                     onNavigatePrescription={() => (navigation as any)?.navigate('PrescriptionSettings')}

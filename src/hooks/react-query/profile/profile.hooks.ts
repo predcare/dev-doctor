@@ -1,7 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import { ProfileQueryKeys } from '../query.keys';
-import { getProfile } from './profile.funcs';
+import { getDoctorClinics, getProfile, switchClinic } from './profile.funcs';
+
+type TQueryEnabled = {
+  enabled?: boolean;
+  refetchOnMount?: boolean | 'always';
+  staleTime?: number;
+};
 
 export const useProfile = () =>
   useQuery({
@@ -17,3 +23,19 @@ export const fetchProfileQuery = async (forceFetch = false) => {
     staleTime: forceFetch ? 0 : undefined,
   });
 };
+
+export const useDoctorClinics = (options?: TQueryEnabled) =>
+  useQuery({
+    queryKey: [ProfileQueryKeys.DoctorClinics],
+    queryFn: () => getDoctorClinics(),
+    select: v => v.data,
+    staleTime: options?.staleTime ?? 5 * 60 * 1000, // 5 minutes
+    enabled: options?.enabled ?? true,
+    refetchOnMount: options?.refetchOnMount,
+  });
+
+export const useSwitchClinic = (options?: TQueryEnabled) =>
+  useMutation({
+    mutationKey: [ProfileQueryKeys.SwitchClinic],
+    mutationFn: switchClinic,
+  });
