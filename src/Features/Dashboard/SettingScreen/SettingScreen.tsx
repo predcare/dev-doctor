@@ -73,9 +73,11 @@ const SettingScreen: React.FC = () => {
                     subExpanded={subExpanded}
                     onToggleSubscription={() => setSubExpanded(v => !v)}
                     onManageSubscription={() =>
-                        showComingSoon('Subscription management feature is coming soon.')
+                        showComingSoon('Contact to admin to manage subscription.', 'Subscription Management')
                     }
-                    onAddonPress={addonName => showComingSoon(`${addonName} add-on purchase is coming soon.`)}
+                    onAddonPress={addonName =>
+                        showComingSoon(`Contact to admin to purchase ${addonName} add-on.`, 'Add-on Purchase')
+                    }
                 />
                 <WalletSection
                     onTopUp={() => showComingSoon('Messaging credits top-up feature is coming soon.')}

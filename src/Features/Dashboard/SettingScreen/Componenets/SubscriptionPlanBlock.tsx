@@ -1,8 +1,9 @@
-import dayjs from 'dayjs';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { formatDate } from '../../../../lib/commons/common.utils';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import theme from '../../../../styled/theme.styled';
+import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
 
 export interface SubscriptionPlanBlockProps {
   onManageSubscription?: () => void;
@@ -37,80 +38,83 @@ const ADDONS = [
 ];
 
 export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
-  ({ onManageSubscription, onAddonPress }) => (
-    <View style={profileStyles.expandedBlock}>
-      <View style={profileStyles.currentPlanCard}>
-        <Text style={profileStyles.expandedMeta}>CURRENT PLAN</Text>
-        <View style={profileStyles.planHeaderRow}>
-          <Text style={profileStyles.planName}>PLAN: TRIAL</Text>
-          <View style={profileStyles.activeBadge}>
-            <Text style={profileStyles.activeBadgeTxt}>ACTIVE</Text>
+  ({ onManageSubscription, onAddonPress }) => {
+    const subscription = useAuthStore(state => state.userData?.subscription);
+    return (
+      <View style={profileStyles.expandedBlock}>
+        <View style={profileStyles.currentPlanCard}>
+          <Text style={profileStyles.expandedMeta}>CURRENT PLAN</Text>
+          <View style={profileStyles.planHeaderRow}>
+            <Text style={profileStyles.planName}>PLAN: {subscription?.plan?.plan_name || "TRIAL"}</Text>
+            <View style={profileStyles.activeBadge}>
+              <Text style={profileStyles.activeBadgeTxt}>ACTIVE</Text>
+            </View>
           </View>
-        </View>
 
-        <View style={profileStyles.renewalRow}>
-          <Text style={profileStyles.renewalText}>Renews on {dayjs().format('MMM DD, YYYY')}</Text>
-        </View>
+          <View style={profileStyles.renewalRow}>
+            <Text style={profileStyles.renewalText}>Renews on {formatDate(subscription?.end_date)}</Text>
+          </View>
 
-        <TouchableOpacity
-          style={profileStyles.manageSubBtn}
-          onPress={onManageSubscription}
-          activeOpacity={0.7}
-        >
-          <Text style={profileStyles.manageSubTxt}>Manage Subscription</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text
-        style={[profileStyles.sectionLabel, { marginTop: 14, marginBottom: 6, marginLeft: 20 }]}
-      >
-        AVAILABLE ADD-ONS
-      </Text>
-
-      <View style={{ backgroundColor: theme.colors.surface }}>
-        {ADDONS.map((item, i) => (
-          <View
-            key={i}
-            style={[
-              profileStyles.addonRow,
-              i < ADDONS.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.colors.bg },
-            ]}
+          <TouchableOpacity
+            style={profileStyles.manageSubBtn}
+            onPress={onManageSubscription}
+            activeOpacity={0.7}
           >
-            <View style={profileStyles.addonIcon}>
-              <Text style={profileStyles.addonIconTxt}>{item.icon}</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={profileStyles.addonName}>{item.name}</Text>
-              <Text style={profileStyles.addonSub}>{item.sub}</Text>
-            </View>
-            <TouchableOpacity
+            <Text style={profileStyles.manageSubTxt}>Manage Subscription</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text
+          style={[profileStyles.sectionLabel, { marginTop: 14, marginBottom: 6, marginLeft: 20 }]}
+        >
+          AVAILABLE ADD-ONS
+        </Text>
+
+        <View style={{ backgroundColor: theme.colors.surface }}>
+          {ADDONS.map((item, i) => (
+            <View
+              key={i}
               style={[
-                profileStyles.addonBtn,
-                item.actionFill
-                  ? { backgroundColor: item.actionColor, borderColor: item.actionColor }
-                  : {
-                    backgroundColor: theme.colors.surface,
-                    borderColor: theme.colors.surfaceBorder,
-                  },
+                profileStyles.addonRow,
+                i < ADDONS.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.colors.bg },
               ]}
-              onPress={() => item.actionFill && onAddonPress?.(item.name)}
-              activeOpacity={item.actionFill ? 0.7 : 1}
-              disabled={!item.actionFill}
             >
-              <Text
+              <View style={profileStyles.addonIcon}>
+                <Text style={profileStyles.addonIconTxt}>{item.icon}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={profileStyles.addonName}>{item.name}</Text>
+                <Text style={profileStyles.addonSub}>{item.sub}</Text>
+              </View>
+              <TouchableOpacity
                 style={[
-                  profileStyles.addonBtnTxt,
-                  { color: item.actionFill ? theme.colors.surface : theme.colors.textMuted },
+                  profileStyles.addonBtn,
+                  item.actionFill
+                    ? { backgroundColor: item.actionColor, borderColor: item.actionColor }
+                    : {
+                      backgroundColor: theme.colors.surface,
+                      borderColor: theme.colors.surfaceBorder,
+                    },
                 ]}
+                onPress={() => item.actionFill && onAddonPress?.(item.name)}
+                activeOpacity={item.actionFill ? 0.7 : 1}
+                disabled={!item.actionFill}
               >
-                {item.action}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+                <Text
+                  style={[
+                    profileStyles.addonBtnTxt,
+                    { color: item.actionFill ? theme.colors.surface : theme.colors.textMuted },
+                  ]}
+                >
+                  {item.action}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
       </View>
-    </View>
-  )
+    )
+  }
 );
 
 export default SubscriptionPlanBlock;

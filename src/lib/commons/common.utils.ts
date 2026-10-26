@@ -53,7 +53,7 @@ export const openLocationOnMap = (params: OpenMapParams): void => {
 
 export const formatDate = (
   date: Date | string | null | undefined,
-  format = 'DD/MM/YYYY'
+  format = 'DD MMM YYYY'
 ): string => {
   if (!date) return '';
   return dayjs(date).format(format);
