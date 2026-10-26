@@ -48,6 +48,7 @@ export * from './PatientAvatarIcon';
 export * from './PatientGenderIcon';
 export * from './PatientsIcon';
 export * from './PersonIcon';
+export * from './PeriodIcons';
 export * from './PhoneIcon';
 export * from './PillIcon';
 export * from './PipIcon';

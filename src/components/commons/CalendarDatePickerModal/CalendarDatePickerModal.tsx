@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   arrowBtn: {
     padding: 6,
     borderRadius: 8,
-    backgroundColor: theme.colors.primarySoft,
+    backgroundColor: theme.colors.inPersonBg,
   },
   monthYearText: {
     fontSize: 16,
