@@ -11,6 +11,7 @@ import {
 import { PatientsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import { formatDateToYYYYMMDD } from '../../../lib/commons/common.utils';
 import { showErrorToast } from '../../../lib/commons/toast.utils';
 import { AddPatientSchema, TAddPatientSchemaType } from '../../../lib/schemas/addPatient.schema';
@@ -73,7 +74,7 @@ export const AddPatientScreen: React.FC = () => {
     const selectionMode = watch('selectionMode');
 
     const handleNext = useCallback(async () => {
-        if (!userData?.clinic?.id) return showErrorToast('Clinic not found');
+        if (!ensureClinicAccess()) return;
         if (selectionMode === 'existing_user') {
             const isStep1Valid = await trigger(['selectionMode', 'selected_user_id']);
             if (!isStep1Valid || !selectedUser) {
@@ -138,6 +139,7 @@ export const AddPatientScreen: React.FC = () => {
         handleSubmit,
         linkExistingPatientMutation,
         userData?.user_id,
+        userData?.clinic?.id,
         navigation,
     ]);
 
@@ -147,7 +149,7 @@ export const AddPatientScreen: React.FC = () => {
     }, [step, selectionMode, navigation]);
 
     const onSubmitNew = (formData: TAddPatientSchemaType) => {
-        if (!userData?.clinic?.id) return showErrorToast('Clinic Not Found');
+        if (!ensureClinicAccess()) return;
         setLoading(true);
 
         const payload = new FormData();

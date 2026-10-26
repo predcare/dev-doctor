@@ -18,6 +18,7 @@ import { PlusIcon, SearchIcon } from '../../../components/ui/icons';
 import CrossIcon from '../../../components/ui/icons/CrossIcon';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
 import { useMyPatientInfiniteList } from '../../../hooks/react-query/patients/patients.hooks';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import { getAge } from '../../../lib/commons/common.utils';
 import { AppRoute } from '../../../route';
 import PatientsStyles from '../../../styled/PatientsScreen.styled';
@@ -71,11 +72,13 @@ export const PatientsScreen: React.FC = () => {
     }, []);
 
     const handleAddPatient = useCallback(() => {
+        if (!ensureClinicAccess()) return;
         appNavigation.navigate(AppRoute.ADD_PATIENT);
     }, [appNavigation]);
 
     const handlePatientDetails = useCallback(
         (params: { patientId: string | number; name: string }) => {
+            if (!ensureClinicAccess()) return;
             appNavigation.navigate(AppRoute.PATIENT_DETAILS, {
                 patientId: params?.patientId,
                 patientName: params?.name,

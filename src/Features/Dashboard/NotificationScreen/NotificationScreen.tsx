@@ -28,6 +28,7 @@ import {
     useMarkNoShowNotifications,
 } from '../../../hooks/react-query/notifications/notifications.hooks';
 import { NotificationQueryKeys } from '../../../hooks/react-query/query.keys';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import { resolveNotificationModalNavigation } from '../../../lib/commons/notificationModal.utils';
 import { showSuccessToast } from '../../../lib/commons/toast.utils';
 import notificationsStyles from '../../../styled/NotificationsScreen.styled';
@@ -105,6 +106,7 @@ const NotificationScreen: React.FC = () => {
 
     const handleDeleteNotification = useCallback(
         (notificationId: string | number) => {
+            if (!ensureClinicAccess()) return;
             showConfirm({
                 title: 'Delete Notification',
                 message: 'Are you sure you want to delete this notification? This action cannot be undone.',
@@ -136,6 +138,7 @@ const NotificationScreen: React.FC = () => {
     );
 
     const handleClearAll = useCallback(() => {
+        if (!ensureClinicAccess()) return;
         showConfirm({
             title: 'Clear All Notifications',
             message: 'Are you sure you want to clear all notifications? This action cannot be undone.',
@@ -186,6 +189,7 @@ const NotificationScreen: React.FC = () => {
 
     const handleNotificationPress = useCallback(
         (item: any) => {
+            if (!ensureClinicAccess()) return;
             const target = resolveNotificationModalNavigation(item);
             if (target?.name) {
                 (navigation.navigate as any)(target.name, target.params);

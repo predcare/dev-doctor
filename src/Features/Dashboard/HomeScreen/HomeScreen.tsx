@@ -190,8 +190,8 @@ export const HomeScreen: React.FC = () => {
           period === 'today'
             ? 'Today Appts'
             : period === 'last_7_days'
-            ? '7 Days Appts'
-            : '30 Days Appts',
+              ? '7 Days Appts'
+              : '30 Days Appts',
         value: statsInfo?.week_appointments || 0,
         icon: <CalendarCheckIcon size={32} color="#9333EA" />,
       },

@@ -78,6 +78,7 @@ export interface IMyProfileDoc {
   doctor_profile_image: any;
   certificates: any;
   clinic: IMyClinic;
+  subscription: IMySubscription;
 }
 
 export interface IPatientEMRDoc {
@@ -140,4 +141,76 @@ export interface IMyClinic {
   created_at?: string;
   updated_at?: string;
   email?: string;
+}
+
+export interface IMySubscription {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  plan_version_id: string;
+  clinic_id: string;
+  term_start: string;
+  end_date: string;
+  grace_end: string;
+  status: string;
+  is_trial: boolean;
+  source: string;
+  auto_renew: boolean;
+  hard_limits: boolean;
+  free_granted: boolean;
+  price_net_paid: string;
+  pending_plan_id: any;
+  s_doctors: number;
+  s_staff: number;
+  s_storage_gb: string;
+  s_devices: number;
+  s_free_credits: number;
+  paused_on: any;
+  note: any;
+  created_at: string;
+  updated_at: string;
+  plan_code: string;
+  plan_name: string;
+  plan_type: string;
+  billing_cycle: string;
+  currency: string;
+  gst_percent: string;
+  version_no: number;
+  is_current: boolean;
+  base_price: string;
+  discount: string;
+  duration_days: number;
+  grace_days: number;
+  addons_allowed: boolean;
+  plan: IMyPlan;
+  plan_version: IMyPlanVersion;
+}
+
+export interface IMyPlan {
+  id: string;
+  plan_code: string;
+  plan_name: string;
+  description: string;
+  plan_type: string;
+  billing_cycle: string;
+  currency: string;
+  gst_percent: string;
+  status: string;
+}
+
+export interface IMyPlanVersion {
+  id: string;
+  version_no: number;
+  is_current: boolean;
+  base_price: string;
+  discount: string;
+  duration_days: number;
+  grace_days: number;
+  hard_limits: boolean;
+  addons_allowed: boolean;
+  doctors: number;
+  staff: number;
+  storage_gb: string;
+  devices: number;
+  free_credits: number;
 }

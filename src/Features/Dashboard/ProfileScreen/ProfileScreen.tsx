@@ -23,6 +23,7 @@ import {
 import { useProfile } from '../../../hooks/react-query/profile/profile.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import {
     capitalize,
     formatDate,
@@ -315,13 +316,6 @@ export const ProfileScreen: React.FC = () => {
                                         iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
                                     />
                                 )}
-                                {/* {clinic.id && (
-                  <ProfileInfoCard
-                    label="CLINIC ID"
-                    value={`Id:- ${clinic.id}`}
-                    iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
-                  />
-                )} */}
                                 {clinic.clinic_reg_number && (
                                     <ProfileInfoCard
                                         label="CLINIC REGISTRATION NUMBER"
@@ -397,7 +391,10 @@ export const ProfileScreen: React.FC = () => {
                 <View style={doctorProfileStyles.actions}>
                     <TouchableOpacity
                         style={doctorProfileStyles.primaryBtn}
-                        onPress={() => navigation?.navigate(AppRoute.AVAILABILITY)}
+                        onPress={() => {
+                            if (!ensureClinicAccess()) return;
+                            navigation?.navigate(AppRoute.AVAILABILITY)
+                        }}
                         activeOpacity={0.87}
                     >
                         <ScheduleIcon color={theme.colors.surface} size={18} />

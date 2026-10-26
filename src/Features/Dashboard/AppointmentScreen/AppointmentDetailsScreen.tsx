@@ -24,6 +24,7 @@ import {
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import {
     _toTitleCase,
     capitalize,
@@ -80,6 +81,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
     }, [isComingFromNotification, navigation]);
 
     const handleJoinVideoCall = useCallback(() => {
+        if (!ensureClinicAccess()) return;
         if (!apptInfo?.id) return;
 
         joinVideoCall({
@@ -90,6 +92,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
     }, [apptInfo, joinVideoCall]);
 
     const handleCancelAppointment = useCallback(() => {
+        if (!ensureClinicAccess()) return;
         if (!apptInfo?.id) {
             showErrorToast('No valid appointment ID found');
             return;
@@ -144,6 +147,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
 
     const handleMarkCompleted = useCallback(
         (appointmentId: number | string) => {
+            if (!ensureClinicAccess()) return;
             showLoader('Loading...');
             changeStatus(
                 {
@@ -180,6 +184,7 @@ export const AppointmentDetailsScreen: React.FC = () => {
             patientName: string,
             status: string
         ) => {
+            if (!ensureClinicAccess()) return;
             if (status?.toLowerCase() === 'confirmed') {
                 showLoader('Loading...');
                 changeStatus(
@@ -599,15 +604,12 @@ export const AppointmentDetailsScreen: React.FC = () => {
                                             isOnline && isCurrentApptInCall && { backgroundColor: theme.colors.primary },
                                             isOnline && isJoinedOnce && { backgroundColor: theme.colors.primaryDark },
                                         ]}
-                                        onPress={() =>
+                                        onPress={() => {
+                                            if (!ensureClinicAccess()) return;
                                             isOnline
                                                 ? handleJoinVideoCall()
-                                                : handleStartConsulation(
-                                                    apptInfo.id,
-                                                    apptInfo.patient?.patient_id || apptInfo.patient_id,
-                                                    apptInfo.patient?.name || '',
-                                                    apptInfo.appointment_status
-                                                )
+                                                : handleStartConsulation(apptInfo.id, apptInfo.patient?.patient_id || apptInfo.patient_id, apptInfo.patient?.name || '', apptInfo.appointment_status);
+                                        }
                                         }
                                         activeOpacity={0.85}
                                     >

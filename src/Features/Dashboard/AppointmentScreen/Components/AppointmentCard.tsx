@@ -9,6 +9,7 @@ import {
   VideoIcon
 } from '../../../../components/ui/icons';
 import {
+  _toTitleCase,
   capitalize,
   formatDate,
   formatTimeSlot,
@@ -139,6 +140,8 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           appointmentStatus === 'in-progress' ||
           appointmentStatus === 'in_progress' ||
           appointmentStatus === 'inprogress';
+        const isInstant = consultation_type?.toLowerCase() === 'instant';
+        const timeLabel = formatTimeSlot(startTime, '');
 
         return {
           isCompleted: appointmentStatus === 'completed',
@@ -147,9 +150,12 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
           isInProgress: inProgress,
           statusColor: getStatusColor(appointmentStatus),
           statusBg: getStatusBackground(appointmentStatus),
-          formattedTime: formatTimeSlot(startTime, ''),
+          formattedTime:
+            !isInstant && appointmentDurationMinutes
+              ? `${timeLabel} (${appointmentDurationMinutes}m)`
+              : timeLabel,
         };
-      }, [appointmentStatus, startTime, endTime]);
+      }, [appointmentStatus, startTime, endTime, consultation_type, appointmentDurationMinutes]);
 
     const buttonText = useMemo(() => {
       if (isVideo) {
@@ -250,8 +256,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             <ClockIcon size={13} color={theme.colors.primary} />
             {formattedTime ? (
               <Text style={S.timePillText} numberOfLines={1}>
-                {formattedTime} ({appointmentDurationMinutes}m),{' '}
-                {formatDate(appointment_date, 'MMM D, YYYY')}
+                {formattedTime}, {formatDate(appointment_date, 'MMM D, YYYY')}
               </Text>
             ) : null}
           </View>
@@ -261,7 +266,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = React.memo(
             ) : (
               <ClinicIcon size={12} color={theme.colors.textGreen} />
             )}
-            <Text style={[S.consultTypeText, !isVideo && { color: theme.colors.textGreen }]}>{isVideo ? 'Video Call' : 'In-Clinic'}</Text>
+            <Text style={[S.consultTypeText, !isVideo && { color: theme.colors.textGreen }]}>{_toTitleCase(consultation_type || '')}</Text>
           </View>
         </View>
 

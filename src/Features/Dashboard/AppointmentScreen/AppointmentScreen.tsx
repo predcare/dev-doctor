@@ -28,6 +28,7 @@ import { IMyApptQueryParams } from '../../../hooks/react-query/appointments/payl
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import {
     formatDate,
     formatDateToYYYYMMDD,
@@ -483,9 +484,11 @@ export const AppointmentsScreen: React.FC = () => {
                                     item?.appointment_status === 'in-progress'
                                 }
                                 onVideoCall={() => {
+                                    if (!ensureClinicAccess()) return;
                                     handleJoinVideoCall(item);
                                 }}
                                 onComplete={() => {
+                                    if (!ensureClinicAccess()) return;
                                     showConfirm({
                                         title: 'Complete Appointment',
                                         message: 'Are you sure you want to mark this appointment as completed?',
@@ -495,12 +498,14 @@ export const AppointmentsScreen: React.FC = () => {
                                     });
                                 }}
                                 onReschedule={() => {
+                                    if (!ensureClinicAccess()) return;
                                     navigation.navigate(AppRoute.RESCHEDULE_APPOINTMENT, {
                                         appointmentId: Number(item.id),
                                         patientId: item.patientInfo?.patientId,
                                     });
                                 }}
                                 onStartConsultation={() => {
+                                    if (!ensureClinicAccess()) return;
                                     handleStartConsulation(
                                         item.id,
                                         Number(item.patientInfo?.patientId),
@@ -542,7 +547,10 @@ export const AppointmentsScreen: React.FC = () => {
                         zIndex: 999,
                     },
                 ]}
-                onPress={() => navigation.navigate(AppRoute.BOOK_APPOINTMENT)}
+                onPress={() => {
+                    if (!ensureClinicAccess()) return;
+                    navigation.navigate(AppRoute.BOOK_APPOINTMENT);
+                }}
                 activeOpacity={0.85}
                 accessibilityRole="button"
                 accessibilityLabel="Book appointment"

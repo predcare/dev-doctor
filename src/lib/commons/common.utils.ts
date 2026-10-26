@@ -383,3 +383,30 @@ export const formatSpecialization = ({
     .filter(Boolean)
     .join(', ');
 };
+
+export const _formatDoctorName = (name: string, salutation?: string): string =>
+  `${salutation?.trim() || 'Dr.'} ${name.trim()}`;
+
+export function truncateText(text: string | undefined | null, maxChars: number): string {
+  if (!text) return '';
+  return text.length > maxChars ? `${text.slice(0, maxChars)}...` : text;
+}
+
+export const formatReviewText = (items: number, text: string): string => {
+  if (items === 0) {
+    return `Not rated yet!`;
+  } else if (items === 1) {
+    return `1 ${text}`;
+  } else {
+    return `${items} ${text}s`;
+  }
+};
+
+export const _PromiseSettled = <T>(result: PromiseSettledResult<T>, fallback: T): T => {
+  return result.status === 'fulfilled' && result.value != null ? result.value : fallback;
+};
+
+export const _cleanParams = <T extends object>(params: T): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value != null && value !== '')
+  ) as Partial<T>;
