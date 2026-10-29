@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getBottomBarHeight } from '../../../components/commons/CustomBottomBar/CustomBottomBar';
 import CommonEmptyCard from '../../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import CommonErrorCard from '../../../components/commons/CommonErrorCard/CommonErrorCard';
+import { getBottomBarHeight } from '../../../components/commons/CustomBottomBar/CustomBottomBar';
+import SelectPatientModal from '../../../components/commons/SelectPatientModal/SelectPatientModal';
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon, SearchIcon } from '../../../components/ui/icons';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
 import {
@@ -11,12 +12,12 @@ import {
     useMyAllInvoices,
 } from '../../../hooks/react-query/invoices/invoices.hooks';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import { _toTitleCase, formatDate, getPayStatus } from '../../../lib/commons/common.utils';
 import { AppRoute, InvoiceListScreenProps } from '../../../route';
 import { invoiceListStyles } from '../../../styled/InvoiceListScreen.styled';
 import theme from '../../../styled/theme.styled';
 import { IInvoiceDoc } from '../../../typescripts/interfaces/invoices.interfaces';
-import SelectPatientModal from '../../../components/commons/SelectPatientModal/SelectPatientModal';
 import { InvoicePreviewModal } from './Modals/InvoicePreviewModal';
 import InvoiceSkeleton from './Skeletons/InvoiceSkeleton';
 
@@ -224,7 +225,10 @@ export const InvoiceListScreen: React.FC<InvoiceListScreenProps> = ({ navigation
                         zIndex: 999,
                     },
                 ]}
-                onPress={() => setShowSelectPatientModal(true)}
+                onPress={() => {
+                    if (!ensureClinicAccess()) return null
+                    setShowSelectPatientModal(true)
+                }}
                 activeOpacity={0.85}
             >
                 <PlusIcon size={24} color={theme.colors.surface} />

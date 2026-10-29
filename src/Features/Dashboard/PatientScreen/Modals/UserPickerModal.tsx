@@ -2,16 +2,20 @@ import React, { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CircleXIcon, SearchIcon } from '../../../../components/ui/icons';
 import { useDebounce } from '../../../../hooks/commons/useDebounce';
+import useKeyboardVisible from '../../../../hooks/commons/useKeyboardVisible';
 import { useGetAllPatients } from '../../../../hooks/react-query/patients/patients.hooks';
 import { getInitials } from '../../../../lib/commons/common.utils';
 import { theme } from '../../../../styled/theme.styled';
@@ -30,6 +34,7 @@ export interface UserPickerModalProps {
 export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
   ({ visible, onClose, onPick }) => {
     const insets = useSafeAreaInsets();
+    const isKeyboardOpen = useKeyboardVisible();
     const [searchText, setSearchText] = useState('');
     const debounceSearch = useDebounce(searchText?.trim(), 500);
     const {
@@ -44,14 +49,30 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
       user_type: 'patient',
     });
 
+    // While typing, back / outside tap only dismisses the keyboard instead of closing the picker
+    const handleRequestClose = () => {
+      if (Keyboard.isVisible()) {
+        Keyboard.dismiss();
+        return;
+      }
+      onClose();
+    };
+
     return (
-      <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
-        <TouchableOpacity style={[s.overlay, { paddingTop: insets.top }]} activeOpacity={1} onPress={onClose}>
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={handleRequestClose}
+      >
+        <TouchableWithoutFeedback onPress={handleRequestClose}>
+          <KeyboardAvoidingView behavior="padding" style={[s.overlay, { paddingTop: insets.top }]}>
           <View
             style={[
               s.sheet,
-              { paddingBottom: Math.max(20, insets.bottom + 12), marginBottom: 20 },
-              { marginBottom: 20 },
+              // Above the keyboard the bottom safe-area inset is hidden, so only a small gap is needed
+              { paddingBottom: isKeyboardOpen ? 0 : Math.max(20, insets.bottom + 12), marginBottom: 0 },
             ]}
             onStartShouldSetResponder={() => true}
           >
@@ -169,7 +190,8 @@ export const UserPickerModal: React.FC<UserPickerModalProps> = React.memo(
               />
             )}
           </View>
-        </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </Modal>
     );
   }

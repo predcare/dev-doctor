@@ -41,6 +41,7 @@ Rules:
   </View>
   ```
   Screens that render their header inside the `KeyboardAvoidingView` (like `CreateInvoiceScreen.tsx`) don't need this.
+- Bottom-sheet modals with inputs (e.g. `EMRUploadModal.tsx`): make the full-screen overlay (`flex: 1`, `justifyContent: 'flex-end'`, `paddingTop: insets.top`) the `KeyboardAvoidingView` with `behavior="padding"` (both platforms). Keep the sheet a plain `View` with `maxHeight` and its own safe-area `paddingBottom` (`insets.bottom + 16` when the keyboard is closed, a small gap when it's open; use `useKeyboardVisible()` from `src/hooks/commons/useKeyboardVisible.ts`). Don't make the sheet itself the `KeyboardAvoidingView`: its `paddingBottom` gets overridden to `0` and the sheet loses its bottom safe-area spacing. No offset is needed because the overlay starts at the top of the screen. While the keyboard is open, an outside tap / Android back should only `Keyboard.dismiss()`, not close the modal.
 - Always set `keyboardShouldPersistTaps="handled"` on the `ScrollView` so the submit button responds on the first tap while the keyboard is open.
 - Give the scroll content enough bottom padding that the last button isn't cut off.
 - Reference implementations: `CreateInvoiceScreen.tsx`, `BookAppointmentScreen.tsx`, `CreatePrescriptionScreen.tsx`.

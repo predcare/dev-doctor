@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -18,6 +19,7 @@ import UploadOptionsModal from '../../../../components/commons/UploadOptionsModa
 import { ChevronDownIcon, CloseIcon, FileIcon } from '../../../../components/ui/icons';
 import { EMR_Record_Category } from '../../../../config/constants';
 import useDevicePermissions from '../../../../hooks/commons/useDevicePermissions';
+import useKeyboardVisible from '../../../../hooks/commons/useKeyboardVisible';
 import { useUploadEmr } from '../../../../hooks/react-query/patients/patients.hooks';
 import { showInfoToast } from '../../../../lib/commons/toast.utils';
 import { emrUploadSchema, TEMRUploadFormValues } from '../../../../lib/schemas/emrUpload.schema';
@@ -41,6 +43,8 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
   doctorId,
 }) => {
   const insets = useSafeAreaInsets();
+  // Above the keyboard the bottom safe-area inset is hidden, so the sheet only needs a small gap
+  const isKeyboardOpen = useKeyboardVisible();
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
   const { mutate, isPending } = useUploadEmr();
@@ -175,6 +179,26 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
     onClose();
   };
 
+  const handleOutsidePress = () => {
+    if (Keyboard.isVisible()) {
+      Keyboard.dismiss();
+      return;
+    }
+    if (showCategoryDropdown) {
+      setShowCategoryDropdown(false);
+    } else {
+      handleCloseModal();
+    }
+  };
+
+  const handleRequestClose = () => {
+    if (Keyboard.isVisible()) {
+      Keyboard.dismiss();
+      return;
+    }
+    handleCloseModal();
+  };
+
   const onSubmit = (data: TEMRUploadFormValues) => {
     const formData = new FormData();
     if (data.file) {
@@ -209,18 +233,13 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
       transparent
       animationType="slide"
       statusBarTranslucent
-      onRequestClose={handleCloseModal}
+      onRequestClose={handleRequestClose}
     >
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (showCategoryDropdown) {
-            setShowCategoryDropdown(false);
-          } else {
-            handleCloseModal();
-          }
-        }}
-      >
-        <View style={[emrUploadModalStyles.modalOverlay, { paddingTop: insets.top }]}>
+      <TouchableWithoutFeedback onPress={handleOutsidePress}>
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={[emrUploadModalStyles.modalOverlay, { paddingTop: insets.top }]}
+        >
           <TouchableWithoutFeedback
             onPress={() => {
               if (showCategoryDropdown) {
@@ -228,11 +247,10 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
               }
             }}
           >
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            <View
               style={[
                 emrUploadModalStyles.sheetContainer,
-                { paddingBottom: Math.max(28, insets.bottom + 16) },
+                { paddingBottom: isKeyboardOpen ? 16 : Math.max(28, insets.bottom + 16) },
               ]}
             >
               <View style={emrUploadModalStyles.headerRow}>
@@ -449,9 +467,9 @@ export const EMRUploadModal: React.FC<EMRUploadModalProps> = ({
                   onSelectGallery={handleGallery}
                 />
               </View>
-            </KeyboardAvoidingView>
+            </View>
           </TouchableWithoutFeedback>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   );

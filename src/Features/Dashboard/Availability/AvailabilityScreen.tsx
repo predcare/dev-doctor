@@ -1,6 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
-import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import CommonEmptyCard from '../../../components/commons/CommonEmptyCard/CommonEmptyCard';
 import { PlusIcon } from '../../../components/ui/icons';
 import {
@@ -28,6 +35,10 @@ export const AvailabilityScreen: React.FC = () => {
   const { showConfirm } = useAlertStore(state => state);
   const { hideLoader, showLoader } = useLoadingStore(state => state);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  // KeyboardAvoidingView measures itself relative to its parent, which sits below the
+  // SafeAreaWrapper header — offset by the form's on-screen top so the padding is correct
+  const formContainerRef = useRef<React.ComponentRef<typeof View>>(null);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
 
   const {
     data: availablityList,
@@ -92,7 +103,18 @@ export const AvailabilityScreen: React.FC = () => {
         />
       }
     >
-      <View style={availabilityStyles.container}>
+      <View
+        ref={formContainerRef}
+        style={availabilityStyles.container}
+        onLayout={() =>
+          formContainerRef.current?.measureInWindow((_x, y) => setKeyboardOffset(y))
+        }
+      >
+        <KeyboardAvoidingView
+          style={availabilityStyles.keyboardView}
+          behavior="padding"
+          keyboardVerticalOffset={keyboardOffset}
+        >
         <ScrollView
           style={availabilityStyles.scroll}
           contentContainerStyle={availabilityStyles.scrollContent}
@@ -216,6 +238,7 @@ export const AvailabilityScreen: React.FC = () => {
             />
           )}
         </ScrollView>
+        </KeyboardAvoidingView>
 
         {!showNewSlotForm && (
           <TouchableOpacity

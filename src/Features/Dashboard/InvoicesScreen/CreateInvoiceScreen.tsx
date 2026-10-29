@@ -25,6 +25,7 @@ import {
 import { useMyPatientInfo } from '../../../hooks/react-query/patients/patients.hooks';
 import { MyInvoices } from '../../../hooks/react-query/query.keys';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
+import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import { formatAddress } from '../../../lib/commons/common.utils';
 import { showErrorToast, showSuccessToast } from '../../../lib/commons/toast.utils';
 import {
@@ -151,6 +152,7 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
   }, [watchedItems, isGstEnabled, gstMode]);
 
   const handleAddItem = () => {
+    if (!ensureClinicAccess()) return null
     append({
       id: String(Date.now()),
       name: '',
@@ -177,6 +179,7 @@ export const CreateInvoiceScreen: React.FC<CreateInvoiceScreenProps> = ({ route,
   };
 
   const onSubmit = (data: TCreateInvoiceSchemaType) => {
+    if (!ensureClinicAccess()) return null
     const clinicName =
       invoiceSettings?.clinic_name ||
       userData?.clinic_name ||

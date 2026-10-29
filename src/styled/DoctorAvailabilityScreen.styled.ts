@@ -30,6 +30,9 @@ export const availabilityStyles = StyleSheet.create({
     color: theme.colors.dark,
   },
 
+  keyboardView: {
+    flex: 1,
+  },
   scroll: {
     flex: 1,
   },
