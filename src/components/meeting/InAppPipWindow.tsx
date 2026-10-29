@@ -1,5 +1,5 @@
 import { MediaStream, RTCView } from '@videosdk.live/react-native-sdk';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { memo, useEffect, useMemo, useRef } from 'react';
 import {
   Animated,
   PanResponder,
@@ -32,8 +32,9 @@ export const InAppPipWindow: React.FC = () => {
   const patientName = useMeetingStore(state => state.patientInfo?.name);
   const { restoreToMeeting } = useMeetingPip();
   const { endCall } = useMeetingConnection();
+  const isAudioOnly = useMeetingStore(state => state.videoTier === 'audio');
   const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
-  const remoteTrack = webcamOn && webcamStream ? webcamStream.track : null;
+  const remoteTrack = !isAudioOnly && webcamOn && webcamStream ? webcamStream.track : null;
   const remoteStreamURL = useMemo(
     () => (remoteTrack ? new MediaStream([remoteTrack]).toURL() : null),
     [remoteTrack],
@@ -169,4 +170,4 @@ export const InAppPipWindow: React.FC = () => {
   );
 };
 
-export default InAppPipWindow;
+export default memo(InAppPipWindow);

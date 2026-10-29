@@ -1,10 +1,12 @@
 import NetInfo from '@react-native-community/netinfo';
 import { onlineManager } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
+import useUnstableConnectionMonitor from '../../../hooks/commons/useUnstableConnectionMonitor';
 import { useNetworkStore } from '../../../zustand/stores/useNetworkStore';
 
 export const NetworkEventListener: React.FC = () => {
   const setNetworkState = useNetworkStore(state => state.setNetworkState);
+  useUnstableConnectionMonitor();
 
   useEffect(() => {
     onlineManager.setEventListener(setOnline => {

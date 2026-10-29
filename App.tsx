@@ -6,6 +6,7 @@ import BackdropLoader from './src/components/commons/BackdropLoader/BackdropLoad
 import EventListener from './src/components/commons/EventListener/EventListener';
 import GlobalNoInternetBlocker from './src/components/commons/Network/GlobalNoInternetBlocker';
 import GlobalOfflineBanner from './src/components/commons/Network/GlobalOfflineBanner';
+import GlobalUnstableConnectionBanner from './src/components/commons/Network/GlobalUnstableConnectionBanner';
 import NetworkEventListener from './src/components/commons/Network/NetworkEventListener';
 import GlobalIncomingCallBanner from './src/components/commons/IncomingCallBanner/GlobalIncomingCallBanner';
 import GlobalPopupAlert from './src/components/commons/PopupAlert/GlobalPopupAlert';
@@ -34,6 +35,7 @@ function App() {
         <HideDuringAndroidPip>
           <GlobalIncomingCallBanner />
           <GlobalOfflineBanner />
+          <GlobalUnstableConnectionBanner />
           <GlobalToast />
           <GlobalPopupAlert />
           <SwitchClinicModal />

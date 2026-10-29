@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import { SocketEvents } from '../../../config/socket.constants';
-import { leaveActiveMeeting } from '../../../hooks/commons/meeting/meetingSessionLeave';
+import { endMeetingCall } from '../../../hooks/commons/meeting/meetingSessionLeave';
+import { getMyAppointmentInfo } from '../../../hooks/react-query/appointments/appointments.func';
 import { MyAppointmentsQueryKeys } from '../../../hooks/react-query/query.keys';
 import { showInfoToast } from '../../../lib/commons/toast.utils';
 import { navigationRef } from '../../../navigation/navigationRef';
@@ -76,7 +77,7 @@ const SocketListeners = () => {
 
       if (!isCallActiveForThisAppt) return;
 
-      await leaveActiveMeeting();
+      await endMeetingCall();
       useLoadingStore.getState().hideLoader();
 
       await queryClient.invalidateQueries({

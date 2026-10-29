@@ -22,7 +22,7 @@ export const doctorMeetingStyles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'ios' ? 12 : 16,
     paddingBottom: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    backgroundColor: 'transparent',
   },
   headerLeft: {
     flex: 1,
@@ -162,7 +162,6 @@ export const doctorMeetingStyles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     zIndex: 100,
-    elevation: 10,
   },
   pipMuteBadge: {
     position: 'absolute',
@@ -204,6 +203,20 @@ export const doctorMeetingStyles = StyleSheet.create({
     backgroundColor: '#000000',
     position: 'relative',
     zIndex: 1,
+  },
+  // Live call overlay: the patient video fills the whole screen, header and controls float above it
+  overlayRoot: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#000000',
+  },
+  overlaySafeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  overlayContent: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: 'transparent',
   },
   stageContainer: {
     ...StyleSheet.absoluteFill,

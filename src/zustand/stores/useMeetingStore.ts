@@ -4,6 +4,9 @@ import {
   IMeetingStoreState,
   MeetingCallState,
   MeetingPipMode,
+  TNetworkQuality,
+  TQualityLimitation,
+  TVideoTier,
 } from '../interfaces/meeting.interfaces';
 
 const initialCallInfo: ICallInfo = {
@@ -27,6 +30,12 @@ const initialVideoState = {
   patientMicOn: true,
   isCameraPausedForCapture: false,
   cameraSessionEpoch: 0,
+  networkQuality: 'GOOD' as TNetworkQuality,
+  qualityLimitation: null as TQualityLimitation,
+  videoTier: 'hd' as TVideoTier,
+  sessionKey: 0,
+  rejoinAttempt: 0,
+  isEndRequested: false,
 };
 
 const initialInPersonState = {
@@ -87,16 +96,58 @@ export const useMeetingStore = create<IMeetingStoreState>((set, get) => ({
     })),
 
   setPatientParticipant: ({ id, webcamOn, micOn }) =>
-    set(state => ({
-      patientParticipantId: id,
-      patientWebcamOn: webcamOn !== undefined ? webcamOn : state.patientWebcamOn,
-      patientMicOn: micOn !== undefined ? micOn : state.patientMicOn,
-    })),
+    set(state => {
+      const nextWebcamOn = webcamOn !== undefined ? webcamOn : state.patientWebcamOn;
+      const nextMicOn = micOn !== undefined ? micOn : state.patientMicOn;
+      // Several hooks report the same patient values; skip no-op writes to avoid extra renders.
+      if (
+        state.patientParticipantId === id &&
+        state.patientWebcamOn === nextWebcamOn &&
+        state.patientMicOn === nextMicOn
+      ) {
+        return state;
+      }
+      return { patientParticipantId: id, patientWebcamOn: nextWebcamOn, patientMicOn: nextMicOn };
+    }),
 
   setIsCameraPausedForCapture: paused => set({ isCameraPausedForCapture: paused }),
 
   bumpCameraSessionEpoch: () =>
     set(state => ({ cameraSessionEpoch: state.cameraSessionEpoch + 1 })),
+
+  setNetworkQuality: networkQuality =>
+    set(state => (state.networkQuality === networkQuality ? state : { networkQuality })),
+
+  setQualityLimitation: qualityLimitation =>
+    set(state => (state.qualityLimitation === qualityLimitation ? state : { qualityLimitation })),
+
+  setVideoTier: videoTier => set(state => (state.videoTier === videoTier ? state : { videoTier })),
+
+  setRejoinAttempt: rejoinAttempt => set({ rejoinAttempt }),
+
+  setEndRequested: isEndRequested => set({ isEndRequested }),
+
+  rejoinCallInfo: ({ token, meetingId, callElapsedSeconds }) =>
+    set(state => {
+      const durationMinutes = Number(state.callInfo.appointment?.appointmentDuration || 0);
+      const totalSeconds = Math.floor(durationMinutes * 60);
+      const serverRemaining =
+        callElapsedSeconds != null && totalSeconds > 0
+          ? Math.max(0, totalSeconds - callElapsedSeconds)
+          : null;
+      // Keeps pipMode, mute/camera state and patientInfo: only the session changes.
+      return {
+        callInfo: { ...state.callInfo, token, meetingId },
+        sessionKey: state.sessionKey + 1,
+        callState: 'RECONNECTING' as MeetingCallState,
+        patientParticipantId: null,
+        // The server can only shorten the remaining time, never extend it.
+        remainingSeconds:
+          serverRemaining != null
+            ? Math.min(state.remainingSeconds, serverRemaining)
+            : state.remainingSeconds,
+      };
+    }),
 
   resetCallInfo: () =>
     set({

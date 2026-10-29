@@ -11,6 +11,18 @@ export type MeetingCallState =
 
 export type MeetingPipMode = 'NORMAL' | 'IN_APP_PIP' | 'NATIVE_PIP';
 
+export type TNetworkQuality = 'GOOD' | 'FAIR' | 'WEAK' | 'OFFLINE';
+
+export type TVideoTier = 'hd' | 'sd' | 'low' | 'audio';
+
+export type TQualityLimitation = 'congestion' | 'bandwidth' | 'cpu' | null;
+
+export interface IMeetingTokenRefresh {
+  token: string;
+  meetingId: string;
+  callElapsedSeconds?: number;
+}
+
 export interface IMeetingPatientInfo {
   name?: string;
   patientId?: string;
@@ -48,6 +60,14 @@ export interface IMeetingStoreState {
   patientMicOn: boolean;
   isCameraPausedForCapture: boolean;
   cameraSessionEpoch: number;
+  networkQuality: TNetworkQuality;
+  qualityLimitation: TQualityLimitation;
+  videoTier: TVideoTier;
+  /** Bumped on every rejoin so MeetingProvider remounts with the fresh token. */
+  sessionKey: number;
+  rejoinAttempt: number;
+  /** Set by endMeetingCall() so a network drop can be told apart from an intentional end. */
+  isEndRequested: boolean;
 
   apptIdforInPerson: string | null;
   patientIdforInPerson: string | null;
@@ -56,6 +76,12 @@ export interface IMeetingStoreState {
 
   setIsCameraPausedForCapture: (paused: boolean) => void;
   bumpCameraSessionEpoch: () => void;
+  setNetworkQuality: (networkQuality: TNetworkQuality) => void;
+  setQualityLimitation: (qualityLimitation: TQualityLimitation) => void;
+  setVideoTier: (videoTier: TVideoTier) => void;
+  setRejoinAttempt: (rejoinAttempt: number) => void;
+  setEndRequested: (isEndRequested: boolean) => void;
+  rejoinCallInfo: (params: IMeetingTokenRefresh) => void;
 
   setCallInfo: (data: {
     token: string;

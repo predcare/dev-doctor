@@ -1,5 +1,5 @@
 import { MediaStream, RTCView, useMeeting, useParticipant } from '@videosdk.live/react-native-sdk';
-import React, { useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { MicOffIcon, ProfileIcon } from '../ui/icons';
 import { usePatientStream } from '../../hooks/commons/meeting/useMeetingParticipants';
@@ -15,14 +15,20 @@ const LocalPipTile: React.FC = () => {
   const cameraSessionEpoch = useMeetingStore(state => state.cameraSessionEpoch);
   const { webcamStream, webcamOn } = useParticipant(localParticipant?.id || '');
 
-  const showVideo = isCamOn && webcamOn && webcamStream;
+  const localTrack = isCamOn && webcamOn && webcamStream ? webcamStream.track : null;
+  const localStreamURL = useMemo(
+    () => (localTrack ? new MediaStream([localTrack]).toURL() : null),
+    // cameraSessionEpoch: Android capture handoff/restore needs a fresh URL even for the same track
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localTrack, cameraSessionEpoch],
+  );
 
   return (
     <View style={androidPipStyles.selfTile}>
-      {showVideo ? (
+      {localStreamURL ? (
         <RTCView
           key={cameraSessionEpoch}
-          streamURL={new MediaStream([webcamStream.track]).toURL()}
+          streamURL={localStreamURL}
           objectFit="cover"
           mirror={isFrontCamera}
           style={StyleSheet.absoluteFill}
@@ -45,8 +51,9 @@ export const AndroidPipStage: React.FC = () => {
   const { width } = useWindowDimensions();
   const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
   const patientName = useMeetingStore(state => state.patientInfo?.name);
+  const isAudioOnly = useMeetingStore(state => state.videoTier === 'audio');
   const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
-  const remoteTrack = webcamOn && webcamStream ? webcamStream.track : null;
+  const remoteTrack = !isAudioOnly && webcamOn && webcamStream ? webcamStream.track : null;
   const remoteStreamURL = useMemo(
     () => (remoteTrack ? new MediaStream([remoteTrack]).toURL() : null),
     [remoteTrack],
@@ -92,4 +99,4 @@ export const AndroidPipStage: React.FC = () => {
   );
 };
 
-export default AndroidPipStage;
+export default memo(AndroidPipStage);

@@ -1,5 +1,5 @@
 import { MediaStream, RTCView, useMeeting, useParticipant } from '@videosdk.live/react-native-sdk';
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { MicOffIcon } from '../../../../components/ui/icons';
 import doctorMeetingStyles from '../../../../styled/DoctorMeetingScreen.styled';
@@ -15,14 +15,21 @@ export const LocalPipCard: React.FC = () => {
   const localId = localParticipant?.id || '';
   const { webcamStream, webcamOn } = useParticipant(localId);
 
-  const shouldRenderVideo = isCamOn && webcamOn && webcamStream;
+  const localTrack = isCamOn && webcamOn && webcamStream ? webcamStream.track : null;
+  // Build the URL only when the track or camera session changes, so RTCView does not re-attach.
+  const localStreamURL = useMemo(
+    () => (localTrack ? new MediaStream([localTrack]).toURL() : null),
+    // cameraSessionEpoch: Android capture handoff/restore needs a fresh URL even for the same track
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localTrack, cameraSessionEpoch],
+  );
 
   return (
     <View style={doctorMeetingStyles.selfPipCard}>
-      {shouldRenderVideo ? (
+      {localStreamURL ? (
         <RTCView
           key={Platform.OS === 'android' ? cameraSessionEpoch : undefined}
-          streamURL={new MediaStream([webcamStream.track]).toURL()}
+          streamURL={localStreamURL}
           objectFit="cover"
           mirror={isFrontCamera}
           style={StyleSheet.absoluteFill}
@@ -44,4 +51,4 @@ export const LocalPipCard: React.FC = () => {
   );
 };
 
-export default LocalPipCard;
+export default memo(LocalPipCard);

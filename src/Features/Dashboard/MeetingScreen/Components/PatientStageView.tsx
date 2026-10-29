@@ -1,5 +1,5 @@
 import { MediaStream, RTCView } from '@videosdk.live/react-native-sdk';
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { usePatientStream } from '../../../../hooks/commons/meeting/useMeetingParticipants';
 import doctorMeetingStyles from '../../../../styled/DoctorMeetingScreen.styled';
@@ -10,8 +10,11 @@ export const PatientStageView: React.FC = () => {
   const patientName = useMeetingStore(state => state.patientInfo?.name);
   const callState = useMeetingStore(state => state.callState);
 
+  // Audio-only on a weak network: show the camera-off view instead of a frozen frame.
+  const isAudioOnly = useMeetingStore(state => state.videoTier === 'audio');
+
   const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
-  const remoteTrack = webcamOn && webcamStream ? webcamStream.track : null;
+  const remoteTrack = !isAudioOnly && webcamOn && webcamStream ? webcamStream.track : null;
   const remoteStreamURL = useMemo(
     () => (remoteTrack ? new MediaStream([remoteTrack]).toURL() : null),
     [remoteTrack],
@@ -45,4 +48,4 @@ export const PatientStageView: React.FC = () => {
   );
 };
 
-export default PatientStageView;
+export default memo(PatientStageView);

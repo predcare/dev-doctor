@@ -1,6 +1,9 @@
 import { useMeeting, useParticipant } from '@videosdk.live/react-native-sdk';
 import { useEffect, useMemo } from 'react';
+import { MeetingCallState } from '../../../zustand/interfaces/meeting.interfaces';
 import useMeetingStore from '../../../zustand/stores/useMeetingStore';
+
+const RECONNECT_STATES: MeetingCallState[] = ['RECONNECTING', 'DISCONNECTED'];
 
 export const useMeetingParticipants = () => {
   const { participants, localParticipant } = useMeeting({});
@@ -24,7 +27,8 @@ export const useMeetingParticipants = () => {
       if (currentCallState === 'WAITING_FOR_PATIENT' || currentCallState === 'CONNECTING') {
         setCallState('CONNECTED');
       }
-    } else {
+    } else if (!RECONNECT_STATES.includes(currentCallState)) {
+      // During a reconnect the participant list empties briefly; keep the patient until it settles.
       setPatientParticipant({ id: null, webcamOn: false });
       if (currentCallState === 'CONNECTED') {
         setCallState('WAITING_FOR_PATIENT');
@@ -75,28 +79,6 @@ export const usePatientStream = (patientId: string | null) => {
     micOn,
     displayName,
   };
-};
-
-export const usePatientVideoQuality = (patientId: string | null) => {
-  const { webcamOn, webcamStream, setQuality } = useParticipant(patientId || '');
-  const trackId = webcamStream?.track?.id ?? null;
-
-  useEffect(() => {
-    if (!patientId || !webcamOn || !trackId || typeof setQuality !== 'function') {
-      return;
-    }
-
-    let cancelled = false;
-    setQuality('high').catch(error => {
-      if (!cancelled) {
-        console.warn('[usePatientVideoQuality] setQuality(high) failed:', error);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [patientId, webcamOn, trackId, setQuality]);
 };
 
 export default useMeetingParticipants;

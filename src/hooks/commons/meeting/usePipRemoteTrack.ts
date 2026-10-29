@@ -7,9 +7,10 @@ import { usePatientStream } from './useMeetingParticipants';
 export const usePipRemoteTrack = () => {
   const patientParticipantId = useMeetingStore(state => state.patientParticipantId);
   const patientName = useMeetingStore(state => state.patientInfo?.name);
+  const isAudioOnly = useMeetingStore(state => state.videoTier === 'audio');
   const { webcamStream, webcamOn } = usePatientStream(patientParticipantId);
 
-  const trackId = webcamOn && webcamStream?.track ? webcamStream.track.id : null;
+  const trackId = !isAudioOnly && webcamOn && webcamStream?.track ? webcamStream.track.id : null;
 
   useEffect(() => {
     if (Platform.OS !== 'ios') return;

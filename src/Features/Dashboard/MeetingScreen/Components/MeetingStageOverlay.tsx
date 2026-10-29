@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { memo } from 'react';
+import { View } from 'react-native';
 import useMeetingConnection from '../../../../hooks/commons/meeting/useMeetingConnection';
 import SafeAreaWrapper from '../../../../Layout/SafeAreaWrapper';
 import doctorMeetingStyles from '../../../../styled/DoctorMeetingScreen.styled';
@@ -12,10 +12,11 @@ export const MeetingStageOverlay: React.FC = () => {
   const { endCall } = useMeetingConnection();
 
   return (
-    <View style={[StyleSheet.absoluteFill, { zIndex: 9999, elevation: 9999 }]}>
-      <SafeAreaWrapper style={doctorMeetingStyles.container} backgroundColor="#000000">
-        <View style={doctorMeetingStyles.stageContainerFull}>
-          <PatientStageView />
+    <View style={[doctorMeetingStyles.overlayRoot, { zIndex: 9999, elevation: 9999 }]}>
+      {/* Edge to edge, behind the status bar and navigation bar */}
+      <PatientStageView />
+      <SafeAreaWrapper style={doctorMeetingStyles.overlaySafeArea} backgroundColor="transparent">
+        <View style={doctorMeetingStyles.overlayContent}>
           <MeetingHeader />
           <LocalPipCard />
           <MeetingController handleEndCall={endCall} />
@@ -25,4 +26,4 @@ export const MeetingStageOverlay: React.FC = () => {
   );
 };
 
-export default MeetingStageOverlay;
+export default memo(MeetingStageOverlay);
