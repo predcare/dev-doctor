@@ -30,6 +30,7 @@ import SupportTicketDetailsScreen from '../Features/Dashboard/SupportScreen/Supp
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import { navigationRef } from './navigationRef';
+import CreateInvoiceScreen from '../Features/Dashboard/InvoicesScreen/CreateInvoiceScreen';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -82,6 +83,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="NewSupportTicket" component={NewSupportTicketScreen} />
         <Stack.Screen name="SupportTicketDetails" component={SupportTicketDetailsScreen} />
+        <Stack.Screen name="CreateInvoice" component={CreateInvoiceScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

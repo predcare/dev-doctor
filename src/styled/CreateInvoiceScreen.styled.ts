@@ -35,12 +35,14 @@ export const createInvoiceStyles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.dark,
   },
+  keyboardView: {
+    flex: 1,
+  },
   scroll: {
     flex: 1,
   },
   scrollContent: {
     padding: 14,
-    paddingBottom: 24,
   },
 
   // Line Item Editor Section
@@ -60,8 +62,6 @@ export const createInvoiceStyles = StyleSheet.create({
   },
   addBtn: {
     backgroundColor: theme.colors.primarySoft,
-    borderWidth: 1,
-    borderColor: theme.colors.mintBdr,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -75,12 +75,8 @@ export const createInvoiceStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
   },
   itemBlock: {
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.surfaceSecondary,
     paddingTop: 14,
     marginTop: 8,
   },
@@ -176,66 +172,45 @@ export const createInvoiceStyles = StyleSheet.create({
   },
 
   // Payment Mode & Billing Config Section
-  payModeRow: {
-    flexDirection: 'row',
+  loadingContainer: {
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: theme.colors.background,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    marginBottom: 4,
+    justifyContent: 'center',
+    padding: 24,
   },
-  payModeLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  payModeIcon: {
+  loadingText: {
+    marginTop: 12,
     fontSize: 14,
+    color: theme.colors.textMuted,
+    fontWeight: '500',
   },
-  payModeVal: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    marginLeft: 6,
+
+  // Tax % Chips
+  taxChipRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
   },
-  changeBtn: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceBorder,
-    borderRadius: 8,
-    paddingHorizontal: 12,
+  taxChip: {
     paddingVertical: 6,
-  },
-  changeBtnTxt: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  pickerBox: {
-    backgroundColor: theme.colors.background,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
-    borderRadius: 8,
-    marginVertical: 6,
-    overflow: 'hidden',
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  pickerOpt: {
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.surfaceBorder,
-  },
-  pickerOptActive: {
+  taxChipActive: {
     backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.primary,
   },
-  pickerOptTxt: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
+  taxChipTxt: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.textSlate,
   },
-  pickerOptTxtActive: {
+  taxChipTxtActive: {
     color: theme.colors.primary,
     fontWeight: '700',
   },
@@ -409,7 +384,12 @@ export const createInvoiceStyles = StyleSheet.create({
     fontWeight: '800',
     color: theme.colors.primary,
   },
+  submitBtnSpacing: {
+    marginTop: 18,
+    marginBottom: 8,
+  },
   submitBtn: {
+    width: '100%',
     backgroundColor: theme.colors.primary,
     borderRadius: 12,
     paddingHorizontal: 20,

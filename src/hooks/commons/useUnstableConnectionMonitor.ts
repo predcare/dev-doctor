@@ -8,7 +8,7 @@ import {
   CONNECTION_STABLE_AFTER,
   CONNECTION_UNSTABLE_AFTER,
 } from '../../config/network.constants';
-import { baseUrlApi } from '../../services/api/endpoints';
+import { baseUrl } from '../../services/api/endpoints';
 import useMeetingStore from '../../zustand/stores/useMeetingStore';
 import useNetworkStore from '../../zustand/stores/useNetworkStore';
 import { getLinkSignalCap } from './meeting/callQuality.utils';
@@ -19,7 +19,7 @@ const probeIsSlow = async (): Promise<boolean> => {
   const timeoutId = setTimeout(() => controller.abort(), CONNECTION_PROBE_TIMEOUT_MS);
   const startedAt = Date.now();
   try {
-    await fetch(baseUrlApi, {
+    await fetch(baseUrl, {
       method: 'HEAD',
       headers: { 'Cache-Control': 'no-cache' },
       signal: controller.signal,
@@ -47,7 +47,10 @@ export const useUnstableConnectionMonitor = () => {
     let cancelled = false;
 
     const evaluate = async () => {
-      if (AppState.currentState !== 'active' && useMeetingStore.getState().pipMode !== 'NATIVE_PIP') {
+      if (
+        AppState.currentState !== 'active' &&
+        useMeetingStore.getState().pipMode !== 'NATIVE_PIP'
+      ) {
         return;
       }
 
@@ -74,7 +77,7 @@ export const useUnstableConnectionMonitor = () => {
         false,
         String(network.connectionType),
         network.wifiStrength,
-        network.cellularGeneration,
+        network.cellularGeneration
       );
       const meeting = useMeetingStore.getState();
       const isCallWeak = Boolean(meeting.callInfo?.meetingId) && meeting.networkQuality === 'WEAK';

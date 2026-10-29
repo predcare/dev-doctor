@@ -188,11 +188,6 @@ export const invoiceListStyles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    elevation: 1,
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
   },
   txName: {
     fontSize: 15,

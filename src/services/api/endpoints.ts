@@ -84,8 +84,8 @@ export const endpoints = {
   invoices: {
     getAll: `/invoices/my-invoices/`,
     patientInvoices: '/doctor/invoices/doctor/',
-    downloadPdf: (invoiceId: number | string) => `/doctor/invoices/${invoiceId}/pdf`,
-    invoiceSettings: '/doctor/invoices/settings/',
+    downloadPdf: (invoiceId: number | string) => `/invoices/${invoiceId}/pdf`,
+    invoiceSettings: '/invoices/settings',
     create: '/invoices/manual',
     stats: '/invoices/stats',
   },

@@ -193,18 +193,25 @@ export const AvailabilityScreen: React.FC = () => {
                 setEditingSlot(null);
                 setShowExistingSlots(true);
               }}
-              onCancel={() => {
-                showConfirm({
-                  title: 'Remove Availability',
-                  message: 'Are you sure you want to remove this availability?',
-                  buttonText: 'Remove',
-                  cancelText: 'Cancel',
-                  onConfirm: () => {
-                    setEditingSlot(null);
-                    setShowNewSlotForm(false);
-                    setShowExistingSlots(true);
-                  },
-                });
+              onCancel={(type) => {
+                if (type === "cancel") {
+                  showConfirm({
+                    title: 'Remove Availability',
+                    message: 'Are you sure you want to remove this availability?',
+                    buttonText: 'Remove',
+                    cancelText: 'Cancel',
+                    onConfirm: () => {
+                      setEditingSlot(null);
+                      setShowNewSlotForm(false);
+                      setShowExistingSlots(true);
+                    },
+                  });
+                } else {
+                  setEditingSlot(null);
+                  setShowNewSlotForm(false);
+                  setShowExistingSlots(true);
+                }
+
               }}
             />
           )}

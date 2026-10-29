@@ -23,12 +23,11 @@ export const useDownloadInvoicePdf = () =>
     mutationFn: (invoiceId: number | string) => getInvoicePdf(invoiceId),
   });
 
-export const useInvoiceSettings = (params?: { doctorId?: number | string }) =>
+export const useInvoiceSettings = () =>
   useQuery({
-    queryKey: [MyInvoices.InvoiceSettings, params],
-    queryFn: () => getInvoiceSettings(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: v => v.settings,
+    queryKey: [MyInvoices.InvoiceSettings],
+    queryFn: () => getInvoiceSettings(),
+    select: v => (v as any)?.settings || (v as any)?.data || v,
   });
 
 export const useMyAllInvoices = (params?: Omit<IGetMyAllInvoicesParams, 'page'>) =>
@@ -58,6 +57,7 @@ export const useInvoicesStats = (params?: {
   clinic_id?: string;
   end_date?: string;
   start_date?: string;
+  category?: string;
 }) =>
   useQuery({
     queryKey: [MyInvoices.InvoicesStats, params],

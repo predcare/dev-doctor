@@ -2,10 +2,11 @@ import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
 import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
 import {
-    IInvoiceSettingRoot,
-    IInvoiceStatsRoot,
-    IMyInvoiceListRoot,
+  IInvoiceSettingRoot,
+  IInvoiceStatsRoot,
+  IMyInvoiceListRoot,
 } from '../../../typescripts/interfaces/invoices.interfaces';
+import { ICreateManualInvoicePayload } from './payload.interfaces';
 
 export const getMyPatientInvoices = async (doctorId: number | string) => {
   const res = await axiosInstance.get<IMyInvoiceListRoot>(
@@ -21,10 +22,8 @@ export const getInvoicePdf = async (invoiceId: number | string): Promise<ArrayBu
 
   return res.data as ArrayBuffer;
 };
-export const getInvoiceSettings = async (doctorId: number | string) => {
-  const res = await axiosInstance.get<IInvoiceSettingRoot>(
-    `${endpoints.invoices.invoiceSettings}${doctorId}`
-  );
+export const getInvoiceSettings = async () => {
+  const res = await axiosInstance.get<IInvoiceSettingRoot>(`${endpoints.invoices.invoiceSettings}`);
   return res.data;
 };
 
@@ -33,6 +32,11 @@ export interface IGetMyAllInvoicesParams {
   limit?: number;
   search?: string;
   payment_status?: string;
+  category?: string;
+  from?: string;
+  to?: string;
+  payment_method?: string;
+  sort?: string;
 }
 
 export const getMyAllInvoices = async (params: IGetMyAllInvoicesParams) => {
@@ -55,15 +59,16 @@ export const getMyAllInvoices = async (params: IGetMyAllInvoicesParams) => {
   return res.data;
 };
 
-export const createInvoices = async (body: any) => {
+export const createInvoices = async (body: ICreateManualInvoicePayload) => {
   const res = await axiosInstance.post<ICommonRoot>(`${endpoints.invoices.create}`, body);
   return res.data;
 };
 
 export const getInvoicesStats = async (params: {
-  clinic_id: string;
-  end_date: string;
-  start_date: string;
+  clinic_id?: string;
+  end_date?: string;
+  start_date?: string;
+  category?: string;
 }) => {
   const res = await axiosInstance.get<IInvoiceStatsRoot>(`${endpoints.invoices.stats}`);
   return res.data;

@@ -1,5 +1,6 @@
 import { IRootResponse } from './common.interfaces';
 export type IMyInvoiceListRoot = IRootResponse<IInvoiceDoc[]>;
+export type IInvoiceSettingRoot = IRootResponse<IDoctorInvoiceSettingDoc>;
 
 export type IInvoiceStatsRoot = IRootResponse<IInvoiceStatsDoc>;
 export interface IInvoiceItem {
@@ -51,11 +52,6 @@ export interface IInvoiceDoc {
   deleted_by?: any;
 }
 
-export interface IInvoiceSettingRoot {
-  success: boolean;
-  settings: IInvoiceSettingsDoc;
-}
-
 export interface IInvoiceSettingsDoc {
   clinic_name: string;
   clinic_address: string;
@@ -84,4 +80,35 @@ export interface IInvoiceStatsDoc {
     unpaid: number;
     overdue: number;
   };
+}
+
+export interface IDoctorInvoiceSettingDoc {
+  id: string;
+  doctor_id: string;
+  clinic_id: string;
+  clinic_name: string;
+  clinic_address: string;
+  clinic_phone: string;
+  clinic_email: string;
+  clinic_gstin: string;
+  reg_no: string;
+  header_note: any;
+  header_type: string;
+  header_text: string;
+  header_image_path: any;
+  header_image_url: any;
+  footer_note: any;
+  footer_type: string;
+  footer_text: any;
+  footer_image_path: any;
+  footer_image_url: any;
+  terms_conditions: string;
+  invoice_prefix: string;
+  gst_type: string;
+  signature_image_path: string;
+  signature_image_url: string;
+  signature_mode: string;
+  generated_sig_text: any;
+  created_at: string;
+  updated_at: string;
 }

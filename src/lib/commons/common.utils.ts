@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { Linking, Platform } from 'react-native';
-import { ISpecializationData } from '../../typescripts/interfaces/common.interfaces';
+import { AddressParams, ISpecializationData } from '../../typescripts/interfaces/common.interfaces';
 import { showErrorToast } from './toast.utils';
 
 export interface OpenMapParams {
@@ -410,3 +410,12 @@ export const _cleanParams = <T extends object>(params: T): Partial<T> =>
   Object.fromEntries(
     Object.entries(params).filter(([, value]) => value != null && value !== '')
   ) as Partial<T>;
+
+export const formatAddress = ({
+  line1,
+  city,
+  state,
+  pincode,
+  country,
+}: AddressParams): string | null =>
+  [line1, city, state, pincode, country].filter(Boolean).join(', ') || null;

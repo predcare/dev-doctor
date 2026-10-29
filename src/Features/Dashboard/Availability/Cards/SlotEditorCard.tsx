@@ -22,7 +22,7 @@ export interface SlotEditorCardProps {
   editingSlot?: IMyAvailabilityDoc | null;
   existingSlots?: IMyAvailabilityDoc[];
   onSave?: (data: TAvailabilityFormValues) => void;
-  onCancel: () => void;
+  onCancel: (type?: string) => void;
   isSaving?: boolean;
 }
 
@@ -428,7 +428,7 @@ export const SlotEditorCard: React.FC<SlotEditorCardProps> = React.memo(
 
           <TouchableOpacity
             style={SlotEditCardStyles.cancelBtn}
-            onPress={onCancel}
+            onPress={() => onCancel("cancel")}
             activeOpacity={0.75}
           >
             <Text style={SlotEditCardStyles.cancelBtnTxt}>✕ Cancel</Text>

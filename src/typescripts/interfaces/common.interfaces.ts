@@ -80,3 +80,12 @@ export interface ISpecializationData {
   specialization?: string | string[];
   sub_specializations?: Record<string, string[]>;
 }
+
+export interface AddressParams {
+  line1?: string | null;
+  line2?: string | null;
+  city?: string | null;
+  state?: string | null;
+  pincode?: string | null;
+  country?: string | null;
+}

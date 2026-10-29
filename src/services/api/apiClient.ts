@@ -5,6 +5,7 @@ import eventEmitter from '../../lib/services/event.emitter';
 import events from '../../lib/services/events/events';
 import { NetworkRoot } from '../../typescripts/enums';
 import { IBaseApiRoot } from '../../typescripts/interfaces/axios.interfaces';
+import { useAuthStore } from '../../zustand/stores/useAuthStore';
 import { baseUrlApi, exclude401Routes, successEndpoints } from './endpoints';
 let isAlreadyHandlingUnauthorized = false;
 let isAlreadyHandlingNetworkError = false;
@@ -23,6 +24,10 @@ axiosInstance.interceptors.request.use(async config => {
   console.log('dev token ==================>', token);
   if (token && !!config.headers) {
     config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  const clinicId = useAuthStore.getState().userData?.clinic?.id;
+  if (clinicId && config.headers) {
+    config.headers['x-clinic-id'] = clinicId;
   }
   return config;
 });

@@ -45,7 +45,7 @@ export const PatientsScreen: React.FC = () => {
         search: debounceSearch,
     });
 
-    const { patientsList, totalCount } = useMemo(() => {
+    const { patientsList } = useMemo(() => {
         const pages = myPatients?.pages ?? [];
         const list = pages.flatMap(page => (Array.isArray(page?.data) ? page.data : []));
         const total = pages[0]?.meta?.total ?? list.length;
