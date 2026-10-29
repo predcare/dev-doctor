@@ -3,8 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
     ActivityIndicator,
-    Keyboard,
-    Platform,
+    KeyboardAvoidingView,
     RefreshControl,
     ScrollView,
     Text,
@@ -12,7 +11,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import {
     CalendarIcon,
@@ -53,9 +51,11 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     const [selectedCountryId, setSelectedCountryId] = useState<number | undefined>();
     const [selectedStateId, setSelectedStateId] = useState<number | undefined>();
     const [refreshing, setRefreshing] = useState(false);
-    const [keyboardOverlap, setKeyboardOverlap] = useState(0);
     const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
-    const insets = useSafeAreaInsets();
+    // KeyboardAvoidingView measures itself relative to its parent, which sits below the
+    // SafeAreaWrapper header — offset by the form's on-screen top so the padding is correct
+    const formContainerRef = useRef<React.ComponentRef<typeof View>>(null);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
 
     const { hideLoader, showLoader } = useLoadingStore(state => state);
 
@@ -216,20 +216,6 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
     }, [countryName, countries]);
 
     useEffect(() => {
-        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-        const showSub = Keyboard.addListener(showEvent, event => {
-            const overlap = event.endCoordinates.height - insets.bottom;
-            setKeyboardOverlap(Math.max(0, overlap));
-        });
-        const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardOverlap(0));
-        return () => {
-            showSub.remove();
-            hideSub.remove();
-        };
-    }, [insets.bottom]);
-
-    useEffect(() => {
         if (stateName && states.length > 0) {
             const found = states.find((s: any) => s.name.toLowerCase() === stateName.toLowerCase());
             if (found) {
@@ -265,7 +251,18 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
             {fetchingPatientInfo ? (
                 <EditPatientSkeleton />
             ) : (
-                <View style={{ flex: 1, paddingBottom: keyboardOverlap }}>
+                <View
+                    ref={formContainerRef}
+                    style={editPatientStyles.keyboardView}
+                    onLayout={() =>
+                        formContainerRef.current?.measureInWindow((_x, y) => setKeyboardOffset(y))
+                    }
+                >
+                <KeyboardAvoidingView
+                    style={editPatientStyles.keyboardView}
+                    behavior="padding"
+                    keyboardVerticalOffset={keyboardOffset}
+                >
                     <ScrollView
                     ref={scrollRef}
                     style={{ flex: 1 }}
@@ -535,6 +532,7 @@ export const EditPatientScreen: React.FC<EditPatientScreenProps> = ({ route, nav
                             )}
                         </TouchableOpacity>
                     </View>
+                </KeyboardAvoidingView>
                 </View>
             )}
             <PatientLocationSelectModal

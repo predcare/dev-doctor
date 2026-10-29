@@ -2,6 +2,9 @@ import { StyleSheet } from 'react-native';
 import { theme } from './theme.styled';
 
 export const editPatientStyles = StyleSheet.create({
+  keyboardView: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

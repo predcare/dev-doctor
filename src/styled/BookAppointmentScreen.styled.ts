@@ -8,6 +8,7 @@ export const TEAL_BORDER = theme.colors.mintBdr;
 
 export const bookAppointmentStyles = StyleSheet.create({
   container: { flex: 1 },
+  keyboardView: { flex: 1 },
   scrollView: { flex: 1 },
   content: { padding: theme.spacing.lg, paddingBottom: 32 },
 

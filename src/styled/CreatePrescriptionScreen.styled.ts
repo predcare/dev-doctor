@@ -2,6 +2,9 @@ import { StyleSheet } from 'react-native';
 import { theme } from './theme.styled';
 
 export const createPrescriptionStyles = StyleSheet.create({
+  keyboardView: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

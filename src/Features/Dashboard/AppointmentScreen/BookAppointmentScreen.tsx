@@ -1,8 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
 import dayjs from 'dayjs';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    KeyboardAvoidingView,
     RefreshControl,
     ScrollView,
     Text,
@@ -75,6 +76,10 @@ const PeriodSeries: SlotPeriod[] = ['MORNING', 'AFTERNOON', 'EVENING', 'NIGHT'];
 
 export const BookAppointmentScreen: React.FC = () => {
     const navigation = useNavigation();
+    // KeyboardAvoidingView measures itself relative to its parent, which sits below the
+    // SafeAreaWrapper header — offset by the form's on-screen top so the padding is correct
+    const formContainerRef = useRef<React.ComponentRef<typeof View>>(null);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
     const { userData } = useAuthStore(state => state);
     const [selectedPatient, setSelectedPatient] = useState<ISelectedPatients | null>(null);
     const [showPatientPicker, setShowPatientPicker] = useState(false);
@@ -347,292 +352,311 @@ export const BookAppointmentScreen: React.FC = () => {
                 />
             }
         >
-
-            <ScrollView
-                style={bookAppointmentStyles.scrollView}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                        colors={[theme.colors.primary]}
-                        tintColor={theme.colors.primary}
-                    />
-                }
+            <View
+                ref={formContainerRef}
+                style={bookAppointmentStyles.keyboardView}
+                onLayout={() => formContainerRef.current?.measureInWindow((_x, y) => setKeyboardOffset(y))}
             >
-                <View style={bookAppointmentStyles.content}>
-                    <View style={bookAppointmentStyles.section}>
-                        <Text style={bookAppointmentStyles.sectionTitle}>1. Select Patient</Text>
-                        <TouchableOpacity
-                            style={bookAppointmentStyles.selectButton}
-                            onPress={() => setShowPatientPicker(true)}
-                            activeOpacity={0.8}
-                        >
-                            <View style={bookAppointmentStyles.selectButtonContent}>
-                                {selectedPatient ? (
-                                    <Text style={bookAppointmentStyles.selectedText}>
-                                        {selectedPatient.name} ({selectedPatient.patientGenId})
-                                    </Text>
-                                ) : (
-                                    <Text style={bookAppointmentStyles.placeholderText}>Select a patient</Text>
-                                )}
-                                <Text style={bookAppointmentStyles.selectButtonIcon}>▼</Text>
-                            </View>
-                        </TouchableOpacity>
-
-                        {selectedPatient?.patientGenId && (
-                            <View style={bookAppointmentStyles.patientInfo}>
-                                <Text style={bookAppointmentStyles.patientInfoText}>
-                                    👤 {selectedPatient.name}, {capitalize(selectedPatient?.gender || '')}
-                                </Text>
-                                <Text style={bookAppointmentStyles.patientInfoText}>
-                                    📞 {selectedPatient.Phone}
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-
-                    <View style={bookAppointmentStyles.section}>
-                        <Text style={bookAppointmentStyles.sectionTitle}>2. Consultation Type</Text>
-                        <View style={bookAppointmentStyles.typeRow}>
-                            <TouchableOpacity
-                                style={[bookAppointmentStyles.typeButton, bookAppointmentStyles.typeButtonActive]}
-                                onPress={() => {
-                                    updateFormState({
-                                        consultationType: 'clinic',
-                                        selectedSlots: null,
-                                    });
-                                }}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={bookAppointmentStyles.typeButtonIcon}>🏥</Text>
-                                <Text
-                                    style={[
-                                        bookAppointmentStyles.typeButtonText,
-                                        bookAppointmentStyles.typeButtonTextActive,
-                                    ]}
-                                >
-                                    In-Clinic
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    <View style={bookAppointmentStyles.section}>
-                        <Text style={bookAppointmentStyles.sectionTitle}>3. Select Date</Text>
-                        {availableDatesPending ? (
-                            <TouchableOpacity style={bookAppointmentStyles.selectButton} disabled>
-                                <View style={bookAppointmentStyles.selectButtonContent}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                        <ActivityIndicator size="small" color={theme.colors.primary} />
-                                        <Text style={bookAppointmentStyles.placeholderText}>
-                                            Loading available dates...
-                                        </Text>
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                        ) : formStates.selectedDate && dateDetails ? (
-                            <TouchableOpacity
-                                style={bookAppointmentStyles.dateSelectedCard}
-                                onPress={() => setShowDatePicker(true)}
-                                activeOpacity={0.85}
-                            >
-                                <View style={bookAppointmentStyles.dateLeafBadge}>
-                                    <Text style={bookAppointmentStyles.dateLeafDay}>{dateDetails.dayNum}</Text>
-                                    <Text style={bookAppointmentStyles.dateLeafMonth}>{dateDetails.monthStr}</Text>
-                                </View>
-
-                                <View style={bookAppointmentStyles.dateDetailsWrap}>
-                                    <Text style={bookAppointmentStyles.dateDetailsFull}>{dateDetails.fullDate}</Text>
-                                    <Text style={bookAppointmentStyles.dateDetailsRel}>
-                                        {dateDetails.relativeLabel} • In-Clinic Consultation
-                                    </Text>
-                                </View>
-
-                                <View style={bookAppointmentStyles.dateChangeBtn}>
-                                    <Text style={bookAppointmentStyles.dateChangeBtnText}>Change</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ) : (
-                            <TouchableOpacity
-                                style={bookAppointmentStyles.selectButton}
-                                onPress={() => {
-                                    if (!selectedPatient?.patientGenId) return showErrorToast('Select Patient First');
-                                    setShowDatePicker(true);
-                                }}
-                                activeOpacity={0.8}
-                            >
-                                <View style={bookAppointmentStyles.selectButtonContent}>
-                                    <Text style={bookAppointmentStyles.placeholderText}>
-                                        📅 Select appointment date
-                                    </Text>
-                                    <Text style={bookAppointmentStyles.selectButtonIcon}>▼</Text>
-                                </View>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                    <View style={bookAppointmentStyles.section}>
-                        <Text style={bookAppointmentStyles.sectionTitle}>4. Select Time Slot</Text>
-
-                        {!formStates.selectedDate ? (
-                            <View style={bookAppointmentStyles.emptyState}>
-                                <Text style={bookAppointmentStyles.emptyStateText}>No Date Selected</Text>
-                                <Text style={bookAppointmentStyles.emptyStateSubtext}>
-                                    Please select an available date above to view available time slots.
-                                </Text>
-                            </View>
-                        ) : timingsPending ? (
-                            <BookingSlotsSkeleton />
-                        ) : !timingsData?.slots || timingsData.slots.length === 0 ? (
-                            <View style={bookAppointmentStyles.emptyState}>
-                                <Text style={bookAppointmentStyles.emptyStateText}>No Slots Available</Text>
-                                <Text style={bookAppointmentStyles.emptyStateSubtext}>
-                                    No appointment time slots are configured for this date. Please choose another
-                                    date.
-                                </Text>
-                            </View>
-                        ) : (
-                            <>
-                                <View style={bookAppointmentStyles.legendRow}>
-                                    <View style={bookAppointmentStyles.legendItem}>
-                                        <View
-                                            style={[
-                                                bookAppointmentStyles.legendDot,
-                                                { backgroundColor: '#EBEBEB', borderColor: '#C8D8D8' },
-                                            ]}
-                                        />
-                                        <Text style={bookAppointmentStyles.legendText}>Available</Text>
-                                    </View>
-                                    <View style={bookAppointmentStyles.legendItem}>
-                                        <View
-                                            style={[
-                                                bookAppointmentStyles.legendDot,
-                                                { backgroundColor: '#FFFFFF', borderColor: theme.colors.primary },
-                                            ]}
-                                        />
-                                        <Text style={bookAppointmentStyles.legendText}>Selected</Text>
-                                    </View>
-                                    <View style={bookAppointmentStyles.legendItem}>
-                                        <View
-                                            style={[
-                                                bookAppointmentStyles.legendDot,
-                                                { backgroundColor: '#EBEBEB', opacity: 0.4, borderColor: '#8E9A97' },
-                                            ]}
-                                        />
-                                        <Text style={bookAppointmentStyles.legendText}>Booked / Past</Text>
-                                    </View>
-                                </View>
-
-                                {formStates.selectedSlots && formStates.selectedSlots.length > 0 && (
-                                    <View style={bookAppointmentStyles.slotSummaryBox}>
-                                        <Text style={bookAppointmentStyles.slotSummaryText}>
-                                            <Text style={{ fontWeight: '600' }}>
-                                                {formStates.selectedSlots.length} Slot
-                                                {formStates.selectedSlots.length > 1 ? 's' : ''} Selected
-                                            </Text>{' '}
-                                            ({formatTime12h(formStates.selectedSlots[0].start)} →{' '}
-                                            {formatTime12h(
-                                                formStates.selectedSlots[formStates.selectedSlots.length - 1].end
-                                            )}
-                                            )
-                                        </Text>
-                                        <TouchableOpacity onPress={() => updateFormState({ selectedSlots: null })}>
-                                            <Text style={bookAppointmentStyles.slotClearText}>Clear</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                )}
-
-                                {periodWiseSlots &&
-                                    PeriodSeries.map(period => {
-                                        const periodSlots = periodWiseSlots[period] || [];
-                                        if (periodSlots.length === 0) return null;
-                                        return (
-                                            <View key={period} style={bookAppointmentStyles.periodSection}>
-                                                <View style={bookAppointmentStyles.periodHeader}>
-                                                    <PeriodIcon period={period} />
-                                                    <Text style={bookAppointmentStyles.periodTitle}>
-                                                        {period.charAt(0) + period.slice(1).toLowerCase()}
-                                                    </Text>
-                                                </View>
-
-                                                <View style={bookAppointmentStyles.slotsGrid}>
-                                                    {periodSlots.map((slot, index) => {
-                                                        const currentSelected = formStates.selectedSlots || [];
-                                                        const isSelected = currentSelected.some(
-                                                            selectedSlot => selectedSlot.start === slot.start
-                                                        );
-                                                        const isBooked = slot.booked;
-                                                        return (
-                                                            <TouchableOpacity
-                                                                key={index}
-                                                                style={[
-                                                                    bookAppointmentStyles.slotButton,
-                                                                    isBooked && bookAppointmentStyles.slotButtonBooked,
-                                                                    isSelected && bookAppointmentStyles.slotButtonSelected,
-                                                                ]}
-                                                                onPress={() => handleSlotPress(slot, currentSelected)}
-                                                                disabled={isBooked}
-                                                                activeOpacity={0.7}
-                                                            >
-                                                                <Text
-                                                                    style={[
-                                                                        bookAppointmentStyles.slotButtonText,
-                                                                        isBooked && bookAppointmentStyles.slotButtonTextBooked,
-                                                                        isSelected && bookAppointmentStyles.slotButtonTextSelected,
-                                                                    ]}
-                                                                >
-                                                                    {slot.displayTime}
-                                                                </Text>
-                                                            </TouchableOpacity>
-                                                        );
-                                                    })}
-                                                </View>
-                                            </View>
-                                        );
-                                    })}
-                            </>
-                        )}
-                    </View>
-
-                    <View style={bookAppointmentStyles.section}>
-                        <Text style={bookAppointmentStyles.sectionTitle}>5. Appointment Fee</Text>
-                        <View style={bookAppointmentStyles.feeDisplay}>
-                            <Text style={bookAppointmentStyles.feeLabel}>Consultation Fee</Text>
-                            <Text style={bookAppointmentStyles.feeAmount}>₹{totalAmount || 0}</Text>
-                        </View>
-                        <Text style={bookAppointmentStyles.feeNote}>In-clinic consultation fee</Text>
-                    </View>
-
-                    <View style={bookAppointmentStyles.section}>
-                        <Text style={bookAppointmentStyles.sectionTitle}>Reason for Visit (Optional)</Text>
-                        <TextInput
-                            style={bookAppointmentStyles.input}
-                            placeholder="e.g., Follow-up, Routine Check-up"
-                            placeholderTextColor="#94A3B8"
-                            value={formStates.reason}
-                            onChangeText={text => updateFormState({ reason: text })}
-                        />
-                    </View>
-
-                    <TouchableOpacity
-                        style={[
-                            bookAppointmentStyles.bookButton,
-                            (!selectedPatient?.patientGenId || bookApptPending) &&
-                            bookAppointmentStyles.bookButtonDisabled,
-                        ]}
-                        onPress={handleBookAppointment}
-                        activeOpacity={0.85}
-                        disabled={!selectedPatient?.patientGenId || bookApptPending}
+                <KeyboardAvoidingView
+                    style={bookAppointmentStyles.keyboardView}
+                    behavior="padding"
+                    keyboardVerticalOffset={keyboardOffset}
+                >
+                    <ScrollView
+                        style={bookAppointmentStyles.scrollView}
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                colors={[theme.colors.primary]}
+                                tintColor={theme.colors.primary}
+                            />
+                        }
                     >
-                        {bookApptPending ? (
-                            <ActivityIndicator color="#FFFFFF" size="small" />
-                        ) : (
-                            <Text style={bookAppointmentStyles.bookButtonText}>Book Appointment</Text>
-                        )}
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
+                        <View style={bookAppointmentStyles.content}>
+                            <View style={bookAppointmentStyles.section}>
+                                <Text style={bookAppointmentStyles.sectionTitle}>1. Select Patient</Text>
+                                <TouchableOpacity
+                                    style={bookAppointmentStyles.selectButton}
+                                    onPress={() => setShowPatientPicker(true)}
+                                    activeOpacity={0.8}
+                                >
+                                    <View style={bookAppointmentStyles.selectButtonContent}>
+                                        {selectedPatient ? (
+                                            <Text style={bookAppointmentStyles.selectedText}>
+                                                {selectedPatient.name} ({selectedPatient.patientGenId})
+                                            </Text>
+                                        ) : (
+                                            <Text style={bookAppointmentStyles.placeholderText}>Select a patient</Text>
+                                        )}
+                                        <Text style={bookAppointmentStyles.selectButtonIcon}>▼</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                {selectedPatient?.patientGenId && (
+                                    <View style={bookAppointmentStyles.patientInfo}>
+                                        <Text style={bookAppointmentStyles.patientInfoText}>
+                                            👤 {selectedPatient.name}, {capitalize(selectedPatient?.gender || '')}
+                                        </Text>
+                                        <Text style={bookAppointmentStyles.patientInfoText}>
+                                            📞 {selectedPatient.Phone}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+
+                            <View style={bookAppointmentStyles.section}>
+                                <Text style={bookAppointmentStyles.sectionTitle}>2. Consultation Type</Text>
+                                <View style={bookAppointmentStyles.typeRow}>
+                                    <TouchableOpacity
+                                        style={[
+                                            bookAppointmentStyles.typeButton,
+                                            bookAppointmentStyles.typeButtonActive,
+                                        ]}
+                                        onPress={() => {
+                                            updateFormState({
+                                                consultationType: 'clinic',
+                                                selectedSlots: null,
+                                            });
+                                        }}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text style={bookAppointmentStyles.typeButtonIcon}>🏥</Text>
+                                        <Text
+                                            style={[
+                                                bookAppointmentStyles.typeButtonText,
+                                                bookAppointmentStyles.typeButtonTextActive,
+                                            ]}
+                                        >
+                                            In-Clinic
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
+                            <View style={bookAppointmentStyles.section}>
+                                <Text style={bookAppointmentStyles.sectionTitle}>3. Select Date</Text>
+                                {availableDatesPending ? (
+                                    <TouchableOpacity style={bookAppointmentStyles.selectButton} disabled>
+                                        <View style={bookAppointmentStyles.selectButtonContent}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                                <ActivityIndicator size="small" color={theme.colors.primary} />
+                                                <Text style={bookAppointmentStyles.placeholderText}>
+                                                    Loading available dates...
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                ) : formStates.selectedDate && dateDetails ? (
+                                    <TouchableOpacity
+                                        style={bookAppointmentStyles.dateSelectedCard}
+                                        onPress={() => setShowDatePicker(true)}
+                                        activeOpacity={0.85}
+                                    >
+                                        <View style={bookAppointmentStyles.dateLeafBadge}>
+                                            <Text style={bookAppointmentStyles.dateLeafDay}>{dateDetails.dayNum}</Text>
+                                            <Text style={bookAppointmentStyles.dateLeafMonth}>
+                                                {dateDetails.monthStr}
+                                            </Text>
+                                        </View>
+
+                                        <View style={bookAppointmentStyles.dateDetailsWrap}>
+                                            <Text style={bookAppointmentStyles.dateDetailsFull}>
+                                                {dateDetails.fullDate}
+                                            </Text>
+                                            <Text style={bookAppointmentStyles.dateDetailsRel}>
+                                                {dateDetails.relativeLabel} • In-Clinic Consultation
+                                            </Text>
+                                        </View>
+
+                                        <View style={bookAppointmentStyles.dateChangeBtn}>
+                                            <Text style={bookAppointmentStyles.dateChangeBtnText}>Change</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={bookAppointmentStyles.selectButton}
+                                        onPress={() => {
+                                            if (!selectedPatient?.patientGenId)
+                                                return showErrorToast('Select Patient First');
+                                            setShowDatePicker(true);
+                                        }}
+                                        activeOpacity={0.8}
+                                    >
+                                        <View style={bookAppointmentStyles.selectButtonContent}>
+                                            <Text style={bookAppointmentStyles.placeholderText}>
+                                                📅 Select appointment date
+                                            </Text>
+                                            <Text style={bookAppointmentStyles.selectButtonIcon}>▼</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                            <View style={bookAppointmentStyles.section}>
+                                <Text style={bookAppointmentStyles.sectionTitle}>4. Select Time Slot</Text>
+
+                                {!formStates.selectedDate ? (
+                                    <View style={bookAppointmentStyles.emptyState}>
+                                        <Text style={bookAppointmentStyles.emptyStateText}>No Date Selected</Text>
+                                        <Text style={bookAppointmentStyles.emptyStateSubtext}>
+                                            Please select an available date above to view available time slots.
+                                        </Text>
+                                    </View>
+                                ) : timingsPending ? (
+                                    <BookingSlotsSkeleton />
+                                ) : !timingsData?.slots || timingsData.slots.length === 0 ? (
+                                    <View style={bookAppointmentStyles.emptyState}>
+                                        <Text style={bookAppointmentStyles.emptyStateText}>No Slots Available</Text>
+                                        <Text style={bookAppointmentStyles.emptyStateSubtext}>
+                                            No appointment time slots are configured for this date. Please choose another
+                                            date.
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    <>
+                                        <View style={bookAppointmentStyles.legendRow}>
+                                            <View style={bookAppointmentStyles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        bookAppointmentStyles.legendDot,
+                                                        { backgroundColor: '#EBEBEB', borderColor: '#C8D8D8' },
+                                                    ]}
+                                                />
+                                                <Text style={bookAppointmentStyles.legendText}>Available</Text>
+                                            </View>
+                                            <View style={bookAppointmentStyles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        bookAppointmentStyles.legendDot,
+                                                        { backgroundColor: '#FFFFFF', borderColor: theme.colors.primary },
+                                                    ]}
+                                                />
+                                                <Text style={bookAppointmentStyles.legendText}>Selected</Text>
+                                            </View>
+                                            <View style={bookAppointmentStyles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        bookAppointmentStyles.legendDot,
+                                                        { backgroundColor: '#EBEBEB', opacity: 0.4, borderColor: '#8E9A97' },
+                                                    ]}
+                                                />
+                                                <Text style={bookAppointmentStyles.legendText}>Booked / Past</Text>
+                                            </View>
+                                        </View>
+
+                                        {formStates.selectedSlots && formStates.selectedSlots.length > 0 && (
+                                            <View style={bookAppointmentStyles.slotSummaryBox}>
+                                                <Text style={bookAppointmentStyles.slotSummaryText}>
+                                                    <Text style={{ fontWeight: '600' }}>
+                                                        {formStates.selectedSlots.length} Slot
+                                                        {formStates.selectedSlots.length > 1 ? 's' : ''} Selected
+                                                    </Text>{' '}
+                                                    ({formatTime12h(formStates.selectedSlots[0].start)} →{' '}
+                                                    {formatTime12h(
+                                                        formStates.selectedSlots[formStates.selectedSlots.length - 1].end
+                                                    )}
+                                                    )
+                                                </Text>
+                                                <TouchableOpacity onPress={() => updateFormState({ selectedSlots: null })}>
+                                                    <Text style={bookAppointmentStyles.slotClearText}>Clear</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+
+                                        {periodWiseSlots &&
+                                            PeriodSeries.map(period => {
+                                                const periodSlots = periodWiseSlots[period] || [];
+                                                if (periodSlots.length === 0) return null;
+                                                return (
+                                                    <View key={period} style={bookAppointmentStyles.periodSection}>
+                                                        <View style={bookAppointmentStyles.periodHeader}>
+                                                            <PeriodIcon period={period} />
+                                                            <Text style={bookAppointmentStyles.periodTitle}>
+                                                                {period.charAt(0) + period.slice(1).toLowerCase()}
+                                                            </Text>
+                                                        </View>
+
+                                                        <View style={bookAppointmentStyles.slotsGrid}>
+                                                            {periodSlots.map((slot, index) => {
+                                                                const currentSelected = formStates.selectedSlots || [];
+                                                                const isSelected = currentSelected.some(
+                                                                    selectedSlot => selectedSlot.start === slot.start
+                                                                );
+                                                                const isBooked = slot.booked;
+                                                                return (
+                                                                    <TouchableOpacity
+                                                                        key={index}
+                                                                        style={[
+                                                                            bookAppointmentStyles.slotButton,
+                                                                            isBooked && bookAppointmentStyles.slotButtonBooked,
+                                                                            isSelected && bookAppointmentStyles.slotButtonSelected,
+                                                                        ]}
+                                                                        onPress={() => handleSlotPress(slot, currentSelected)}
+                                                                        disabled={isBooked}
+                                                                        activeOpacity={0.7}
+                                                                    >
+                                                                        <Text
+                                                                            style={[
+                                                                                bookAppointmentStyles.slotButtonText,
+                                                                                isBooked && bookAppointmentStyles.slotButtonTextBooked,
+                                                                                isSelected && bookAppointmentStyles.slotButtonTextSelected,
+                                                                            ]}
+                                                                        >
+                                                                            {slot.displayTime}
+                                                                        </Text>
+                                                                    </TouchableOpacity>
+                                                                );
+                                                            })}
+                                                        </View>
+                                                    </View>
+                                                );
+                                            })}
+                                    </>
+                                )}
+                            </View>
+
+                            <View style={bookAppointmentStyles.section}>
+                                <Text style={bookAppointmentStyles.sectionTitle}>5. Appointment Fee</Text>
+                                <View style={bookAppointmentStyles.feeDisplay}>
+                                    <Text style={bookAppointmentStyles.feeLabel}>Consultation Fee</Text>
+                                    <Text style={bookAppointmentStyles.feeAmount}>₹{totalAmount || 0}</Text>
+                                </View>
+                                <Text style={bookAppointmentStyles.feeNote}>In-clinic consultation fee</Text>
+                            </View>
+
+                            <View style={bookAppointmentStyles.section}>
+                                <Text style={bookAppointmentStyles.sectionTitle}>Reason for Visit (Optional)</Text>
+                                <TextInput
+                                    style={bookAppointmentStyles.input}
+                                    placeholder="e.g., Follow-up, Routine Check-up"
+                                    placeholderTextColor="#94A3B8"
+                                    value={formStates.reason}
+                                    onChangeText={text => updateFormState({ reason: text })}
+                                />
+                            </View>
+
+                            <TouchableOpacity
+                                style={[
+                                    bookAppointmentStyles.bookButton,
+                                    (!selectedPatient?.patientGenId || bookApptPending) &&
+                                    bookAppointmentStyles.bookButtonDisabled,
+                                ]}
+                                onPress={handleBookAppointment}
+                                activeOpacity={0.85}
+                                disabled={!selectedPatient?.patientGenId || bookApptPending}
+                            >
+                                {bookApptPending ? (
+                                    <ActivityIndicator color="#FFFFFF" size="small" />
+                                ) : (
+                                    <Text style={bookAppointmentStyles.bookButtonText}>Book Appointment</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </View>
 
             <BookingPatientSelectModal
                 visible={showPatientPicker}

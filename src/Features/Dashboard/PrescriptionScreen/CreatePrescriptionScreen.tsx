@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
     KeyboardAvoidingView,
-    Platform,
     ScrollView,
     Text,
     TouchableOpacity,
@@ -115,6 +114,10 @@ const defaultFormValues: TCreatePrescriptionFormValues = {
 
 export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> = ({ route }) => {
     const navigation = useNavigation();
+    // KeyboardAvoidingView measures itself relative to its parent, which sits below the
+    // SafeAreaWrapper header — offset by the form's on-screen top so the padding is correct
+    const formContainerRef = useRef<React.ComponentRef<typeof View>>(null);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
     const patientId = route?.params?.patientId;
     const prescriptionId = route?.params?.prescriptionId;
     const [activeStep, setActiveStep] = useState<PrescriptionStep>('clinical');
@@ -746,9 +749,17 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                 </ScrollView>
             ) : (
                 <FormProvider {...methods}>
+                    <View
+                        ref={formContainerRef}
+                        style={createPrescriptionStyles.keyboardView}
+                        onLayout={() =>
+                            formContainerRef.current?.measureInWindow((_x, y) => setKeyboardOffset(y))
+                        }
+                    >
                     <KeyboardAvoidingView
-                        style={{ flex: 1 }}
-                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        style={createPrescriptionStyles.keyboardView}
+                        behavior="padding"
+                        keyboardVerticalOffset={keyboardOffset}
                     >
                         <View style={createPrescriptionStyles.stepBarWrapper}>
                             <ScrollView
@@ -870,6 +881,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                             )}
                         </View>
                     </KeyboardAvoidingView>
+                    </View>
                 </FormProvider>
             )}
         </SafeAreaWrapper>

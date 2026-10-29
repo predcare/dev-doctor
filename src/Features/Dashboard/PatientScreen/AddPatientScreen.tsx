@@ -1,8 +1,15 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigation } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { queryClient } from '../../../components/providers/ReactQueryProvider';
 import {
     useCreateNewPatient,
@@ -30,6 +37,10 @@ export const AddPatientScreen: React.FC = () => {
     const navigation = useNavigation();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    // KeyboardAvoidingView measures itself relative to its parent, which sits below the
+    // SafeAreaWrapper header — offset by the form's on-screen top so the padding is correct
+    const formContainerRef = useRef<React.ComponentRef<typeof View>>(null);
+    const [keyboardOffset, setKeyboardOffset] = useState(0);
     const { userData } = useAuthStore(state => state);
     const { hideLoader, showLoader } = useLoadingStore(state => state);
 
@@ -242,7 +253,18 @@ export const AddPatientScreen: React.FC = () => {
                 />
             }
         >
-            <View style={AddPatientStyles.outer}>
+            <View
+                ref={formContainerRef}
+                style={AddPatientStyles.outer}
+                onLayout={() =>
+                    formContainerRef.current?.measureInWindow((_x, y) => setKeyboardOffset(y))
+                }
+            >
+            <KeyboardAvoidingView
+                style={AddPatientStyles.outer}
+                behavior="padding"
+                keyboardVerticalOffset={keyboardOffset}
+            >
                 {selectionMode === 'create_new' && (
                     <View style={AddPatientStyles.stepWrap}>
                         <StepIndicator step={step} />
@@ -348,6 +370,7 @@ export const AddPatientScreen: React.FC = () => {
 
                     <View style={{ height: 36 }} />
                 </ScrollView>
+            </KeyboardAvoidingView>
             </View>
         </SafeAreaWrapper>
     );

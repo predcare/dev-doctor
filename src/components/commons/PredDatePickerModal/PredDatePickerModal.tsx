@@ -27,8 +27,9 @@ export interface PredDatePickerModalProps {
 }
 
 const ITEM_HEIGHT = 44;
-const VISIBLE_ITEMS = 3;
+const VISIBLE_ITEMS = 5; // must be odd so one row sits in the middle
 const WHEEL_HEIGHT = ITEM_HEIGHT * VISIBLE_ITEMS;
+const WHEEL_PADDING = ITEM_HEIGHT * Math.floor(VISIBLE_ITEMS / 2);
 
 const MONTH_NAMES = [
   'January',
@@ -119,9 +120,12 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
         keyExtractor={(_, i) => i.toString()}
         showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
-        decelerationRate="fast"
-        disableIntervalMomentum
+        // Normal deceleration lets a flick travel across many rows before snapping
+        decelerationRate="normal"
         removeClippedSubviews={false}
+        initialNumToRender={20}
+        maxToRenderPerBatch={30}
+        windowSize={11}
         scrollEventThrottle={16}
         onScroll={handleScroll}
         onScrollEndDrag={handleScrollEndDrag}
@@ -131,9 +135,7 @@ function WheelColumn<T>({ data, selectedIndex, onSelect, renderLabel }: WheelCol
           offset: ITEM_HEIGHT * index,
           index,
         })}
-        contentContainerStyle={{
-          paddingVertical: ITEM_HEIGHT, // Center single active item in middle row
-        }}
+        contentContainerStyle={PredDatePickerstyles.wheelContent}
         renderItem={({ item, index }) => {
           const isSelected = index === highlightIndex;
           return (
@@ -381,7 +383,7 @@ export const PredDatePickerstyles = StyleSheet.create({
     position: 'absolute',
     left: 4,
     right: 4,
-    top: ITEM_HEIGHT,
+    top: WHEEL_PADDING,
     height: ITEM_HEIGHT,
     backgroundColor: theme.colors.primarySoft || '#F0FDFA',
     borderRadius: 12,
@@ -391,6 +393,9 @@ export const PredDatePickerstyles = StyleSheet.create({
     flexDirection: 'row',
     height: WHEEL_HEIGHT,
     zIndex: 1,
+  },
+  wheelContent: {
+    paddingVertical: WHEEL_PADDING, // lets the first/last item reach the middle row
   },
   columnContainer: {
     flex: 1,
