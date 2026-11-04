@@ -71,7 +71,7 @@ export type RootStackParamList = {
       }
     | undefined;
   Appointments: undefined;
-  AppointmentDetails: { appointmentId?: string } | undefined;
+  AppointmentDetails: { appointmentId?: string; isComingFromNotification?: boolean } | undefined;
   PrescriptionList: { user?: any } | undefined;
   Prescription: undefined;
   ViewPrescription:

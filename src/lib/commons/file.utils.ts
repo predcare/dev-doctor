@@ -1,4 +1,4 @@
-import { NativeModules, PermissionsAndroid, Platform } from 'react-native';
+import { NativeModules, PermissionsAndroid, Platform, Share } from 'react-native';
 import * as FileViewerModule from 'react-native-file-viewer';
 import * as RNFSModule from 'react-native-fs';
 import { showErrorToast, showSuccessToast } from './toast.utils';
@@ -88,6 +88,41 @@ export const sanitizeFilename = (filename: string, defaultName = 'Document.pdf')
   }
   const safeName = name.replace(/[^A-Za-z0-9_-]/g, '_');
   return `${safeName}${ext || '.pdf'}`;
+};
+
+/**
+ * Safely opens a file in the system default viewer with an automatic fallback
+ * to the native React Native Share sheet (supporting "Save to Files" on iOS).
+ */
+export const openOrShareFile = async (
+  filePath: string,
+  title: string = 'Document'
+): Promise<boolean> => {
+  const FileViewer = getFileViewer();
+  if (FileViewer && typeof FileViewer.open === 'function') {
+    try {
+      await FileViewer.open(filePath, {
+        showOpenWithDialog: true,
+        showAppsSuggestions: true,
+      });
+      return true;
+    } catch (viewerErr) {
+      console.log('[file.utils] FileViewer failed, attempting Share fallback:', viewerErr);
+    }
+  }
+
+  try {
+    const shareUrl = Platform.OS === 'ios' ? filePath : `file://${filePath}`;
+    await Share.share({
+      title,
+      url: shareUrl,
+      message: Platform.OS === 'android' ? title : undefined,
+    });
+    return true;
+  } catch (shareErr) {
+    console.log('[file.utils] Share fallback error:', shareErr);
+    return false;
+  }
 };
 
 export const saveOrOpenFile = async ({

@@ -29,6 +29,8 @@ import { showErrorToast } from '../../lib/commons/toast.utils';
 import { LoginFormSchema, TLoginFormSchemaType } from '../../lib/schemas/auth.schema';
 import { Assets } from '../../resources/assets';
 import { AppRoute, type LoginScreenNavigationProp, type LoginScreenRouteProp } from '../../route';
+import { getDeviceInfo } from '../../hooks/commons/useDeviceInfo';
+import { syncPushToken } from '../../services/calls/deviceSync';
 import { loginStyles } from '../../styled/LoginScreen.styled';
 import theme from '../../styled/theme.styled';
 import { UserRoles } from '../../typescripts/enums';
@@ -143,8 +145,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
     if (!identifier) return;
 
     const cleanIdentifier = identifier.trim();
-    const activeDeviceId = '';
-    const activeDeviceName = '';
+    const deviceInfo = await getDeviceInfo();
 
     const payload: ILoginVerifyOtpPayload = {
       ...(loginMode === 'email'
@@ -152,12 +153,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
         : { phone_number: cleanIdentifier }),
       otp: _data.otp,
       user_type: UserRoles.DOCTOR,
-      device_id: activeDeviceId,
-      device_name: activeDeviceName,
+      device_id: deviceInfo.device_id,
+      device_name: deviceInfo.device_name,
       platform: Platform.OS as 'android' | 'ios',
-      fcm_token: '',
-      os_version: '',
-      app_version: '1.0.0',
+      fcm_token: deviceInfo.fcm_token,
+      os_version: deviceInfo.os_version,
+      app_version: deviceInfo.app_version,
     };
 
     verifyOtpMutation(payload, {
@@ -173,6 +174,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
               if (profileRes?.data) {
                 doctorData = profileRes?.data;
                 setUserData(profileRes?.data);
+                // Login only sends the FCM token; this also sends the iOS VoIP token.
+                syncPushToken();
               }
             } catch (err) {
               console.error('Failed to fetch doctor profile after login:', err);
@@ -209,7 +212,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
   return (
     <SafeAreaWrapper style={loginStyles.safeArea}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         style={loginStyles.keyboardAvoid}
       >
         <ScrollView
@@ -218,7 +221,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation: propNaviga
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          automaticallyAdjustKeyboardInsets={true}
           bounces={true}
         >
           <View style={loginStyles.logoContainer}>

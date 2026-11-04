@@ -55,7 +55,11 @@ export const useAuthStore = create<TAuthState>()(
           hasActiveSubscription: false,
           hasActiveClinic: false,
         });
-        await clearStorageExcept([STORAGE_KEYS.FCM_TOKEN]);
+        await clearStorageExcept([
+          STORAGE_KEYS.FCM_TOKEN,
+          STORAGE_KEYS.DEVICE_ID,
+          STORAGE_KEYS.VOIP_TOKEN,
+        ]);
       },
     }),
     {

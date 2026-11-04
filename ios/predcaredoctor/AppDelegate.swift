@@ -2,6 +2,9 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import Firebase
+import RNCallKeep
+import RNVoipPushNotification
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,6 +18,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    FirebaseApp.configure()
+
+    // CallKit for incoming patient calls. Set up natively so a VoIP push can show a call before JS
+    // starts; CallKeep's JS setup() isn't called on iOS.
+    RNCallKeep.setup([
+      "appName": "PRED Doctor",
+      "supportsVideo": false,
+      "includesCallsInRecents": false,
+      "maximumCallGroups": "1",
+      "maximumCallsPerCallGroup": "1",
+      "ringtoneSound": "ringtone.caf",
+      // Transparent icon: without one, CallKit shows the app icon on the call screen.
+      "imageName": "CallKitBlank",
+    ])
+    // Registers PushKit with this AppDelegate as its delegate (see AppDelegate+PushKit.swift).
+    RNVoipPushNotificationManager.voipRegistration()
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()

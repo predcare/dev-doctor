@@ -6,6 +6,10 @@ import SafeAreaWrapper from '../../Layout/SafeAreaWrapper';
 import { getItem, STORAGE_KEYS } from '../../lib/commons/asyncStorage';
 import { consumeTargetRoute, resetAndNavigate, resetToLogin, resetToMainTabs } from '../../lib/commons/navigation.utils';
 import { AppRoute, SplashScreenNavigationProp, SplashScreenRouteProp } from '../../route';
+import { consumePendingAnswer, replayInitialCallEvents } from '../../services/calls/callService';
+import { syncPushToken } from '../../services/calls/deviceSync';
+import { joinIncomingCall } from '../../services/calls/joinIncomingCall';
+import { processInitialNotification } from '../../services/notifications/notificationDispatcher';
 import { Splashstyles } from '../../styled/SplashScreen.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
@@ -72,6 +76,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
 
         if (res?.data) {
           setUserData(res.data);
+          // Keeps the backend's FCM token current, so call pushes reach this phone.
+          syncPushToken();
           return res.data;
         } else {
           logout();
@@ -87,6 +93,12 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
     const startAuthentication = async () => {
       if (!isMounted) return;
       const doctorData = await authenticateAndLoad();
+      // A tap that opened the app sets the target route; a call tap sets the pending answer.
+      await processInitialNotification();
+      // Answers made on CallKit before the app's JS was ready.
+      await replayInitialCallEvents();
+      // Set when the app was opened by answering an incoming call.
+      const pendingCall = consumePendingAnswer();
       // Move immediately after authentication/API completes
       if (onFinish) {
         onFinish();
@@ -102,6 +114,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
               navigation?.reset({ index: 0, routes: [target as any] });
             } else {
               resetToMainTabs(navigation);
+            }
+            // The doctor answered a call before the app had started.
+            if (pendingCall) {
+              joinIncomingCall(pendingCall.appointmentId, pendingCall.callerName);
             }
           } else {
             resetAndNavigate(navigation, AppRoute.POLICY_ACCEPTANCE);

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import {
   SafeAreaProvider
@@ -18,9 +19,35 @@ import HideDuringAndroidPip from './src/components/meeting/HideDuringAndroidPip'
 import MeetingSessionHost from './src/components/meeting/MeetingSessionHost';
 import ReactQueryProvider from './src/components/providers/ReactQueryProvider';
 import AppNavigator from './src/navigation/AppNavigator';
+import NotificationEventListener from './src/services/notifications/components/NotificationEventListener';
+import { startCallKeepListeners } from './src/services/calls/callService';
+import { startVoipToken } from './src/services/calls/voipToken';
+import { setupPush } from './src/services/notifications/push/pushSetup';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+
+  useEffect(() => {
+    let cancelled = false;
+    let unsubscribe: (() => void) | undefined;
+
+    setupPush()
+      .then(stopListening => {
+        if (cancelled) stopListening();
+        else unsubscribe = stopListening;
+      })
+      .catch(err => console.warn('[Push] Setup failed:', err));
+
+    // Answer and Decline on the system call screen (also registered in index.js for background JS).
+    startCallKeepListeners().catch(err => console.warn('[CallKeep] Listener setup failed:', err));
+    // iOS: PushKit VoIP token for CallKit when the app is closed.
+    startVoipToken();
+
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
+  }, []);
 
   return (
     <ReactQueryProvider>
@@ -32,6 +59,7 @@ function App() {
         <AppNavigator />
         <MeetingSessionHost />
         <EventListener />
+        <NotificationEventListener />
         <HideDuringAndroidPip>
           <GlobalIncomingCallBanner />
           <GlobalOfflineBanner />

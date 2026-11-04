@@ -31,6 +31,12 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- ============================================
+         INCOMING CALL RINGING (react-native-callkeep, self-managed mode)
+    ============================================= -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+    <!-- MANAGE_OWN_CALLS comes from CallKeep's manifest; self-managed mode needs nothing to be asked. -->
+
+    <!-- ============================================
          BLUETOOTH (For headsets and audio routing)
     ============================================= -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
@@ -104,5 +110,28 @@
         android:exported="false"
         android:foregroundServiceType="camera|microphone"
         tools:replace="android:foregroundServiceType" />
+    <!-- ============================================
+         INCOMING CALL CONNECTION SERVICE (react-native-callkeep)
+    ============================================= -->
+    <service
+        android:name="io.wazo.callkeep.VoiceConnectionService"
+        android:label="PRED Doctor"
+        android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+        android:foregroundServiceType="phoneCall|microphone|camera"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.telecom.ConnectionService" />
+        </intent-filter>
+    </service>
+    <!-- ============================================
+         PUSH NOTIFICATION DEFAULTS (FCM)
+    ============================================= -->
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_channel_id"
+        android:value="default_channel_id"
+        tools:replace="android:value" />
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@mipmap/ic_launcher" />
     </application>
 </manifest>

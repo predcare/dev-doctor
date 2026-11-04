@@ -765,6 +765,7 @@ export const CreatePrescriptionScreen: React.FC<CreatePrescriptionScreenProps> =
                             <ScrollView
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
+                                keyboardShouldPersistTaps="handled"
                                 contentContainerStyle={createPrescriptionStyles.stepBarContent}
                             >
                                 {PrescriptionSteps.map(step => {

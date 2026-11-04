@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "1002044339898",
+    "project_id": "predcare-ba1f9",
+    "storage_bucket": "predcare-ba1f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002044339898:android:635d80b4981944c9997483",
+        "android_client_info": {
+          "package_name": "com.predcaredoctor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1002044339898-ktmkelboqj55sbvfkf9blkabegcgmfos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX1P-tN8Q6aBCkVLMwINSFfORJ2mcIMhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002044339898-ktmkelboqj55sbvfkf9blkabegcgmfos.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1002044339898-eb1e61grhlq7s9jm0obppuhqj1nb8dif.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.predcaredoctor"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002044339898:android:aec395ebb034fe68997483",
+        "android_client_info": {
+          "package_name": "com.predcarepatient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1002044339898-1l53ifhbd8qpf5o9fbr1iq1ho3371hek.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.predcarepatient",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1002044339898-tp1140qm4d52p0ffi78ba1e3793t121k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.predcarepatient",
+            "certificate_hash": "6c0317e76b590f71daed5a32c3213c4390c9aadf"
+          }
+        },
+        {
+          "client_id": "1002044339898-ktmkelboqj55sbvfkf9blkabegcgmfos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX1P-tN8Q6aBCkVLMwINSFfORJ2mcIMhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002044339898-ktmkelboqj55sbvfkf9blkabegcgmfos.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1002044339898-eb1e61grhlq7s9jm0obppuhqj1nb8dif.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.predcaredoctor"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -104,6 +104,7 @@ export const endpoints = {
     delete: '/notifications/',
     counts: `/notifications/count`,
     clearNotify: `/notifications/clear-all`,
+    registerToken: '/notifications/register-token',
   },
   homes: {
     stats: (doctorId: string | number) => `/doctor/appointments/doctor/${doctorId}/stats`,
