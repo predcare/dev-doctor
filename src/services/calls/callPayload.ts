@@ -3,15 +3,13 @@ import type { CallCancel, IncomingCall, PushData } from './call.types';
 export const INCOMING_CALL_TYPE = 'INCOMING_CALL';
 export const CALL_CANCELLED_TYPE = 'CALL_CANCELLED';
 const DEFAULT_TIMEOUT_S = 30;
-// The doctor app is rung by patients.
-const CALLER_ROLE = 'patient';
 
 // Reads the backend push data (all values are strings). Also reads back the data saved on the
 // Android ring notification, which uses the same field names.
 export const callFromPush = (data: PushData): IncomingCall | null => {
   if (data?.type !== INCOMING_CALL_TYPE || !data.uuid || !data.appointment_id) return null;
   // The doctor app only takes calls from patients.
-  if (data.caller_role && data.caller_role !== CALLER_ROLE) return null;
+  if (data.caller_role && data.caller_role !== 'patient') return null;
 
   const startedAt = Number(data.timestamp) || Date.now();
   const timeoutMs = (Number(data.timeout_seconds) || DEFAULT_TIMEOUT_S) * 1000;
@@ -41,7 +39,7 @@ export const callToData = (call: IncomingCall): Record<string, string> => ({
   appointment_id: call.appointmentId,
   meeting_id: call.meetingId,
   caller_name: call.callerName,
-  caller_role: CALLER_ROLE,
+  caller_role: 'patient',
   caller_image: call.callerImage,
   timestamp: String(call.expiresAtMs - DEFAULT_TIMEOUT_S * 1000),
   timeout_seconds: String(DEFAULT_TIMEOUT_S),
