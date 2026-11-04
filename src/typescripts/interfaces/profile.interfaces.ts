@@ -51,6 +51,7 @@ export interface IMyProfileDoc {
   clinic_location: IClinicLocation;
   location: ILocation;
   has_accepted_policies?: boolean;
+  wallet_credit: number | number;
   parent_user_id: any;
   relation: any;
   is_dependent: boolean;
@@ -81,7 +82,7 @@ export interface IMyProfileDoc {
   doctor_profile_image: any;
   certificates: any;
   clinic: IMyClinic;
-  subscription: IMySubscription;
+  subscription?: IMySubscription;
 }
 
 export interface IPatientEMRDoc {

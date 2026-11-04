@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { formatDate } from '../../../../lib/commons/common.utils';
+import { _toTitleCase, formatDate } from '../../../../lib/commons/common.utils';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import theme from '../../../../styled/theme.styled';
 import { useAuthStore } from '../../../../zustand/stores/useAuthStore';
@@ -47,7 +47,7 @@ export const SubscriptionPlanBlock = React.memo<SubscriptionPlanBlockProps>(
           <View style={profileStyles.planHeaderRow}>
             <Text style={profileStyles.planName}>PLAN: {subscription?.plan?.plan_name || "TRIAL"}</Text>
             <View style={profileStyles.activeBadge}>
-              <Text style={profileStyles.activeBadgeTxt}>ACTIVE</Text>
+              <Text style={profileStyles.activeBadgeTxt}>{_toTitleCase(subscription?.plan?.status || "-") || "-"}</Text>
             </View>
           </View>
 
