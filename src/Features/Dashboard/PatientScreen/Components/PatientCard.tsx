@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import ChevronRightIcon from '../../../../components/ui/icons/ChevronRightIcon';
-import { capitalize, getInitials } from '../../../../lib/commons/common.utils';
+import { _toTitleCase, capitalize, getInitials } from '../../../../lib/commons/common.utils';
 import { theme } from '../../../../styled/theme.styled';
 
 export interface PatientCardProps {
@@ -17,7 +17,7 @@ export interface PatientCardProps {
 }
 
 export const PatientCard: React.FC<PatientCardProps> = React.memo(
-  ({ onPress, name, patientId, gender, age, condition, phoneNumber, email, profileImage }) => {
+  ({ onPress, name, patientId, gender, age, profileImage }) => {
     return (
       <TouchableOpacity style={styles.txCard} onPress={onPress} activeOpacity={0.75}>
         <View style={styles.avatar}>
@@ -29,7 +29,7 @@ export const PatientCard: React.FC<PatientCardProps> = React.memo(
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.txName} numberOfLines={1}>
-            {name || 'Unknown'}
+            {_toTitleCase(name) || 'Unknown'}
           </Text>
           <Text style={styles.txSub} numberOfLines={1}>
             {patientId || 'N/A'}

@@ -67,7 +67,7 @@ export const useUnstableConnectionMonitor = () => {
 
       if (tick % CONNECTION_PROBE_EVERY === 0 && !probeInFlight) {
         probeInFlight = true;
-        probeBad = await probeIsSlow();
+        // probeBad = await probeIsSlow();
         probeInFlight = false;
         if (cancelled) return;
       }

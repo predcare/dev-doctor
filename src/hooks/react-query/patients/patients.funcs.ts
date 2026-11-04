@@ -1,12 +1,13 @@
+import { _cleanParams } from '../../../lib/commons/common.utils';
 import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
 import { IPatientConsultApptRoot } from '../../../typescripts/interfaces/appointments.interfaces';
 import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
 import {
-    AllPatientRoot,
-    ILinkExistingPatientResponse,
-    IMyPatientDoc,
-    IPatientFamilyMember,
+  AllPatientRoot,
+  ILinkExistingPatientResponse,
+  IMyPatientDoc,
+  IPatientFamilyMember,
 } from '../../../typescripts/interfaces/patients.interfaces';
 import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
@@ -25,7 +26,7 @@ export const getMyPatientsList = async (params?: IGetMyPatientsParams) => {
     search: params?.search,
   };
   const res = await axiosInstance.get<IRootResponse<IMyPatientDoc[]>>(`${endpoints.patients.get}`, {
-    params: queryParams,
+    params: _cleanParams(queryParams),
   });
   return res.data;
 };
