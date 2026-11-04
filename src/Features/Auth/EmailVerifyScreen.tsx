@@ -7,7 +7,6 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -190,7 +189,7 @@ export const EmailVerifyScreen: React.FC<EmailVerifyScreenProps> = ({
   return (
     <SafeAreaWrapper style={emailVerifyStyles.safeArea}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         style={emailVerifyStyles.keyboardAvoid}
       >
         <ScrollView
