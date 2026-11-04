@@ -10,6 +10,7 @@ import { consumePendingAnswer, replayInitialCallEvents } from '../../services/ca
 import { syncPushToken } from '../../services/calls/deviceSync';
 import { joinIncomingCall } from '../../services/calls/joinIncomingCall';
 import { processInitialNotification } from '../../services/notifications/notificationDispatcher';
+import { checkAndPromptNotificationPermission } from '../../services/notifications/push/notificationPermissionManager';
 import { Splashstyles } from '../../styled/SplashScreen.styled';
 import { useAuthStore } from '../../zustand/stores/useAuthStore';
 
@@ -99,6 +100,14 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ navigation, onFinish
       await replayInitialCallEvents();
       // Set when the app was opened by answering an incoming call.
       const pendingCall = consumePendingAnswer();
+
+      // Show notification permission prompt (native OS dialog or custom PopupAlert) on Splash Screen
+      if (!pendingCall) {
+        await checkAndPromptNotificationPermission();
+      }
+
+      if (!isMounted) return;
+
       // Move immediately after authentication/API completes
       if (onFinish) {
         onFinish();

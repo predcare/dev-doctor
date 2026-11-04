@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   DEVICE_ID: '@device_id',
   // iOS PushKit token. Kept on logout: PushKit only sends it at app launch.
   VOIP_TOKEN: '@voip_token',
+  NOTIFICATION_DENIED: '@notification_denied',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS] | string;

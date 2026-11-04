@@ -59,6 +59,7 @@ export const useAuthStore = create<TAuthState>()(
           STORAGE_KEYS.FCM_TOKEN,
           STORAGE_KEYS.DEVICE_ID,
           STORAGE_KEYS.VOIP_TOKEN,
+          STORAGE_KEYS.NOTIFICATION_DENIED,
         ]);
       },
     }),

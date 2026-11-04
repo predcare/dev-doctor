@@ -1,27 +1,23 @@
 import {
   getMessaging,
-  getToken,
   onTokenRefresh,
 } from '@react-native-firebase/messaging';
 import { getItem, setItem, STORAGE_KEYS } from '../../../lib/commons/asyncStorage';
-import { requestNotificationPermission } from '../notification.core';
+import { checkAndPromptNotificationPermission } from './notificationPermissionManager';
 
 // Returns the saved token, or '' so login and registration still work without one.
 export const getSavedPushToken = async (): Promise<string> => {
   return (await getItem(STORAGE_KEYS.FCM_TOKEN)) ?? '';
 };
 
-// Asks for permission and fetches a token only when none is saved yet.
-// If permission is denied, nothing is saved and this tries again on the next app open.
+// Ensures permission is handled and a token fetched.
+// If permission is denied, warning toast is shown and re-prompted on next app open.
 export const ensurePushToken = async (): Promise<void> => {
   let token = await getSavedPushToken();
 
   if (!token) {
-    const granted = await requestNotificationPermission();
-    if (!granted) return;
-
-    token = await getToken(getMessaging());
-    await setItem(STORAGE_KEYS.FCM_TOKEN, token);
+    await checkAndPromptNotificationPermission();
+    token = await getSavedPushToken();
   }
 
   if (__DEV__) console.log('FCM token:', token);

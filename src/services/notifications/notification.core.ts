@@ -3,7 +3,7 @@ import notifee, {
   AndroidVisibility,
   AuthorizationStatus,
 } from '@notifee/react-native';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 export const NOTIFICATION_CHANNELS = {
   // The id must match default_notification_channel_id in AndroidManifest.xml.
@@ -96,5 +96,27 @@ export const getNotificationPermissionStatus = async (): Promise<boolean> => {
   } catch (err) {
     console.warn('[NotificationCore] Failed to get permission settings:', err);
     return false;
+  }
+};
+
+/**
+ * Opens notification settings in device system settings.
+ * On iOS, notifee.openNotificationSettings is a no-op, so Linking.openSettings is required.
+ */
+export const openNotificationSettings = async (): Promise<void> => {
+  try {
+    if (Platform.OS === 'ios') {
+      await Linking.openSettings();
+      return;
+    }
+    await notifee.openNotificationSettings();
+  } catch (err) {
+    console.warn(
+      '[NotificationCore] Failed to open notification settings via Notifee, falling back to Linking:',
+      err,
+    );
+    await Linking.openSettings().catch(linkErr =>
+      console.warn('[NotificationCore] Linking.openSettings failed:', linkErr),
+    );
   }
 };
