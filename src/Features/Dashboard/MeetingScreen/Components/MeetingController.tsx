@@ -68,51 +68,89 @@ export const MeetingController: React.FC<IMeetingControllerProps> = ({ handleEnd
   };
 
   return (
-    <View style={doctorMeetingStyles.controlBarContainer}>
-      <View style={[doctorMeetingStyles.controlRow, doctorMeetingStyles.controlRowSpacing]}>
-        <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={toggleMic}>
-          {isMuted ? <MicOffIcon size={22} color="#FFFFFF" /> : <MicOnIcon size={22} color="#FFFFFF" />}
-          <Text style={doctorMeetingStyles.controlBtnTxt}>{isMuted ? 'UNMUTE' : 'MUTE'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={toggleCamera}>
-          {isCamOn ? (
-            <CameraOnIcon size={22} color="#FFFFFF" />
-          ) : (
-            <CameraOffIcon size={22} color="#FFFFFF" />
-          )}
-          <Text style={doctorMeetingStyles.controlBtnTxt}>{isCamOn ? 'CAM ON' : 'CAM OFF'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={flipCamera}>
-          <FlipCameraIcon size={22} color="#FFFFFF" />
-          <Text style={doctorMeetingStyles.controlBtnTxt}>FLIP</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={doctorMeetingStyles.controlRow}>
-        <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={handleRxPress}>
-          <RxIcon size={20} color="#FFFFFF" />
-          <Text style={doctorMeetingStyles.controlBtnTxt}>RX</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={handleUploadPress}>
-          <UploadIcon size={20} color="#FFFFFF" />
-          <Text style={doctorMeetingStyles.controlBtnTxt}>UPLOAD</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={doctorMeetingStyles.controlBtn} activeOpacity={0.8} onPress={handlePipPress}>
-          <PipIcon size={20} color="#FFFFFF" />
-          <Text style={doctorMeetingStyles.controlBtnTxt}>PIP</Text>
+    <View style={doctorMeetingStyles.bottomHud}>
+      <View style={doctorMeetingStyles.controlsRow1}>
+        <TouchableOpacity
+          style={doctorMeetingStyles.btnCol3}
+          activeOpacity={0.8}
+          onPress={toggleMic}
+        >
+          <View style={[doctorMeetingStyles.ctrlBtnLg, isMuted && doctorMeetingStyles.ctrlBtnLgActiveRed]}>
+            {isMuted ? <MicOffIcon size={22} color="#FFFFFF" /> : <MicOnIcon size={22} color="#FFFFFF" />}
+            <Text style={doctorMeetingStyles.ctrlLabel}>{isMuted ? 'UNMUTE' : 'MUTE'}</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[doctorMeetingStyles.controlBtn, doctorMeetingStyles.controlBtnEnd]}
+          style={doctorMeetingStyles.btnCol3}
+          activeOpacity={0.8}
+          onPress={toggleCamera}
+        >
+          <View style={[doctorMeetingStyles.ctrlBtnLg, isCamOn && doctorMeetingStyles.ctrlBtnLgActiveTeal]}>
+            {isCamOn ? (
+              <CameraOnIcon size={22} color="#FFFFFF" />
+            ) : (
+              <CameraOffIcon size={22} color="#FFFFFF" />
+            )}
+            <Text style={doctorMeetingStyles.ctrlLabel}>{isCamOn ? 'CAM ON' : 'CAM OFF'}</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={doctorMeetingStyles.btnCol3}
+          activeOpacity={0.8}
+          onPress={flipCamera}
+        >
+          <View style={doctorMeetingStyles.ctrlBtnLg}>
+            <FlipCameraIcon size={22} color="#FFFFFF" />
+            <Text style={doctorMeetingStyles.ctrlLabel}>FLIP</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <View style={doctorMeetingStyles.controlsRow2}>
+        <TouchableOpacity
+          style={doctorMeetingStyles.btnCol4}
+          activeOpacity={0.8}
+          onPress={handleRxPress}
+        >
+          <View style={doctorMeetingStyles.ctrlBtnSm}>
+            <RxIcon size={20} color="#FFFFFF" />
+            <Text style={doctorMeetingStyles.ctrlLabel}>RX</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={doctorMeetingStyles.btnCol4}
+          activeOpacity={0.8}
+          onPress={handleUploadPress}
+        >
+          <View style={doctorMeetingStyles.ctrlBtnSm}>
+            <UploadIcon size={20} color="#FFFFFF" />
+            <Text style={doctorMeetingStyles.ctrlLabel}>UPLOAD</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={doctorMeetingStyles.btnCol4}
+          activeOpacity={0.8}
+          onPress={handlePipPress}
+        >
+          <View style={doctorMeetingStyles.ctrlBtnSm}>
+            <PipIcon size={20} color="#FFFFFF" />
+            <Text style={doctorMeetingStyles.ctrlLabel}>PIP</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={doctorMeetingStyles.btnCol4}
           activeOpacity={0.85}
           onPress={handleEndCall}
         >
-          <EndPhoneIcon size={20} color="#EF4444" />
-          <Text style={[doctorMeetingStyles.controlBtnTxt, doctorMeetingStyles.controlBtnTxtEnd]}>END</Text>
+          <View style={[doctorMeetingStyles.ctrlBtnSm, doctorMeetingStyles.ctrlBtnSmActiveRed]}>
+            <EndPhoneIcon size={20} color="#FFFFFF" />
+            <Text style={doctorMeetingStyles.ctrlLabel}>END</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>

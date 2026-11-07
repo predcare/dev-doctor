@@ -363,8 +363,8 @@ const styles = StyleSheet.create({
 
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 15.5,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '600',
     letterSpacing: -0.1,
   },
 
@@ -382,8 +382,8 @@ const styles = StyleSheet.create({
 
   cancelButtonText: {
     color: '#475569',
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '500',
   },
 
   buttonPressed: {

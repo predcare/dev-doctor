@@ -1,6 +1,6 @@
 import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native';
 import React, { useCallback, useEffect } from 'react';
-import { View } from 'react-native';
+import { StatusBar, View } from 'react-native';
 import useMeetingPip from '../../../hooks/commons/meeting/useMeetingPip';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import doctorMeetingStyles from '../../../styled/DoctorMeetingScreen.styled';
@@ -58,6 +58,7 @@ export const DoctorMeetingScreen: React.FC = () => {
 
   return (
     <SafeAreaWrapper style={doctorMeetingStyles.container} backgroundColor="#000000">
+      <StatusBar barStyle="light-content" />
       <View style={doctorMeetingStyles.stageContainerFull} />
     </SafeAreaWrapper>
   );

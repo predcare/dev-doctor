@@ -205,6 +205,33 @@ export const doctorMeetingStyles = StyleSheet.create({
     zIndex: 1,
   },
   // Live call overlay: the patient video fills the whole screen, header and controls float above it
+  stageOverlay: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 9999,
+    elevation: 9999,
+    backgroundColor: '#0F172A',
+  },
+  fullScreenStage: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: '#1E293B',
+  },
+  stageContent: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  stageControls: {
+    flex: 1,
+    position: 'relative',
+    backgroundColor: 'transparent',
+  },
   overlayRoot: {
     ...StyleSheet.absoluteFill,
     backgroundColor: '#000000',
@@ -284,6 +311,67 @@ export const doctorMeetingStyles = StyleSheet.create({
   },
   controlBtnTxtEnd: {
     color: '#EF4444',
+  },
+
+  // Floating Bottom HUD Container (Compact 64px, rounded 24, subtle border)
+  bottomHud: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    right: 10,
+    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+    borderRadius: 24,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    zIndex: 10,
+  },
+  controlsRow1: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
+  btnCol3: {
+    flex: 1,
+  },
+  ctrlBtnLg: {
+    height: 64,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
+  ctrlBtnLgActiveTeal: {
+    backgroundColor: '#0D9488',
+  },
+  ctrlBtnLgActiveRed: {
+    backgroundColor: '#EF4444',
+  },
+  controlsRow2: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  btnCol4: {
+    flex: 1,
+  },
+  ctrlBtnSm: {
+    height: 64,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
+  ctrlBtnSmActiveRed: {
+    backgroundColor: '#EF4444',
+  },
+  ctrlLabel: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+    marginTop: 4,
   },
 });
 
