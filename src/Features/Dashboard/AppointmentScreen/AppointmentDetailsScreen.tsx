@@ -253,6 +253,8 @@ export const AppointmentDetailsScreen: React.FC = () => {
     const isConfirmed = status === 'confirmed';
     const isJoinedOnce = isInProgress;
 
+    console.log('isInProgress', isInProgress)
+
     const meetingStoreState = useMeetingStore(state => state);
     const isCallActive =
         (meetingStoreState.callState === 'INITIALIZING' ||
@@ -283,6 +285,8 @@ export const AppointmentDetailsScreen: React.FC = () => {
                 apptInfo?.call_duration_seconds || apptInfo?.call_elapsed_seconds || 0
             ),
         });
+
+    console.log('hideVideoJoin', hideVideoJoin)
 
     return (
         <SafeAreaWrapper
@@ -593,10 +597,10 @@ export const AppointmentDetailsScreen: React.FC = () => {
                         <View
                             style={[
                                 appointmentDetailsStyles.actionRow,
-                                !isInProgress && { flexDirection: 'column' },
+                                isInProgress && { flexDirection: 'column' },
                             ]}
                         >
-                            {isConfirmed && !hideVideoJoin && (
+                            {isConfirmed && (
                                 <>
                                     <TouchableOpacity
                                         style={[

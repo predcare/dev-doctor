@@ -5,7 +5,7 @@ import CommonErrorCard from '../../../components/commons/CommonErrorCard/CommonE
 import { useMyPatientInfo } from '../../../hooks/react-query/patients/patients.hooks';
 import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
-import { capitalize, getAge } from '../../../lib/commons/common.utils';
+import { _toTitleCase, capitalize, getAge } from '../../../lib/commons/common.utils';
 import { AppRoute, PatientDetailsScreenProps } from '../../../route';
 import { patientDetailsStyles } from '../../../styled/PatientDetailsScreen.styled';
 import PatientHeaderCard from './Components/PatientHeaderCard';
@@ -62,7 +62,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
             showBottomBar
             header={
                 <Header
-                    title={displayName || 'Patient Details'}
+                    title={_toTitleCase(displayName) || 'Patient Details'}
                     description="View and Manage Patient Records"
                     isBackBtn
                     onBackPress={() => {
@@ -93,7 +93,7 @@ export const PatientDetailsScreen: React.FC<PatientDetailsScreenProps> = ({
                 ) : (
                     <>
                         <PatientHeaderCard
-                            name={patientInfo?.name || 'UnKnown'}
+                            name={_toTitleCase(patientInfo?.name || '-')}
                             patientId={patientInfo?.patient_id || ''}
                             gender={capitalize(patientInfo?.gender || '')}
                             age={

@@ -1126,9 +1126,10 @@ export const appointmentDetailsStyles = StyleSheet.create({
     borderColor: theme.colors.danger,
     paddingVertical: 14,
     borderRadius: 12,
+    padding: 5,
   },
   cancelButtonText: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
     color: theme.colors.danger,
     marginLeft: 6,
