@@ -10,7 +10,9 @@ import AppointmentsScreen from '../Features/Dashboard/AppointmentScreen/Appointm
 import BookAppointmentScreen from '../Features/Dashboard/AppointmentScreen/BookAppointmentScreen';
 import RescheduleAppointmentScreen from '../Features/Dashboard/AppointmentScreen/RescheduleAppointmentScreen';
 import AvailabilityScreen from '../Features/Dashboard/Availability/AvailabilityScreen';
+import { ClinicScreen } from '../Features/Dashboard/ClinicScreen/ClinicScreen';
 import HomeScreen from '../Features/Dashboard/HomeScreen/HomeScreen';
+import CreateInvoiceScreen from '../Features/Dashboard/InvoicesScreen/CreateInvoiceScreen';
 import InvoicesScreen from '../Features/Dashboard/InvoicesScreen/InvoicesScreen';
 import DoctorMeetingScreen from '../Features/Dashboard/MeetingScreen/DoctorMeetingScreen';
 import MeetingStatusScreen from '../Features/Dashboard/MeetingScreen/MeetingStatusScreen';
@@ -30,7 +32,6 @@ import SupportTicketDetailsScreen from '../Features/Dashboard/SupportScreen/Supp
 import SplashScreen from '../Features/SplashScreen/SplashScreen';
 import { DashboardTabParamList, RootStackParamList } from '../route';
 import { navigationRef } from './navigationRef';
-import CreateInvoiceScreen from '../Features/Dashboard/InvoicesScreen/CreateInvoiceScreen';
 
 export type { DashboardTabParamList, RootStackParamList };
 
@@ -64,6 +65,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Account" component={SettingScreen} />
         <Stack.Screen name="Patients" component={PatinetScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Clinic" component={ClinicScreen} />
         <Stack.Screen name="Reports" component={ReportsTabScreen} />
         <Stack.Screen name="Availability" component={AvailabilityScreen} />
         <Stack.Screen name="Notifications" component={NotificationScreen} />

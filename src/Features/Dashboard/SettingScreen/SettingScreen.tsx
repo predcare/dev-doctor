@@ -65,9 +65,10 @@ const SettingScreen: React.FC = () => {
                 showsVerticalScrollIndicator={false}
             >
                 <SettingsProfileCard onEditProfile={() => navigation?.navigate(AppRoute.PROFILE)} />
-                <SettingsClinicCard />
+                <SettingsClinicCard onViewClinic={() => navigation?.navigate(AppRoute.CLINIC)} />
                 <AccountSettingsSection
                     onNavigateProfile={() => navigation?.navigate(AppRoute.PROFILE)}
+                    onNavigateClinic={() => navigation?.navigate(AppRoute.CLINIC)}
                     onNavigatePrescription={() => (navigation as any)?.navigate('PrescriptionSettings')}
                     onNavigateInvoice={() => (navigation as any)?.navigate('InvoiceSettings')}
                     subExpanded={subExpanded}

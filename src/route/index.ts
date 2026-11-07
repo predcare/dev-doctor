@@ -12,6 +12,7 @@ export const AppRoute = {
   EMAIL_VERIFY: 'EmailVerify',
   ACCOUNT: 'Account',
   PROFILE: 'Profile',
+  CLINIC: 'Clinic',
   PRESCRIPTION_SETTINGS: 'PrescriptionSettings',
   PRESCRIPTION_VIEW: 'PrescriptionView',
   VIEW_PRESCRIPTION: 'ViewPrescription',
@@ -60,6 +61,7 @@ export type RootStackParamList = {
   Reports: undefined;
   Account: undefined;
   Profile: undefined;
+  Clinic: undefined;
   Notifications: { user?: any } | undefined;
   PrescriptionSettings: { user?: any } | undefined;
   PrescriptionView:
@@ -309,4 +311,11 @@ export type EmailVerifyScreenRouteProp = RouteProp<RootStackParamList, 'EmailVer
 export interface EmailVerifyScreenProps {
   navigation?: EmailVerifyScreenNavigationProp;
   route?: EmailVerifyScreenRouteProp;
+}
+
+export type ClinicScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Clinic'>;
+export type ClinicScreenRouteProp = RouteProp<RootStackParamList, 'Clinic'>;
+export interface ClinicScreenProps {
+  navigation?: ClinicScreenNavigationProp;
+  route?: ClinicScreenRouteProp;
 }

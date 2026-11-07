@@ -1,24 +1,20 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import CustomTabs from '../../../components/ui/CustomTabs/CustomTabs';
 import {
-    AssociationIcon,
     BioIcon,
     CalendarIcon,
     CheckBadgeIcon,
-    ClinicIcon,
     ExperienceIcon,
     LicenseIcon,
     LocationIcon,
     MailIcon,
-    MapIcon,
     PhoneIcon,
     ProfileIcon,
     QualificationsIcon,
     RxIcon,
     ScheduleIcon,
-    SpecializationIcon,
+    SpecializationIcon
 } from '../../../components/ui/icons';
 import { useProfile } from '../../../hooks/react-query/profile/profile.hooks';
 import Header from '../../../Layout/Header';
@@ -157,236 +153,125 @@ export const ProfileScreen: React.FC = () => {
                         </View>
                     </View>
                 </View>
-                <CustomTabs
-                    tabs={[
-                        {
-                            key: 'pro',
-                            label: 'Professional Details',
-                            icon: (active: boolean) => (
-                                <ProfileIcon
-                                    color={active ? theme.colors.surface : theme.colors.textMuted}
-                                    size={16}
-                                />
-                            ),
-                        },
-                        {
-                            key: 'clinic',
-                            label: 'Clinic Info',
-                            icon: (active: boolean) => (
-                                <ClinicIcon
-                                    color={active ? theme.colors.surface : theme.colors.textMuted}
-                                    size={16}
-                                />
-                            ),
-                        },
-                    ]}
-                    activeTab={tab}
-                    onTabChange={setTab}
-                />
 
-                {tab === 'pro' && (
-                    <View style={doctorProfileStyles.card}>
-                        {doctorProfile.specialization && (
-                            <ProfileInfoCard
-                                label="SPECIALIZATION"
-                                value={formatSpecialization({
-                                    specialization: doctorProfile.specialization,
-                                })}
-                                iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {subSpecializations.length > 0 && (
-                            <ProfileInfoCard
-                                label="SUB SPECIALIZATION"
-                                multiTag={true}
-                                tags={subSpecializations}
-                                iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.qualifications && (
-                            <ProfileInfoCard
-                                label="QUALIFICATIONS"
-                                value={doctorProfile.qualifications}
-                                iconPath={<QualificationsIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.experience_years != null && (
-                            <ProfileInfoCard
-                                label="EXPERIENCE"
-                                value={`${doctorProfile.experience_years} Years`}
-                                iconPath={<ExperienceIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.languages_spoken && doctorProfile.languages_spoken.length > 0 && (
-                            <ProfileInfoCard
-                                label="LANGUAGES SPOKEN"
-                                multiTag={true}
-                                tags={doctorProfile.languages_spoken}
-                                iconPath={<ProfileIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.gender && (
-                            <ProfileInfoCard
-                                label="GENDER"
-                                value={capitalize(doctorProfile.gender)}
-                                iconPath={<ProfileIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.email && (
-                            <ProfileInfoCard
-                                label="EMAIL"
-                                value={doctorProfile.email}
-                                iconPath={<MailIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.phone_number && (
-                            <ProfileInfoCard
-                                label="PHONE"
-                                value={doctorProfile.phone_number}
-                                iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.date_of_birth && (
-                            <ProfileInfoCard
-                                label="DATE OF BIRTH"
-                                value={formatDate(doctorProfile.date_of_birth)}
-                                iconPath={<CalendarIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.blood_type && (
-                            <ProfileInfoCard
-                                label="BLOOD TYPE"
-                                value={doctorProfile.blood_type}
-                                iconPath={<RxIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.address && (
-                            <ProfileInfoCard
-                                label="ADDRESS"
-                                value={doctorProfile.address}
-                                iconPath={<LocationIcon size={18} color={theme.colors.primary} outline={true} />}
-                            />
-                        )}
-                        {doctorProfile.alternate_number && (
-                            <ProfileInfoCard
-                                label="ALTERNATE NUMBER"
-                                value={doctorProfile.alternate_number}
-                                iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.whatsapp_number && (
-                            <ProfileInfoCard
-                                label="WHATSAPP NUMBER"
-                                value={doctorProfile.whatsapp_number}
-                                iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.license_number && (
-                            <ProfileInfoCard
-                                label="MEDICAL LICENSE"
-                                value={doctorProfile.license_number}
-                                iconPath={<LicenseIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.verification_status && (
-                            <ProfileInfoCard
-                                label="VERIFICATION STATUS"
-                                value={capitalize(doctorProfile.verification_status)}
-                                iconPath={<CheckBadgeIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                        {doctorProfile.bio && (
-                            <ProfileInfoCard
-                                label="PROFESSIONAL BIO"
-                                value={doctorProfile.bio}
-                                iconPath={<BioIcon size={18} color={theme.colors.primary} />}
-                            />
-                        )}
-                    </View>
-                )}
-
-                {tab === 'clinic' && (
-                    <View style={doctorProfileStyles.card}>
-                        {clinic ? (
-                            <>
-                                {clinic.name && (
-                                    <ProfileInfoCard
-                                        label="CLINIC NAME"
-                                        value={clinic.name}
-                                        iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
-                                    />
-                                )}
-                                {clinic.clinic_reg_number && (
-                                    <ProfileInfoCard
-                                        label="CLINIC REGISTRATION NUMBER"
-                                        value={clinic.clinic_reg_number}
-                                        iconPath={<ClinicIcon size={18} color={theme.colors.primary} />}
-                                    />
-                                )}
-                                {clinic.contact_numbers && clinic.contact_numbers.length > 0 && (
-                                    <ProfileInfoCard
-                                        label="CLINIC PHONE"
-                                        value={clinic.contact_numbers.join(', ')}
-                                        iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
-                                    />
-                                )}
-                                {clinicAddress && (
-                                    <ProfileInfoCard
-                                        label="CLINIC ADDRESS"
-                                        value={clinicAddress}
-                                        iconPath={<LocationIcon size={18} color={theme.colors.primary} />}
-                                        rightAction={
-                                            <TouchableOpacity
-                                                style={doctorProfileStyles.mapBtn}
-                                                onPress={handleOpenMap}
-                                                activeOpacity={0.7}
-                                            >
-                                                <MapIcon size={18} color={theme.colors.primary} />
-                                            </TouchableOpacity>
-                                        }
-                                    />
-                                )}
-                                {clinic.about && (
-                                    <ProfileInfoCard
-                                        label="ABOUT CLINIC"
-                                        value={clinic.about}
-                                        iconPath={<BioIcon size={18} color={theme.colors.primary} />}
-                                    />
-                                )}
-                                {clinic.specialities && clinic.specialities.length > 0 && (
-                                    <ProfileInfoCard
-                                        label="CLINIC SPECIALITIES"
-                                        multiTag={true}
-                                        tags={clinic.specialities}
-                                        iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
-                                    />
-                                )}
-                                {clinic.status && (
-                                    <ProfileInfoCard
-                                        label="ASSOCIATION STATUS"
-                                        value={capitalize(clinic.status)}
-                                        iconPath={<AssociationIcon size={18} color={theme.colors.primary} />}
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <View style={doctorProfileStyles.emptyTab}>
-                                <ClinicIcon color={theme.colors.textMuted} size={44} />
-                                <Text style={doctorProfileStyles.emptyTitle}>No Clinic Information</Text>
-                                <Text style={doctorProfileStyles.emptySub}>
-                                    Add your clinic details in Settings
-                                </Text>
-                                <TouchableOpacity
-                                    style={doctorProfileStyles.emptyBtn}
-                                    onPress={navigateToAccountTab}
-                                    activeOpacity={0.85}
-                                >
-                                    <Text style={doctorProfileStyles.emptyBtnTxt}>Go to Settings</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    </View>
-                )}
+                <View style={doctorProfileStyles.card}>
+                    {doctorProfile.specialization && (
+                        <ProfileInfoCard
+                            label="SPECIALIZATION"
+                            value={formatSpecialization({
+                                specialization: doctorProfile.specialization,
+                            })}
+                            iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {subSpecializations.length > 0 && (
+                        <ProfileInfoCard
+                            label="SUB SPECIALIZATION"
+                            multiTag={true}
+                            tags={subSpecializations}
+                            iconPath={<SpecializationIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.qualifications && (
+                        <ProfileInfoCard
+                            label="QUALIFICATIONS"
+                            value={doctorProfile.qualifications}
+                            iconPath={<QualificationsIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.experience_years != null && (
+                        <ProfileInfoCard
+                            label="EXPERIENCE"
+                            value={`${doctorProfile.experience_years} Years`}
+                            iconPath={<ExperienceIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.languages_spoken && doctorProfile.languages_spoken.length > 0 && (
+                        <ProfileInfoCard
+                            label="LANGUAGES SPOKEN"
+                            multiTag={true}
+                            tags={doctorProfile.languages_spoken}
+                            iconPath={<ProfileIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.gender && (
+                        <ProfileInfoCard
+                            label="GENDER"
+                            value={capitalize(doctorProfile.gender)}
+                            iconPath={<ProfileIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.email && (
+                        <ProfileInfoCard
+                            label="EMAIL"
+                            value={doctorProfile.email}
+                            iconPath={<MailIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.phone_number && (
+                        <ProfileInfoCard
+                            label="PHONE"
+                            value={doctorProfile.phone_number}
+                            iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.date_of_birth && (
+                        <ProfileInfoCard
+                            label="DATE OF BIRTH"
+                            value={formatDate(doctorProfile.date_of_birth)}
+                            iconPath={<CalendarIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.blood_type && (
+                        <ProfileInfoCard
+                            label="BLOOD TYPE"
+                            value={doctorProfile.blood_type}
+                            iconPath={<RxIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.address && (
+                        <ProfileInfoCard
+                            label="ADDRESS"
+                            value={doctorProfile.address}
+                            iconPath={<LocationIcon size={18} color={theme.colors.primary} outline={true} />}
+                        />
+                    )}
+                    {doctorProfile.alternate_number && (
+                        <ProfileInfoCard
+                            label="ALTERNATE NUMBER"
+                            value={doctorProfile.alternate_number}
+                            iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.whatsapp_number && (
+                        <ProfileInfoCard
+                            label="WHATSAPP NUMBER"
+                            value={doctorProfile.whatsapp_number}
+                            iconPath={<PhoneIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.license_number && (
+                        <ProfileInfoCard
+                            label="MEDICAL LICENSE"
+                            value={doctorProfile.license_number}
+                            iconPath={<LicenseIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.verification_status && (
+                        <ProfileInfoCard
+                            label="VERIFICATION STATUS"
+                            value={capitalize(doctorProfile.verification_status)}
+                            iconPath={<CheckBadgeIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                    {doctorProfile.bio && (
+                        <ProfileInfoCard
+                            label="PROFESSIONAL BIO"
+                            value={doctorProfile.bio}
+                            iconPath={<BioIcon size={18} color={theme.colors.primary} />}
+                        />
+                    )}
+                </View>
 
                 <View style={doctorProfileStyles.actions}>
                     <TouchableOpacity

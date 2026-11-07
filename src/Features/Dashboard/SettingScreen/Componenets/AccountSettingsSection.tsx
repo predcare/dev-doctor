@@ -15,6 +15,7 @@ import SubscriptionPlanBlock from './SubscriptionPlanBlock';
 
 export interface AccountSettingsSectionProps {
   onNavigateProfile: () => void;
+  onNavigateClinic?: () => void;
   onNavigatePrescription: () => void;
   onNavigateInvoice: () => void;
   subExpanded: boolean;
@@ -26,6 +27,7 @@ export interface AccountSettingsSectionProps {
 export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
   ({
     onNavigateProfile,
+    onNavigateClinic,
     subExpanded,
     onManageSubscription,
     onAddonPress,
@@ -42,7 +44,7 @@ export const AccountSettingsSection = React.memo<AccountSettingsSectionProps>(
         <SettingsRowItem
           icon={<HospitalIcon size={18} color={theme.colors.primary} />}
           label="Clinic Information"
-          onPress={onNavigateProfile}
+          onPress={onNavigateClinic || onNavigateProfile}
         />
 
         <SettingsRowItem
