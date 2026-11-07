@@ -30,6 +30,7 @@ import Header from '../../../Layout/Header';
 import SafeAreaWrapper from '../../../Layout/SafeAreaWrapper';
 import { ensureClinicAccess } from '../../../lib/commons/auth.Utils';
 import {
+    _toTitleCase,
     formatDate,
     formatDateToYYYYMMDD,
     formatTimeSlot,
@@ -464,7 +465,7 @@ export const AppointmentsScreen: React.FC = () => {
                             <AppointmentCard
                                 appointmentGeneratedId={item.appointment_id}
                                 appointmentId={Number(item.id)}
-                                patientName={item?.patientInfo?.name || ''}
+                                patientName={_toTitleCase(item?.patientInfo?.name || '-')}
                                 patientGender={item.patientInfo?.gender || ''}
                                 patientDateOfBirth={item?.patientInfo?.dateOfBirth || ''}
                                 appointmentStatus={item.appointment_status}

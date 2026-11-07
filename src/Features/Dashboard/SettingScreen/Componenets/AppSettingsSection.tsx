@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import CustomSwitch from '../../../../components/ui/CustomSwitch';
-import { BellIcon, CalendarIcon, ShieldIcon, ThemeIcon } from '../../../../components/ui/icons';
+import { CalendarIcon, ShieldIcon, ThemeIcon } from '../../../../components/ui/icons';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import theme from '../../../../styled/theme.styled';
 import SettingsRowItem from './SettingsRowItem';
@@ -12,7 +12,6 @@ export interface AppSettingsSectionProps {
   notifEnabled?: boolean;
   faceIDEnabled?: boolean;
   onGCToggle: (val: boolean) => void;
-  onNotifToggle: (val: boolean) => void;
   onFaceIDToggle: (val: boolean) => void;
   onThemePress: () => void;
 }
@@ -23,7 +22,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
     notifEnabled,
     faceIDEnabled,
     onGCToggle,
-    onNotifToggle,
     onFaceIDToggle,
     onThemePress,
   }) => {
@@ -40,13 +38,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
         setInternalGC(false);
       }
       onGCToggle(false);
-    };
-
-    const handleNotifToggle = (val: boolean) => {
-      if (notifEnabled === undefined) {
-        setInternalNotif(false);
-      }
-      onNotifToggle(false);
     };
 
     const handleFaceIDToggle = (val: boolean) => {
@@ -67,17 +58,6 @@ export const AppSettingsSection = React.memo<AppSettingsSectionProps>(
               <CustomSwitch
                 value={isGCActive}
                 onValueChange={handleGCToggle}
-              />
-            }
-          />
-
-          <SettingsRowItem
-            icon={<BellIcon size={18} color={theme.colors.primary} />}
-            label="Notifications"
-            right={
-              <CustomSwitch
-                value={isNotifActive}
-                onValueChange={handleNotifToggle}
               />
             }
           />

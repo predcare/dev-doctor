@@ -7,13 +7,12 @@ import {
   FileDocumentIcon,
   FileTextIcon,
   HelpIcon,
-  InfoCircleIcon,
   LogoutIcon,
-  ShieldIcon,
+  ShieldIcon
 } from '../../../../components/ui/icons';
+import { APP_DISPLAY_VERSION } from '../../../../config/constants';
 import profileStyles from '../../../../styled/ProfileScreen.styled';
 import theme from '../../../../styled/theme.styled';
-import { APP_DISPLAY_VERSION } from '../../../../config/constants';
 import SettingsRowItem from './SettingsRowItem';
 import SettingsSectionLabel from './SettingsSectionLabel';
 
@@ -53,8 +52,6 @@ export const SupportSection = React.memo<SupportSectionProps>(
               onPress={onContactSupport}
             />
           ) : null}
-
-          {/* Policies & Legal accordion header */}
           <SettingsRowItem
             icon={<ShieldIcon size={18} color={theme.colors.primary} />}
             label="Policies & Legal"
@@ -68,11 +65,8 @@ export const SupportSection = React.memo<SupportSectionProps>(
               )
             }
           />
-
-          {/* Enhanced Policy Sub-items */}
           {policiesExpanded && (
             <View style={profileStyles.expandedBlock}>
-              {/* Privacy Policy */}
               <TouchableOpacity
                 style={profileStyles.policySubRow}
                 onPress={onPrivacyPolicy}
@@ -87,8 +81,6 @@ export const SupportSection = React.memo<SupportSectionProps>(
                 </View>
                 <ChevronRightIcon size={14} color={theme.colors.textMuted} />
               </TouchableOpacity>
-
-              {/* Terms of Service */}
               <TouchableOpacity
                 style={profileStyles.policySubRow}
                 onPress={onTermsOfService ?? onPrivacyPolicy}
@@ -105,20 +97,18 @@ export const SupportSection = React.memo<SupportSectionProps>(
                 </View>
                 <ChevronRightIcon size={14} color={theme.colors.textMuted} />
               </TouchableOpacity>
-
-              {/* HIPAA & Data Compliance */}
               <TouchableOpacity
                 style={[profileStyles.policySubRow, { borderBottomWidth: 0 }]}
                 onPress={onCompliance ?? onPrivacyPolicy}
                 activeOpacity={0.7}
               >
                 <View style={profileStyles.policyIconBox}>
-                  <InfoCircleIcon size={15} color={theme.colors.primary} />
+                  <FileDocumentIcon size={15} color={theme.colors.primary} />
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={profileStyles.policyTitle}>HIPAA & Data Compliance</Text>
+                  <Text style={profileStyles.policyTitle}>Informed Consent</Text>
                   <Text style={profileStyles.policySub}>
-                    Medical data security & HIPAA standards
+                    Consent for treatment and data usage
                   </Text>
                 </View>
                 <ChevronRightIcon size={14} color={theme.colors.textMuted} />

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PatientSkeleton from '../../../Features/Dashboard/PatientScreen/Skeletons/PatientSkeleton';
 import { useDebounce } from '../../../hooks/commons/useDebounce';
 import { useMyPatientList } from '../../../hooks/react-query/patients/patients.hooks';
-import { getInitials } from '../../../lib/commons/common.utils';
+import { _toTitleCase, getInitials } from '../../../lib/commons/common.utils';
 import { theme } from '../../../styled/theme.styled';
 import { SearchIcon } from '../../ui/icons';
 import CommonErrorCard from '../CommonErrorCard/CommonErrorCard';
@@ -103,7 +103,7 @@ export const SelectPatientModal: React.FC<SelectPatientModalProps> = ({
 
                     <View style={{ flex: 1, marginRight: 8 }}>
                       <Text style={styles.patientName} numberOfLines={1} ellipsizeMode="tail">
-                        {item.name}
+                        {_toTitleCase(item.name)}
                       </Text>
                       <Text style={styles.patientSub} numberOfLines={1} ellipsizeMode="tail">
                         {item.patient_id || `ID: ${item.id}`}

@@ -85,16 +85,21 @@ const SettingScreen: React.FC = () => {
                 />
                 <AppSettingsSection
                     onGCToggle={() => showComingSoon('Google Calendar sync is coming soon.')}
-                    onNotifToggle={() => showComingSoon('Notification settings is coming soon.')}
                     onFaceIDToggle={() => showComingSoon('Face ID is coming soon.')}
                     onThemePress={() => showComingSoon('Theme customization feature is coming soon.')}
                 />
                 <SupportSection
                     onContactSupport={() => navigation.navigate(AppRoute.SUPPORT)}
-                    onHelpCenter={() => showComingSoon('Help Center feature is coming soon.')}
-                    onPrivacyPolicy={() => showComingSoon('Privacy Policy feature is coming soon.')}
-                    onTermsOfService={() => showComingSoon('Terms of Service feature is coming soon.')}
-                    onCompliance={() => showComingSoon('HIPAA & Data Compliance feature is coming soon.')}
+                    onHelpCenter={() => navigation.navigate(AppRoute.SUPPORT)}
+                    onPrivacyPolicy={() =>
+                        navigation.navigate(AppRoute.POLICIES, { initialPolicy: 'privacy_policy' })
+                    }
+                    onTermsOfService={() =>
+                        navigation.navigate(AppRoute.POLICIES, { initialPolicy: 'terms' })
+                    }
+                    onCompliance={() =>
+                        navigation.navigate(AppRoute.POLICIES, { initialPolicy: 'informed_consent' })
+                    }
                     onLogout={handleLogout}
                 />
             </ScrollView>

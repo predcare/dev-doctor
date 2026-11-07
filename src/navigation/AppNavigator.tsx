@@ -25,6 +25,7 @@ import CreatePrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/C
 import PrescritionScreen from '../Features/Dashboard/PrescriptionScreen/PrescritionScreen';
 import ViewPrescriptionScreen from '../Features/Dashboard/PrescriptionScreen/ViewPrescriptionScreen';
 import { ProfileScreen } from '../Features/Dashboard/ProfileScreen/ProfileScreen';
+import { PolicyScreen } from '../Features/Dashboard/PolicyScreen/PolicyScreen';
 import SettingScreen from '../Features/Dashboard/SettingScreen/SettingScreen';
 import NewSupportTicketScreen from '../Features/Dashboard/SupportScreen/NewSupportTicketScreen';
 import SupportScreen from '../Features/Dashboard/SupportScreen/SupportScreen';
@@ -66,6 +67,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Patients" component={PatinetScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Clinic" component={ClinicScreen} />
+        <Stack.Screen name="Policies" component={PolicyScreen} />
         <Stack.Screen name="Reports" component={ReportsTabScreen} />
         <Stack.Screen name="Availability" component={AvailabilityScreen} />
         <Stack.Screen name="Notifications" component={NotificationScreen} />

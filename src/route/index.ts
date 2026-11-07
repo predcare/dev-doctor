@@ -13,6 +13,7 @@ export const AppRoute = {
   ACCOUNT: 'Account',
   PROFILE: 'Profile',
   CLINIC: 'Clinic',
+  POLICIES: 'Policies',
   PRESCRIPTION_SETTINGS: 'PrescriptionSettings',
   PRESCRIPTION_VIEW: 'PrescriptionView',
   VIEW_PRESCRIPTION: 'ViewPrescription',
@@ -62,6 +63,7 @@ export type RootStackParamList = {
   Account: undefined;
   Profile: undefined;
   Clinic: undefined;
+  Policies: { initialPolicy?: 'privacy_policy' | 'terms' | 'informed_consent' } | undefined;
   Notifications: { user?: any } | undefined;
   PrescriptionSettings: { user?: any } | undefined;
   PrescriptionView:
@@ -318,4 +320,11 @@ export type ClinicScreenRouteProp = RouteProp<RootStackParamList, 'Clinic'>;
 export interface ClinicScreenProps {
   navigation?: ClinicScreenNavigationProp;
   route?: ClinicScreenRouteProp;
+}
+
+export type PolicyScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Policies'>;
+export type PolicyScreenRouteProp = RouteProp<RootStackParamList, 'Policies'>;
+export interface PolicyScreenProps {
+  navigation?: PolicyScreenNavigationProp;
+  route?: PolicyScreenRouteProp;
 }
